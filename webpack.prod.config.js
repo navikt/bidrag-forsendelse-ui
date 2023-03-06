@@ -9,6 +9,8 @@ module.exports = merge(webpackCommon, {
         new EnvironmentPlugin({
             STATIC_FILES_URL: "",
             BIDRAG_PERSON_URL: "",
+            BIDRAG_DOKUMENT_FORSENDELSE_URL: "",
+            BIDRAG_SAK_URL: "",
         }),
     ],
 });
