@@ -30,7 +30,7 @@ export function SakHeader({ saksnummer, roller, tittel }: ISakHeaderProps) {
             </div>
 
             <Grid>
-                <Cell xs={12} md={8} lg={6}>
+                <Cell xs={12} sm={8} md={9} lg={3}>
                     {roller
                         ?.filter((r) => r.rolleType != RolleType.BA)
                         .map((rolle, i) => (

@@ -1,0 +1,5 @@
+tr.dokumentrad {
+  border: 1px solid var(--a-border-alt-3);
+}
+
+/*:not(.navds-table__row--selected):not(:hover)*/

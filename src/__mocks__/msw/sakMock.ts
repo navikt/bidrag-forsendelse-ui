@@ -2,7 +2,7 @@ import { rest, RestHandler, RestRequest } from "msw";
 
 import environment from "../../environment";
 import { sakMap } from "../testdata/sakData";
-import {sakerPersonMap} from "../testdata/sakData";
+import { sakerPersonMap } from "../testdata/sakData";
 
 export default function sakMock(): RestHandler[] {
     const baseUrl = environment.url.bidragSak;
@@ -18,7 +18,7 @@ export default function sakMock(): RestHandler[] {
             );
         }),
 
-        rest.post(`${baseUrl}/bidrag-sak/person/sak/:fnr`, async (req: RestRequest, res, ctx) => {
+        rest.get(`${baseUrl}/bidrag-sak/person/sak/:fnr`, async (req: RestRequest, res, ctx) => {
             const fnr = req.params.fnr as string;
             console.log("Hent saker for", fnr);
             return res(

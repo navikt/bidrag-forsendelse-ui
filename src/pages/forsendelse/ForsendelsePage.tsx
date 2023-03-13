@@ -6,28 +6,31 @@ import { ContentContainer } from "@navikt/ds-react";
 import React from "react";
 import { PropsWithChildren } from "react";
 
+import { hentForsendelseQuery } from "../../api/queries";
 import DokumenterTable from "../../components/dokument/DokumenterTable";
-import { useForsendelseApi } from "../../hooks/useForsendelseApi";
+import ValidationErrorSummary from "../../components/ValidationErrorSummary";
 import PageWrapper from "../PageWrapper";
 import ForsendelseSakHeader from "./components/ForsendelseSakHeader";
 import Gjelder from "./components/Gjelder";
 import Mottaker from "./components/Mottaker";
-import { ForsendelseProvider } from "./context/ForsendelseContext";
-import { useForsendelse } from "./context/ForsendelseContext";
+import { DokumenterProvider } from "./context/DokumenterContext";
+import { ErrorProvider } from "./context/ErrorContext";
+import { useSession } from "./context/SessionContext";
+import { SessionProvider } from "./context/SessionContext";
 interface ForsendelsePageProps {
     forsendelseId: string;
     sessionId: string;
     enhet: string;
 }
 function ForsendelseView() {
-    const { forsendelseId } = useForsendelse();
-    const { hentForsendelse } = useForsendelseApi();
+    const { forsendelseId } = useSession();
 
-    const forsendelse = hentForsendelse();
+    const forsendelse = hentForsendelseQuery(forsendelseId);
+    console.log("HERE", forsendelse.dokumenter.length);
     return (
         <ContentContainer>
             <Grid>
-                <Cell xs={4} md={6} lg={8}>
+                <Cell xs={12} md={12} lg={10}>
                     <div className={"py-18 leading-xlarge tracking-wide"}>
                         <Heading spacing size={"medium"} className={"w-max"}>
                             Forsendelse nr. {forsendelseId}
@@ -44,8 +47,9 @@ function ForsendelseView() {
                             <Heading spacing level={"3"} size={"small"} className={"max-w"}>
                                 Dokumentliste
                             </Heading>
-                            <DokumenterTable dokumenter={forsendelse.dokumenter} forsendelseId={forsendelseId} />
+                            <DokumenterTable />
                         </div>
+                        <ValidationErrorSummary />
                     </div>
                 </Cell>
             </Grid>
@@ -56,14 +60,18 @@ function ForsendelseView() {
 export default function ForsendelsePage({ forsendelseId, sessionId, enhet }: PropsWithChildren<ForsendelsePageProps>) {
     return (
         <PageWrapper name={"forsendelse-page"}>
-            <ForsendelseProvider forsendelseId={forsendelseId} sessionId={sessionId} enhet={enhet}>
-                <React.Suspense fallback={<Loader size={"3xlarge"} title={"Laster..."} />}>
-                    <div>
-                        <ForsendelseSakHeader />
-                        <ForsendelseView />
-                    </div>
-                </React.Suspense>
-            </ForsendelseProvider>
+            <ErrorProvider>
+                <SessionProvider forsendelseId={forsendelseId} sessionId={sessionId} enhet={enhet}>
+                    <DokumenterProvider forsendelseId={forsendelseId}>
+                        <React.Suspense fallback={<Loader size={"3xlarge"} title={"Laster..."} />}>
+                            <div>
+                                <ForsendelseSakHeader />
+                                <ForsendelseView />
+                            </div>
+                        </React.Suspense>
+                    </DokumenterProvider>
+                </SessionProvider>
+            </ErrorProvider>
         </PageWrapper>
     );
 }

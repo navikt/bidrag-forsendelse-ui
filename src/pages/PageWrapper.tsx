@@ -23,7 +23,7 @@ const initReactQuery = () =>
         },
     });
 
-const queryClient = initReactQuery();
+export const queryClient = initReactQuery();
 interface PageWrapperProps {
     name: string;
 }

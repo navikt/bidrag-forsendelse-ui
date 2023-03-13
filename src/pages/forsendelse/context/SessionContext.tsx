@@ -3,39 +3,39 @@ import { PropsWithChildren } from "react";
 import { useState } from "react";
 import { useContext } from "react";
 
-interface IForsendelseContext {
+interface ISessionContext {
     forsendelseId: string;
 }
 
-interface IForsendelsePropsContext {
+interface ISessionPropsContext {
     forsendelseId: string;
     sessionId: string;
     enhet: string;
 }
 
-export const ForsendelseContext = createContext<IForsendelseContext>({} as IForsendelseContext);
+export const SessionContext = createContext<ISessionContext>({} as ISessionContext);
 
-function ForsendelseProvider({ children, ...props }: PropsWithChildren<IForsendelsePropsContext>) {
+function SessionProvider({ children, ...props }: PropsWithChildren<ISessionPropsContext>) {
     const [forsendelseId, setForsendelseId] = useState(props.forsendelseId);
     const [sessionId, setSessionId] = useState(props.sessionId);
     const [enhet, setEnhet] = useState(props.enhet);
 
     return (
-        <ForsendelseContext.Provider
+        <SessionContext.Provider
             value={{
                 forsendelseId,
             }}
         >
             {children}
-        </ForsendelseContext.Provider>
+        </SessionContext.Provider>
     );
 }
-function useForsendelse() {
-    const context = useContext(ForsendelseContext);
+function useSession() {
+    const context = useContext(SessionContext);
     if (context === undefined) {
         throw new Error("useForsendelse must be used within a ForsendelseProvider");
     }
     return context;
 }
 
-export { ForsendelseProvider, useForsendelse };
+export { SessionProvider, useSession };

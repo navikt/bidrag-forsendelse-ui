@@ -1,32 +1,32 @@
-import { Eye } from "@navikt/ds-icons";
+import { ExternalLink } from "@navikt/ds-icons";
 import { Button } from "@navikt/ds-react";
 import React from "react";
 
-import { DokumentRespons } from "../../api/BidragForsendelseApi";
 import OpenDocumentUtils from "../../utils/OpenDocumentUtils";
 import EditDocumentButton from "./EditDocumentButton";
 
 interface IOpenDokumentButtonProps {
-    dokument: DokumentRespons;
+    dokumentreferanse?: string;
+    journalpostId?: string;
+    status?: string;
     forsendelseId?: string;
 }
-export default function OpenDokumentButton({ dokument, forsendelseId }: IOpenDokumentButtonProps) {
-    if (dokument.status == "FERDIGSTILT") {
+export default function OpenDokumentButton({
+    dokumentreferanse,
+    forsendelseId,
+    status,
+    journalpostId,
+}: IOpenDokumentButtonProps) {
+    if (status == "FERDIGSTILT") {
         return (
             <Button
                 size={"small"}
                 variant={"tertiary"}
-                icon={<Eye />}
-                onClick={() => OpenDocumentUtils.åpneDokument(forsendelseId, dokument.dokumentreferanse)}
+                icon={<ExternalLink />}
+                onClick={() => OpenDocumentUtils.åpneDokument(forsendelseId, dokumentreferanse)}
             />
         );
     }
 
-    return (
-        <EditDocumentButton
-            dokument={dokument}
-            journalpostId={dokument.journalpostId ?? forsendelseId}
-            onEditFinished={console.log}
-        />
-    );
+    return <EditDocumentButton journalpostId={journalpostId ?? forsendelseId} onEditFinished={console.log} />;
 }

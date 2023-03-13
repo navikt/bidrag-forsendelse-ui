@@ -23,5 +23,5 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 
 function ForsendelsePageWrapper() {
     const { forsendelseId } = useParams();
-    return <ForsendelsePage forsendelseId={forsendelseId} />;
+    return <ForsendelsePage forsendelseId={forsendelseId} sessionId={""} enhet={""} />;
 }

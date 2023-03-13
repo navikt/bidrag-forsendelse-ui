@@ -40,6 +40,11 @@ export interface OpprettDokumentForesporsel {
     språk?: string;
     /** Arkivsystem hvor dokument er lagret */
     arkivsystem?: "JOARK" | "MIDLERTIDLIG_BREVLAGER" | "UKJENT" | "BIDRAG";
+    /**
+     * Dato dokument ble opprettet
+     * @format date-time
+     */
+    dokumentDato?: string;
     /** Referansen til dokumentet hvis det er allerede er lagret i arkivsystem. Hvis dette ikke settes opprettes det en ny dokumentreferanse som kan brukes ved opprettelse av dokument */
     dokumentreferanse?: string;
     /** JournalpostId til dokumentet hvis det er allerede er lagret i arkivsystem */
@@ -47,11 +52,18 @@ export interface OpprettDokumentForesporsel {
     /** DokumentmalId sier noe om dokumentets innhold og oppbygning. (Også kjent som brevkode) */
     dokumentmalId?: string;
     /** Dette skal være UNDER_PRODUKSJON for redigerbare dokumenter som ikke er ferdigprodusert. Ellers settes det til FERDIGSTILT */
-    status: "IKKE_BESTILT" | "BESTILLING_FEILET" | "AVBRUTT" | "UNDER_PRODUKSJON" | "UNDER_REDIGERING" | "FERDIGSTILT";
+    status:
+        | "IKKE_BESTILT"
+        | "BESTILLING_FEILET"
+        | "AVBRUTT"
+        | "UNDER_PRODUKSJON"
+        | "UNDER_REDIGERING"
+        | "FERDIGSTILT"
+        | "MÅ_KONTROLLERES"
+        | "KONTROLLERT";
     /** Om dokumentet med dokumentmalId skal bestilles. Hvis dette er satt til false så antas det at kallende system bestiller dokumentet selv. */
     bestillDokument: boolean;
-    /** @format byte */
-    fysiskDokument?: string;
+    /** Dokument metadata */
     metadata: Record<string, string>;
 }
 
@@ -85,11 +97,20 @@ export interface OpprettForsendelseForesporsel {
 export interface DokumentRespons {
     dokumentreferanse: string;
     tittel: string;
+    /** @format date-time */
+    dokumentDato: string;
     journalpostId?: string;
     dokumentmalId?: string;
-    dokumentDato?: string;
     metadata: Record<string, string>;
-    status?: "IKKE_BESTILT" | "BESTILLING_FEILET" | "AVBRUTT" | "UNDER_PRODUKSJON" | "UNDER_REDIGERING" | "FERDIGSTILT";
+    status?:
+        | "IKKE_BESTILT"
+        | "BESTILLING_FEILET"
+        | "AVBRUTT"
+        | "UNDER_PRODUKSJON"
+        | "UNDER_REDIGERING"
+        | "FERDIGSTILT"
+        | "MÅ_KONTROLLERES"
+        | "KONTROLLERT";
     arkivsystem?: "JOARK" | "MIDLERTIDLIG_BREVLAGER" | "UKJENT" | "BIDRAG";
 }
 
@@ -184,19 +205,23 @@ export interface OppdaterDokumentForesporsel {
     dokumentmalId?: string;
     dokumentreferanse?: string;
     tittel?: string;
-    språk?: string;
+    fjernTilknytning?: boolean;
+    /** @format date-time */
+    dokumentDato?: string;
     journalpostId?: string;
-    /** @format byte */
-    fysiskDokument?: string;
-    status: "IKKE_BESTILT" | "BESTILLING_FEILET" | "AVBRUTT" | "UNDER_PRODUKSJON" | "UNDER_REDIGERING" | "FERDIGSTILT";
     arkivsystem?: "JOARK" | "MIDLERTIDLIG_BREVLAGER" | "UKJENT" | "BIDRAG";
-    metadata: Record<string, string>;
+    metadata?: Record<string, string>;
 }
 
 /** Metadata for oppdatering av forsendelse */
 export interface OppdaterForsendelseForesporsel {
     /** Liste over dokumentene på journalposten der metadata skal oppdateres */
     dokumenter: OppdaterDokumentForesporsel[];
+    /**
+     * Dato hoveddokument i forsendelsen ble opprettet
+     * @format date-time
+     */
+    dokumentDato?: string;
 }
 
 /** Metadata til en respons etter journalpost ble oppdatert */
@@ -839,6 +864,30 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 path: `/api/forsendelse/${forsendelseIdMedPrefix}/ferdigstill`,
                 method: "PATCH",
                 secure: true,
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags endre-forsendelse-kontroller
+         * @name OppdaterDokument
+         * @summary Oppdater dokument i en forsendelsee
+         * @request PATCH:/api/forsendelse/{forsendelseIdMedPrefix}/dokument/{dokumentreferanse}
+         * @secure
+         */
+        oppdaterDokument: (
+            forsendelseIdMedPrefix: string,
+            dokumentreferanse: string,
+            data: OppdaterDokumentForesporsel,
+            params: RequestParams = {}
+        ) =>
+            this.request<DokumentRespons, any>({
+                path: `/api/forsendelse/${forsendelseIdMedPrefix}/dokument/${dokumentreferanse}`,
+                method: "PATCH",
+                body: data,
+                secure: true,
+                type: ContentType.Json,
                 ...params,
             }),
 

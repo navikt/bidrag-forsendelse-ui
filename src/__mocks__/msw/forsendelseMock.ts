@@ -14,5 +14,12 @@ export default function forsendelseMock(): RestHandler[] {
                 ctx.body(JSON.stringify(simpleForsendelse))
             );
         }),
+        rest.patch(`${baseUrl}/api/forsendelse/:forsendelseId`, (req, res, ctx) => {
+            return res(
+                ctx.set("Content-Type", "application/json"),
+                ctx.delay(500)
+                // Respond with the "ArrayBuffer".
+            );
+        }),
     ];
 }

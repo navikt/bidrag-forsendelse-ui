@@ -4,8 +4,8 @@ import { EditDocumentBroadcastMessage } from "../components/dokument/DokumentRed
 import { EditorConfigStorage } from "../components/dokument/DokumentRedigeringTypes";
 
 export default class OpenDocumentUtils {
-    static åpneDokument(journalpostid: string, dokumentreferanse: string) {
-        window.open(`/aapnedokument/${journalpostid}/${dokumentreferanse}`);
+    static åpneDokument(journalpostid: string, dokumentreferanse?: string) {
+        window.open(`/aapnedokument/${journalpostid}${dokumentreferanse ? "/" + dokumentreferanse : ""}`);
     }
 
     static åpneDokumenter(dokumenter: string[]) {
@@ -23,14 +23,9 @@ export default class OpenDocumentUtils {
         window.open(`/rediger/?${dokumenterPath}&id=${id}`);
     }
 
-    static openDocumentEditor(
-        journalpostId: string,
-        dokumentReferanse?: string,
-        editedDocument?: EditDocumentBroadcastMessage,
-        id?: string
-    ) {
+    static openDocumentEditor(journalpostId: string, editedDocument?: EditDocumentBroadcastMessage, id?: string) {
         LoggerService.info(`Åpner dokument ${journalpostId} på nettleser`);
         id && editedDocument && EditorConfigStorage.save(id, editedDocument?.config);
-        window.open(`/rediger/${journalpostId}${dokumentReferanse ? "/" + dokumentReferanse : ""}?id=${id}`);
+        window.open(`/rediger/${journalpostId}?id=${id}`);
     }
 }

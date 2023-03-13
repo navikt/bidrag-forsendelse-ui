@@ -1,11 +1,12 @@
 import { SessionStorage } from "@navikt/bidrag-ui-common";
 
-import { Dokument } from "../../types/forsendelseInternal";
-export function dokumenterToString(journalpostId: string, dokumenter?: Dokument[]) {
+import { IDokument } from "../../types/Dokument";
+
+export function dokumenterToString(journalpostId: string, dokumenter?: IDokument[]) {
     return dokumenter?.map((dokument) => dokumentToString(journalpostId, dokument));
 }
 
-export function dokumentToString(journalpostId: string, dokument: Dokument) {
+export function dokumentToString(journalpostId: string, dokument: IDokument) {
     return `${journalpostId}:${dokument.dokumentreferanse}`;
 }
 
