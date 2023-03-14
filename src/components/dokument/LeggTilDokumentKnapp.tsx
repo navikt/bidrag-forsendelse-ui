@@ -21,12 +21,12 @@ import { DokumentDto } from "../../api/BidragDokumentApi";
 import { DokumentStatus } from "../../constants/DokumentStatus";
 import { RolleType } from "../../constants/RolleType";
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
-import { useDokumenter } from "../../pages/forsendelse/context/DokumenterContext";
+import { useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IDokument } from "../../types/Dokument";
 import OpenDokumentButton from "./OpenDokumentButton";
 
 export default function LeggTilDokumentKnapp() {
-    const { addDocuments } = useDokumenter();
+    const { addDocuments } = useDokumenterForm();
     const [modalOpen, setModalOpen] = useState(false);
 
     return (

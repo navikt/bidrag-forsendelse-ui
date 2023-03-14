@@ -1,0 +1,176 @@
+import dayjs from "dayjs";
+import { createContext } from "react";
+import { PropsWithChildren } from "react";
+import { useState } from "react";
+import { useContext } from "react";
+import { useEffect } from "react";
+import React from "react";
+import { useFieldArray, useForm } from "react-hook-form";
+import { FormProvider } from "react-hook-form";
+import { FieldArrayWithId } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
+import { useMutation } from "react-query";
+
+import { BIDRAG_FORSENDELSE_API } from "../../../api/api";
+import { OppdaterForsendelseForesporsel } from "../../../api/BidragForsendelseApi";
+import { DokumentStatus } from "../../../constants/DokumentStatus";
+import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
+import { IDokument } from "../../../types/Dokument";
+import { queryClient } from "../../PageWrapper";
+
+type FormIDokument = FieldArrayWithId<IForsendelseFormProps, "dokumenter">;
+interface IDokumenterContext {
+    isSavingChanges: boolean;
+    hasChanged: boolean;
+    saveChanges: () => void;
+    validateCanSendForsendelse: () => boolean;
+    forsendelseId: string;
+    dokumenter: FormIDokument[];
+    swapDocuments: (from: number, to: number) => void;
+    addDocuments: (selectedDocuments: IDokument[]) => void;
+    deleteDocument: (deleteDocument: FormIDokument) => void;
+    updateDocument: (updatedDocument: FormIDokument) => void;
+    resetDocumentChanges: () => void;
+}
+
+interface IDokumenterPropsContext {
+    forsendelseId: string;
+}
+
+export interface IForsendelseFormProps {
+    dokumenter: IDokument[];
+}
+
+export const DokumenterFormContext = createContext<IDokumenterContext>({} as IDokumenterContext);
+
+function DokumenterFormProvider({ children, ...props }: PropsWithChildren<IDokumenterPropsContext>) {
+    const forsendelse = useForsendelseApi().hentForsendelse();
+    const methods = useForm<IForsendelseFormProps>({
+        defaultValues: {
+            dokumenter: forsendelse.dokumenter,
+        },
+    });
+
+    return (
+        <FormProvider {...methods}>
+            <DokumenterProvider {...props}>{children}</DokumenterProvider>
+        </FormProvider>
+    );
+}
+
+function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumenterPropsContext>) {
+    const forsendelse = useForsendelseApi().hentForsendelse();
+    const {
+        reset,
+        handleSubmit,
+        formState: { isDirty },
+        setError,
+    } = useFormContext<IForsendelseFormProps>();
+    const { fields, append, update, swap } = useFieldArray<IForsendelseFormProps>({
+        name: "dokumenter",
+    });
+    const [isSavingChanges, setIsSavingChanges] = useState(false);
+
+    const oppdaterDokumenterMutation = useMutation({
+        mutationFn: (dokumenter: IDokument[]) => {
+            const request: OppdaterForsendelseForesporsel = {
+                dokumenter: dokumenter.map((dokument) => ({
+                    dokumentreferanse: dokument.dokumentreferanse,
+                    dokumentmalId: dokument.dokumentmalId,
+                    dokumentDato: dayjs(dokument.dokumentDato).format("YYYY-MM-DDTHH:mm:ss"),
+                    fjernTilknytning: dokument.status == DokumentStatus.SLETTET,
+                    tittel: dokument.tittel,
+                    journalpostId: dokument.journalpostId,
+                })),
+            };
+            return BIDRAG_FORSENDELSE_API.api.oppdaterForsendelse(props.forsendelseId, request);
+        },
+        onSuccess: () => {
+            setIsSavingChanges(false);
+            queryClient.invalidateQueries("forsendelse");
+        },
+        onError: (error, variables, context) => {
+            console.log(error, variables, context);
+        },
+    });
+    useEffect(() => {
+        if (!forsendelse.isStaleData) {
+            resetForm();
+        }
+    }, [forsendelse.dokumenter]);
+
+    const resetForm = () => {
+        reset({
+            dokumenter: forsendelse.dokumenter,
+        });
+    };
+    const saveChanges = (formProps: IForsendelseFormProps) => {
+        setIsSavingChanges(true);
+        oppdaterDokumenterMutation.mutate(formProps.dokumenter);
+    };
+
+    const deleteDocument = (deleteDocument: FormIDokument) => {
+        const index = fields.indexOf(deleteDocument);
+        update(index, {
+            ...deleteDocument,
+            status: DokumentStatus.SLETTET,
+        });
+    };
+    const updateDocument = (updatedDocument: FormIDokument) => {
+        const index = fields.indexOf(updatedDocument);
+        update(index, {
+            ...updatedDocument,
+            status: DokumentStatus.SLETTET,
+        });
+    };
+
+    function validateCanSendForsendelse() {
+        if (isDirty) {
+            setError("root", { message: "Endringene må lagres før distribusjon av forsendelse kan bestilles" });
+            return false;
+        }
+        let isValid = true;
+        let index = 0;
+        for (const dok of fields) {
+            const hasValidState = [DokumentStatus.FERDIGSTILT, DokumentStatus.KONTROLLERT].includes(dok.status);
+            if (!hasValidState) {
+                isValid = false;
+                const errorMessage =
+                    dok.status == DokumentStatus.MÅ_KONTROLLERES
+                        ? `Dokument ${dok.tittel} må kontrolleres`
+                        : `Dokument ${dok.tittel} må ferdigstilles`;
+                setError(`dokumenter.${index}`, { message: errorMessage });
+            }
+            index++;
+        }
+        return isValid;
+    }
+    return (
+        <DokumenterFormContext.Provider
+            value={{
+                forsendelseId: props.forsendelseId,
+                dokumenter: fields,
+                hasChanged: isDirty,
+                isSavingChanges,
+                addDocuments: append,
+                deleteDocument,
+                validateCanSendForsendelse,
+                updateDocument,
+                saveChanges: handleSubmit(saveChanges),
+                swapDocuments: swap,
+                resetDocumentChanges: resetForm,
+            }}
+        >
+            {children}
+        </DokumenterFormContext.Provider>
+    );
+}
+function useDokumenterForm() {
+    const context = useContext(DokumenterFormContext);
+    if (context === undefined) {
+        throw new Error("useDokumenter must be used within a ForsendelseProvider");
+    }
+    return context;
+}
+
+export { DokumenterFormProvider, useDokumenterForm };

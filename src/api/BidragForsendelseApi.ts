@@ -143,7 +143,7 @@ export interface Avvikshendelse {
 
 /** Adresse for hvor brev sendes ved sentral print */
 export interface DistribuerTilAdresse {
-    adresselinje1?: string;
+    adresselinje1: string;
     adresselinje2?: string;
     adresselinje3?: string;
     /** ISO 3166-1 alpha-2 to-bokstavers landkode */

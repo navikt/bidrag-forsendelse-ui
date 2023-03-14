@@ -13,8 +13,8 @@ import PageWrapper from "../PageWrapper";
 import ForsendelseSakHeader from "./components/ForsendelseSakHeader";
 import Gjelder from "./components/Gjelder";
 import Mottaker from "./components/Mottaker";
-import { DokumenterProvider } from "./context/DokumenterContext";
-import { ErrorProvider } from "./context/ErrorContext";
+import SendButton from "./components/SendButton";
+import { DokumenterFormProvider } from "./context/DokumenterFormContext";
 import { useSession } from "./context/SessionContext";
 import { SessionProvider } from "./context/SessionContext";
 interface ForsendelsePageProps {
@@ -49,7 +49,13 @@ function ForsendelseView() {
                             </Heading>
                             <DokumenterTable />
                         </div>
-                        <ValidationErrorSummary />
+                        <div className={"mt-10"}>
+                            <ValidationErrorSummary />
+
+                            <div className={"mt-2"}>
+                                <SendButton />
+                            </div>
+                        </div>
                     </div>
                 </Cell>
             </Grid>
@@ -60,18 +66,16 @@ function ForsendelseView() {
 export default function ForsendelsePage({ forsendelseId, sessionId, enhet }: PropsWithChildren<ForsendelsePageProps>) {
     return (
         <PageWrapper name={"forsendelse-page"}>
-            <ErrorProvider>
-                <SessionProvider forsendelseId={forsendelseId} sessionId={sessionId} enhet={enhet}>
-                    <DokumenterProvider forsendelseId={forsendelseId}>
-                        <React.Suspense fallback={<Loader size={"3xlarge"} title={"Laster..."} />}>
-                            <div>
-                                <ForsendelseSakHeader />
-                                <ForsendelseView />
-                            </div>
-                        </React.Suspense>
-                    </DokumenterProvider>
-                </SessionProvider>
-            </ErrorProvider>
+            <SessionProvider forsendelseId={forsendelseId} sessionId={sessionId} enhet={enhet}>
+                <DokumenterFormProvider forsendelseId={forsendelseId}>
+                    <React.Suspense fallback={<Loader size={"3xlarge"} title={"Laster..."} />}>
+                        <div>
+                            <ForsendelseSakHeader />
+                            <ForsendelseView />
+                        </div>
+                    </React.Suspense>
+                </DokumenterFormProvider>
+            </SessionProvider>
         </PageWrapper>
     );
 }

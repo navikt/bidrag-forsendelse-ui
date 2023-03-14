@@ -12,31 +12,24 @@ import React from "react";
 import { useState } from "react";
 import { useEffect } from "react";
 import { CSSProperties } from "react";
+import { useFormContext } from "react-hook-form";
 
 import { DokumentStatus } from "../../constants/DokumentStatus";
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
-import { useDokumenter } from "../../pages/forsendelse/context/DokumenterContext";
+import { useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
+import { IForsendelseFormProps } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IDokument } from "../../types/Dokument";
 import TableDraggableBody from "../table/TableDraggableBody";
 import DokumentStatusTag from "./DokumentStatusTag";
 import OpenDokumentButton from "./OpenDokumentButton";
 
 export default function DokumentRows() {
-    const { dokumenter, forsendelseId, deleteDocument, updateDocumentOrder } = useDokumenter();
+    const { dokumenter, forsendelseId, deleteDocument, swapDocuments } = useDokumenterForm();
 
     function onDocumentsChange(result: DropResult, provided: ResponderProvided) {
         if (result.reason == "DROP") {
-            updateDocumentOrder((r) => arrayMove(r, result.source.index, result.destination.index));
+            swapDocuments(result.source.index, result.destination.index);
         }
-    }
-
-    function arrayMove(array: any[], oldIndex: number, newIndex: number) {
-        const updatedArray = [...array];
-        const [element] = updatedArray.splice(oldIndex, 1);
-
-        // insert the element at the new position
-        updatedArray.splice(newIndex, 0, element);
-        return updatedArray;
     }
 
     const getItemStyle = (isDragging, draggableStyle) => ({
@@ -75,7 +68,7 @@ export default function DokumentRows() {
 }
 
 function DokumenterTableBottomButtons() {
-    const { isSavingChanges, hasChanged, saveChanges, resetDocumentChanges } = useDokumenter();
+    const { isSavingChanges, hasChanged, saveChanges, resetDocumentChanges } = useDokumenterForm();
     return (
         <div className={"flex flex-row mt-[10px]"}>
             {hasChanged && (
@@ -101,6 +94,15 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
     ({ dokument, forsendelseId, index, deleteDocument, ...otherProps }: IDokumentRowProps, ref) => {
         const { tittel, index: dokindex, status, journalpostId, dokumentreferanse, dokumentDato } = dokument;
         const forsendelse = useForsendelseApi().hentForsendelse();
+        const {
+            register,
+            formState: { errors },
+        } = useFormContext<IForsendelseFormProps>();
+
+        useEffect(() => {
+            const { ref: formRef } = register(`dokumenter.${index}`);
+            formRef(ref);
+        }, []);
         function getKildeDisplayValue() {
             if ([DokumentStatus.UNDER_REDIGERING, DokumentStatus.FERDIGSTILT].includes(dokument.status)) {
                 return "Fra mal";
@@ -121,11 +123,18 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
 
             return styles;
         };
+
         return (
-            <Table.Row key={index + dokumentreferanse + journalpostId} ref={ref} {...otherProps} style={getRowStyle()}>
+            <Table.Row
+                key={index + dokumentreferanse + journalpostId}
+                ref={ref}
+                {...otherProps}
+                style={getRowStyle()}
+                className={`dokument-row ${errors.dokumenter?.[index]?.message ? "error" : ""}`}
+            >
                 <Table.DataCell style={{ width: "1%" }}>{dokindex + 1}</Table.DataCell>
                 <Table.HeaderCell scope="row" style={{ width: "20%" }}>
-                    <EditableDokumentTitle dokument={dokument} />
+                    <EditableDokumentTitle dokument={dokument} index={index} />
                 </Table.HeaderCell>
                 <Table.DataCell style={{ width: "5%" }}>{dayjs(dokumentDato).format("DD.MM.YYYY")}</Table.DataCell>
                 <Table.DataCell style={{ width: "10%" }}>{getKildeDisplayValue()}</Table.DataCell>
@@ -151,13 +160,19 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
 
 interface IEditableDokumentTitleProps {
     dokument: IDokument;
+    index: number;
 }
-function EditableDokumentTitle({ dokument }: IEditableDokumentTitleProps) {
+function EditableDokumentTitle({ dokument, index }: IEditableDokumentTitleProps) {
     const [inEditMode, setInEditMode] = useState(false);
-    const { updateDocument, hasChanged } = useDokumenter();
+    const { hasChanged } = useDokumenterForm();
+    const {
+        register,
+        formState: { errors },
+    } = useFormContext<IForsendelseFormProps>();
     useEffect(() => {
         hasChanged == false && setInEditMode(false);
     }, [hasChanged]);
+
     if (inEditMode) {
         return (
             <Textarea
@@ -166,7 +181,8 @@ function EditableDokumentTitle({ dokument }: IEditableDokumentTitleProps) {
                 label="Tittel"
                 defaultValue={dokument.tittel}
                 hideLabel
-                onChange={(e) => updateDocument({ ...dokument, tittel: e.target.value })}
+                {...register(`dokumenter.${index}.tittel`, { required: "Tittel kan ikke være tom" })}
+                error={errors.dokumenter?.[index]?.tittel?.message}
             />
         );
     }

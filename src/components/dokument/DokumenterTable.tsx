@@ -3,7 +3,7 @@ import "./DokumenterTable.css";
 import { Table } from "@navikt/ds-react";
 import React from "react";
 
-import { useDokumenter } from "../../pages/forsendelse/context/DokumenterContext";
+import { useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
 import DokumentRows from "./DokumentRows";
 import LeggTilDokumentButton from "./LeggTilDokumentKnapp";
 // interface DokumenterTableProps {
@@ -22,14 +22,14 @@ import LeggTilDokumentButton from "./LeggTilDokumentKnapp";
 // }
 
 export default function DokumenterTable() {
-    const { dokumenter, forsendelseId } = useDokumenter();
+    const { dokumenter, forsendelseId } = useDokumenterForm();
     return (
         <div>
             <div className={"flex flex-rpw mt-[10px] border-b-[1px]"}>
                 <LeggTilDokumentButton />
                 <div style={{ marginLeft: "auto" }}>Antall dokumenter: {dokumenter.length}</div>
             </div>
-            <div className={"dokument_table "} style={{ borderColor: "var(--a-border-subtle)" }}>
+            <div className={"dokument-table "} style={{ borderColor: "var(--a-border-subtle)" }}>
                 <Table size={"small"} style={{ tableLayout: "auto", display: "block" }}>
                     <Table.Header>
                         <Table.Row>

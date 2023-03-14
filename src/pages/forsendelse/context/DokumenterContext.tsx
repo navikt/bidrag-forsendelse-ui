@@ -11,10 +11,10 @@ import { OppdaterForsendelseForesporsel } from "../../../api/BidragForsendelseAp
 import { DokumentStatus } from "../../../constants/DokumentStatus";
 import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
 import { arraysDeepEqual } from "../../../types/ArrayUtils";
+import { arrayMove } from "../../../types/ArrayUtils";
 import { IDokument } from "../../../types/Dokument";
 import { queryClient } from "../../PageWrapper";
 
-type setDocumentsType = (allDocuments: IDokument[]) => IDokument[];
 interface IDokumenterContext {
     isSavingChanges: boolean;
     hasChanged: boolean;
@@ -22,7 +22,7 @@ interface IDokumenterContext {
     forsendelseId: string;
     dokumenter: IDokument[];
     originalDocuments: IDokument[];
-    updateDocumentOrder: (setDocumentsType) => void;
+    swapDocuments: (from: number, to: number) => void;
     addDocuments: (selectedDocuments: IDokument[]) => void;
     deleteDocument: (deleteDocument: IDokument) => void;
     updateDocument: (updatedDocument: IDokument) => void;
@@ -79,8 +79,8 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
     };
     const addDocuments = (selectedDocuments: IDokument[]) => {
         const numberOfExisting = renderedDocuments.length;
-        setRenderedDocuments((r) => [
-            ...r,
+        setRenderedDocuments((dokumenter) => [
+            ...dokumenter,
             ...selectedDocuments.map((d, index) => ({
                 ...d,
                 index: index + numberOfExisting,
@@ -118,6 +118,11 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
             })
         );
     };
+
+    const swapDocuments = (fromIndex: number, toIndex: number) => {
+        setRenderedDocuments((dokumenter) => arrayMove(dokumenter, fromIndex, toIndex));
+    };
+
     return (
         <DokumenterContext.Provider
             value={{
@@ -130,7 +135,7 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
                 deleteDocument,
                 updateDocument,
                 saveChanges,
-                updateDocumentOrder: setRenderedDocuments,
+                swapDocuments,
                 resetDocumentChanges: () => setRenderedDocuments(originalDocuments),
             }}
         >

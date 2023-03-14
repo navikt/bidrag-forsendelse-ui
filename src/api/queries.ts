@@ -4,16 +4,57 @@ import { DokumentStatus } from "../constants/DokumentStatus";
 import { SAKSNUMMER } from "../constants/fellestyper";
 import { RolleType } from "../constants/RolleType";
 import { queryClient } from "../pages/PageWrapper";
+import { AvvikType } from "../types/AvvikTypes";
 import { IDokument } from "../types/Dokument";
 import { IForsendelse } from "../types/Forsendelse";
 import { IRolleDetaljer } from "../types/forsendelseInternal";
+import { PostnummerPoststed } from "../types/KodeverkTypes";
+import { LandkodeLand } from "../types/KodeverkTypes";
 import { SAK_API } from "./api";
 import { BIDRAG_DOKUMENT_API } from "./api";
 import { PERSON_API } from "./api";
 import { BIDRAG_FORSENDELSE_API } from "./api";
 import { JournalpostDto } from "./BidragDokumentApi";
 import { PersonDto } from "./BidragPersonApi";
+import { PersonAdresseDto } from "./BidragPersonApi";
 import { BidragSakDto } from "./BidragSakApi";
+import KodeverkService from "./KodeverkService";
+export const hentAvvik = (forsendelseId: string): AvvikType[] => {
+    const { data: avvikTyper } = useQuery({
+        queryKey: `avviktyper_${forsendelseId}`,
+        queryFn: ({ signal }) => BIDRAG_FORSENDELSE_API.api.hentAvvik(forsendelseId),
+    });
+
+    return avvikTyper.data as AvvikType[];
+};
+export const hentLandkoder = (): LandkodeLand[] => {
+    const { data: landkoder } = useQuery({
+        queryKey: `landkoder`,
+        queryFn: ({ signal }) => new KodeverkService().getLandkoder(),
+    });
+
+    return landkoder;
+};
+
+export const hentPostnummere = (): PostnummerPoststed[] => {
+    const { data: postnummere } = useQuery({
+        queryKey: `postnummere`,
+        queryFn: ({ signal }) => new KodeverkService().getPostnummere(),
+    });
+
+    return postnummere;
+};
+export const hentPersonAdresse = (ident?: string): PersonAdresseDto => {
+    if (!ident) {
+        return null;
+    }
+    const { data: personData } = useQuery({
+        queryKey: `person_adresse_${ident}`,
+        queryFn: ({ signal }) => PERSON_API.adresse.hentPersonPostadresse({ personident: "" }, { ident }),
+    });
+
+    return personData.data;
+};
 
 const hentSak = (): BidragSakDto => {
     const forsendelse = queryClient.getQueryData<IForsendelse>("forsendelse");
