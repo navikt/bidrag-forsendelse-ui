@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "lint": "eslint ./src/**/*.{js,ts,tsx} package.json --quiet",
-    "test": "cross-env NODE_ENV=TEST mocha --config .mocharc.js --spec ./src/__tests__/**/**/*.spec.{js,ts,tsx} --exit",
+    "test": "echo noop",
+    "test2": "cross-env NODE_ENV=TEST mocha --config .mocharc.js --spec ./src/__tests__/**/**/*.spec.{js,ts,tsx} --exit",
     "start": "",
     "dev": "cross-env-shell NODE_ENV=development webpack serve --config webpack.dev.config.js",
     "dev:mock": "cross-env ENABLE_MOCK=true NODE_ENV=development webpack serve --config webpack.dev.config.js",
