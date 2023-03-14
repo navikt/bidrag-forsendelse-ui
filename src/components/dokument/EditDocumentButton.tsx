@@ -18,7 +18,7 @@ interface EditDocumentButtonProps {
 
 async function editDocument(journalpostId: string, editedDocument?: EditDocumentBroadcastMessage) {
     const windowId = uuidV4();
-    OpenDocumentUtils.openDocumentEditor(journalpostId, editedDocument);
+    OpenDocumentUtils.openDocumentEditor(journalpostId, editedDocument, windowId);
 
     return waitForDocumentEditFinished(windowId).then((res) => res.payload);
 }

@@ -2,13 +2,15 @@ import { ExternalLink } from "@navikt/ds-icons";
 import { Button } from "@navikt/ds-react";
 import React from "react";
 
+import { DokumentStatus } from "../../constants/DokumentStatus";
+import { queryClient } from "../../pages/PageWrapper";
 import OpenDocumentUtils from "../../utils/OpenDocumentUtils";
 import EditDocumentButton from "./EditDocumentButton";
 
 interface IOpenDokumentButtonProps {
     dokumentreferanse?: string;
     journalpostId?: string;
-    status?: string;
+    status?: DokumentStatus | string;
     forsendelseId?: string;
 }
 export default function OpenDokumentButton({
@@ -17,16 +19,21 @@ export default function OpenDokumentButton({
     status,
     journalpostId,
 }: IOpenDokumentButtonProps) {
-    if (status == "FERDIGSTILT") {
+    if (status == "MÅ_KONTROLLERES" || status == "KONTROLLERT") {
         return (
-            <Button
-                size={"small"}
-                variant={"tertiary"}
-                icon={<ExternalLink />}
-                onClick={() => OpenDocumentUtils.åpneDokument(forsendelseId, dokumentreferanse)}
+            <EditDocumentButton
+                journalpostId={journalpostId ?? forsendelseId}
+                onEditFinished={() => queryClient.invalidateQueries("forsendelse")}
             />
         );
     }
 
-    return <EditDocumentButton journalpostId={journalpostId ?? forsendelseId} onEditFinished={console.log} />;
+    return (
+        <Button
+            size={"small"}
+            variant={"tertiary"}
+            icon={<ExternalLink />}
+            onClick={() => OpenDocumentUtils.åpneDokument(forsendelseId, dokumentreferanse)}
+        />
+    );
 }
