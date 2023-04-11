@@ -28,4 +28,17 @@ export default class OpenDocumentUtils {
         id && editedDocument && EditorConfigStorage.save(id, editedDocument?.config);
         window.open(`/rediger/${journalpostId}?id=${id}`);
     }
+
+    static openDocumentMaskingEditor(
+        forsendelseId: string,
+        dokumentreferanse: string,
+        editedDocument?: EditDocumentBroadcastMessage,
+        id?: string
+    ) {
+        LoggerService.info(
+            `Åpner redigering av forsendelse ${forsendelseId} og dokument ${dokumentreferanse} på nettleser`
+        );
+        id && editedDocument && EditorConfigStorage.save(id, editedDocument?.config);
+        window.open(`/rediger/masker/${forsendelseId}/${dokumentreferanse}?id=${id}`);
+    }
 }

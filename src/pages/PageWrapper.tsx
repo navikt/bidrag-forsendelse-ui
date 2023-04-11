@@ -1,6 +1,4 @@
 import "../index.css";
-import "@navikt/ds-css";
-import "@navikt/ds-css-internal";
 
 import * as dayjs from "dayjs";
 import * as customParseFormat from "dayjs/plugin/customParseFormat";

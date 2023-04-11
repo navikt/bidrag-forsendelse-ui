@@ -33,6 +33,7 @@ export default function DokumenterTable() {
                 <Table size={"small"} style={{ tableLayout: "auto", display: "block" }}>
                     <Table.Header>
                         <Table.Row>
+                            <Table.HeaderCell scope="col" style={{ width: "1%" }}></Table.HeaderCell>
                             <Table.HeaderCell scope="col" style={{ width: "1%" }}>
                                 Nr.
                             </Table.HeaderCell>
@@ -41,12 +42,6 @@ export default function DokumenterTable() {
                             </Table.HeaderCell>
                             <Table.HeaderCell scope="col" style={{ width: "5%" }}>
                                 Dok. dato
-                            </Table.HeaderCell>
-                            <Table.HeaderCell scope="col" align={"left"} style={{ width: "10%" }}>
-                                Kilde
-                            </Table.HeaderCell>
-                            <Table.HeaderCell scope="col" align={"left"} style={{ width: "2%" }}>
-                                Dok.mal
                             </Table.HeaderCell>
                             <Table.HeaderCell scope="col" align={"left"} style={{ width: "8%" }}>
                                 Status

@@ -11,14 +11,19 @@ import OpenDocumentUtils from "../../utils/OpenDocumentUtils";
 interface EditDocumentButtonProps {
     dokumentList?: IDokument[];
     journalpostId: string;
+    dokumentreferanse?: string;
     editedDocument?: EditDocumentBroadcastMessage;
     onEditFinished: (document?: EditDocumentBroadcastMessage) => void;
     onEditStarted?: () => void;
 }
 
-async function editDocument(journalpostId: string, editedDocument?: EditDocumentBroadcastMessage) {
+async function editDocument(
+    journalpostId: string,
+    dokumentreferanse: string,
+    editedDocument?: EditDocumentBroadcastMessage
+) {
     const windowId = uuidV4();
-    OpenDocumentUtils.openDocumentEditor(journalpostId, editedDocument, windowId);
+    OpenDocumentUtils.openDocumentMaskingEditor(journalpostId, dokumentreferanse, editedDocument, windowId);
 
     return waitForDocumentEditFinished(windowId).then((res) => res.payload);
 }
@@ -29,6 +34,7 @@ function waitForDocumentEditFinished(id: string): Promise<BroadcastMessage<EditD
 
 export default function EditDocumentButton({
     journalpostId,
+    dokumentreferanse,
     editedDocument,
     onEditFinished,
     onEditStarted,
@@ -37,7 +43,7 @@ export default function EditDocumentButton({
     function _editDocument() {
         onEditStarted?.();
         setIsWaiting(true);
-        editDocument(journalpostId, editedDocument)
+        editDocument(journalpostId, dokumentreferanse, editedDocument)
             .then(onEditFinished)
             .finally(() => setIsWaiting(false));
     }

@@ -1,3 +1,4 @@
+import { IRolleDetaljer, RolleType } from "@navikt/bidrag-ui-common";
 import { useQuery } from "react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../api/api";
@@ -9,11 +10,9 @@ import { PersonDto } from "../api/BidragPersonApi";
 import { BidragSakDto } from "../api/BidragSakApi";
 import { DokumentStatus } from "../constants/DokumentStatus";
 import { SAKSNUMMER } from "../constants/fellestyper";
-import { RolleType } from "../constants/RolleType";
 import { useSession } from "../pages/forsendelse/context/SessionContext";
 import { IDokument } from "../types/Dokument";
 import { IForsendelse } from "../types/Forsendelse";
-import { IRolleDetaljer } from "../types/forsendelseInternal";
 
 interface UseForsendelseDataProps {
     hentForsendelse: () => IForsendelse;

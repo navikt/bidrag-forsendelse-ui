@@ -1,13 +1,12 @@
+import { IRolleDetaljer, RolleType } from "@navikt/bidrag-ui-common";
 import { useQuery } from "react-query";
 
 import { DokumentStatus } from "../constants/DokumentStatus";
 import { SAKSNUMMER } from "../constants/fellestyper";
-import { RolleType } from "../constants/RolleType";
 import { queryClient } from "../pages/PageWrapper";
 import { AvvikType } from "../types/AvvikTypes";
 import { IDokument } from "../types/Dokument";
 import { IForsendelse } from "../types/Forsendelse";
-import { IRolleDetaljer } from "../types/forsendelseInternal";
 import { PostnummerPoststed } from "../types/KodeverkTypes";
 import { LandkodeLand } from "../types/KodeverkTypes";
 import { SAK_API } from "./api";

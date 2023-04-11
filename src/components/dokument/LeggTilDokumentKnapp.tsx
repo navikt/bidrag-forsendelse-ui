@@ -1,5 +1,6 @@
 import "./LeggTilDokumentButton.css";
 
+import { RolleType } from "@navikt/bidrag-ui-common";
 import { Add } from "@navikt/ds-icons";
 import { Collapse } from "@navikt/ds-icons";
 import { Expand } from "@navikt/ds-icons";
@@ -19,7 +20,6 @@ import { useEffect } from "react";
 import { JournalpostDto } from "../../api/BidragDokumentApi";
 import { DokumentDto } from "../../api/BidragDokumentApi";
 import { DokumentStatus } from "../../constants/DokumentStatus";
-import { RolleType } from "../../constants/RolleType";
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
 import { useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IDokument } from "../../types/Dokument";
@@ -281,8 +281,6 @@ function JournalpostDokumenterRow({
     fraRolle,
     selectedDocuments,
 }: JournalpostDokumenterRowProps) {
-    const [showAllDocuments, setShowAllDocuments] = useState(false);
-
     function onDocumentSelected() {
         const leggTilDokument: IDokument = {
             fraSaksnummer: saksnummer,
@@ -299,14 +297,13 @@ function JournalpostDokumenterRow({
         selectDocument(leggTilDokument);
     }
     const isSelected = selectedDocuments.some((d) => d.journalpostId == journalpost.journalpostId);
-    const borderStyle = showAllDocuments ? { borderBottom: "none" } : {};
 
     let tittel = journalpost.dokumenter.length > 0 ? journalpost.dokumenter[0].tittel : journalpost.innhold;
     tittel = tittel != undefined || tittel.trim().length == 0 ? journalpost.innhold : tittel;
     const hasOnlyOneDocument = journalpost.dokumenter.length == 1;
     const renderTableRowContent = () => (
         <>
-            <Table.DataCell style={{ width: "2%", ...borderStyle }}>
+            <Table.DataCell style={{ width: "2%" }}>
                 <Checkbox
                     hideLabel
                     checked={isSelected}
@@ -316,20 +313,14 @@ function JournalpostDokumenterRow({
                     {" "}
                 </Checkbox>
             </Table.DataCell>
-            <Table.DataCell style={{ width: "20%", ...borderStyle }}>{tittel}</Table.DataCell>
-            <Table.DataCell style={{ width: "5%", ...borderStyle }}>
+            <Table.DataCell style={{ width: "20%" }}>{tittel}</Table.DataCell>
+            <Table.DataCell style={{ width: "5%" }}>
                 {dayjs(journalpost.dokumentDato).format("DD.MM.YYYY")}
             </Table.DataCell>
-            <Table.DataCell style={{ width: "5%", ...borderStyle }}>{journalpost.gjelderAktor?.ident}</Table.DataCell>
-            <Table.DataCell style={{ width: "2%", ...borderStyle }}>
+            <Table.DataCell style={{ width: "5%" }}>{journalpost.gjelderAktor?.ident}</Table.DataCell>
+            <Table.DataCell style={{ width: "2%" }}>
                 <div className={"flex flex-row gap-1"}>
                     <OpenDokumentButton journalpostId={journalpost.journalpostId} status={journalpost.journalstatus} />
-                    {/*<Button*/}
-                    {/*    size={"small"}*/}
-                    {/*    variant={"tertiary"}*/}
-                    {/*    onClick={() => setShowAllDocuments((a) => !a)}*/}
-                    {/*    icon={showAllDocuments ? <Collapse /> : <Expand />}*/}
-                    {/*/>*/}
                 </div>
             </Table.DataCell>
             {hasOnlyOneDocument && <Table.DataCell></Table.DataCell>}
@@ -373,23 +364,6 @@ function JournalpostDokumenterRow({
             >
                 {renderTableRowContent()}
             </Table.ExpandableRow>
-            {/*{showAllDocuments && (*/}
-            {/*    <>*/}
-            {/*        {journalpost.dokumenter.map((dok, index) => (*/}
-            {/*            <Table.Row className={"dokumentrad"} key={index + dok.dokumentreferanse} selected={isSelected}>*/}
-            {/*                <Table.DataCell></Table.DataCell>*/}
-            {/*                <Table.DataCell colSpan={3}>{dok.tittel}</Table.DataCell>*/}
-            {/*                <Table.DataCell>*/}
-            {/*                    <OpenDokumentButton*/}
-            {/*                        dokumentreferanse={dok.dokumentreferanse}*/}
-            {/*                        journalpostId={journalpost.journalpostId}*/}
-            {/*                        status={"FERDIGSTILT"}*/}
-            {/*                    />*/}
-            {/*                </Table.DataCell>*/}
-            {/*            </Table.Row>*/}
-            {/*        ))}*/}
-            {/*    </>*/}
-            {/*)}*/}
         </>
     );
 }
@@ -413,7 +387,6 @@ function JournalpostDokumenterRowMultiDoc({
             journalpostId: journalpost.journalpostId,
             dokumentreferanse: dokumentDto.dokumentreferanse,
             språk: journalpost.språk,
-            dokumentmalId: dokumentDto.dokumentmalId,
             tittel: dokumentDto.tittel,
             fraRolle: fraRolle,
             dokumentDato: journalpost.dokumentDato,

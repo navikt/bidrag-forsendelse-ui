@@ -2,6 +2,7 @@ import { DraggableProvidedDragHandleProps } from "@hello-pangea/dnd";
 import { DraggableProvidedDraggableProps } from "@hello-pangea/dnd";
 import { DropResult } from "@hello-pangea/dnd";
 import { ResponderProvided } from "@hello-pangea/dnd";
+import { MenuHamburgerIcon } from "@navikt/aksel-icons";
 import { Delete } from "@navikt/ds-icons";
 import { Edit } from "@navikt/ds-icons";
 import { Table } from "@navikt/ds-react";
@@ -22,7 +23,6 @@ import { IDokument } from "../../types/Dokument";
 import TableDraggableBody from "../table/TableDraggableBody";
 import DokumentStatusTag from "./DokumentStatusTag";
 import OpenDokumentButton from "./OpenDokumentButton";
-
 export default function DokumentRows() {
     const { dokumenter, forsendelseId, deleteDocument, swapDocuments } = useDokumenterForm();
 
@@ -132,13 +132,14 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
                 style={getRowStyle()}
                 className={`dokument-row ${errors.dokumenter?.[index]?.message ? "error" : ""}`}
             >
+                <Table.DataCell style={{ width: "1%" }} className={"cursor-all-scroll"}>
+                    <MenuHamburgerIcon />
+                </Table.DataCell>
                 <Table.DataCell style={{ width: "1%" }}>{dokindex + 1}</Table.DataCell>
                 <Table.HeaderCell scope="row" style={{ width: "20%" }}>
                     <EditableDokumentTitle dokument={dokument} index={index} />
                 </Table.HeaderCell>
                 <Table.DataCell style={{ width: "5%" }}>{dayjs(dokumentDato).format("DD.MM.YYYY")}</Table.DataCell>
-                <Table.DataCell style={{ width: "10%" }}>{getKildeDisplayValue()}</Table.DataCell>
-                <Table.DataCell style={{ width: "2%" }}>{dokument.dokumentmalId}</Table.DataCell>
                 <Table.DataCell style={{ width: "8%" }}>
                     <DokumentStatusTag status={status} />
                 </Table.DataCell>

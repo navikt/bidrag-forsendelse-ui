@@ -22,7 +22,8 @@ export default function OpenDokumentButton({
     if (status == "MÅ_KONTROLLERES" || status == "KONTROLLERT") {
         return (
             <EditDocumentButton
-                journalpostId={journalpostId ?? forsendelseId}
+                journalpostId={"BIF-" + forsendelseId}
+                dokumentreferanse={dokumentreferanse}
                 onEditFinished={() => queryClient.invalidateQueries("forsendelse")}
             />
         );

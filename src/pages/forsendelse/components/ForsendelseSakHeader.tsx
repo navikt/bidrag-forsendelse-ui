@@ -1,6 +1,7 @@
-import { SakHeader } from "../../../components/header/SakHeader";
-import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
+import SakHeader from "@navikt/bidrag-ui-common/esm/react";
+import React from "react";
 
+import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
 export default function ForsendelseSakHeader() {
     const { hentRoller, hentForsendelse } = useForsendelseApi();
     const saksnummer = hentForsendelse().saksnummer;
