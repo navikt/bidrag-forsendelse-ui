@@ -3,6 +3,8 @@ import { DraggableProvidedDraggableProps } from "@hello-pangea/dnd";
 import { DropResult } from "@hello-pangea/dnd";
 import { ResponderProvided } from "@hello-pangea/dnd";
 import { MenuHamburgerIcon } from "@navikt/aksel-icons";
+import { EyeIcon } from "@navikt/aksel-icons";
+import { OpenDocumentUtils } from "@navikt/bidrag-ui-common";
 import { Delete } from "@navikt/ds-icons";
 import { Edit } from "@navikt/ds-icons";
 import { Table } from "@navikt/ds-react";
@@ -145,6 +147,16 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
                 </Table.DataCell>
                 <Table.DataCell style={{ width: "3%" }}>
                     <div className={"flex flex-row gap-1"}>
+                        {dokument.status == "KONTROLLERT" && (
+                            <Button
+                                size={"small"}
+                                variant={"tertiary"}
+                                icon={<EyeIcon />}
+                                onClick={() =>
+                                    OpenDocumentUtils.åpneDokument(`BIF-${forsendelseId}`, dokumentreferanse)
+                                }
+                            />
+                        )}
                         <OpenDokumentButton
                             dokumentreferanse={dokument.dokumentreferanse}
                             journalpostId={dokument.journalpostId}

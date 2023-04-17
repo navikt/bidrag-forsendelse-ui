@@ -34,7 +34,7 @@ export default function OpenDokumentButton({
             size={"small"}
             variant={"tertiary"}
             icon={<ExternalLink />}
-            onClick={() => OpenDocumentUtils.åpneDokument(forsendelseId, dokumentreferanse)}
+            onClick={() => OpenDocumentUtils.åpneDokument(`BIF-${forsendelseId}`, dokumentreferanse)}
         />
     );
 }
