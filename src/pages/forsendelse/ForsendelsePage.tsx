@@ -6,7 +6,6 @@ import { ContentContainer } from "@navikt/ds-react";
 import React from "react";
 import { PropsWithChildren } from "react";
 
-import { hentForsendelseQuery } from "../../api/queries";
 import DokumenterTable from "../../components/dokument/DokumenterTable";
 import ValidationErrorSummary from "../../components/ValidationErrorSummary";
 import PageWrapper from "../PageWrapper";
@@ -25,8 +24,6 @@ interface ForsendelsePageProps {
 function ForsendelseView() {
     const { forsendelseId } = useSession();
 
-    const forsendelse = hentForsendelseQuery(forsendelseId);
-    console.log("HERE", forsendelse.dokumenter.length);
     return (
         <ContentContainer>
             <Grid>

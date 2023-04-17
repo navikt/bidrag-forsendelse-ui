@@ -23,6 +23,8 @@ import { DokumentStatus } from "../../constants/DokumentStatus";
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
 import { useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IDokument } from "../../types/Dokument";
+import { journalstatusToDisplayValue } from "../../types/Journalpost";
+import { mapRolleToDisplayValue } from "../../types/RolleMapper";
 import OpenDokumentButton from "./OpenDokumentButton";
 
 export default function LeggTilDokumentKnapp() {
@@ -51,6 +53,8 @@ interface LeggTilDokumentFraSakModalProps {
 }
 function LeggTilDokumentFraSakModal({ onClose, open }: LeggTilDokumentFraSakModalProps) {
     const [selectedDocuments, setSelectedDocuments] = useState<IDokument[]>([]);
+    const { hentForsendelse } = useForsendelseApi();
+    const saksnummer = hentForsendelse().saksnummer;
     function selectDocument(document: IDokument, toggle = true) {
         setSelectedDocuments((selectedDocuments) => {
             const isDocumentSelected = selectedDocuments.some((d) => d.journalpostId == document.journalpostId);
@@ -59,7 +63,12 @@ function LeggTilDokumentFraSakModal({ onClose, open }: LeggTilDokumentFraSakModa
                     ? selectedDocuments.filter((d) => d.journalpostId !== document.journalpostId)
                     : selectedDocuments;
             }
-            return [...selectedDocuments, document];
+            const rolle = document.fraRolle ? mapRolleToDisplayValue(document.fraRolle) : "";
+            const title =
+                saksnummer == document.fraSaksnummer
+                    ? document.tittel
+                    : `${document.tittel} (Fra ${rolle} sak ${document.fraSaksnummer})`;
+            return [...selectedDocuments, { ...document, tittel: title }];
         });
     }
 
@@ -227,6 +236,7 @@ function DokumenterForSakTabell({
     fraRolle,
 }: DokumenterForSakTabellProps) {
     const { hentJournalposterForSak, hentForsendelse } = useForsendelseApi();
+    const { dokumenter } = useDokumenterForm();
     const journalposter = hentJournalposterForSak(saksnummer);
     const forsendelse = hentForsendelse();
     return (
@@ -240,6 +250,12 @@ function DokumenterForSakTabell({
                     <Table.HeaderCell scope="col" style={{ width: "5%" }}>
                         Dok. dato
                     </Table.HeaderCell>
+                    <Table.HeaderCell scope="col" style={{ width: "5%" }}>
+                        Status
+                    </Table.HeaderCell>
+                    <Table.HeaderCell scope="col" style={{ width: "5%" }}>
+                        J.type
+                    </Table.HeaderCell>
                     <Table.HeaderCell scope="col" style={{ width: "5%" }} align={"left"}>
                         Gjelder
                     </Table.HeaderCell>
@@ -250,6 +266,7 @@ function DokumenterForSakTabell({
             <Table.Body>
                 {journalposter
                     .filter((jp) => jp.dokumentType != "X")
+                    .filter((jp) => !dokumenter.some((dok) => dok.journalpostId == jp.journalpostId))
                     .filter((jp) => jp.journalpostId != `BIF-${forsendelse.forsendelseId}`)
                     .map((journalpost) => {
                         return (
@@ -317,6 +334,10 @@ function JournalpostDokumenterRow({
             <Table.DataCell style={{ width: "5%" }}>
                 {dayjs(journalpost.dokumentDato).format("DD.MM.YYYY")}
             </Table.DataCell>
+            <Table.DataCell style={{ width: "5%" }}>
+                {journalstatusToDisplayValue(journalpost.journalstatus)}
+            </Table.DataCell>
+            <Table.DataCell style={{ width: "5%" }}>{journalpost.dokumentType}</Table.DataCell>
             <Table.DataCell style={{ width: "5%" }}>{journalpost.gjelderAktor?.ident}</Table.DataCell>
             <Table.DataCell style={{ width: "2%" }}>
                 <div className={"flex flex-row gap-1"}>

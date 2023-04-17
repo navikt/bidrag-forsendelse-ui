@@ -1,5 +1,6 @@
+import { RolleType } from "@navikt/bidrag-ui-common";
+
 import { DokumentStatus } from "../constants/DokumentStatus";
-import { RolleType } from "../constants/RolleType";
 
 export interface IDokument {
     index: number;

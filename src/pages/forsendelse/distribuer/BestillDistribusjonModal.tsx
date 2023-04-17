@@ -43,6 +43,7 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
                 return (await PERSON_API.adresse.hentPersonPostadresse({ personident: "" }, { ident }))?.data;
             }
         },
+        suspense: false,
     });
 
     useEffect(() => {
@@ -54,7 +55,7 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
                 adresselinje1: adresseResponse.adresselinje1 ?? "",
             });
         }
-    }, []);
+    }, [personAdresseQuery]);
 
     const distribuerMutation = useMutation({
         mutationFn: () => {

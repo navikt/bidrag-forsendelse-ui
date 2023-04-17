@@ -4,6 +4,20 @@ import { AktorDto } from "../api/BidragDokumentApi";
 import { KodeDto } from "../api/BidragDokumentApi";
 import { DistribuerTilAdresse } from "../api/BidragDokumentApi";
 
+export function journalstatusToDisplayValue(journalstatus: string) {
+    switch (journalstatus) {
+        case "D":
+            return "Under prod.";
+        case "E":
+            return "Distribuert";
+        case "J":
+            return "Journalført";
+        case "KP":
+            return "Klar for distribusjon";
+    }
+
+    return journalstatus;
+}
 export interface IJournalpost {
     avsenderNavn?: string;
     avsenderMottaker?: AvsenderMottakerDto;

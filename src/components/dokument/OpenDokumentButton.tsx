@@ -1,10 +1,10 @@
+import { OpenDocumentUtils } from "@navikt/bidrag-ui-common";
 import { ExternalLink } from "@navikt/ds-icons";
 import { Button } from "@navikt/ds-react";
 import React from "react";
 
 import { DokumentStatus } from "../../constants/DokumentStatus";
 import { queryClient } from "../../pages/PageWrapper";
-import OpenDocumentUtils from "../../utils/OpenDocumentUtils";
 import EditDocumentButton from "./EditDocumentButton";
 
 interface IOpenDokumentButtonProps {
