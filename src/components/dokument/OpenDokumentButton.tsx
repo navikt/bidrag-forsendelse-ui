@@ -11,18 +11,12 @@ interface IOpenDokumentButtonProps {
     dokumentreferanse?: string;
     journalpostId?: string;
     status?: DokumentStatus | string;
-    forsendelseId?: string;
 }
-export default function OpenDokumentButton({
-    dokumentreferanse,
-    forsendelseId,
-    status,
-    journalpostId,
-}: IOpenDokumentButtonProps) {
+export default function OpenDokumentButton({ dokumentreferanse, status, journalpostId }: IOpenDokumentButtonProps) {
     if (status == "MÅ_KONTROLLERES" || status == "KONTROLLERT") {
         return (
             <EditDocumentButton
-                journalpostId={"BIF-" + forsendelseId}
+                journalpostId={journalpostId}
                 dokumentreferanse={dokumentreferanse}
                 onEditFinished={() => queryClient.invalidateQueries("forsendelse")}
             />
@@ -34,7 +28,7 @@ export default function OpenDokumentButton({
             size={"small"}
             variant={"tertiary"}
             icon={<ExternalLink />}
-            onClick={() => OpenDocumentUtils.åpneDokument(`BIF-${forsendelseId}`, dokumentreferanse)}
+            onClick={() => OpenDocumentUtils.åpneDokument(journalpostId, dokumentreferanse)}
         />
     );
 }
