@@ -6,7 +6,6 @@ import { EyeIcon } from "@navikt/aksel-icons";
 import { DragVerticalIcon } from "@navikt/aksel-icons";
 import { OpenDocumentUtils } from "@navikt/bidrag-ui-common";
 import { Delete } from "@navikt/ds-icons";
-import { Edit } from "@navikt/ds-icons";
 import { Table } from "@navikt/ds-react";
 import { Button } from "@navikt/ds-react";
 import { Textarea } from "@navikt/ds-react";
@@ -15,7 +14,7 @@ import React from "react";
 import { useState } from "react";
 import { useEffect } from "react";
 import { CSSProperties } from "react";
-import { useFormContext } from "react-hook-form";
+import { useFormContext, useWatch } from "react-hook-form";
 
 import { DokumentStatus } from "../../constants/DokumentStatus";
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
@@ -181,27 +180,32 @@ function EditableDokumentTitle({ dokument, index }: IEditableDokumentTitleProps)
         register,
         formState: { errors },
     } = useFormContext<IForsendelseFormProps>();
+    const value = useWatch({ name: `dokumenter.${index}.tittel` });
     useEffect(() => {
         hasChanged == false && setInEditMode(false);
     }, [hasChanged]);
 
-    if (inEditMode) {
-        return (
-            <Textarea
-                maxRows={2}
-                minRows={1}
-                label="Tittel"
-                defaultValue={dokument.tittel}
-                hideLabel
-                {...register(`dokumenter.${index}.tittel`, { required: "Tittel kan ikke være tom" })}
-                error={errors.dokumenter?.[index]?.tittel?.message}
-            />
-        );
-    }
     return (
-        <div style={{ display: "flex", flexDirection: "row" }}>
-            <Button onClick={() => setInEditMode(true)} size={"xsmall"} variant={"tertiary"} icon={<Edit />} />
-            {dokument.tittel}
+        <div
+            tabIndex={0}
+            style={{ width: "100%" }}
+            onDoubleClick={() => setInEditMode(true)}
+            onBlur={() => setInEditMode(false)}
+        >
+            {inEditMode ? (
+                <Textarea
+                    autoFocus
+                    maxRows={2}
+                    minRows={1}
+                    label="Tittel"
+                    defaultValue={dokument.tittel}
+                    hideLabel
+                    {...register(`dokumenter.${index}.tittel`, { required: "Tittel kan ikke være tom" })}
+                    error={errors.dokumenter?.[index]?.tittel?.message}
+                />
+            ) : (
+                <>{value}</>
+            )}
         </div>
     );
 }
