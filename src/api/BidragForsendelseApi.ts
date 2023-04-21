@@ -63,8 +63,6 @@ export interface OpprettDokumentForesporsel {
         | "KONTROLLERT";
     /** Om dokumentet med dokumentmalId skal bestilles. Hvis dette er satt til false så antas det at kallende system bestiller dokumentet selv. */
     bestillDokument: boolean;
-    /** Dokument metadata */
-    metadata: Record<string, string>;
 }
 
 /** Metadata for opprettelse av forsendelse */
@@ -101,7 +99,7 @@ export interface DokumentRespons {
     dokumentDato: string;
     journalpostId?: string;
     dokumentmalId?: string;
-    metadata: Record<string, string>;
+    redigeringMetadata?: string;
     status?:
         | "IKKE_BESTILT"
         | "BESTILLING_FEILET"
@@ -143,7 +141,7 @@ export interface Avvikshendelse {
 
 /** Adresse for hvor brev sendes ved sentral print */
 export interface DistribuerTilAdresse {
-    adresselinje1: string;
+    adresselinje1?: string;
     adresselinje2?: string;
     adresselinje3?: string;
     /** ISO 3166-1 alpha-2 to-bokstavers landkode */
@@ -202,15 +200,15 @@ export interface DistribuerJournalpostResponse {
 
 /** Metadata for dokument som skal knyttes til forsendelsen. Første dokument i listen blir automatisk satt som hoveddokument i forsendelsen */
 export interface OppdaterDokumentForesporsel {
+    /** JournalpostId til dokumentet hvis det er allerede er lagret i arkivsystem */
+    journalpostId?: string;
     dokumentmalId?: string;
     dokumentreferanse?: string;
     tittel?: string;
     fjernTilknytning?: boolean;
     /** @format date-time */
     dokumentDato?: string;
-    journalpostId?: string;
     arkivsystem?: "JOARK" | "MIDLERTIDLIG_BREVLAGER" | "UKJENT" | "BIDRAG";
-    metadata?: Record<string, string>;
 }
 
 /** Metadata for oppdatering av forsendelse */
@@ -255,6 +253,12 @@ export interface OpprettJournalpostResponse {
     journalpostId?: string;
     /** Liste med dokumenter som er knyttet til journalposten */
     dokumenter: OpprettDokumentDto[];
+}
+
+export interface FerdigstillDokumentRequest {
+    /** @format byte */
+    fysiskDokument: string;
+    redigeringMetadata?: string;
 }
 
 /** Metadata for endring av et dokument */
@@ -337,6 +341,7 @@ export interface DokumentMetadata {
     /** Journalpostid med arkiv prefiks som skal benyttes når dokumentet hentes */
     journalpostId?: string;
     dokumentreferanse?: string;
+    tittel?: string;
     /** Hvilken format dokument er på. Dette forteller hvordan dokumentet må åpnes. */
     format: "PDF" | "MBDOK" | "HTML";
     /** Status på dokumentet */
@@ -352,10 +357,12 @@ export interface ForsendelseResponsTo {
     mottaker?: MottakerTo;
     /** Liste over dokumentene på journalposten der metadata skal oppdateres */
     dokumenter: DokumentRespons[];
-    /** Bidragsak som forsendelse er knyttet til */
+    /** Bidragsak som forsendelsen er knyttet til */
     saksnummer?: string;
     /** NAV-enheten som oppretter forsendelsen */
     enhet?: string;
+    /** Tema på forsendelsen */
+    tema?: string;
     /** Ident på saksbehandler eller applikasjon som opprettet forsendelsen */
     opprettetAvIdent?: string;
     /** Navn på saksbehandler eller applikasjon som opprettet forsendelsen */
@@ -373,6 +380,11 @@ export interface ForsendelseResponsTo {
      * @format date
      */
     opprettetDato?: string;
+    /**
+     * Dato på hoveddokumentet i forsendelsen
+     * @format date
+     */
+    dokumentDato?: string;
     /**
      * Dato forsendelsen ble distribuert
      * @format date
@@ -424,6 +436,11 @@ export interface JournalpostDto {
      * @format date
      */
     dokumentDato?: string;
+    /**
+     * Tidspunkt for dokument i journalpost
+     * @format date-time
+     */
+    dokumentTidspunkt?: string;
     /**
      * Dato dokumentene på journalposten ble sendt til bruker.
      * @format date
@@ -537,6 +554,29 @@ export interface ReturDetaljerLog {
     beskrivelse?: string;
     /** Returdetalje er låst for endring. Dette blir satt etter en ny distribusjon er bestilt */
     locked?: boolean;
+}
+
+export interface DokumentDetaljer {
+    tittel: string;
+    dokumentreferanse?: string;
+    /** @format int32 */
+    antallSider: number;
+}
+
+export interface DokumentRedigeringMetadataResponsDto {
+    tittel: string;
+    status:
+        | "IKKE_BESTILT"
+        | "BESTILLING_FEILET"
+        | "AVBRUTT"
+        | "UNDER_PRODUKSJON"
+        | "UNDER_REDIGERING"
+        | "FERDIGSTILT"
+        | "MÅ_KONTROLLERES"
+        | "KONTROLLERT";
+    forsendelseStatus: "UNDER_PRODUKSJON" | "FERDIGSTILT" | "SLETTET" | "DISTRIBUERT" | "DISTRIBUERT_LOKALT";
+    redigeringMetadata?: string;
+    dokumenter: DokumentDetaljer[];
 }
 
 /** Metadata til en respons etter journalpost med tilhørende data */
@@ -756,6 +796,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                     | "REGISTRER_RETUR"
                     | "MANGLER_ADRESSE"
                     | "BESTILL_NY_DISTRIBUSJON"
+                    | "FARSKAP_UTELUKKET"
                 )[],
                 (
                     | "ARKIVERE_JOURNALPOST"
@@ -774,6 +815,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                     | "REGISTRER_RETUR"
                     | "MANGLER_ADRESSE"
                     | "BESTILL_NY_DISTRIBUSJON"
+                    | "FARSKAP_UTELUKKET"
                 )[]
             >({
                 path: `/api/forsendelse/journal/${forsendelseIdMedPrefix}/avvik`,
@@ -888,6 +930,117 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 body: data,
                 secure: true,
                 type: ContentType.Json,
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags endre-forsendelse-kontroller
+         * @name OpphevFerdigstillingAvDokument
+         * @summary Opphev ferdigstilling av dokument i en forsendelse
+         * @request PATCH:/api/forsendelse/{forsendelseIdMedPrefix}/dokument/{dokumentreferanse}/opphevFerdigstill
+         * @secure
+         */
+        opphevFerdigstillingAvDokument: (
+            forsendelseIdMedPrefix: string,
+            dokumentreferanse: string,
+            params: RequestParams = {}
+        ) =>
+            this.request<DokumentRespons, any>({
+                path: `/api/forsendelse/${forsendelseIdMedPrefix}/dokument/${dokumentreferanse}/opphevFerdigstill`,
+                method: "PATCH",
+                secure: true,
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags rediger-dokument-kontroller
+         * @name HentDokumentRedigeringMetadata
+         * @summary Hent dokument redigering metadata
+         * @request GET:/api/forsendelse/redigering/{forsendelseIdMedPrefix}/{dokumentreferanse}
+         * @secure
+         */
+        hentDokumentRedigeringMetadata: (
+            forsendelseIdMedPrefix: string,
+            dokumentreferanse: string,
+            params: RequestParams = {}
+        ) =>
+            this.request<DokumentRedigeringMetadataResponsDto, DokumentRedigeringMetadataResponsDto>({
+                path: `/api/forsendelse/redigering/${forsendelseIdMedPrefix}/${dokumentreferanse}`,
+                method: "GET",
+                secure: true,
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags rediger-dokument-kontroller
+         * @name OppdaterDokumentRedigeringmetadata
+         * @summary Oppdater dokument redigeringdata
+         * @request PATCH:/api/forsendelse/redigering/{forsendelseIdMedPrefix}/{dokumentreferanse}
+         * @secure
+         */
+        oppdaterDokumentRedigeringmetadata: (
+            forsendelseIdMedPrefix: string,
+            dokumentreferanse: string,
+            data: string,
+            params: RequestParams = {}
+        ) =>
+            this.request<void, void>({
+                path: `/api/forsendelse/redigering/${forsendelseIdMedPrefix}/${dokumentreferanse}`,
+                method: "PATCH",
+                body: data,
+                secure: true,
+                type: ContentType.Json,
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags rediger-dokument-kontroller
+         * @name FerdigstillDokument
+         * @summary Ferdigstill dokument i en forsendelse
+         * @request PATCH:/api/forsendelse/redigering/{forsendelseIdMedPrefix}/{dokumentreferanse}/ferdigstill
+         * @secure
+         */
+        ferdigstillDokument: (
+            forsendelseIdMedPrefix: string,
+            dokumentreferanse: string,
+            data: FerdigstillDokumentRequest,
+            params: RequestParams = {}
+        ) =>
+            this.request<DokumentRespons, any>({
+                path: `/api/forsendelse/redigering/${forsendelseIdMedPrefix}/${dokumentreferanse}/ferdigstill`,
+                method: "PATCH",
+                body: data,
+                secure: true,
+                type: ContentType.Json,
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags rediger-dokument-kontroller
+         * @name OpphevFerdigstillDokument
+         * @summary Ferdigstill dokument i en forsendelse
+         * @request PATCH:/api/forsendelse/redigering/{forsendelseIdMedPrefix}/{dokumentreferanse}/ferdigstill/opphev
+         * @secure
+         */
+        opphevFerdigstillDokument: (
+            forsendelseIdMedPrefix: string,
+            dokumentreferanse: string,
+            params: RequestParams = {}
+        ) =>
+            this.request<DokumentRespons, any>({
+                path: `/api/forsendelse/redigering/${forsendelseIdMedPrefix}/${dokumentreferanse}/ferdigstill/opphev`,
+                method: "PATCH",
+                secure: true,
                 ...params,
             }),
 

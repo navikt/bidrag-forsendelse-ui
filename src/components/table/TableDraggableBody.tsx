@@ -1,41 +1,117 @@
-import { Droppable } from "@hello-pangea/dnd";
-import { Draggable } from "@hello-pangea/dnd";
-import { DragDropContext } from "@hello-pangea/dnd";
-import { DropResult } from "@hello-pangea/dnd";
-import { ResponderProvided } from "@hello-pangea/dnd";
-import { DraggableProvided } from "@hello-pangea/dnd";
-import { DraggableStateSnapshot } from "@hello-pangea/dnd";
+import {
+    closestCenter,
+    DndContext,
+    DragEndEvent,
+    DraggableAttributes,
+    DragOverlay,
+    MouseSensor,
+    useSensor,
+    useSensors,
+} from "@dnd-kit/core";
+import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
+import { restrictToVerticalAxis, restrictToWindowEdges } from "@dnd-kit/modifiers";
+import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { Table } from "@navikt/ds-react";
-import React from "react";
+import React, { CSSProperties, useState } from "react";
 import { ReactNode } from "react";
-
 export type TableDraggableBodyChildrenFn<T> = (
-    provided: DraggableProvided,
-    snapshot: DraggableStateSnapshot,
     dokument: T,
-    index: number
+    index: number,
+    id: string,
+    attributes?: DraggableAttributes,
+    listeners?: SyntheticListenerMap,
+    style?: CSSProperties,
+    ref?: (node: HTMLElement) => void
 ) => ReactNode | null;
 interface ITableDraggableBodyProps<T> {
-    onChange: (result: DropResult, provided: ResponderProvided) => void;
+    onChange: (event: DragEndEvent) => void;
     rowData: T[];
     getRowKey: (data: T) => string;
     children: TableDraggableBodyChildrenFn<T>;
 }
+
 export default function TableDraggableBody<T>({ children, onChange, rowData, getRowKey }: ITableDraggableBodyProps<T>) {
-    return (
-        <DragDropContext onDragEnd={onChange}>
-            <Droppable droppableId="droppable">
-                {(provided, snapshot) => (
-                    <Table.Body {...provided.droppableProps} ref={provided.innerRef} style={{ overflowY: "auto" }}>
-                        {rowData.map((data, i) => (
-                            <Draggable key={getRowKey(data)} draggableId={getRowKey(data)} index={i}>
-                                {(provided, snapshot) => children(provided, snapshot, data, i)}
-                            </Draggable>
-                        ))}
-                        {provided.placeholder}
-                    </Table.Body>
-                )}
-            </Droppable>
-        </DragDropContext>
+    const [activeId, setActiveId] = useState(null);
+    const sensors = useSensors(
+        useSensor(MouseSensor, {
+            activationConstraint: {
+                distance: 10,
+                tolerance: 100,
+            },
+        })
+        // useSensor(KeyboardSensor, {
+        //     coordinateGetter: sortableKeyboardCoordinates,
+        // })
     );
+
+    function handleDragStart(event) {
+        const { active } = event;
+
+        setActiveId(active.id);
+    }
+    const activeIndex = rowData.findIndex((data) => getRowKey(data) == activeId);
+    const activeData = rowData.find((data) => getRowKey(data) == activeId);
+    return (
+        <DndContext
+            sensors={sensors}
+            onDragEnd={onChange}
+            onDragStart={handleDragStart}
+            collisionDetection={closestCenter}
+            modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
+        >
+            <SortableContext
+                strategy={verticalListSortingStrategy}
+                items={rowData.map((data) => ({
+                    ...data,
+                    id: getRowKey(data),
+                }))}
+            >
+                <Table.Body style={{ overflowY: "auto" }}>
+                    {rowData.map((data, i) => (
+                        <SortableItem data={data} index={i} id={getRowKey(data)} children={children} />
+                    ))}
+                </Table.Body>
+            </SortableContext>
+            <DragOverlay>
+                {activeId ? (
+                    <OverlayItem id={activeId} data={activeData} index={activeIndex} children={children} />
+                ) : null}
+            </DragOverlay>
+        </DndContext>
+    );
+}
+
+interface OverlayItemProps<T> {
+    id: string;
+    data: T;
+    index: number;
+    children: TableDraggableBodyChildrenFn<T>;
+}
+function OverlayItem<T>({ id, children, data, index }: OverlayItemProps<T>) {
+    return <>{children(data, index, id, null, null, { backgroundColor: "var(--a-gray-100)" })}</>;
+}
+
+interface SortableItemProps<T> {
+    id: string;
+    data: T;
+    index: number;
+    children: TableDraggableBodyChildrenFn<T>;
+}
+function SortableItem<T>({ id, children, data, index }: SortableItemProps<T>) {
+    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+        id,
+        transition: {
+            duration: null, // milliseconds
+            easing: "cubic-bezier(0.25, 1, 0.5, 1)",
+        },
+    });
+
+    const style: CSSProperties = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        cursor: "grab",
+    };
+
+    return <>{children(data, index, id, attributes, listeners, style, setNodeRef)}</>;
 }

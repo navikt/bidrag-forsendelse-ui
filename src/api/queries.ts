@@ -3,6 +3,7 @@ import { useQuery } from "react-query";
 
 import { DokumentStatus } from "../constants/DokumentStatus";
 import { SAKSNUMMER } from "../constants/fellestyper";
+import { useSession } from "../pages/forsendelse/context/SessionContext";
 import { queryClient } from "../pages/PageWrapper";
 import { AvvikType } from "../types/AvvikTypes";
 import { IDokument } from "../types/Dokument";
@@ -18,9 +19,66 @@ import { PersonDto } from "./BidragPersonApi";
 import { PersonAdresseDto } from "./BidragPersonApi";
 import { BidragSakDto } from "./BidragSakApi";
 import KodeverkService from "./KodeverkService";
+
+export const QueryKeys = {
+    avvik: "avvik",
+    sak: "sak",
+    forsendelse: "forsendelse",
+    person: "person",
+    avvik_forsendelse: (forsendelseId: string) => [QueryKeys.avvik, forsendelseId],
+    landkoder: ["landkoder"],
+    postnummere: ["postnummere"],
+    hentSak: (saksnummer: string) => [QueryKeys.sak, saksnummer],
+    sakerPerson: (personident: string) => [QueryKeys.sak, QueryKeys.person, personident],
+    hentJournalposterForPerson: (personident: string) => [QueryKeys.person, QueryKeys.forsendelse, personident],
+};
+
+export const ForsendelseApiHooks = {
+    hentAvvik: (forsendelseId: string): AvvikType[] => {
+        const { data: avvikTyper } = useQuery({
+            queryKey: QueryKeys.avvik_forsendelse(forsendelseId),
+            queryFn: ({ signal }) => BIDRAG_FORSENDELSE_API.api.hentAvvik(forsendelseId),
+        });
+        return avvikTyper.data as AvvikType[];
+    },
+    hentForsendelse: (): IForsendelse => {
+        const { forsendelseId } = useSession();
+        const { data: forsendelse, isRefetching } = useQuery({
+            queryKey: "forsendelse",
+            queryFn: ({ signal }) => BIDRAG_FORSENDELSE_API.api.hentForsendelse(forsendelseId),
+            enabled: forsendelseId != undefined,
+            optimisticResults: false,
+            select: (response) => {
+                const forsendelse = response.data;
+                return {
+                    ...forsendelse,
+                    forsendelseId,
+                    dokumenter: forsendelse.dokumenter.map(
+                        (dokument, index) =>
+                        ({
+                            ...dokument,
+                            status: DokumentStatus[dokument.status],
+                            fraSaksnummer: forsendelse.saksnummer,
+                            lagret: true,
+                            index,
+                        } as IDokument)
+                    ),
+                };
+            },
+            onSuccess: (data) => {
+                console.log("Hentet forsendelse", data);
+            },
+        });
+
+        return {
+            ...forsendelse,
+            isStaleData: isRefetching,
+        };
+    },
+};
 export const hentAvvik = (forsendelseId: string): AvvikType[] => {
     const { data: avvikTyper } = useQuery({
-        queryKey: `avviktyper_${forsendelseId}`,
+        queryKey: QueryKeys.avvik_forsendelse(forsendelseId),
         queryFn: ({ signal }) => BIDRAG_FORSENDELSE_API.api.hentAvvik(forsendelseId),
     });
 
@@ -28,7 +86,7 @@ export const hentAvvik = (forsendelseId: string): AvvikType[] => {
 };
 export const hentLandkoder = (): LandkodeLand[] => {
     const { data: landkoder } = useQuery({
-        queryKey: `landkoder`,
+        queryKey: QueryKeys.landkoder,
         queryFn: ({ signal }) => new KodeverkService().getLandkoder(),
     });
 
@@ -37,7 +95,7 @@ export const hentLandkoder = (): LandkodeLand[] => {
 
 export const hentPostnummere = (): PostnummerPoststed[] => {
     const { data: postnummere } = useQuery({
-        queryKey: `postnummere`,
+        queryKey: QueryKeys.postnummere,
         queryFn: ({ signal }) => new KodeverkService().getPostnummere(),
     });
 
@@ -97,7 +155,7 @@ const hentJournalposterForSak = (saksnummer: string): JournalpostDto[] => {
 
 const hentSakerPerson = (ident: string): string[] => {
     const { data: sakerPerson, refetch } = useQuery({
-        queryKey: `saker_person_${ident}`,
+        queryKey: QueryKeys.sakerPerson(ident),
         queryFn: ({ signal }) => SAK_API.bidragSak.find(ident),
     });
 
@@ -159,35 +217,5 @@ export const hentMottaker = (): IRolleDetaljer => {
         rolleType: rolleISak(ident),
         navn,
         ident,
-    };
-};
-export const hentForsendelseQuery = (forsendelseId: string): IForsendelse => {
-    const { data: forsendelse, isRefetching } = useQuery({
-        queryKey: "forsendelse",
-        queryFn: ({ signal }) => BIDRAG_FORSENDELSE_API.api.hentForsendelse(forsendelseId),
-        enabled: forsendelseId != undefined,
-        optimisticResults: false,
-        select: (response) => {
-            const forsendelse = response.data;
-            return {
-                ...forsendelse,
-                forsendelseId,
-                dokumenter: forsendelse.dokumenter.map(
-                    (dokument, index) =>
-                        ({
-                            ...dokument,
-                            status: DokumentStatus[dokument.status],
-                            fraSaksnummer: forsendelse.saksnummer,
-                            lagret: true,
-                            index,
-                        } as IDokument)
-                ),
-            };
-        },
-    });
-
-    return {
-        ...forsendelse,
-        isStaleData: isRefetching,
     };
 };

@@ -1,7 +1,5 @@
-import { DraggableProvidedDragHandleProps } from "@hello-pangea/dnd";
-import { DraggableProvidedDraggableProps } from "@hello-pangea/dnd";
-import { DropResult } from "@hello-pangea/dnd";
-import { ResponderProvided } from "@hello-pangea/dnd";
+import { DragEndEvent, DraggableAttributes } from "@dnd-kit/core";
+import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import { EyeIcon } from "@navikt/aksel-icons";
 import { DragVerticalIcon } from "@navikt/aksel-icons";
 import { OpenDocumentUtils } from "@navikt/bidrag-ui-common";
@@ -10,16 +8,19 @@ import { Table } from "@navikt/ds-react";
 import { Button } from "@navikt/ds-react";
 import { Textarea } from "@navikt/ds-react";
 import dayjs from "dayjs";
-import React from "react";
+import React, { useRef } from "react";
 import { useState } from "react";
 import { useEffect } from "react";
 import { CSSProperties } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
+import { useMutation } from "react-query";
 
+import { BIDRAG_FORSENDELSE_API } from "../../api/api";
 import { DokumentStatus } from "../../constants/DokumentStatus";
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
-import { useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
+import { FormIDokument, useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IForsendelseFormProps } from "../../pages/forsendelse/context/DokumenterFormContext";
+import { useSession } from "../../pages/forsendelse/context/SessionContext";
 import { IDokument } from "../../types/Dokument";
 import TableDraggableBody from "../table/TableDraggableBody";
 import DokumentStatusTag from "./DokumentStatusTag";
@@ -27,39 +28,37 @@ import OpenDokumentButton from "./OpenDokumentButton";
 export default function DokumentRows() {
     const { dokumenter, forsendelseId, deleteDocument, swapDocuments } = useDokumenterForm();
 
-    function onDocumentsChange(result: DropResult, provided: ResponderProvided) {
-        if (result.reason == "DROP") {
-            swapDocuments(result.source.index, result.destination.index);
+    function onDocumentsChange(event: DragEndEvent) {
+        const { active, over } = event;
+
+        if (active?.id !== over?.id) {
+            const oldIndex = dokumenter.findIndex((d) => getRowKey(d) == active?.id);
+            const newIndex = dokumenter.findIndex((d) => getRowKey(d) == over?.id);
+
+            if (oldIndex != -1 && newIndex != -1) {
+                swapDocuments(oldIndex, newIndex);
+            }
         }
     }
 
-    const getItemStyle = (isDragging, draggableStyle) => ({
-        // some basic styles to make the items look a bit nicer
-        userSelect: "none",
-        // change background colour if dragging
-        background: isDragging ? "var(--a-gray-100)" : "unset",
-
-        // styles we need to apply on draggables
-        ...draggableStyle,
-    });
+    function getRowKey(d: FormIDokument) {
+        return d.dokumentreferanse + d.journalpostId;
+    }
 
     return (
         <>
-            <TableDraggableBody
-                rowData={dokumenter}
-                getRowKey={(d) => d.dokumentreferanse + d.journalpostId}
-                onChange={onDocumentsChange}
-            >
-                {(provided, snapshot, dokument, i) => (
+            <TableDraggableBody rowData={dokumenter} getRowKey={getRowKey} onChange={onDocumentsChange}>
+                {(dokument, i, id, attributes, listeners, style, ref) => (
                     <DokumentRow
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        ref={provided.innerRef}
                         dokument={dokument}
                         forsendelseId={forsendelseId}
                         index={i}
+                        ref={ref}
+                        id={id}
+                        listeners={listeners}
+                        attributes={attributes}
+                        style={style}
                         deleteDocument={() => deleteDocument(dokument)}
-                        style={getItemStyle(snapshot.isDragging, provided.draggableProps.style)}
                     />
                 )}
             </TableDraggableBody>
@@ -85,14 +84,18 @@ function DokumenterTableBottomButtons() {
         </div>
     );
 }
-interface IDokumentRowProps extends DraggableProvidedDragHandleProps, DraggableProvidedDraggableProps {
+interface IDokumentRowProps {
+    id: string;
     index: number;
     dokument: IDokument;
     forsendelseId: string;
     deleteDocument: () => void;
+    attributes: DraggableAttributes;
+    listeners: SyntheticListenerMap;
+    style: CSSProperties;
 }
 const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
-    ({ dokument, forsendelseId, index, deleteDocument, ...otherProps }: IDokumentRowProps, ref) => {
+    ({ id, dokument, forsendelseId, index, deleteDocument, listeners, attributes, style }: IDokumentRowProps, ref) => {
         const { tittel, index: dokindex, status, journalpostId, dokumentreferanse, dokumentDato } = dokument;
         const forsendelse = useForsendelseApi().hentForsendelse();
         const {
@@ -114,12 +117,12 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
             return "Fra sak " + dokument.fraSaksnummer;
         }
         const getRowStyle = () => {
-            let styles = { ...otherProps.style } as CSSProperties;
+            let styles = { ...style } as CSSProperties;
 
             if (dokument.status == DokumentStatus.SLETTET) {
-                styles = { ...otherProps.style, backgroundColor: "var(--a-red-50)" };
+                styles = { ...style, backgroundColor: "var(--a-red-50)" };
             } else if (dokument.lagret == false) {
-                styles = { ...otherProps.style, backgroundColor: "var(--a-green-50)" };
+                styles = { ...style, backgroundColor: "var(--a-green-50)" };
             }
 
             return styles;
@@ -129,7 +132,8 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
             <Table.Row
                 key={index + dokumentreferanse + journalpostId}
                 ref={ref}
-                {...otherProps}
+                {...listeners}
+                {...attributes}
                 style={getRowStyle()}
                 className={`dokument-row ${errors.dokumenter?.[index]?.message ? "error" : ""}`}
             >
@@ -175,22 +179,44 @@ interface IEditableDokumentTitleProps {
 }
 function EditableDokumentTitle({ dokument, index }: IEditableDokumentTitleProps) {
     const [inEditMode, setInEditMode] = useState(false);
-    const { hasChanged } = useDokumenterForm();
+    const { forsendelseId } = useSession();
+    const enableBlurEvent = useRef(false);
+    const oppdaterDokumentTittelFn = useMutation({
+        mutationFn: (tittel: string) =>
+            BIDRAG_FORSENDELSE_API.api.oppdaterDokument(forsendelseId, dokument.dokumentreferanse, { tittel }),
+    });
     const {
         register,
+        setValue,
         formState: { errors },
     } = useFormContext<IForsendelseFormProps>();
     const value = useWatch({ name: `dokumenter.${index}.tittel` });
-    useEffect(() => {
-        hasChanged == false && setInEditMode(false);
-    }, [hasChanged]);
 
+    function updateTitle(e) {
+        if (enableBlurEvent.current == false) return;
+        setInEditMode(false);
+        oppdaterDokumentTittelFn.mutate(value);
+        enableBlurEvent.current = false;
+    }
+
+    function onKeyDown(e: React.KeyboardEvent) {
+        if (e.code == "Escape") {
+            setInEditMode(false);
+            setValue(`dokumenter.${index}.tittel`, dokument.tittel);
+        }
+    }
     return (
         <div
-            tabIndex={0}
+            tabIndex={-1}
             style={{ width: "100%" }}
-            onDoubleClick={() => setInEditMode(true)}
-            onBlur={() => setInEditMode(false)}
+            onDoubleClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                setTimeout(() => (enableBlurEvent.current = true), 500);
+                setInEditMode(true);
+            }}
+            onBlur={updateTitle}
+            onKeyDown={onKeyDown}
         >
             {inEditMode ? (
                 <Textarea

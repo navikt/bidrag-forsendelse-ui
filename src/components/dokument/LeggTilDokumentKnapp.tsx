@@ -117,7 +117,10 @@ function VelgDokumentTabs({ selectDocument, selectedDocuments }: VelgDokumentTab
         if (numberOfSelectedDocuments > 0) {
             return (
                 <div>
-                    {label} <Tag variant={"neutral"}>{numberOfSelectedDocuments}</Tag>
+                    {label}{" "}
+                    <Tag variant={"info"} size="small">
+                        {numberOfSelectedDocuments}
+                    </Tag>
                 </div>
             );
         }
@@ -190,7 +193,10 @@ function DokumenterForPerson({ ident, selectDocument, selectedDocuments, rolle }
         if (numberOfSelectedDocuments > 0) {
             return (
                 <div>
-                    Sak {saksnummer} <Tag variant={"neutral"}>{numberOfSelectedDocuments}</Tag>
+                    Sak {saksnummer}{" "}
+                    <Tag variant={"info"} size="small">
+                        {numberOfSelectedDocuments}
+                    </Tag>
                 </div>
             );
         }

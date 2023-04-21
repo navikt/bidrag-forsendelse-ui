@@ -17,7 +17,7 @@ import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
 import { IDokument } from "../../../types/Dokument";
 import { queryClient } from "../../PageWrapper";
 
-type FormIDokument = FieldArrayWithId<IForsendelseFormProps, "dokumenter">;
+export type FormIDokument = FieldArrayWithId<IForsendelseFormProps, "dokumenter">;
 interface IDokumenterContext {
     isSavingChanges: boolean;
     hasChanged: boolean;
@@ -62,7 +62,7 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
     const {
         reset,
         handleSubmit,
-        formState: { isDirty },
+        formState: { isDirty, dirtyFields },
         setError,
     } = useFormContext<IForsendelseFormProps>();
     const { fields, append, update, swap } = useFieldArray<IForsendelseFormProps>({
@@ -141,12 +141,17 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
         }
         return isValid;
     }
+    const hasChanged =
+        isDirty &&
+        dirtyFields.dokumenter?.filter((dok) => {
+            return !(dok.tittel && Object.keys(dok).length == 1);
+        }).length > 0;
     return (
         <DokumenterFormContext.Provider
             value={{
                 forsendelseId: props.forsendelseId,
                 dokumenter: fields,
-                hasChanged: isDirty,
+                hasChanged: hasChanged,
                 isSavingChanges: oppdaterDokumenterMutation.isLoading,
                 addDocuments: append,
                 deleteDocument,

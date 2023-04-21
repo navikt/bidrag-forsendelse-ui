@@ -1,4 +1,6 @@
 import { IRolleDetaljer, RolleType } from "@navikt/bidrag-ui-common";
+import { AxiosResponse } from "axios";
+import React from "react";
 import { useQuery } from "react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../api/api";
@@ -11,7 +13,6 @@ import { BidragSakDto } from "../api/BidragSakApi";
 import { DokumentStatus } from "../constants/DokumentStatus";
 import { SAKSNUMMER } from "../constants/fellestyper";
 import { useSession } from "../pages/forsendelse/context/SessionContext";
-import { IDokument } from "../types/Dokument";
 import { IForsendelse } from "../types/Forsendelse";
 
 interface UseForsendelseDataProps {
@@ -136,23 +137,22 @@ export function useForsendelseApi(): UseForsendelseDataProps {
             queryFn: ({ signal }) => BIDRAG_FORSENDELSE_API.api.hentForsendelse(forsendelseId),
             enabled: forsendelseId != undefined,
             optimisticResults: false,
-            select: (response) => {
+            select: React.useCallback((response: AxiosResponse) => {
                 const forsendelse = response.data;
                 return {
                     ...forsendelse,
                     forsendelseId,
-                    dokumenter: forsendelse.dokumenter.map(
-                        (dokument, index) =>
-                            ({
-                                ...dokument,
-                                status: DokumentStatus[dokument.status],
-                                fraSaksnummer: forsendelse.saksnummer,
-                                lagret: true,
-                                index,
-                            } as IDokument)
-                    ),
+                    dokumenter: forsendelse.dokumenter.map((dokument, index) => {
+                        return {
+                            ...dokument,
+                            status: DokumentStatus[dokument.status],
+                            fraSaksnummer: forsendelse.saksnummer,
+                            lagret: true,
+                            index,
+                        };
+                    }),
                 };
-            },
+            }, []),
             onSuccess: (data) => {
                 console.log("Hentet forsendelse", data);
             },
