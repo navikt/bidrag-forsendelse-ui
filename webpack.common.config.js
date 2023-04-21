@@ -76,7 +76,7 @@ module.exports = {
             name: "bidrag_forsendelse_ui",
             filename: "remoteEntry.js",
             exposes: {
-                "./Forsendelse": "./src/pages/forsendelse/ForsendelsePage.tsx",
+                "./Forsendelse": "./src/app.tsx",
             },
             shared: {
                 react: { singleton: true, requiredVersion: deps.react },

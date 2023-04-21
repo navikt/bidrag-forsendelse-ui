@@ -2,8 +2,8 @@ import { DraggableProvidedDragHandleProps } from "@hello-pangea/dnd";
 import { DraggableProvidedDraggableProps } from "@hello-pangea/dnd";
 import { DropResult } from "@hello-pangea/dnd";
 import { ResponderProvided } from "@hello-pangea/dnd";
-import { MenuHamburgerIcon } from "@navikt/aksel-icons";
 import { EyeIcon } from "@navikt/aksel-icons";
+import { DragVerticalIcon } from "@navikt/aksel-icons";
 import { OpenDocumentUtils } from "@navikt/bidrag-ui-common";
 import { Delete } from "@navikt/ds-icons";
 import { Edit } from "@navikt/ds-icons";
@@ -118,9 +118,9 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
             let styles = { ...otherProps.style } as CSSProperties;
 
             if (dokument.status == DokumentStatus.SLETTET) {
-                styles = { ...otherProps.style, backgroundColor: "var(--a-surface-danger-subtle)" };
+                styles = { ...otherProps.style, backgroundColor: "var(--a-red-50)" };
             } else if (dokument.lagret == false) {
-                styles = { ...otherProps.style, backgroundColor: "var(--a-surface-success-subtle)" };
+                styles = { ...otherProps.style, backgroundColor: "var(--a-green-50)" };
             }
 
             return styles;
@@ -135,18 +135,18 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
                 className={`dokument-row ${errors.dokumenter?.[index]?.message ? "error" : ""}`}
             >
                 <Table.DataCell style={{ width: "1%" }} className={"cursor-all-scroll"}>
-                    <MenuHamburgerIcon />
+                    <DragVerticalIcon />
                 </Table.DataCell>
                 <Table.DataCell style={{ width: "1%" }}>{dokindex + 1}</Table.DataCell>
-                <Table.HeaderCell scope="row" style={{ width: "20%" }}>
+                <Table.DataCell scope="row" style={{ width: "30%" }}>
                     <EditableDokumentTitle dokument={dokument} index={index} />
-                </Table.HeaderCell>
+                </Table.DataCell>
                 <Table.DataCell style={{ width: "5%" }}>{dayjs(dokumentDato).format("DD.MM.YYYY")}</Table.DataCell>
-                <Table.DataCell style={{ width: "8%" }}>
+                <Table.DataCell style={{ width: "3%" }}>
                     <DokumentStatusTag status={status} />
                 </Table.DataCell>
-                <Table.DataCell style={{ width: "3%" }}>
-                    <div className={"flex flex-row gap-1"}>
+                <Table.DataCell style={{ width: "1%" }}>
+                    <div className={"flex flex-row gap-1 justify-end"}>
                         {dokument.status == "KONTROLLERT" && (
                             <Button
                                 size={"small"}
@@ -199,9 +199,9 @@ function EditableDokumentTitle({ dokument, index }: IEditableDokumentTitleProps)
         );
     }
     return (
-        <div>
+        <div style={{ display: "flex", flexDirection: "row" }}>
+            <Button onClick={() => setInEditMode(true)} size={"xsmall"} variant={"tertiary"} icon={<Edit />} />
             {dokument.tittel}
-            <Button onClick={() => setInEditMode(true)} size={"small"} variant={"tertiary"} icon={<Edit />} />
         </div>
     );
 }

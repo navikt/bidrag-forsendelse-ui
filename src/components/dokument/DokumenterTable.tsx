@@ -37,16 +37,16 @@ export default function DokumenterTable() {
                             <Table.HeaderCell scope="col" style={{ width: "1%" }}>
                                 Nr.
                             </Table.HeaderCell>
-                            <Table.HeaderCell scope="col" style={{ width: "20%" }}>
+                            <Table.HeaderCell scope="col" style={{ width: "30%" }}>
                                 Tittel
                             </Table.HeaderCell>
                             <Table.HeaderCell scope="col" style={{ width: "5%" }}>
                                 Dok. dato
                             </Table.HeaderCell>
-                            <Table.HeaderCell scope="col" align={"left"} style={{ width: "8%" }}>
+                            <Table.HeaderCell scope="col" align={"left"} style={{ width: "5%" }}>
                                 Status
                             </Table.HeaderCell>
-                            <Table.HeaderCell scope="col" style={{ width: "6%" }}></Table.HeaderCell>
+                            <Table.HeaderCell scope="col" style={{ width: "1%" }}></Table.HeaderCell>
                         </Table.Row>
                     </Table.Header>
                     <DokumentRows />

@@ -1,7 +1,6 @@
 import dayjs from "dayjs";
 import { createContext } from "react";
 import { PropsWithChildren } from "react";
-import { useState } from "react";
 import { useContext } from "react";
 import { useEffect } from "react";
 import React from "react";
@@ -69,7 +68,6 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
     const { fields, append, update, swap } = useFieldArray<IForsendelseFormProps>({
         name: "dokumenter",
     });
-    const [isSavingChanges, setIsSavingChanges] = useState(false);
 
     const oppdaterDokumenterMutation = useMutation({
         mutationFn: (dokumenter: IDokument[]) => {
@@ -86,7 +84,6 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
             return BIDRAG_FORSENDELSE_API.api.oppdaterForsendelse(props.forsendelseId, request);
         },
         onSuccess: () => {
-            setIsSavingChanges(false);
             queryClient.invalidateQueries("forsendelse");
         },
         onError: (error, variables, context) => {
@@ -105,7 +102,6 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
         });
     };
     const saveChanges = (formProps: IForsendelseFormProps) => {
-        setIsSavingChanges(true);
         oppdaterDokumenterMutation.mutate(formProps.dokumenter);
     };
 
@@ -137,8 +133,8 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
                 isValid = false;
                 const errorMessage =
                     dok.status == DokumentStatus.MÅ_KONTROLLERES
-                        ? `Dokument ${dok.tittel} må kontrolleres`
-                        : `Dokument ${dok.tittel} må ferdigstilles`;
+                        ? `Dokument "${dok.tittel}" må kontrolleres`
+                        : `Dokument "${dok.tittel}" må ferdigstilles`;
                 setError(`dokumenter.${index}`, { message: errorMessage });
             }
             index++;
@@ -151,7 +147,7 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
                 forsendelseId: props.forsendelseId,
                 dokumenter: fields,
                 hasChanged: isDirty,
-                isSavingChanges,
+                isSavingChanges: oppdaterDokumenterMutation.isLoading,
                 addDocuments: append,
                 deleteDocument,
                 validateCanSendForsendelse,
