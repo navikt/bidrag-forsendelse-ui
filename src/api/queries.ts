@@ -55,13 +55,13 @@ export const ForsendelseApiHooks = {
                     forsendelseId,
                     dokumenter: forsendelse.dokumenter.map(
                         (dokument, index) =>
-                        ({
-                            ...dokument,
-                            status: DokumentStatus[dokument.status],
-                            fraSaksnummer: forsendelse.saksnummer,
-                            lagret: true,
-                            index,
-                        } as IDokument)
+                            ({
+                                ...dokument,
+                                status: DokumentStatus[dokument.status],
+                                fraSaksnummer: forsendelse.saksnummer,
+                                lagret: true,
+                                index,
+                            } as IDokument)
                     ),
                 };
             },
