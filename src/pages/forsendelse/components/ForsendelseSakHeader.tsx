@@ -1,4 +1,4 @@
-import SakHeader from "@navikt/bidrag-ui-common/esm/react";
+import SakHeader from "@navikt/bidrag-ui-common/esm/react_components";
 import React from "react";
 
 import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
