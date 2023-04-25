@@ -135,7 +135,6 @@ function VelgDokumentTabs({ selectDocument, selectedDocuments }: VelgDokumentTab
                 <Tabs.Tab value="fra_samme_sak" label={renderLabel("Fra samme sak", forsendelse.saksnummer)} />
                 <Tabs.Tab value="bm" label={renderLabel("Fra BM saker", null, RolleType.BM)} />
                 <Tabs.Tab value="bp" label={renderLabel("Fra BP saker", null, RolleType.BP)} />
-                <Tabs.Tab value="mal" label="Opprett nytt dokument" />
             </Tabs.List>
             <Tabs.Panel value="fra_samme_sak" className="w-full ">
                 <React.Suspense fallback={<Loader size={"small"} />}>
@@ -215,7 +214,7 @@ function DokumenterForPerson({ ident, selectDocument, selectedDocuments, rolle }
         <>
             {rolleSaksnummere.map((saksnummer) => {
                 return (
-                    <Accordion.Item style={{ minWidth: "3rem" }}>
+                    <Accordion.Item defaultOpen style={{ minWidth: "3rem" }}>
                         <Accordion.Header>{renderAccordionHeader(saksnummer)}</Accordion.Header>
                         <Accordion.Content>
                             <DokumenterForSakTabell

@@ -1,14 +1,14 @@
 import { RolleType } from "@navikt/bidrag-ui-common";
-import { Button, Cell, ContentContainer, Grid, Heading, Select } from "@navikt/ds-react";
+import { Button, Cell, ContentContainer, Grid, Heading } from "@navikt/ds-react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { useMutation } from "react-query";
-import { useNavigate } from "react-router-dom";
 
 import { BIDRAG_FORSENDELSE_API } from "../../api/api";
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
 import { useSession } from "../forsendelse/context/SessionContext";
 import DokumentValg from "./DokumentValg";
 import GjelderSelect from "./GjelderSelect";
+import LanguageAndTemaSelect from "./LanguageAndTemaSelect";
 import MottakerSelect from "./MottakerSelect";
 
 export type OpprettForsendelseFormProps = {
@@ -27,8 +27,7 @@ export type OpprettForsendelseFormProps = {
 export const useOpprettForsendelseFormContext = () => useFormContext<OpprettForsendelseFormProps>();
 
 export default function OpprettForsendelsePage() {
-    const navigate = useNavigate();
-    const { saksnummer, enhet } = useSession();
+    const { saksnummer, enhet, navigateToForsendelse } = useSession();
     const opprettForsendelseFn = useMutation({
         mutationFn: (data: OpprettForsendelseFormProps) =>
             BIDRAG_FORSENDELSE_API.api.opprettForsendelse({
@@ -50,11 +49,7 @@ export default function OpprettForsendelsePage() {
             }),
         onSuccess: (data) => {
             const forsendelseId = data.data.forsendelseId;
-            if (data.data.forsendelseType == "NOTAT") {
-                navigate(`/sak/${saksnummer}/journal/BIF-${forsendelseId}`);
-            } else {
-                navigate(`/sak/${saksnummer}/forsendelse/${forsendelseId}`);
-            }
+            navigateToForsendelse(forsendelseId?.toString(), data.data.forsendelseType);
         },
     });
 
@@ -84,16 +79,7 @@ export default function OpprettForsendelsePage() {
                             <form onSubmit={methods.handleSubmit(onSubmit)}>
                                 <GjelderSelect />
                                 <MottakerSelect />
-                                <div>
-                                    <Heading spacing size="small">
-                                        Andre detaljer
-                                    </Heading>
-                                    <div className="flex flex-row gap-4 pb-4">
-                                        <LanguageSelect />
-                                        <TemaSelect />
-                                    </div>
-                                </div>
-
+                                <LanguageAndTemaSelect />
                                 <DokumentValg />
                                 <div className="flex flex-row gap-2 pt-4">
                                     <Button size="small" loading={opprettForsendelseFn.isLoading}>
@@ -114,61 +100,5 @@ export default function OpprettForsendelsePage() {
                 </Cell>
             </Grid>
         </ContentContainer>
-    );
-}
-
-function TemaSelect() {
-    const { register, getValues } = useOpprettForsendelseFormContext();
-
-    const temaOptions = [
-        {
-            label: "Bidrag",
-            value: "BID",
-        },
-        {
-            label: "Farskap",
-            value: "FAR",
-        },
-    ];
-    return (
-        <Select size="small" label="Tema" {...register("tema")} defaultValue={getValues("tema")}>
-            {temaOptions.map((opt) => (
-                <option value={opt.value}>{opt.label}</option>
-            ))}
-        </Select>
-    );
-}
-
-function LanguageSelect() {
-    const { register, getValues } = useOpprettForsendelseFormContext();
-
-    const languageOptions = [
-        {
-            label: "Bokmål",
-            value: "NB",
-        },
-        {
-            label: "Nynorsk",
-            value: "NN",
-        },
-        {
-            label: "Engelsk",
-            value: "EN",
-        },
-        {
-            label: "Tysk",
-            value: "DE",
-        },
-        {
-            label: "Fransk",
-            value: "FR",
-        },
-    ];
-    return (
-        <Select size="small" label="Språk" {...register("språk")} defaultValue={getValues("språk")}>
-            {languageOptions.map((opt) => (
-                <option value={opt.value}>{opt.label}</option>
-            ))}
-        </Select>
     );
 }

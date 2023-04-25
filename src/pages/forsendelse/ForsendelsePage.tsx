@@ -8,6 +8,7 @@ import { PropsWithChildren } from "react";
 
 import DokumenterTable from "../../components/dokument/DokumenterTable";
 import PageWrapper from "../PageWrapper";
+import ForsendelseDetaljer from "./components/ForsendelseDetaljer";
 import ForsendelseSakHeader from "./components/ForsendelseSakHeader";
 import Gjelder from "./components/Gjelder";
 import Mottaker from "./components/Mottaker";
@@ -33,14 +34,17 @@ function ForsendelseView() {
                         <Heading spacing size={"medium"} className={"w-max"}>
                             Forsendelse nr. {forsendelseId}
                         </Heading>
-                        <div className={"w-max"}>
-                            <div>
+                        <Grid className={"w-max"}>
+                            <Cell xs={12} md={12} lg={6}>
                                 <React.Suspense fallback={<Loader size={"large"} title={"Laster..."} />}>
                                     <Gjelder />
                                     <Mottaker />
                                 </React.Suspense>
-                            </div>
-                        </div>
+                            </Cell>
+                            <Cell xs={12} md={12} lg={4}>
+                                <ForsendelseDetaljer />
+                            </Cell>
+                        </Grid>
                         <div>
                             <Heading spacing level={"3"} size={"small"} className={"max-w"}>
                                 Dokumentliste

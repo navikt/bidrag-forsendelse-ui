@@ -2,6 +2,11 @@ import { Heading, Radio, RadioGroup, Table, Tabs } from "@navikt/ds-react";
 
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
 import { useOpprettForsendelseFormContext } from "./OpprettForsendelsePage";
+interface TableRowData {
+    malId: string;
+    tittel: string;
+    type: "UTGÅENDE" | "NOTAT";
+}
 
 export default function DokumentValg() {
     const { data: dokumentDetaljer, isFetching } = useForsendelseApi().dokumentMalDetaljer();
@@ -47,30 +52,11 @@ export default function DokumentValg() {
                         <Tabs.Tab value="utgående" label="Utgående" />
                         <Tabs.Tab value="notat" label="Notat" />
                     </Tabs.List>
-
                     <Tabs.Panel value="utgående">
-                        <Table size="small" width={"200px"}>
-                            <Table.Header>
-                                <Table.Row>
-                                    <Table.HeaderCell></Table.HeaderCell>
-                                    <Table.HeaderCell>Mal</Table.HeaderCell>
-                                    <Table.HeaderCell>Tittel</Table.HeaderCell>
-                                </Table.Row>
-                            </Table.Header>
-                            <DokumentValgTable rows={alleBrev.filter((v) => v.type == "UTGÅENDE")} />
-                        </Table>
+                        <DokumentValgTable rows={alleBrev.filter((v) => v.type == "UTGÅENDE")} />
                     </Tabs.Panel>
                     <Tabs.Panel value="notat">
-                        <Table size="small">
-                            <Table.Header>
-                                <Table.Row>
-                                    <Table.HeaderCell></Table.HeaderCell>
-                                    <Table.HeaderCell>Mal</Table.HeaderCell>
-                                    <Table.HeaderCell>Tittel</Table.HeaderCell>
-                                </Table.Row>
-                            </Table.Header>
-                            <DokumentValgTable rows={alleBrev.filter((v) => v.type == "NOTAT")} />
-                        </Table>
+                        <DokumentValgTable rows={alleBrev.filter((v) => v.type == "NOTAT")} />
                     </Tabs.Panel>
                 </Tabs>
             </RadioGroup>
@@ -78,17 +64,28 @@ export default function DokumentValg() {
     );
 }
 
-interface TableRowData {
-    malId: string;
-    tittel: string;
-    type: "UTGÅENDE" | "NOTAT";
+interface IDokumentValgTableProps {
+    rows: TableRowData[];
+}
+function DokumentValgTable({ rows }: IDokumentValgTableProps) {
+    return (
+        <Table size="small">
+            <Table.Header>
+                <Table.Row>
+                    <Table.HeaderCell></Table.HeaderCell>
+                    <Table.HeaderCell>Mal</Table.HeaderCell>
+                    <Table.HeaderCell>Tittel</Table.HeaderCell>
+                </Table.Row>
+            </Table.Header>
+            <DokumentValgTableRows rows={rows} />
+        </Table>
+    );
 }
 
 interface DokumentValgTableProps {
     rows: TableRowData[];
 }
-function DokumentValgTable({ rows }: DokumentValgTableProps) {
-    const { register, setValue, getValues } = useOpprettForsendelseFormContext();
+function DokumentValgTableRows({ rows }: DokumentValgTableProps) {
     return (
         <Table.Body>
             {rows.map((row) => (

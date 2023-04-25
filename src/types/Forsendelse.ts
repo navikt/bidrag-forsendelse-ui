@@ -9,6 +9,7 @@ export interface IForsendelse {
     dokumenter: IDokument[];
     saksnummer?: string;
     enhet?: string;
+    tema?: string;
     opprettetAvIdent?: string;
     opprettetAvNavn?: string;
     tittel?: string;
