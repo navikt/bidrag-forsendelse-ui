@@ -92,8 +92,10 @@ function LeggTilDokumentFraSakModal({ onClose, open }: LeggTilDokumentFraSakModa
             </Modal.Content>
             <Modal.Content>
                 <div className={"ml-2 flex flex-row gap-2 items-end bottom-2"}>
-                    <Button onClick={() => onClose(selectedDocuments)}>Legg til valgte</Button>
-                    <Button variant={"tertiary"} onClick={() => onClose([])}>
+                    <Button size="small" onClick={() => onClose(selectedDocuments)}>
+                        Legg til valgte
+                    </Button>
+                    <Button size="small" variant={"tertiary"} onClick={() => onClose([])}>
                         Avbryt
                     </Button>
                 </div>

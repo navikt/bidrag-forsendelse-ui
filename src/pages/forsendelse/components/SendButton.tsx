@@ -25,10 +25,10 @@ export default function SendButton() {
     return (
         <>
             <div className={"flex flex-row gap-2"}>
-                <Button variant={"primary"} onClick={sendForsendelse}>
+                <Button size="small" variant={"primary"} onClick={sendForsendelse}>
                     Send
                 </Button>
-                <Button variant={"secondary"} onClick={sendForsendelseManuelt}>
+                <Button size="small" variant={"secondary"} onClick={sendForsendelseManuelt}>
                     Send lokalt
                 </Button>
             </div>

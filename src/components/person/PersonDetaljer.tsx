@@ -1,27 +1,36 @@
 import "./PersonDetaljer.css";
 
-import { PeopleInCircle } from "@navikt/ds-icons";
+import { RolleTag, RolleType } from "@navikt/bidrag-ui-common";
 import { BodyShort, Label } from "@navikt/ds-react";
 import { CopyToClipboard } from "@navikt/ds-react-internal";
 import React from "react";
 
-import { RolleType } from "../../types/types";
 interface IPersonDetaljerProps {
     rolle?: RolleType;
     navn: string;
     ident?: string;
+    copy?: boolean;
     className?: string;
+    spacing?: boolean;
 }
-export default function PersonDetaljer({ rolle, navn, ident, className }: IPersonDetaljerProps) {
+export default function PersonDetaljer({
+    rolle,
+    navn,
+    ident,
+    className,
+    copy = true,
+    spacing = true,
+}: IPersonDetaljerProps) {
     return (
-        <div className={`person-detaljer margin--M ${className} pt-2 pb-2`}>
-            <PeopleInCircle className={"person-circle"} />
-            {rolle && <div>{rolle} / </div>}
+        <div className={`person-detaljer ${spacing ? "margin--M pt-2 pb-2" : ""} ${className} `}>
+            {rolle && <RolleTag rolleType={rolle} />}
             <Label size={"medium"}>{navn}</Label>
             {ident && (
                 <>
                     <BodyShort size={"medium"}>{(navn ? " / " : "") + ident}</BodyShort>
-                    <CopyToClipboard copyText={ident} popoverText={"Kopiert til utklippstavlen"} />
+                    {copy && (
+                        <CopyToClipboard size="small" copyText={ident} popoverText={"Kopiert til utklippstavlen"} />
+                    )}
                 </>
             )}
         </div>

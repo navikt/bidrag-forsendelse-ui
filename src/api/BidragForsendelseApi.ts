@@ -52,17 +52,17 @@ export interface OpprettDokumentForesporsel {
     /** DokumentmalId sier noe om dokumentets innhold og oppbygning. (Også kjent som brevkode) */
     dokumentmalId?: string;
     /** Dette skal være UNDER_PRODUKSJON for redigerbare dokumenter som ikke er ferdigprodusert. Ellers settes det til FERDIGSTILT */
-    status:
-        | "IKKE_BESTILT"
-        | "BESTILLING_FEILET"
-        | "AVBRUTT"
-        | "UNDER_PRODUKSJON"
-        | "UNDER_REDIGERING"
-        | "FERDIGSTILT"
-        | "MÅ_KONTROLLERES"
-        | "KONTROLLERT";
+    status?:
+    | "IKKE_BESTILT"
+    | "BESTILLING_FEILET"
+    | "AVBRUTT"
+    | "UNDER_PRODUKSJON"
+    | "UNDER_REDIGERING"
+    | "FERDIGSTILT"
+    | "MÅ_KONTROLLERES"
+    | "KONTROLLERT";
     /** Om dokumentet med dokumentmalId skal bestilles. Hvis dette er satt til false så antas det at kallende system bestiller dokumentet selv. */
-    bestillDokument: boolean;
+    bestillDokument?: boolean;
 }
 
 /** Metadata for opprettelse av forsendelse */
@@ -101,14 +101,14 @@ export interface DokumentRespons {
     dokumentmalId?: string;
     redigeringMetadata?: string;
     status?:
-        | "IKKE_BESTILT"
-        | "BESTILLING_FEILET"
-        | "AVBRUTT"
-        | "UNDER_PRODUKSJON"
-        | "UNDER_REDIGERING"
-        | "FERDIGSTILT"
-        | "MÅ_KONTROLLERES"
-        | "KONTROLLERT";
+    | "IKKE_BESTILT"
+    | "BESTILLING_FEILET"
+    | "AVBRUTT"
+    | "UNDER_PRODUKSJON"
+    | "UNDER_REDIGERING"
+    | "FERDIGSTILT"
+    | "MÅ_KONTROLLERES"
+    | "KONTROLLERT";
     arkivsystem?: "JOARK" | "MIDLERTIDLIG_BREVLAGER" | "UKJENT" | "BIDRAG";
 }
 
@@ -119,6 +119,8 @@ export interface OpprettForsendelseRespons {
      * @format int64
      */
     forsendelseId?: number;
+    /** Type på forsendelse. Kan være NOTAT eller UTGÅENDE */
+    forsendelseType?: "UTGÅENDE" | "NOTAT";
     /** Liste med dokumenter som er knyttet til journalposten */
     dokumenter: DokumentRespons[];
 }
@@ -337,6 +339,11 @@ export interface EndreReturDetaljer {
     beskrivelse: string;
 }
 
+export interface DokumentMalDetaljer {
+    beskrivelse: string;
+    type: "UTGÅENDE" | "NOTAT";
+}
+
 export interface DokumentMetadata {
     /** Journalpostid med arkiv prefiks som skal benyttes når dokumentet hentes */
     journalpostId?: string;
@@ -470,24 +477,24 @@ export interface JournalpostDto {
      * @deprecated
      */
     kilde?:
-        | "NAV_NO_BID"
-        | "SKAN_BID"
-        | "NAV_NO"
-        | "SKAN_NETS"
-        | "LOKAL_UTSKRIFT"
-        | "SENTRAL_UTSKRIFT"
-        | "SDP"
-        | "INGEN_DISTRIBUSJON";
+    | "NAV_NO_BID"
+    | "SKAN_BID"
+    | "NAV_NO"
+    | "SKAN_NETS"
+    | "LOKAL_UTSKRIFT"
+    | "SENTRAL_UTSKRIFT"
+    | "SDP"
+    | "INGEN_DISTRIBUSJON";
     /** Journalposten ble mottatt/sendt ut i kanal */
     kanal?:
-        | "NAV_NO_BID"
-        | "SKAN_BID"
-        | "NAV_NO"
-        | "SKAN_NETS"
-        | "LOKAL_UTSKRIFT"
-        | "SENTRAL_UTSKRIFT"
-        | "SDP"
-        | "INGEN_DISTRIBUSJON";
+    | "NAV_NO_BID"
+    | "SKAN_BID"
+    | "NAV_NO"
+    | "SKAN_NETS"
+    | "LOKAL_UTSKRIFT"
+    | "SENTRAL_UTSKRIFT"
+    | "SDP"
+    | "INGEN_DISTRIBUSJON";
     /**
      * Dato for når dokument er mottat, dvs. dato for journalføring eller skanning
      * @format date
@@ -566,14 +573,14 @@ export interface DokumentDetaljer {
 export interface DokumentRedigeringMetadataResponsDto {
     tittel: string;
     status:
-        | "IKKE_BESTILT"
-        | "BESTILLING_FEILET"
-        | "AVBRUTT"
-        | "UNDER_PRODUKSJON"
-        | "UNDER_REDIGERING"
-        | "FERDIGSTILT"
-        | "MÅ_KONTROLLERES"
-        | "KONTROLLERT";
+    | "IKKE_BESTILT"
+    | "BESTILLING_FEILET"
+    | "AVBRUTT"
+    | "UNDER_PRODUKSJON"
+    | "UNDER_REDIGERING"
+    | "FERDIGSTILT"
+    | "MÅ_KONTROLLERES"
+    | "KONTROLLERT";
     forsendelseStatus: "UNDER_PRODUKSJON" | "FERDIGSTILT" | "SLETTET" | "DISTRIBUERT" | "DISTRIBUERT_LOKALT";
     redigeringMetadata?: string;
     dokumenter: DokumentDetaljer[];
@@ -631,10 +638,7 @@ export class HttpClient<SecurityDataType = unknown> {
     private format?: ResponseType;
 
     constructor({ securityWorker, secure, format, ...axiosConfig }: ApiConfig<SecurityDataType> = {}) {
-        this.instance = axios.create({
-            ...axiosConfig,
-            baseURL: axiosConfig.baseURL || "https://bidrag-dokument-forsendelse-feature.dev.intern.nav.no",
-        });
+        this.instance = axios.create({ ...axiosConfig, baseURL: axiosConfig.baseURL || "http://localhost:8999" });
         this.secure = secure;
         this.format = format;
         this.securityWorker = securityWorker;
@@ -723,7 +727,7 @@ export class HttpClient<SecurityDataType = unknown> {
 /**
  * @title bidrag-dokument-forsendelse
  * @version v1
- * @baseUrl https://bidrag-dokument-forsendelse-feature.dev.intern.nav.no
+ * @baseUrl http://localhost:8999
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
     api = {
@@ -1102,6 +1106,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         stottedeDokumentmaler: (params: RequestParams = {}) =>
             this.request<string[], any>({
                 path: `/api/forsendelse/v2/dokumentmaler`,
+                method: "OPTIONS",
+                secure: true,
+                ...params,
+            }),
+
+        /**
+         * @description Henter dokumentmaler som er støttet av applikasjonen
+         *
+         * @tags forsendelse-innsyn-kontroller
+         * @name StottedeDokumentmalDetaljer
+         * @request OPTIONS:/api/forsendelse/v2/dokumentmaler/detaljer
+         * @secure
+         */
+        stottedeDokumentmalDetaljer: (params: RequestParams = {}) =>
+            this.request<Record<string, DokumentMalDetaljer>, any>({
+                path: `/api/forsendelse/v2/dokumentmaler/detaljer`,
                 method: "OPTIONS",
                 secure: true,
                 ...params,

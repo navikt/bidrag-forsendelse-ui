@@ -5,8 +5,14 @@ import { Api as BidragDokumentApi } from "./BidragDokumentApi";
 import { Api as BidragForsendelseApi } from "./BidragForsendelseApi";
 import { Api as PersonApi } from "./BidragPersonApi";
 import { Api as SakApi } from "./BidragSakApi";
+import { Api as SamhandlerApi } from "./BidragSamhandlerApi";
 
 export const PERSON_API = useApi(new PersonApi({ baseURL: environment.url.bidragPerson }), "bidrag-person", "fss");
+export const SAMHANDLER_API = useApi(
+    new SamhandlerApi({ baseURL: environment.url.bidragSamhandler }),
+    "bidrag-samhandler",
+    "gcp"
+);
 export const SAK_API = useApi(new SakApi({ baseURL: environment.url.bidragSak }), "bidrag-sak", "fss");
 export const BIDRAG_DOKUMENT_API = useApi(
     new BidragDokumentApi({ baseURL: environment.url.bidragDokument }),

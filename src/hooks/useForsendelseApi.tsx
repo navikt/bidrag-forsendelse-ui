@@ -1,13 +1,14 @@
 import { IRolleDetaljer, RolleType } from "@navikt/bidrag-ui-common";
 import { AxiosResponse } from "axios";
 import React from "react";
-import { useQuery } from "react-query";
+import { useQuery, UseQueryResult } from "react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../api/api";
 import { PERSON_API } from "../api/api";
 import { SAK_API } from "../api/api";
 import { BIDRAG_DOKUMENT_API } from "../api/api";
 import { JournalpostDto } from "../api/BidragDokumentApi";
+import { DokumentMalDetaljer } from "../api/BidragForsendelseApi";
 import { PersonDto } from "../api/BidragPersonApi";
 import { BidragSakDto } from "../api/BidragSakApi";
 import { DokumentStatus } from "../constants/DokumentStatus";
@@ -19,15 +20,15 @@ interface UseForsendelseDataProps {
     hentForsendelse: () => IForsendelse;
     hentGjelder: () => IRolleDetaljer;
     hentMottaker: () => IRolleDetaljer;
+    dokumentMalDetaljer: () => UseQueryResult<Record<string, DokumentMalDetaljer>>;
     hentRoller: () => IRolleDetaljer[];
     hentJournalposterForPerson: (ident: string) => Map<SAKSNUMMER, JournalpostDto[]>;
     hentJournalposterForSak: (saksnummer: string) => JournalpostDto[];
 }
 export function useForsendelseApi(): UseForsendelseDataProps {
-    const { forsendelseId } = useSession();
+    const { forsendelseId, saksnummer: saksnummerFromSession } = useSession();
+    const saksnummer = saksnummerFromSession ?? hentForsendelseQuery().saksnummer;
     const hentSak = (): BidragSakDto => {
-        const forsendelse = hentForsendelseQuery();
-        const saksnummer = forsendelse.saksnummer;
         const { data: sak, refetch } = useQuery({
             queryKey: `sak_${saksnummer}`,
             queryFn: ({ signal }) => SAK_API.bidragSak.findMetadataForSak(saksnummer),
@@ -131,9 +132,9 @@ export function useForsendelseApi(): UseForsendelseDataProps {
             ident,
         };
     };
-    const hentForsendelseQuery = (): IForsendelse => {
+    function hentForsendelseQuery(): IForsendelse {
         const { data: forsendelse, isRefetching } = useQuery({
-            queryKey: "forsendelse",
+            queryKey: ["forsendelse", forsendelseId],
             queryFn: ({ signal }) => BIDRAG_FORSENDELSE_API.api.hentForsendelse(forsendelseId),
             enabled: forsendelseId != undefined,
             optimisticResults: false,
@@ -162,11 +163,21 @@ export function useForsendelseApi(): UseForsendelseDataProps {
             ...forsendelse,
             isStaleData: isRefetching,
         };
-    };
+    }
+
+    function dokumentMalDetaljer() {
+        return useQuery({
+            queryKey: "dokumentMalDetaljer",
+            queryFn: ({ signal }) => BIDRAG_FORSENDELSE_API.api.stottedeDokumentmalDetaljer(),
+            select: (data) => data.data,
+            optimisticResults: false,
+        });
+    }
 
     return {
         hentForsendelse: hentForsendelseQuery,
         hentMottaker,
+        dokumentMalDetaljer,
         hentGjelder,
         hentRoller,
         hentJournalposterForPerson,

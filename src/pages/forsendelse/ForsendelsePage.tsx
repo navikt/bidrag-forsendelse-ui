@@ -7,17 +7,18 @@ import React from "react";
 import { PropsWithChildren } from "react";
 
 import DokumenterTable from "../../components/dokument/DokumenterTable";
-import ValidationErrorSummary from "../../components/ValidationErrorSummary";
 import PageWrapper from "../PageWrapper";
 import ForsendelseSakHeader from "./components/ForsendelseSakHeader";
 import Gjelder from "./components/Gjelder";
 import Mottaker from "./components/Mottaker";
 import SendButton from "./components/SendButton";
+import ValidationErrorSummary from "./components/ValidationErrorSummary";
 import { DokumenterFormProvider } from "./context/DokumenterFormContext";
 import { useSession } from "./context/SessionContext";
 import { SessionProvider } from "./context/SessionContext";
 interface ForsendelsePageProps {
     forsendelseId: string;
+    saksnummer: string;
     sessionId: string;
     enhet: string;
 }
@@ -60,10 +61,15 @@ function ForsendelseView() {
     );
 }
 
-export default function ForsendelsePage({ forsendelseId, sessionId, enhet }: PropsWithChildren<ForsendelsePageProps>) {
+export default function ForsendelsePage({
+    forsendelseId,
+    sessionId,
+    enhet,
+    saksnummer,
+}: PropsWithChildren<ForsendelsePageProps>) {
     return (
         <PageWrapper name={"forsendelse-page"}>
-            <SessionProvider forsendelseId={forsendelseId} sessionId={sessionId} enhet={enhet}>
+            <SessionProvider forsendelseId={forsendelseId} saksnummer={saksnummer} sessionId={sessionId} enhet={enhet}>
                 <DokumenterFormProvider forsendelseId={forsendelseId}>
                     <React.Suspense fallback={<Loader size={"3xlarge"} title={"Laster..."} />}>
                         <div>

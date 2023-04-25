@@ -2,7 +2,7 @@ import { ErrorSummary } from "@navikt/ds-react";
 import ErrorSummaryItem from "@navikt/ds-react/esm/form/error-summary/ErrorSummaryItem";
 import { useFormContext } from "react-hook-form";
 
-import { IForsendelseFormProps } from "../pages/forsendelse/context/DokumenterFormContext";
+import { IForsendelseFormProps } from "../context/DokumenterFormContext";
 
 export default function ValidationErrorSummary() {
     const {

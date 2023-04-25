@@ -5,10 +5,14 @@ import { useContext } from "react";
 
 interface ISessionContext {
     forsendelseId: string;
+    saksnummer: string;
+    enhet: string;
+    sessionId: string;
 }
 
 interface ISessionPropsContext {
-    forsendelseId: string;
+    saksnummer?: string;
+    forsendelseId?: string;
     sessionId: string;
     enhet: string;
 }
@@ -17,6 +21,7 @@ export const SessionContext = createContext<ISessionContext>({} as ISessionConte
 
 function SessionProvider({ children, ...props }: PropsWithChildren<ISessionPropsContext>) {
     const [forsendelseId, setForsendelseId] = useState(props.forsendelseId);
+    const [saksnummer, setSaksnummer] = useState(props.saksnummer);
     const [sessionId, setSessionId] = useState(props.sessionId);
     const [enhet, setEnhet] = useState(props.enhet);
 
@@ -24,6 +29,9 @@ function SessionProvider({ children, ...props }: PropsWithChildren<ISessionProps
         <SessionContext.Provider
             value={{
                 forsendelseId,
+                saksnummer,
+                enhet,
+                sessionId,
             }}
         >
             {children}
