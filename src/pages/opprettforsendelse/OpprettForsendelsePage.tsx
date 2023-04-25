@@ -75,7 +75,7 @@ export default function OpprettForsendelsePage() {
     return (
         <ContentContainer>
             <Grid>
-                <Cell xs={12} md={10} lg={8}>
+                <Cell xs={12} md={12} lg={10}>
                     <div className={"leading-xlarge tracking-wide"}>
                         <Heading spacing size="large">
                             Opprett forsendelse
