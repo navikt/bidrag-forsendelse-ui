@@ -4,8 +4,9 @@ import { EyeIcon } from "@navikt/aksel-icons";
 import { DragVerticalIcon } from "@navikt/aksel-icons";
 import { OpenDocumentUtils } from "@navikt/bidrag-ui-common";
 import { Delete } from "@navikt/ds-icons";
-import { Table, Textarea } from "@navikt/ds-react";
+import { Table } from "@navikt/ds-react";
 import { Button } from "@navikt/ds-react";
+import { Textarea } from "@navikt/ds-react";
 import dayjs from "dayjs";
 import React, { useRef } from "react";
 import { useState } from "react";
@@ -16,6 +17,7 @@ import { useMutation } from "react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../../api/api";
 import { DokumentStatus } from "../../constants/DokumentStatus";
+import { useForsendelseApi } from "../../hooks/useForsendelseApi";
 import { FormIDokument, useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IForsendelseFormProps } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { useSession } from "../../pages/forsendelse/context/SessionContext";
@@ -95,6 +97,7 @@ interface IDokumentRowProps {
 const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
     ({ id, dokument, forsendelseId, index, deleteDocument, listeners, attributes, style }: IDokumentRowProps, ref) => {
         const { tittel, index: dokindex, status, journalpostId, dokumentreferanse, dokumentDato } = dokument;
+        const forsendelse = useForsendelseApi().hentForsendelse();
         const {
             register,
             formState: { errors },
@@ -104,7 +107,15 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
             const { ref: formRef } = register(`dokumenter.${index}`);
             formRef(ref);
         }, []);
-
+        function getKildeDisplayValue() {
+            if ([DokumentStatus.UNDER_REDIGERING, DokumentStatus.FERDIGSTILT].includes(dokument.status)) {
+                return "Fra mal";
+            }
+            if (dokument.fraSaksnummer == forsendelse.saksnummer) {
+                return "Fra samme sak";
+            }
+            return "Fra sak " + dokument.fraSaksnummer;
+        }
         const getRowStyle = () => {
             let styles = { ...style } as CSSProperties;
 
@@ -116,6 +127,8 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
 
             return styles;
         };
+
+        const forsendelseIdNumeric = forsendelseId?.replace("BIF-", "");
 
         return (
             <Table.Row
@@ -145,13 +158,13 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
                                 variant={"tertiary"}
                                 icon={<EyeIcon />}
                                 onClick={() =>
-                                    OpenDocumentUtils.åpneDokument(`BIF-${forsendelseId}`, dokumentreferanse)
+                                    OpenDocumentUtils.åpneDokument(`BIF-${forsendelseIdNumeric}`, dokumentreferanse)
                                 }
                             />
                         )}
                         <OpenDokumentButton
                             dokumentreferanse={dokument.dokumentreferanse}
-                            journalpostId={"BIF-" + forsendelseId}
+                            journalpostId={"BIF-" + forsendelseIdNumeric}
                             status={dokument.status}
                         />
                         <Button size={"small"} variant={"tertiary"} icon={<Delete />} onClick={deleteDocument} />
@@ -167,7 +180,7 @@ interface IEditableDokumentTitleProps {
     index: number;
 }
 function EditableDokumentTitle({ dokument, index }: IEditableDokumentTitleProps) {
-    const [inEditMode, setInEditMode] = useState(true);
+    const [inEditMode, setInEditMode] = useState(false);
     const { forsendelseId } = useSession();
     const enableBlurEvent = useRef(false);
     const oppdaterDokumentTittelFn = useMutation({
@@ -182,10 +195,10 @@ function EditableDokumentTitle({ dokument, index }: IEditableDokumentTitleProps)
     const value = useWatch({ name: `dokumenter.${index}.tittel` });
 
     function updateTitle(e) {
-        // if (enableBlurEvent.current == false) return;
-        // setInEditMode(false);
+        if (enableBlurEvent.current == false) return;
+        setInEditMode(false);
         oppdaterDokumentTittelFn.mutate(value);
-        // enableBlurEvent.current = false;
+        enableBlurEvent.current = false;
     }
 
     function onKeyDown(e: React.KeyboardEvent) {
@@ -198,29 +211,29 @@ function EditableDokumentTitle({ dokument, index }: IEditableDokumentTitleProps)
         <div
             tabIndex={-1}
             style={{ width: "100%" }}
-            // onDoubleClick={(e) => {
-            //     e.stopPropagation();
-            //     e.preventDefault();
-            //     setTimeout(() => (enableBlurEvent.current = true), 500);
-            //     setInEditMode(true);
-            // }}
-            onBlur={updateTitle}
-            onMouseDown={(e) => {
+            onDoubleClick={(e) => {
                 e.stopPropagation();
+                e.preventDefault();
+                setTimeout(() => (enableBlurEvent.current = true), 500);
+                setInEditMode(true);
             }}
-        // onKeyDown={onKeyDown}
+            onBlur={updateTitle}
+            onKeyDown={onKeyDown}
         >
-            <Textarea
-                size="small"
-                label="Tittel"
-                maxRows={1}
-                minRows={1}
-                resize
-                defaultValue={dokument.tittel}
-                hideLabel
-                {...register(`dokumenter.${index}.tittel`, { required: "Tittel kan ikke være tom" })}
-                error={errors.dokumenter?.[index]?.tittel?.message}
-            />
+            {inEditMode ? (
+                <Textarea
+                    autoFocus
+                    maxRows={2}
+                    minRows={1}
+                    label="Tittel"
+                    defaultValue={dokument.tittel}
+                    hideLabel
+                    {...register(`dokumenter.${index}.tittel`, { required: "Tittel kan ikke være tom" })}
+                    error={errors.dokumenter?.[index]?.tittel?.message}
+                />
+            ) : (
+                <>{value}</>
+            )}
         </div>
     );
 }

@@ -28,7 +28,7 @@ export default function ManuellUtsendingModal({ onCancel }: ManuellUtsendingModa
         onSuccess: () => {
             queryClient.invalidateQueries("forsendelse");
             setSubmitState("succesfull");
-            // RedirectT o.sakshistorikk(saksnummer);
+            RedirectTo.sakshistorikk(forsendelse.saksnummer);
         },
         onError: (error, variables, context) => {
             setSubmitState("error");

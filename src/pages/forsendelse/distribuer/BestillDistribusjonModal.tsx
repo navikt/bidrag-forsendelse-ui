@@ -12,6 +12,7 @@ import { DistribuerJournalpostRequest } from "../../../api/BidragForsendelseApi"
 import { DistribuerTilAdresse } from "../../../api/BidragForsendelseApi";
 import { hentPostnummere } from "../../../api/queries";
 import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
+import { RedirectTo } from "../../../utils/RedirectUtils";
 import { queryClient } from "../../PageWrapper";
 import BestillDistribusjonInfo from "./BestillDistribusjonInfo";
 
@@ -68,7 +69,7 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
         onSuccess: () => {
             queryClient.invalidateQueries("forsendelse");
             setSubmitState("succesfull");
-            // RedirectT o.sakshistorikk(saksnummer);
+            RedirectTo.sakshistorikk(forsendelse.saksnummer);
         },
         onError: () => {
             setError("Det skjedde en feil ved bestilling av distribusjon. Vennligst prøv på nytt.");

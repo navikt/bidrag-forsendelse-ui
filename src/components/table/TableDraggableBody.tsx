@@ -4,19 +4,13 @@ import {
     DragEndEvent,
     DraggableAttributes,
     DragOverlay,
-    KeyboardSensor,
     MouseSensor,
     useSensor,
     useSensors,
 } from "@dnd-kit/core";
 import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import { restrictToVerticalAxis, restrictToWindowEdges } from "@dnd-kit/modifiers";
-import {
-    SortableContext,
-    sortableKeyboardCoordinates,
-    useSortable,
-    verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
+import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Table } from "@navikt/ds-react";
 import React, { CSSProperties, useState } from "react";
@@ -42,12 +36,13 @@ export default function TableDraggableBody<T>({ children, onChange, rowData, get
     const sensors = useSensors(
         useSensor(MouseSensor, {
             activationConstraint: {
+                tolerance: 100,
                 distance: 10,
             },
-        }),
-        useSensor(KeyboardSensor, {
-            coordinateGetter: sortableKeyboardCoordinates,
         })
+        // useSensor(KeyboardSensor, {
+        //     coordinateGetter: sortableKeyboardCoordinates,
+        // })
     );
 
     function handleDragStart(event) {

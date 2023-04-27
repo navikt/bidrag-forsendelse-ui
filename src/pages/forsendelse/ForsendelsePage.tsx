@@ -8,7 +8,6 @@ import { PropsWithChildren } from "react";
 
 import DokumenterTable from "../../components/dokument/DokumenterTable";
 import PageWrapper from "../PageWrapper";
-import ForsendelseDetaljer from "./components/ForsendelseDetaljer";
 import ForsendelseSakHeader from "./components/ForsendelseSakHeader";
 import Gjelder from "./components/Gjelder";
 import Mottaker from "./components/Mottaker";
@@ -31,22 +30,22 @@ function ForsendelseView() {
             <Grid>
                 <Cell xs={12} md={12} lg={10}>
                     <div className={"py-18 leading-xlarge tracking-wide"}>
-                        <Heading spacing size={"medium"} className={"w-max"}>
+                        <Heading spacing size={"large"} className={"w-max"}>
                             Forsendelse nr. {forsendelseId}
                         </Heading>
                         <Grid className={"w-max"}>
-                            <Cell xs={12} md={12} lg={6}>
+                            <Cell xs={12} md={12} lg={10}>
                                 <React.Suspense fallback={<Loader size={"large"} title={"Laster..."} />}>
                                     <Gjelder />
                                     <Mottaker />
                                 </React.Suspense>
                             </Cell>
-                            <Cell xs={12} md={12} lg={4}>
+                            {/* <Cell xs={12} md={12} lg={4}>
                                 <ForsendelseDetaljer />
-                            </Cell>
+                            </Cell> */}
                         </Grid>
                         <div>
-                            <Heading spacing level={"3"} size={"small"} className={"max-w"}>
+                            <Heading level={"3"} size={"medium"} className={"max-w mt-[32px]"}>
                                 Dokumentliste
                             </Heading>
                             <DokumenterTable />

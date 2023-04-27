@@ -15,7 +15,7 @@ interface IRolleDetaljerProps {
 export default function RolleDetaljer({ rolle, ident, navn, label }: IRolleDetaljerProps) {
     return (
         <div className={"rolledetaljer"}>
-            <Heading level="3" size={"medium"}>
+            <Heading level="3" size={"small"}>
                 {label}
             </Heading>
             <div className={"ml-2"}>

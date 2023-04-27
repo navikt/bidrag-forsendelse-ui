@@ -11,6 +11,7 @@ const url = {
     bidragSamhandler: process.env.BIDRAG_SAMHANDLER_URL,
     bidragSak: process.env.BIDRAG_SAK_URL,
     bidragDokument: process.env.BIDRAG_DOKUMENT_URL,
+    bisys: process.env.BISYS_URL,
 };
 
 export default { url, system };
