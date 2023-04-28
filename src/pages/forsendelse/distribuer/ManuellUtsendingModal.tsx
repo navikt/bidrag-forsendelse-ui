@@ -10,6 +10,7 @@ import { useMutation } from "react-query";
 import { BIDRAG_FORSENDELSE_API } from "../../../api/api";
 import { DistribuerJournalpostRequest } from "../../../api/BidragForsendelseApi";
 import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
+import { RedirectTo } from "../../../utils/RedirectUtils";
 import { queryClient } from "../../PageWrapper";
 
 interface ManuellUtsendingModalProps {
