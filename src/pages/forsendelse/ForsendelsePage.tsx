@@ -46,7 +46,7 @@ function ForsendelseView() {
                         </Grid>
                         <div>
                             <Heading level={"3"} size={"medium"} className={"max-w mt-[32px]"}>
-                                Dokumentliste
+                                Dokumenter
                             </Heading>
                             <DokumenterTable />
                         </div>
