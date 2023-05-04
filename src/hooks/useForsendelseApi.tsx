@@ -16,11 +16,28 @@ import { SAKSNUMMER } from "../constants/fellestyper";
 import { useSession } from "../pages/forsendelse/context/SessionContext";
 import { IForsendelse } from "../types/Forsendelse";
 
+const UseForsendelseApiKeys = {
+    forsendelse: "forsendelse",
+    dokumentValg: (behandlingType: string, soknadFra: string, soknadType: string) => [
+        UseForsendelseApiKeys.forsendelse,
+        "dokumentValg",
+        behandlingType,
+        soknadFra,
+        soknadType,
+    ],
+};
 interface UseForsendelseDataProps {
     hentForsendelse: () => IForsendelse;
     hentGjelder: () => IRolleDetaljer;
     hentMottaker: () => IRolleDetaljer;
-    dokumentMalDetaljer: () => UseQueryResult<Record<string, DokumentMalDetaljer>>;
+    dokumentMalDetaljer: (props: {
+        behandlingType: BEHANDLING_TYPE;
+        soknadType: SOKNAD_TYPE;
+        soknadFra: SOKNAD_FRA;
+        klage?: boolean;
+        erVedtakFattet?: boolean;
+        manuelBeregning?: boolean;
+    }) => UseQueryResult<Record<string, DokumentMalDetaljer>>;
     hentRoller: () => IRolleDetaljer[];
     hentJournalposterForPerson: (ident: string) => Map<SAKSNUMMER, JournalpostDto[]>;
     hentJournalposterForSak: (saksnummer: string) => JournalpostDto[];
@@ -165,10 +182,17 @@ export function useForsendelseApi(): UseForsendelseDataProps {
         };
     }
 
-    function dokumentMalDetaljer() {
+    function dokumentMalDetaljer(request: {
+        behandlingType: BEHANDLING_TYPE;
+        soknadType: SOKNAD_TYPE;
+        soknadFra: SOKNAD_FRA;
+        klage?: boolean;
+        erVedtakFattet?: boolean;
+        manuelBeregning?: boolean;
+    }) {
         return useQuery({
             queryKey: "dokumentMalDetaljer",
-            queryFn: ({ signal }) => BIDRAG_FORSENDELSE_API.api.stottedeDokumentmalDetaljer(),
+            queryFn: ({ signal }) => BIDRAG_FORSENDELSE_API.api.hentDokumentValg(request),
             select: (data) => data.data,
             optimisticResults: false,
         });
@@ -184,3 +208,64 @@ export function useForsendelseApi(): UseForsendelseDataProps {
         hentJournalposterForSak,
     };
 }
+
+export type BEHANDLING_TYPE =
+    | "AVSKRIVNING"
+    | "EKTEFELLEBIDRAG"
+    | "BIDRAG_18_AR"
+    | "BIDRAG"
+    | "BIDRAG_TILLEGGSBIDRAG"
+    | "DIREKTE_OPPGJOR"
+    | "ETTERGIVELSE"
+    | "ERSTATNING"
+    | "FARSKAP"
+    | "FORSKUDD"
+    | "GEBYR"
+    | "INNKREVING"
+    | "MOTREGNING"
+    | "REFUSJON_BIDRAG"
+    | "SAKSOMKOSTNINGER"
+    | "SARTILSKUDD"
+    | "BIDRAG_18_AR_TILLEGGSBBI"
+    | "TILLEGGSBIDRAG"
+    | "TILBAKEKR_ETTERGIVELSE"
+    | "TILBAKEKREVING"
+    | "OPPFOSTRINGSBIDRAG"
+    | "MORSKAP"
+    | "KUNNSKAP_BIOLOGISK_FAR"
+    | "BARNEBORTFORING"
+    | "KV"
+    | "REISEKOSTNADER";
+export type SOKNAD_TYPE =
+    | "ENDRING"
+    | "EGET_TILTAK"
+    | "SOKNAD"
+    | "INNKREVINGSGRUNNL"
+    | "INDEKSREG"
+    | "KLAGE_BEGR_SATS"
+    | "KLAGE"
+    | "FOLGER_KLAGE"
+    | "KONVERTERING"
+    | "OMGJORING_BEGR_SATS"
+    | "OPPJUST_FORSK"
+    | "OPPHOR"
+    | "OMGJORING"
+    | "PRIVAT_AVTALE"
+    | "BEGR_REVURD"
+    | "REVURDERING"
+    | "KR";
+export type SOKNAD_FRA =
+    | "BM_I_ANNEN_SAK"
+    | "BARN_18"
+    | "BIDRAGSENHET"
+    | "FYLKESNEMDA"
+    | "NAV_INTERNASJONALT"
+    | "KOMMUNE"
+    | "KONVERTERING"
+    | "BIDRAGSMOTTAKER"
+    | "NORSKE_MYNDIGH"
+    | "BIDRAGSPLIKTIG"
+    | "UTENLANDSKE_MYNDIGH"
+    | "VERGE"
+    | "TI"
+    | "KLAGE_ENHET";

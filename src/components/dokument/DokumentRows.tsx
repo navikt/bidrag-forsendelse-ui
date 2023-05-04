@@ -134,12 +134,10 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
             <Table.Row
                 key={index + dokumentreferanse + journalpostId}
                 ref={ref}
-                {...listeners}
-                {...attributes}
                 style={getRowStyle()}
                 className={`dokument-row ${errors.dokumenter?.[index]?.message ? "error" : ""}`}
             >
-                <Table.DataCell style={{ width: "1%" }} className={"cursor-all-scroll"}>
+                <Table.DataCell style={{ width: "1%" }} className={"cursor-all-scroll"} {...listeners} {...attributes}>
                     <DragVerticalIcon />
                 </Table.DataCell>
                 <Table.DataCell style={{ width: "1%" }}>{dokindex + 1}</Table.DataCell>
@@ -195,10 +193,8 @@ function EditableDokumentTitle({ dokument, index }: IEditableDokumentTitleProps)
     const value = useWatch({ name: `dokumenter.${index}.tittel` });
 
     function updateTitle(e) {
-        if (enableBlurEvent.current == false) return;
         setInEditMode(false);
         oppdaterDokumentTittelFn.mutate(value);
-        enableBlurEvent.current = false;
     }
 
     function onKeyDown(e: React.KeyboardEvent) {
@@ -209,7 +205,6 @@ function EditableDokumentTitle({ dokument, index }: IEditableDokumentTitleProps)
     }
     return (
         <div
-            tabIndex={-1}
             style={{ width: "100%" }}
             onDoubleClick={(e) => {
                 e.stopPropagation();

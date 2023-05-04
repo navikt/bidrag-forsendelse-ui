@@ -21,5 +21,5 @@ export const DokumentStatusDisplayName = {
     [DokumentStatus.FERDIGSTILT]: "Ferdigstilt",
     [DokumentStatus.KONTROLLERT]: "Kontrollert",
     [DokumentStatus.IKKE_BESTILT]: "Ikke bestilt",
-    [DokumentStatus.SLETTET]: "Slettet",
+    [DokumentStatus.SLETTET]: "Fjernet",
 } as const;

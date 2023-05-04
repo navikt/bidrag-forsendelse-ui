@@ -1,6 +1,7 @@
 import { Heading, Radio, RadioGroup, Table, Tabs } from "@navikt/ds-react";
 
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
+import { useOpprettForsendelse } from "./OpprettForsendelseContext";
 import { useOpprettForsendelseFormContext } from "./OpprettForsendelsePage";
 interface TableRowData {
     malId: string;
@@ -9,7 +10,8 @@ interface TableRowData {
 }
 
 export default function DokumentValg() {
-    const { data: dokumentDetaljer, isFetching } = useForsendelseApi().dokumentMalDetaljer();
+    const options = useOpprettForsendelse();
+    const { data: dokumentDetaljer, isFetching } = useForsendelseApi().dokumentMalDetaljer(options);
     const { register, setValue } = useOpprettForsendelseFormContext();
 
     if (isFetching) {

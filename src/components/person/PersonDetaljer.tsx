@@ -1,7 +1,7 @@
 import "./PersonDetaljer.css";
 
 import { RolleTag, RolleType } from "@navikt/bidrag-ui-common";
-import { BodyShort, Label } from "@navikt/ds-react";
+import { BodyShort } from "@navikt/ds-react";
 import { CopyToClipboard } from "@navikt/ds-react-internal";
 import React from "react";
 
@@ -24,7 +24,7 @@ export default function PersonDetaljer({
     return (
         <div className={`person-detaljer ${spacing ? "margin--M pt-2 pb-2" : ""} ${className} `}>
             {rolle && <RolleTag rolleType={rolle} />}
-            <Label size={"medium"}>{navn}</Label>
+            <BodyShort size={"medium"}>{navn}</BodyShort>
             {ident && (
                 <>
                     <BodyShort size={"medium"}>{(navn ? " / " : "") + ident}</BodyShort>

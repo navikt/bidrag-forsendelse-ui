@@ -1239,6 +1239,90 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             }),
 
         /**
+         * @description Henter dokumentmaler som er støttet av applikasjonen
+         *
+         * @tags forsendelse-innsyn-kontroller
+         * @name HentDokumentValg
+         * @request GET:/api/forsendelse/v2/dokumentvalg
+         * @secure
+         */
+        hentDokumentValg: (
+            query: {
+                behandlingType:
+                | "AVSKRIVNING"
+                | "EKTEFELLEBIDRAG"
+                | "BIDRAG_18_AR"
+                | "BIDRAG"
+                | "BIDRAG_TILLEGGSBIDRAG"
+                | "DIREKTE_OPPGJOR"
+                | "ETTERGIVELSE"
+                | "ERSTATNING"
+                | "FARSKAP"
+                | "FORSKUDD"
+                | "GEBYR"
+                | "INNKREVING"
+                | "MOTREGNING"
+                | "REFUSJON_BIDRAG"
+                | "SAKSOMKOSTNINGER"
+                | "SARTILSKUDD"
+                | "BIDRAG_18_AR_TILLEGGSBBI"
+                | "TILLEGGSBIDRAG"
+                | "TILBAKEKR_ETTERGIVELSE"
+                | "TILBAKEKREVING"
+                | "OPPFOSTRINGSBIDRAG"
+                | "MORSKAP"
+                | "KUNNSKAP_BIOLOGISK_FAR"
+                | "BARNEBORTFORING"
+                | "KV"
+                | "REISEKOSTNADER";
+                soknadType:
+                | "ENDRING"
+                | "EGET_TILTAK"
+                | "SOKNAD"
+                | "INNKREVINGSGRUNNL"
+                | "INDEKSREG"
+                | "KLAGE_BEGR_SATS"
+                | "KLAGE"
+                | "FOLGER_KLAGE"
+                | "KONVERTERING"
+                | "OMGJORING_BEGR_SATS"
+                | "OPPJUST_FORSK"
+                | "OPPHOR"
+                | "OMGJORING"
+                | "PRIVAT_AVTALE"
+                | "BEGR_REVURD"
+                | "REVURDERING"
+                | "KR";
+                soknadFra:
+                | "BM_I_ANNEN_SAK"
+                | "BARN_18"
+                | "BIDRAGSENHET"
+                | "FYLKESNEMDA"
+                | "NAV_INTERNASJONALT"
+                | "KOMMUNE"
+                | "KONVERTERING"
+                | "BIDRAGSMOTTAKER"
+                | "NORSKE_MYNDIGH"
+                | "BIDRAGSPLIKTIG"
+                | "UTENLANDSKE_MYNDIGH"
+                | "VERGE"
+                | "TI"
+                | "KLAGE_ENHET";
+                klage?: boolean;
+                erVedtakFattet?: boolean;
+                manuelBeregning?: boolean;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<Record<string, DokumentMalDetaljer>, any>({
+                path: `/api/forsendelse/v2/dokumentvalg`,
+                method: "GET",
+                query: query,
+                secure: true,
+                ...params,
+            }),
+
+        /**
          * @description Hent alle forsendelse som har saksnummer
          *
          * @tags forsendelse-journal-kontroller
