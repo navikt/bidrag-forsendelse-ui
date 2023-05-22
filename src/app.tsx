@@ -4,6 +4,7 @@ import React from "react";
 import { BrowserRouter, Route, Routes, useParams, useSearchParams } from "react-router-dom";
 
 import { initMock } from "./__mocks__/msw";
+import { BEHANDLING_TYPE, SOKNAD_FRA, SOKNAD_TYPE } from "./hooks/useForsendelseApi";
 import ForsendelsePage from "./pages/forsendelse/ForsendelsePage";
 import Opprettforsendelse from "./pages/opprettforsendelse";
 
@@ -46,6 +47,12 @@ function OpprettNyForsendelsePageWrapper() {
             saksnummer={saksnummer}
             sessionId={searchParams.get("sessionId")}
             enhet={searchParams.get("enhet")}
+            behandlingType={searchParams.get("behandlingType") as BEHANDLING_TYPE}
+            soknadType={searchParams.get("soknadType") as SOKNAD_TYPE}
+            soknadFra={searchParams.get("soknadFra") as SOKNAD_FRA}
+            erVedtakFattet={searchParams.get("erVedtakFattet") == "true"}
+            manuelBeregning={searchParams.get("soknadmanuelBeregningFra") == "true"}
+            klage={searchParams.get("soknadFra") == "true"}
         />
     );
 }
