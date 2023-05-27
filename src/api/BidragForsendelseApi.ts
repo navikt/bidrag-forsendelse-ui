@@ -9,6 +9,49 @@
  * ---------------------------------------------------------------
  */
 
+/** Detaljer om behandling hvis forsendelsen inneholder brev for en behandling eller vedtak */
+export interface BehandlingInfoDto {
+    vedtakId?: string;
+    behandlingId?: string;
+    engangsBelopType?:
+    | "DIREKTE_OPPGJOR"
+    | "ETTERGIVELSE"
+    | "ETTERGIVELSE_TILBAKEKREVING"
+    | "TILBAKEKREVING"
+    | "SAERTILSKUDD"
+    | "GEBYR_MOTTAKER"
+    | "GEBYR_SKYLDNER";
+    stonadType?: "BIDRAG" | "FORSKUDD" | "BIDRAG18AAR" | "EKTEFELLEBIDRAG" | "MOTREGNING" | "OPPFOSTRINGSBIDRAG";
+    vedtakType?:
+    | "INDEKSREGULERING"
+    | "ALDERSJUSTERING"
+    | "OPPHØR"
+    | "ALDERSOPPHØR"
+    | "REVURDERING"
+    | "FASTSETTELSE"
+    | "INNKREVING"
+    | "KLAGE"
+    | "ENDRING"
+    | "ENDRING_MOTTAKER";
+    vedtakKilde?: "MANUELT" | "AUTOMATISK";
+    soknadFra?:
+    | "BM_I_ANNEN_SAK"
+    | "BARN_18"
+    | "BIDRAGSENHET"
+    | "FYLKESNEMDA"
+    | "NAV_INTERNASJONALT"
+    | "KOMMUNE"
+    | "KONVERTERING"
+    | "BIDRAGSMOTTAKER"
+    | "NORSKE_MYNDIGH"
+    | "BIDRAGSPLIKTIG"
+    | "UTENLANDSKE_MYNDIGH"
+    | "VERGE"
+    | "TRYGDEETATEN_INNKREVING"
+    | "KLAGE_ENHET";
+    roller: string[];
+}
+
 /** Adresse til mottaker hvis dokumentet sendes som brev */
 export interface MottakerAdresseTo {
     adresselinje1: string;
@@ -81,6 +124,8 @@ export interface OpprettForsendelseForesporsel {
     saksnummer: string;
     /** NAV-enheten som oppretter forsendelsen */
     enhet: string;
+    /** Detaljer om behandling hvis forsendelsen inneholder brev for en behandling eller vedtak */
+    behandlingInfo?: BehandlingInfoDto;
     /** Identifikator til batch kjøring forsendelsen ble opprettet av */
     batchId?: string;
     /** Tema forsendelsen skal opprettes med */
@@ -222,6 +267,15 @@ export interface OppdaterForsendelseForesporsel {
      * @format date-time
      */
     dokumentDato?: string;
+    /** Ident til brukeren som journalposten gjelder. Kan bare oppdateres hvis status = UNDER_OPPRETTELSE */
+    gjelderIdent?: string;
+    mottaker?: MottakerTo;
+    /** NAV-enheten som oppretter forsendelsen. Kan bare oppdateres hvis status = UNDER_OPPRETTELSE */
+    enhet?: string;
+    /** Tema forsendelsen skal opprettes med */
+    tema?: "BID" | "FAR";
+    /** Språk forsendelsen skal være på */
+    språk?: string;
 }
 
 /** Metadata til en respons etter journalpost ble oppdatert */
@@ -381,7 +435,13 @@ export interface ForsendelseResponsTo {
     /** Type på forsendelse. Kan være NOTAT eller UTGÅENDE */
     forsendelseType?: "UTGÅENDE" | "NOTAT";
     /** Status på forsendelsen */
-    status?: "UNDER_PRODUKSJON" | "FERDIGSTILT" | "SLETTET" | "DISTRIBUERT" | "DISTRIBUERT_LOKALT";
+    status?:
+    | "UNDER_OPPRETTELSE"
+    | "UNDER_PRODUKSJON"
+    | "FERDIGSTILT"
+    | "SLETTET"
+    | "DISTRIBUERT"
+    | "DISTRIBUERT_LOKALT";
     /**
      * Dato forsendelsen ble opprettet
      * @format date
@@ -581,7 +641,13 @@ export interface DokumentRedigeringMetadataResponsDto {
     | "FERDIGSTILT"
     | "MÅ_KONTROLLERES"
     | "KONTROLLERT";
-    forsendelseStatus: "UNDER_PRODUKSJON" | "FERDIGSTILT" | "SLETTET" | "DISTRIBUERT" | "DISTRIBUERT_LOKALT";
+    forsendelseStatus:
+    | "UNDER_OPPRETTELSE"
+    | "UNDER_PRODUKSJON"
+    | "FERDIGSTILT"
+    | "SLETTET"
+    | "DISTRIBUERT"
+    | "DISTRIBUERT_LOKALT";
     redigeringMetadata?: string;
     dokumenter: DokumentDetaljer[];
 }
@@ -1152,7 +1218,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @request OPTIONS:/api/forsendelse/dokument/{forsendelseIdMedPrefix}
          * @secure
          */
-        hentDokumentMetadata: (forsendelseIdMedPrefix: string, dokumentreferanse: string, params: RequestParams = {}) =>
+        hentDokumentMetadata: (forsendelseIdMedPrefix: string, params: RequestParams = {}) =>
             this.request<DokumentMetadata[], any>({
                 path: `/api/forsendelse/dokument/${forsendelseIdMedPrefix}`,
                 method: "OPTIONS",
@@ -1247,53 +1313,20 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @secure
          */
         hentDokumentValg: (
-            query: {
-                behandlingType:
-                | "AVSKRIVNING"
-                | "EKTEFELLEBIDRAG"
-                | "BIDRAG_18_AR"
-                | "BIDRAG"
-                | "BIDRAG_TILLEGGSBIDRAG"
-                | "DIREKTE_OPPGJOR"
-                | "ETTERGIVELSE"
-                | "ERSTATNING"
-                | "FARSKAP"
-                | "FORSKUDD"
-                | "GEBYR"
-                | "INNKREVING"
-                | "MOTREGNING"
-                | "REFUSJON_BIDRAG"
-                | "SAKSOMKOSTNINGER"
-                | "SARTILSKUDD"
-                | "BIDRAG_18_AR_TILLEGGSBBI"
-                | "TILLEGGSBIDRAG"
-                | "TILBAKEKR_ETTERGIVELSE"
-                | "TILBAKEKREVING"
-                | "OPPFOSTRINGSBIDRAG"
-                | "MORSKAP"
-                | "KUNNSKAP_BIOLOGISK_FAR"
-                | "BARNEBORTFORING"
-                | "KV"
-                | "REISEKOSTNADER";
-                soknadType:
-                | "ENDRING"
-                | "EGET_TILTAK"
-                | "SOKNAD"
-                | "INNKREVINGSGRUNNL"
-                | "INDEKSREG"
-                | "KLAGE_BEGR_SATS"
-                | "KLAGE"
-                | "FOLGER_KLAGE"
-                | "KONVERTERING"
-                | "OMGJORING_BEGR_SATS"
-                | "OPPJUST_FORSK"
-                | "OPPHOR"
-                | "OMGJORING"
-                | "PRIVAT_AVTALE"
-                | "BEGR_REVURD"
+            query?: {
+                vedtakType?:
+                | "INDEKSREGULERING"
+                | "ALDERSJUSTERING"
+                | "OPPHØR"
+                | "ALDERSOPPHØR"
                 | "REVURDERING"
-                | "KR";
-                soknadFra:
+                | "FASTSETTELSE"
+                | "INNKREVING"
+                | "KLAGE"
+                | "ENDRING"
+                | "ENDRING_MOTTAKER";
+                behandlingType?: string;
+                soknadFra?:
                 | "BM_I_ANNEN_SAK"
                 | "BARN_18"
                 | "BIDRAGSENHET"
@@ -1306,11 +1339,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 | "BIDRAGSPLIKTIG"
                 | "UTENLANDSKE_MYNDIGH"
                 | "VERGE"
-                | "TI"
+                | "TRYGDEETATEN_INNKREVING"
                 | "KLAGE_ENHET";
-                klage?: boolean;
-                erVedtakFattet?: boolean;
-                manuelBeregning?: boolean;
+                vedtakKilde?: "MANUELT" | "AUTOMATISK";
+                enhet?: string;
             },
             params: RequestParams = {}
         ) =>
@@ -1318,6 +1350,38 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 path: `/api/forsendelse/v2/dokumentvalg`,
                 method: "GET",
                 query: query,
+                secure: true,
+                ...params,
+            }),
+
+        /**
+         * @description Henter dokumentmaler som er støttet av applikasjonen
+         *
+         * @tags forsendelse-innsyn-kontroller
+         * @name HentDokumentValgNotater
+         * @request GET:/api/forsendelse/v2/dokumentvalg/notat
+         * @secure
+         */
+        hentDokumentValgNotater: (params: RequestParams = {}) =>
+            this.request<Record<string, DokumentMalDetaljer>, any>({
+                path: `/api/forsendelse/v2/dokumentvalg/notat`,
+                method: "GET",
+                secure: true,
+                ...params,
+            }),
+
+        /**
+         * @description Henter dokumentmaler som er støttet av applikasjonen
+         *
+         * @tags forsendelse-innsyn-kontroller
+         * @name HentDokumentValgForForsendelse
+         * @request GET:/api/forsendelse/v2/dokumentvalg/forsendelse/{forsendelseIdMedPrefix}
+         * @secure
+         */
+        hentDokumentValgForForsendelse: (forsendelseIdMedPrefix: string, params: RequestParams = {}) =>
+            this.request<Record<string, DokumentMalDetaljer>, any>({
+                path: `/api/forsendelse/v2/dokumentvalg/forsendelse/${forsendelseIdMedPrefix}`,
+                method: "GET",
                 secure: true,
                 ...params,
             }),

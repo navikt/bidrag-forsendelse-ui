@@ -1,26 +1,24 @@
-import { Heading, Radio, RadioGroup, Table, Tabs } from "@navikt/ds-react";
+import { Heading, Radio, RadioGroup, Table } from "@navikt/ds-react";
+import { useFormContext } from "react-hook-form";
 
-import { useForsendelseApi } from "../../hooks/useForsendelseApi";
-import { useOpprettForsendelse } from "./OpprettForsendelseContext";
-import { useOpprettForsendelseFormContext } from "./OpprettForsendelsePage";
+import { DokumentMalDetaljer } from "../../api/BidragForsendelseApi";
+
 interface TableRowData {
     malId: string;
     tittel: string;
     type: "UTGÅENDE" | "NOTAT";
 }
 
-export default function DokumentValg() {
-    const options = useOpprettForsendelse();
-    const { data: dokumentDetaljer, isFetching } = useForsendelseApi().dokumentMalDetaljer(options);
-    const { register, setValue } = useOpprettForsendelseFormContext();
+interface DokumentValgProps {
+    malDetaljer: Record<string, DokumentMalDetaljer>;
+}
+export default function DokumentValg({ malDetaljer }: DokumentValgProps) {
+    const { register, setValue } = useFormContext();
 
-    if (isFetching) {
-        return null;
-    }
-    const alleBrev: TableRowData[] = Object.keys(dokumentDetaljer).map((key) => ({
+    const alleBrev: TableRowData[] = Object.keys(malDetaljer).map((key) => ({
         malId: key,
-        tittel: dokumentDetaljer[key].beskrivelse,
-        type: dokumentDetaljer[key].type,
+        tittel: malDetaljer[key].beskrivelse,
+        type: malDetaljer[key].type,
     }));
 
     function updateValues(malId?: string) {
@@ -49,18 +47,7 @@ export default function DokumentValg() {
                     updateValues(malId);
                 }}
             >
-                <Tabs defaultValue="utgående">
-                    <Tabs.List>
-                        <Tabs.Tab value="utgående" label="Utgående" />
-                        <Tabs.Tab value="notat" label="Notat" />
-                    </Tabs.List>
-                    <Tabs.Panel value="utgående">
-                        <DokumentValgTable rows={alleBrev.filter((v) => v.type == "UTGÅENDE")} />
-                    </Tabs.Panel>
-                    <Tabs.Panel value="notat">
-                        <DokumentValgTable rows={alleBrev.filter((v) => v.type == "NOTAT")} />
-                    </Tabs.Panel>
-                </Tabs>
+                <DokumentValgTable rows={alleBrev.filter((v) => v.type == "UTGÅENDE")} />
             </RadioGroup>
         </div>
     );

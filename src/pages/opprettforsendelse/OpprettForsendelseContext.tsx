@@ -1,52 +1,68 @@
-import ObjectUtils from "@navikt/bidrag-ui-common/esm/utils/ObjectUtils";
 import { Alert } from "@navikt/ds-react";
-import { createContext, useEffect, useState } from "react";
+import { createContext, useState } from "react";
 import { PropsWithChildren } from "react";
 import { useContext } from "react";
 
-import { BEHANDLING_TYPE, SOKNAD_FRA, SOKNAD_TYPE } from "../../hooks/useForsendelseApi";
+import { SOKNAD_FRA, VEDTAK_KILDE, VEDTAK_TYPE } from "../../hooks/useForsendelseApi";
 
 interface IOpprettForsendelseContext {
-    behandlingType: BEHANDLING_TYPE;
-    soknadType: SOKNAD_TYPE;
+    vedtakType: VEDTAK_TYPE;
+    vedtakKilde: VEDTAK_KILDE;
+    engangsBelopType: string;
+    stonadType: string;
+    behandlingType: string;
     soknadFra: SOKNAD_FRA;
-    klage?: boolean;
-    erVedtakFattet?: boolean;
-    manuelBeregning?: boolean;
+    enhet?: string;
 }
 
 interface IOpprettForsendelsePropsContext {
-    behandlingType: BEHANDLING_TYPE;
-    soknadType: SOKNAD_TYPE;
+    behandlingType: string;
+    vedtakType: VEDTAK_TYPE;
+    vedtakKilde: VEDTAK_KILDE;
     soknadFra: SOKNAD_FRA;
-    klage?: boolean;
-    erVedtakFattet?: boolean;
-    manuelBeregning?: boolean;
+    enhet?: string;
 }
 
-export const OpprettForsendelseContext = createContext<IOpprettForsendelseContext>({} as IOpprettForsendelseContext);
+export const OpprettForsendelseContext = createContext<IOpprettForsendelsePropsContext>(
+    {} as IOpprettForsendelsePropsContext
+);
 
-function OpprettForsendelseProvider({ children, ...otherProps }: PropsWithChildren<IOpprettForsendelseContext>) {
+function OpprettForsendelseProvider({
+    children,
+    stonadType,
+    behandlingType,
+    engangsBelopType,
+    ...otherProps
+}: PropsWithChildren<IOpprettForsendelseContext>) {
     const [errors, setErrors] = useState<string[]>([]);
 
-    useEffect(() => {
-        const tempErrors = [];
-        if (ObjectUtils.isEmpty(otherProps.behandlingType)) {
-            tempErrors.push("Behandlingtype må settes");
-        }
-        if (ObjectUtils.isEmpty(otherProps.soknadFra)) {
-            tempErrors.push("Søknadfra må settes");
-        }
-        if (ObjectUtils.isEmpty(otherProps.soknadType)) {
-            tempErrors.push("Søknadtype må settes");
-        }
-        setErrors(tempErrors);
-    }, []);
+    // useEffect(() => {
+    //     const tempErrors = [];
+    //     if (ObjectUtils.isEmpty(otherProps.vedtakType)) {
+    //         tempErrors.push("Behandlingtype må settes");
+    //     }
+    //     if (ObjectUtils.isEmpty(otherProps.soknadFra)) {
+    //         tempErrors.push("Søknadfra må settes");
+    //     }
+    //     if (ObjectUtils.isEmpty(otherProps.stonadType)) {
+    //         tempErrors.push("Søknadtype må settes");
+    //     }
+    //     setErrors(tempErrors);
+    // }, []);
 
     if (errors.length > 0) {
         return <Alert variant="error">{errors.join(", ")}</Alert>;
     }
-    return <OpprettForsendelseContext.Provider value={otherProps}>{children}</OpprettForsendelseContext.Provider>;
+    return (
+        <OpprettForsendelseContext.Provider
+            value={{
+                ...otherProps,
+                behandlingType: behandlingType ?? stonadType ?? engangsBelopType,
+            }}
+        >
+            {children}
+        </OpprettForsendelseContext.Provider>
+    );
 }
 function useOpprettForsendelse() {
     const context = useContext(OpprettForsendelseContext);

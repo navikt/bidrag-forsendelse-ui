@@ -1,12 +1,12 @@
-import { RolleType } from "@navikt/bidrag-ui-common";
+import { IRolleDetaljer, RolleType } from "@navikt/bidrag-ui-common";
 import { Heading, Select } from "@navikt/ds-react";
+import { useFormContext } from "react-hook-form";
 
-import { useForsendelseApi } from "../../hooks/useForsendelseApi";
-import { useOpprettForsendelseFormContext } from "./OpprettForsendelsePage";
-
-export default function GjelderSelect() {
-    const { register, getValues } = useOpprettForsendelseFormContext();
-    const roller = useForsendelseApi().hentRoller();
+interface GjelderSelectProps {
+    roller: IRolleDetaljer[];
+}
+export default function GjelderSelect({ roller }: GjelderSelectProps) {
+    const { register, getValues } = useFormContext();
     const rollerFiltrert = roller.filter((rolle) =>
         [RolleType.BA, RolleType.BM, RolleType.BP].includes(rolle.rolleType)
     );

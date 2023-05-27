@@ -1,22 +1,33 @@
 import IdentUtils from "@navikt/bidrag-ui-common/esm/utils/IdentUtils";
 import ObjectUtils from "@navikt/bidrag-ui-common/esm/utils/ObjectUtils";
-import { useQuery, UseQueryResult } from "react-query";
+import { useQuery } from "react-query";
 
 import { PERSON_API, SAMHANDLER_API } from "../api/api";
+import { PersonDto } from "../api/BidragPersonApi";
 
 type PersonInfo = { ident: string; navn?: string; valid?: boolean };
-type IUsePersonApiProps = {
-    hentPerson: (ident: string) => UseQueryResult<PersonInfo>;
-};
 
 const PersonApiQueryKeys = {
     person: "person",
     hentPerson: (ident: string) => [PersonApiQueryKeys.person, ident],
+    hentAktorForIdent: (ident: string) => [PersonApiQueryKeys.person, "aktor", ident],
 };
-export default function useSamhandlerPersonApi(): IUsePersonApiProps {
-    function hentPerson(ident: string) {
-        return useQuery({
+export default function useSamhandlerPersonApi() {
+    const hentPerson = (ident?: string): PersonDto => {
+        if (!ident) {
+            return { ident };
+        }
+        const { data: personData, refetch } = useQuery({
             queryKey: PersonApiQueryKeys.hentPerson(ident),
+            queryFn: ({ signal }) => PERSON_API.informasjon.hentPersonPost({ ident }),
+        });
+
+        return personData.data;
+    };
+
+    function hentSamhandlerEllerPersonForIdent(ident: string) {
+        return useQuery({
+            queryKey: PersonApiQueryKeys.hentAktorForIdent(ident),
             queryFn: async (): Promise<PersonInfo> => {
                 if (ObjectUtils.isEmpty(ident)) return { ident, valid: false };
                 if (IdentUtils.isSamhandlerId(ident)) {
@@ -45,6 +56,7 @@ export default function useSamhandlerPersonApi(): IUsePersonApiProps {
     }
 
     return {
+        hentSamhandlerEllerPersonForIdent,
         hentPerson,
     };
 }

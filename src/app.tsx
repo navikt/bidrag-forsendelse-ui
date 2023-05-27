@@ -4,9 +4,11 @@ import React from "react";
 import { BrowserRouter, Route, Routes, useParams, useSearchParams } from "react-router-dom";
 
 import { initMock } from "./__mocks__/msw";
-import { BEHANDLING_TYPE, SOKNAD_FRA, SOKNAD_TYPE } from "./hooks/useForsendelseApi";
+import { SOKNAD_FRA, VEDTAK_KILDE, VEDTAK_TYPE } from "./hooks/useForsendelseApi";
+import { SessionProvider } from "./pages/forsendelse/context/SessionContext";
 import ForsendelsePage from "./pages/forsendelse/ForsendelsePage";
 import Opprettforsendelse from "./pages/opprettforsendelse";
+import Opprettnotat from "./pages/opprettnotat";
 
 // This file is only used for development. The entrypoint is under pages folder
 initMock();
@@ -17,9 +19,11 @@ export default function App() {
                 <Routes>
                     <Route path="/:forsendelseId" element={<ForsendelsePageWrapper />} />
                     <Route path="/forsendelse/:forsendelseId" element={<ForsendelsePageWrapper />} />
-                    <Route path="sak/:saksnummer/forsendelse/" element={<OpprettNyForsendelsePageWrapper />} />
-                    <Route path="/sak/:saksnummer/forsendelse/:forsendelseId" element={<ForsendelsePageWrapper />} />
-                    <Route path="/" element={<div>Hello world</div>} />
+                    <Route path="sak/:saksnummer/">
+                        <Route path="forsendelse" element={<OpprettNyForsendelsePageWrapper />} />
+                        <Route path="notat" element={<OpprettNyNotatPageWrapper />} />
+                        <Route path="forsendelse/:forsendelseId" element={<ForsendelsePageWrapper />} />
+                    </Route>
                 </Routes>
             </BrowserRouter>
         </React.StrictMode>
@@ -38,21 +42,35 @@ function ForsendelsePageWrapper() {
         />
     );
 }
-
-function OpprettNyForsendelsePageWrapper() {
+function OpprettNyNotatPageWrapper() {
     const { saksnummer } = useParams();
     const [searchParams, _] = useSearchParams();
     return (
-        <Opprettforsendelse
+        <Opprettnotat
             saksnummer={saksnummer}
             sessionId={searchParams.get("sessionId")}
             enhet={searchParams.get("enhet")}
-            behandlingType={searchParams.get("behandlingType") as BEHANDLING_TYPE}
-            soknadType={searchParams.get("soknadType") as SOKNAD_TYPE}
-            soknadFra={searchParams.get("soknadFra") as SOKNAD_FRA}
-            erVedtakFattet={searchParams.get("erVedtakFattet") == "true"}
-            manuelBeregning={searchParams.get("soknadmanuelBeregningFra") == "true"}
-            klage={searchParams.get("soknadFra") == "true"}
         />
+    );
+}
+function OpprettNyForsendelsePageWrapper() {
+    const { saksnummer, forsendelseId, enhet } = useParams();
+    const [searchParams, _] = useSearchParams();
+    return (
+        <SessionProvider
+            forsendelseId={forsendelseId}
+            saksnummer={saksnummer}
+            sessionId={searchParams.get("sessionId")}
+            enhet={searchParams.get("enhet")}
+        >
+            <Opprettforsendelse
+                vedtakType={searchParams.get("vedtakType") as VEDTAK_TYPE}
+                vedtakKilde={searchParams.get("vedtakKilde") as VEDTAK_KILDE}
+                soknadFra={searchParams.get("soknadFra") as SOKNAD_FRA}
+                behandlingType={searchParams.get("behandlingType")}
+                engangsBelopType={searchParams.get("engangsBelopType")}
+                stonadType={searchParams.get("stonadType")}
+            />
+        </SessionProvider>
     );
 }

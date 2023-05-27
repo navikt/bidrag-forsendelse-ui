@@ -33,7 +33,7 @@ function SessionProvider({ children, ...props }: PropsWithChildren<ISessionProps
         params.append("enhet", enhet);
         params.append("sessionId", sessionId);
         if (type == "NOTAT") {
-            navigate(`/sak/${saksnummer}/journal/BIF-${forsendelseId}?${params.toString()}`);
+            window.open(`/sak/${saksnummer}/journal/BIF-${forsendelseId}?${params.toString()}`, "_self");
         } else {
             navigate(`/sak/${saksnummer}/forsendelse/${forsendelseId}?${params.toString()}`);
         }

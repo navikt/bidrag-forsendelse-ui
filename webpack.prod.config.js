@@ -11,6 +11,7 @@ module.exports = merge(webpackCommon, {
             BIDRAG_PERSON_URL: "",
             BIDRAG_DOKUMENT_URL: "",
             BIDRAG_SAMHANDLER_URL: "",
+            BIDRAG_TILGANGSKONTROLL_URL: "",
             BIDRAG_DOKUMENT_FORSENDELSE_URL: "",
             BIDRAG_SAK_URL: "",
             BISYS_URL: "",

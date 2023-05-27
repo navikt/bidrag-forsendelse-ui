@@ -6,6 +6,7 @@ import { Api as BidragForsendelseApi } from "./BidragForsendelseApi";
 import { Api as PersonApi } from "./BidragPersonApi";
 import { Api as SakApi } from "./BidragSakApi";
 import { Api as SamhandlerApi } from "./BidragSamhandlerApi";
+import { Api as BidragTilgangskontrollApi } from "./BidragTilgangskontrollApi";
 
 export const PERSON_API = useApi(new PersonApi({ baseURL: environment.url.bidragPerson }), "bidrag-person", "fss");
 export const SAMHANDLER_API = useApi(
@@ -22,5 +23,11 @@ export const BIDRAG_DOKUMENT_API = useApi(
 export const BIDRAG_FORSENDELSE_API = useApi(
     new BidragForsendelseApi({ baseURL: environment.url.bidragDokumentForsendelse }),
     "bidrag-dokument-forsendelse",
+    "gcp"
+);
+
+export const BIDRAG_TILGANGSKONTROLL_API = useApi(
+    new BidragTilgangskontrollApi({ baseURL: environment.url.bidragTilgangskontroll }),
+    "bidrag-tilgangskontroll",
     "gcp"
 );

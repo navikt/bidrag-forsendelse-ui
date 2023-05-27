@@ -64,7 +64,7 @@ export default function MottakerSelect() {
 
 function MottakerNavn() {
     const mottakerIdent: string = useWatch<OpprettForsendelseFormProps>({ name: "mottakerIdent" }) as string;
-    const { data, isFetching, isError } = useSamhandlerPersonApi().hentPerson(mottakerIdent);
+    const { data, isFetching, isError } = useSamhandlerPersonApi().hentSamhandlerEllerPersonForIdent(mottakerIdent);
 
     if (isFetching) {
         return <Loader size="xsmall" />;

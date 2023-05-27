@@ -64,6 +64,10 @@ export default function ManuellUtsendingModal({ onCancel }: ManuellUtsendingModa
                             <BodyShort>
                                 Jeg bekrefter at jeg har printet og sendt ut alle dokumenter i forsendelsen
                             </BodyShort>
+                            <BodyShort>
+                                Det vil bli automatisk lagt til <i>(dokumentet er sendt per post med vedlegg)</i> bak
+                                tittel
+                            </BodyShort>
                         </div>
                     </div>
                 </div>

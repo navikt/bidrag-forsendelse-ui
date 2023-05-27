@@ -7,6 +7,8 @@ import React from "react";
 import { PropsWithChildren } from "react";
 
 import DokumenterTable from "../../components/dokument/DokumenterTable";
+import { useForsendelseApi } from "../../hooks/useForsendelseApi";
+import OpprettForsendelsePage from "../opprettforsendelse/OpprettForsendelsePage";
 import PageWrapper from "../PageWrapper";
 import ForsendelseSakHeader from "./components/ForsendelseSakHeader";
 import Gjelder from "./components/Gjelder";
@@ -24,7 +26,12 @@ interface ForsendelsePageProps {
 }
 function ForsendelseView() {
     const { forsendelseId } = useSession();
+    const forsendelse = useForsendelseApi().hentForsendelse();
 
+    console.log(forsendelse);
+    if (forsendelse.status == "UNDER_OPPRETTELSE") {
+        return <OpprettForsendelsePage />;
+    }
     return (
         <ContentContainer>
             <Grid>

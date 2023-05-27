@@ -1,23 +1,24 @@
 import { IRolleDetaljer, RolleType } from "@navikt/bidrag-ui-common";
 import { AxiosResponse } from "axios";
 import React from "react";
-import { useQuery, UseQueryResult } from "react-query";
+import { useQuery } from "react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../api/api";
-import { PERSON_API } from "../api/api";
 import { SAK_API } from "../api/api";
 import { BIDRAG_DOKUMENT_API } from "../api/api";
 import { JournalpostDto } from "../api/BidragDokumentApi";
-import { DokumentMalDetaljer } from "../api/BidragForsendelseApi";
-import { PersonDto } from "../api/BidragPersonApi";
 import { BidragSakDto } from "../api/BidragSakApi";
 import { DokumentStatus } from "../constants/DokumentStatus";
 import { SAKSNUMMER } from "../constants/fellestyper";
 import { useSession } from "../pages/forsendelse/context/SessionContext";
 import { IForsendelse } from "../types/Forsendelse";
+import useSamhandlerPersonApi from "./usePersonApi";
 
-const UseForsendelseApiKeys = {
+export const UseForsendelseApiKeys = {
     forsendelse: "forsendelse",
+    sak: "sak",
+    hentForsendelse: () => [UseForsendelseApiKeys.forsendelse],
+    sakerPerson: (personId: string) => [UseForsendelseApiKeys.sak, personId],
     dokumentValg: (behandlingType: string, soknadFra: string, soknadType: string) => [
         UseForsendelseApiKeys.forsendelse,
         "dokumentValg",
@@ -30,14 +31,6 @@ interface UseForsendelseDataProps {
     hentForsendelse: () => IForsendelse;
     hentGjelder: () => IRolleDetaljer;
     hentMottaker: () => IRolleDetaljer;
-    dokumentMalDetaljer: (props: {
-        behandlingType: BEHANDLING_TYPE;
-        soknadType: SOKNAD_TYPE;
-        soknadFra: SOKNAD_FRA;
-        klage?: boolean;
-        erVedtakFattet?: boolean;
-        manuelBeregning?: boolean;
-    }) => UseQueryResult<Record<string, DokumentMalDetaljer>>;
     hentRoller: () => IRolleDetaljer[];
     hentJournalposterForPerson: (ident: string) => Map<SAKSNUMMER, JournalpostDto[]>;
     hentJournalposterForSak: (saksnummer: string) => JournalpostDto[];
@@ -85,7 +78,7 @@ export function useForsendelseApi(): UseForsendelseDataProps {
 
     const hentSakerPerson = (ident: string): string[] => {
         const { data: sakerPerson, refetch } = useQuery({
-            queryKey: `saker_person_${ident}`,
+            queryKey: UseForsendelseApiKeys.sakerPerson(ident),
             queryFn: ({ signal }) => SAK_API.bidragSak.find(ident),
         });
 
@@ -98,7 +91,7 @@ export function useForsendelseApi(): UseForsendelseDataProps {
         return sak.roller.map((rolle) => ({
             rolleType: RolleType[rolle.rolleType],
             ident: rolle.fodselsnummer ?? rolle.samhandlerIdent,
-            navn: hentPerson(rolle.fodselsnummer)?.navn,
+            navn: useSamhandlerPersonApi().hentPerson(rolle.fodselsnummer)?.navn,
         }));
     };
 
@@ -107,21 +100,10 @@ export function useForsendelseApi(): UseForsendelseDataProps {
         return RolleType[sak.roller?.find((r) => r.fodselsnummer == ident)?.rolleType];
     };
 
-    const hentPerson = (ident?: string): PersonDto => {
-        if (!ident) {
-            return { ident };
-        }
-        const { data: personData, refetch } = useQuery({
-            queryKey: `person_${ident}`,
-            queryFn: ({ signal }) => PERSON_API.informasjon.hentPersonPost({ ident }),
-        });
-
-        return personData.data;
-    };
     const hentGjelder = (): IRolleDetaljer => {
         const forsendelse = hentForsendelseQuery();
         const gjelderIdent = forsendelse.gjelderIdent;
-        const person = hentPerson(gjelderIdent);
+        const person = useSamhandlerPersonApi().hentPerson(gjelderIdent);
 
         const ident = gjelderIdent;
         const navn = person.navn;
@@ -138,7 +120,7 @@ export function useForsendelseApi(): UseForsendelseDataProps {
         // TODO: Sjekk om mottaker er samhandler
 
         if (!mottaker.navn) {
-            mottaker = hentPerson(mottaker.ident);
+            mottaker = useSamhandlerPersonApi().hentPerson(mottaker.ident);
         }
 
         const ident = mottaker.ident;
@@ -151,7 +133,7 @@ export function useForsendelseApi(): UseForsendelseDataProps {
     };
     function hentForsendelseQuery(): IForsendelse {
         const { data: forsendelse, isRefetching } = useQuery({
-            queryKey: ["forsendelse", forsendelseId],
+            queryKey: UseForsendelseApiKeys.hentForsendelse(),
             queryFn: ({ signal }) => BIDRAG_FORSENDELSE_API.api.hentForsendelse(forsendelseId),
             enabled: forsendelseId != undefined,
             optimisticResults: false,
@@ -182,26 +164,9 @@ export function useForsendelseApi(): UseForsendelseDataProps {
         };
     }
 
-    function dokumentMalDetaljer(request: {
-        behandlingType: BEHANDLING_TYPE;
-        soknadType: SOKNAD_TYPE;
-        soknadFra: SOKNAD_FRA;
-        klage?: boolean;
-        erVedtakFattet?: boolean;
-        manuelBeregning?: boolean;
-    }) {
-        return useQuery({
-            queryKey: "dokumentMalDetaljer",
-            queryFn: ({ signal }) => BIDRAG_FORSENDELSE_API.api.hentDokumentValg(request),
-            select: (data) => data.data,
-            optimisticResults: false,
-        });
-    }
-
     return {
         hentForsendelse: hentForsendelseQuery,
         hentMottaker,
-        dokumentMalDetaljer,
         hentGjelder,
         hentRoller,
         hentJournalposterForPerson,
@@ -209,6 +174,20 @@ export function useForsendelseApi(): UseForsendelseDataProps {
     };
 }
 
+export type VEDTAK_TYPE =
+    | "INDEKSREGULERING"
+    | "ALDERSJUSTERING"
+    | "OPPHØR"
+    | "ALDERSOPPHØR"
+    | "REVURDERING"
+    | "FASTSETTELSE"
+    | "INNKREVING"
+    | "KLAGE"
+    | "ENDRING"
+    | "ENDRING_MOTTAKER";
+
+export type VEDTAK_KILDE = "MANUELT" | "AUTOMATISK";
+export type FORVALTNING = "KLAGE_ANKE";
 export type BEHANDLING_TYPE =
     | "AVSKRIVNING"
     | "EKTEFELLEBIDRAG"
@@ -267,5 +246,5 @@ export type SOKNAD_FRA =
     | "BIDRAGSPLIKTIG"
     | "UTENLANDSKE_MYNDIGH"
     | "VERGE"
-    | "TI"
+    | "TRYGDEETATEN_INNKREVING"
     | "KLAGE_ENHET";
