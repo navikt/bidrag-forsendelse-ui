@@ -47,7 +47,7 @@ export default function DokumentValg({ malDetaljer }: DokumentValgProps) {
                     updateValues(malId);
                 }}
             >
-                <DokumentValgTable rows={alleBrev.filter((v) => v.type == "UTGÅENDE")} />
+                <DokumentValgTable rows={alleBrev} />
             </RadioGroup>
         </div>
     );
