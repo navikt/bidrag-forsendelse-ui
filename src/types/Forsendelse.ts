@@ -17,11 +17,11 @@ export interface IForsendelse {
     forsendelseType?: "UTGÅENDE" | "NOTAT";
 
     status?:
-    | "UNDER_PRODUKSJON"
-    | "FERDIGSTILT"
-    | "SLETTET"
-    | "DISTRIBUERT"
-    | "DISTRIBUERT_LOKALT"
-    | "UNDER_OPPRETTELSE";
+        | "UNDER_PRODUKSJON"
+        | "FERDIGSTILT"
+        | "SLETTET"
+        | "DISTRIBUERT"
+        | "DISTRIBUERT_LOKALT"
+        | "UNDER_OPPRETTELSE";
     opprettetDato?: string;
 }
