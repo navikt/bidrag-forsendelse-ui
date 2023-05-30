@@ -3,11 +3,11 @@ import { createContext, useState } from "react";
 import { PropsWithChildren } from "react";
 import { useContext } from "react";
 
-import { SOKNAD_FRA, VEDTAK_KILDE, VEDTAK_TYPE } from "../../hooks/useForsendelseApi";
+import { SOKNAD_FRA, VEDTAK_TYPE } from "../../hooks/useForsendelseApi";
 
 interface IOpprettForsendelseContext {
     vedtakType: VEDTAK_TYPE;
-    vedtakKilde: VEDTAK_KILDE;
+    erFattetBeregnet?: boolean;
     engangsBelopType: string;
     stonadType: string;
     behandlingType: string;
@@ -18,7 +18,7 @@ interface IOpprettForsendelseContext {
 interface IOpprettForsendelsePropsContext {
     behandlingType: string;
     vedtakType: VEDTAK_TYPE;
-    vedtakKilde: VEDTAK_KILDE;
+    erFattetBeregnet?: boolean;
     soknadFra: SOKNAD_FRA;
     enhet?: string;
 }

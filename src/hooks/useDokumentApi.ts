@@ -2,7 +2,7 @@ import { useQuery } from "react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../api/api";
 import { useSession } from "../pages/forsendelse/context/SessionContext";
-import { SOKNAD_FRA, VEDTAK_KILDE, VEDTAK_TYPE } from "./useForsendelseApi";
+import { SOKNAD_FRA, VEDTAK_TYPE } from "./useForsendelseApi";
 
 export default function useDokumentApi() {
     const { forsendelseId, saksnummer, enhet } = useSession();
@@ -18,15 +18,15 @@ export default function useDokumentApi() {
         vedtakType: VEDTAK_TYPE;
         behandlingType: string;
         soknadFra: SOKNAD_FRA;
-        vedtakKilde?: VEDTAK_KILDE;
+        erFattetBeregnet?: boolean;
     }) {
         return useQuery({
             queryKey: [
                 "dokumentMalDetaljer",
-                request.vedtakKilde,
+                request.behandlingType,
                 request.vedtakType,
                 request.soknadFra,
-                request.vedtakKilde,
+                request.erFattetBeregnet,
                 enhet,
             ],
             queryFn: ({ signal }) =>

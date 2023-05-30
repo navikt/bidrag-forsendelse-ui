@@ -4,7 +4,7 @@ import React from "react";
 import { BrowserRouter, Route, Routes, useParams, useSearchParams } from "react-router-dom";
 
 import { initMock } from "./__mocks__/msw";
-import { SOKNAD_FRA, VEDTAK_KILDE, VEDTAK_TYPE } from "./hooks/useForsendelseApi";
+import { SOKNAD_FRA, VEDTAK_TYPE } from "./hooks/useForsendelseApi";
 import { SessionProvider } from "./pages/forsendelse/context/SessionContext";
 import ForsendelsePage from "./pages/forsendelse/ForsendelsePage";
 import Opprettforsendelse from "./pages/opprettforsendelse";
@@ -65,7 +65,11 @@ function OpprettNyForsendelsePageWrapper() {
         >
             <Opprettforsendelse
                 vedtakType={searchParams.get("vedtakType") as VEDTAK_TYPE}
-                vedtakKilde={searchParams.get("vedtakKilde") as VEDTAK_KILDE}
+                erFattetBeregnet={
+                    searchParams.get("erFattetBeregnet") != undefined
+                        ? searchParams.get("erFattetBeregnet") == "true"
+                        : null
+                }
                 soknadFra={searchParams.get("soknadFra") as SOKNAD_FRA}
                 behandlingType={searchParams.get("behandlingType")}
                 engangsBelopType={searchParams.get("engangsBelopType")}

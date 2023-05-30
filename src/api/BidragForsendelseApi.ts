@@ -33,7 +33,7 @@ export interface BehandlingInfoDto {
     | "KLAGE"
     | "ENDRING"
     | "ENDRING_MOTTAKER";
-    vedtakKilde?: "MANUELT" | "AUTOMATISK";
+    erFattetBeregnet?: boolean;
     soknadFra?:
     | "BM_I_ANNEN_SAK"
     | "BARN_18"
@@ -1341,7 +1341,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 | "VERGE"
                 | "TRYGDEETATEN_INNKREVING"
                 | "KLAGE_ENHET";
-                vedtakKilde?: "MANUELT" | "AUTOMATISK";
+                erFattetBeregnet?: boolean;
                 enhet?: string;
             },
             params: RequestParams = {}
