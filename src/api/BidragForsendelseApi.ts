@@ -13,43 +13,49 @@
 export interface BehandlingInfoDto {
     vedtakId?: string;
     behandlingId?: string;
-    engangsBelopType?:
-    | "DIREKTE_OPPGJOR"
-    | "ETTERGIVELSE"
-    | "ETTERGIVELSE_TILBAKEKREVING"
-    | "TILBAKEKREVING"
-    | "SAERTILSKUDD"
-    | "GEBYR_MOTTAKER"
-    | "GEBYR_SKYLDNER";
-    stonadType?: "BIDRAG" | "FORSKUDD" | "BIDRAG18AAR" | "EKTEFELLEBIDRAG" | "MOTREGNING" | "OPPFOSTRINGSBIDRAG";
-    vedtakType?:
-    | "INDEKSREGULERING"
-    | "ALDERSJUSTERING"
-    | "OPPHØR"
-    | "ALDERSOPPHØR"
-    | "REVURDERING"
-    | "FASTSETTELSE"
-    | "INNKREVING"
-    | "KLAGE"
-    | "ENDRING"
-    | "ENDRING_MOTTAKER";
+    soknadId?: string;
+    engangsBelopType?: EngangsbelopType;
+    stonadType?: StonadType;
+    vedtakType?: VedtakType;
     erFattetBeregnet?: boolean;
-    soknadFra?:
-    | "BM_I_ANNEN_SAK"
-    | "BARN_18"
-    | "BIDRAGSENHET"
-    | "FYLKESNEMDA"
-    | "NAV_INTERNASJONALT"
-    | "KOMMUNE"
-    | "KONVERTERING"
-    | "BIDRAGSMOTTAKER"
-    | "NORSKE_MYNDIGH"
-    | "BIDRAGSPLIKTIG"
-    | "UTENLANDSKE_MYNDIGH"
-    | "VERGE"
-    | "TRYGDEETATEN_INNKREVING"
-    | "KLAGE_ENHET";
-    roller: string[];
+    soknadFra?: SoknadFra;
+    roller?: string[];
+}
+
+/** Arkivsystem hvor dokument er lagret */
+export enum DokumentArkivSystemDto {
+    JOARK = "JOARK",
+    MIDLERTIDLIG_BREVLAGER = "MIDLERTIDLIG_BREVLAGER",
+    UKJENT = "UKJENT",
+    BIDRAG = "BIDRAG",
+}
+
+/** Dette skal være UNDER_PRODUKSJON for redigerbare dokumenter som ikke er ferdigprodusert. Ellers settes det til FERDIGSTILT */
+export enum DokumentStatusTo {
+    IKKE_BESTILT = "IKKE_BESTILT",
+    BESTILLING_FEILET = "BESTILLING_FEILET",
+    AVBRUTT = "AVBRUTT",
+    UNDER_PRODUKSJON = "UNDER_PRODUKSJON",
+    UNDER_REDIGERING = "UNDER_REDIGERING",
+    FERDIGSTILT = "FERDIGSTILT",
+    MAKONTROLLERES = "MÅ_KONTROLLERES",
+    KONTROLLERT = "KONTROLLERT",
+}
+
+export enum EngangsbelopType {
+    DIREKTE_OPPGJOR = "DIREKTE_OPPGJOR",
+    ETTERGIVELSE = "ETTERGIVELSE",
+    ETTERGIVELSE_TILBAKEKREVING = "ETTERGIVELSE_TILBAKEKREVING",
+    TILBAKEKREVING = "TILBAKEKREVING",
+    SAERTILSKUDD = "SAERTILSKUDD",
+    GEBYR_MOTTAKER = "GEBYR_MOTTAKER",
+    GEBYR_SKYLDNER = "GEBYR_SKYLDNER",
+}
+
+/** Tema forsendelsen skal opprettes med */
+export enum JournalTema {
+    BID = "BID",
+    FAR = "FAR",
 }
 
 /** Adresse til mottaker hvis dokumentet sendes som brev */
@@ -66,11 +72,16 @@ export interface MottakerAdresseTo {
     poststed?: string;
 }
 
+export enum MottakerIdentTypeTo {
+    FNR = "FNR",
+    SAMHANDLER = "SAMHANDLER",
+}
+
 export interface MottakerTo {
     ident?: string;
     språk?: string;
     navn?: string;
-    identType?: "FNR" | "SAMHANDLER";
+    identType?: MottakerIdentTypeTo;
     /** Adresse til mottaker hvis dokumentet sendes som brev */
     adresse?: MottakerAdresseTo;
 }
@@ -82,7 +93,7 @@ export interface OpprettDokumentForesporsel {
     /** Språket på inneholdet i dokumentet. */
     språk?: string;
     /** Arkivsystem hvor dokument er lagret */
-    arkivsystem?: "JOARK" | "MIDLERTIDLIG_BREVLAGER" | "UKJENT" | "BIDRAG";
+    arkivsystem?: DokumentArkivSystemDto;
     /**
      * Dato dokument ble opprettet
      * @format date-time
@@ -95,15 +106,7 @@ export interface OpprettDokumentForesporsel {
     /** DokumentmalId sier noe om dokumentets innhold og oppbygning. (Også kjent som brevkode) */
     dokumentmalId?: string;
     /** Dette skal være UNDER_PRODUKSJON for redigerbare dokumenter som ikke er ferdigprodusert. Ellers settes det til FERDIGSTILT */
-    status?:
-    | "IKKE_BESTILT"
-    | "BESTILLING_FEILET"
-    | "AVBRUTT"
-    | "UNDER_PRODUKSJON"
-    | "UNDER_REDIGERING"
-    | "FERDIGSTILT"
-    | "MÅ_KONTROLLERES"
-    | "KONTROLLERT";
+    status?: DokumentStatusTo;
     /** Om dokumentet med dokumentmalId skal bestilles. Hvis dette er satt til false så antas det at kallende system bestiller dokumentet selv. */
     bestillDokument?: boolean;
 }
@@ -129,11 +132,50 @@ export interface OpprettForsendelseForesporsel {
     /** Identifikator til batch kjøring forsendelsen ble opprettet av */
     batchId?: string;
     /** Tema forsendelsen skal opprettes med */
-    tema?: "BID" | "FAR";
+    tema?: JournalTema;
     /** Språk forsendelsen skal være på */
     språk?: string;
     /** Ident til saksbehandler som oppretter journalpost. Dette vil prioriteres over ident som tilhører tokenet til kallet. */
     saksbehandlerIdent?: string;
+}
+
+export enum SoknadFra {
+    BM_I_ANNEN_SAK = "BM_I_ANNEN_SAK",
+    BARN18AAR = "BARN_18_AAR",
+    NAV_BIDRAG = "NAV_BIDRAG",
+    FYLKESNEMDA = "FYLKESNEMDA",
+    NAV_INTERNASJONALT = "NAV_INTERNASJONALT",
+    KOMMUNE = "KOMMUNE",
+    KONVERTERING = "KONVERTERING",
+    BIDRAGSMOTTAKER = "BIDRAGSMOTTAKER",
+    NORSKE_MYNDIGHET = "NORSKE_MYNDIGHET",
+    BIDRAGSPLIKTIG = "BIDRAGSPLIKTIG",
+    UTENLANDSKE_MYNDIGHET = "UTENLANDSKE_MYNDIGHET",
+    VERGE = "VERGE",
+    TRYGDEETATEN_INNKREVING = "TRYGDEETATEN_INNKREVING",
+    KLAGE_ANKE = "KLAGE_ANKE",
+}
+
+export enum StonadType {
+    BIDRAG = "BIDRAG",
+    FORSKUDD = "FORSKUDD",
+    BIDRAG18AAR = "BIDRAG18AAR",
+    EKTEFELLEBIDRAG = "EKTEFELLEBIDRAG",
+    MOTREGNING = "MOTREGNING",
+    OPPFOSTRINGSBIDRAG = "OPPFOSTRINGSBIDRAG",
+}
+
+export enum VedtakType {
+    INDEKSREGULERING = "INDEKSREGULERING",
+    ALDERSJUSTERING = "ALDERSJUSTERING",
+    OPPHOR = "OPPHØR",
+    ALDERSOPPHOR = "ALDERSOPPHØR",
+    REVURDERING = "REVURDERING",
+    FASTSETTELSE = "FASTSETTELSE",
+    INNKREVING = "INNKREVING",
+    KLAGE = "KLAGE",
+    ENDRING = "ENDRING",
+    ENDRING_MOTTAKER = "ENDRING_MOTTAKER",
 }
 
 /** Metadata til en respons etter dokumenter i forsendelse ble opprettet */
@@ -145,16 +187,16 @@ export interface DokumentRespons {
     journalpostId?: string;
     dokumentmalId?: string;
     redigeringMetadata?: string;
-    status?:
-    | "IKKE_BESTILT"
-    | "BESTILLING_FEILET"
-    | "AVBRUTT"
-    | "UNDER_PRODUKSJON"
-    | "UNDER_REDIGERING"
-    | "FERDIGSTILT"
-    | "MÅ_KONTROLLERES"
-    | "KONTROLLERT";
-    arkivsystem?: "JOARK" | "MIDLERTIDLIG_BREVLAGER" | "UKJENT" | "BIDRAG";
+    /** Dette skal være UNDER_PRODUKSJON for redigerbare dokumenter som ikke er ferdigprodusert. Ellers settes det til FERDIGSTILT */
+    status?: DokumentStatusTo;
+    /** Arkivsystem hvor dokument er lagret */
+    arkivsystem?: DokumentArkivSystemDto;
+}
+
+/** Type på forsendelse. Kan være NOTAT eller UTGÅENDE */
+export enum ForsendelseTypeTo {
+    UTGAENDE = "UTGÅENDE",
+    NOTAT = "NOTAT",
 }
 
 /** Metadata til en respons etter forsendelse ble opprettet */
@@ -165,9 +207,25 @@ export interface OpprettForsendelseRespons {
      */
     forsendelseId?: number;
     /** Type på forsendelse. Kan være NOTAT eller UTGÅENDE */
-    forsendelseType?: "UTGÅENDE" | "NOTAT";
+    forsendelseType?: ForsendelseTypeTo;
     /** Liste med dokumenter som er knyttet til journalposten */
     dokumenter: DokumentRespons[];
+}
+
+export interface HentDokumentValgRequest {
+    vedtakType?: VedtakType;
+    behandlingType?: string;
+    soknadFra?: SoknadFra;
+    erFattetBeregnet?: boolean;
+    vedtakId?: string;
+    behandlingId?: string;
+    enhet?: string;
+}
+
+export interface DokumentMalDetaljer {
+    beskrivelse: string;
+    type: "UTGÅENDE" | "NOTAT";
+    kanBestilles: boolean;
 }
 
 /** En avvikshendelse som kan utføres på en journalpost */
@@ -273,7 +331,7 @@ export interface OppdaterForsendelseForesporsel {
     /** NAV-enheten som oppretter forsendelsen. Kan bare oppdateres hvis status = UNDER_OPPRETTELSE */
     enhet?: string;
     /** Tema forsendelsen skal opprettes med */
-    tema?: "BID" | "FAR";
+    tema?: JournalTema;
     /** Språk forsendelsen skal være på */
     språk?: string;
 }
@@ -393,11 +451,6 @@ export interface EndreReturDetaljer {
     beskrivelse: string;
 }
 
-export interface DokumentMalDetaljer {
-    beskrivelse: string;
-    type: "UTGÅENDE" | "NOTAT";
-}
-
 export interface DokumentMetadata {
     /** Journalpostid med arkiv prefiks som skal benyttes når dokumentet hentes */
     journalpostId?: string;
@@ -409,6 +462,13 @@ export interface DokumentMetadata {
     status: "IKKE_BESTILT" | "BESTILLING_FEILET" | "UNDER_PRODUKSJON" | "UNDER_REDIGERING" | "FERDIGSTILT" | "AVBRUTT";
     /** Hvilken arkivsystem dokumentet er lagret på */
     arkivsystem: "JOARK" | "MIDLERTIDLIG_BREVLAGER" | "UKJENT" | "BIDRAG";
+}
+
+/** Metadata om behandling */
+export interface BehandlingInfoResponseDto {
+    vedtakId?: string;
+    behandlingId?: string;
+    soknadId?: string;
 }
 
 /** Metadata om forsendelse */
@@ -424,6 +484,8 @@ export interface ForsendelseResponsTo {
     enhet?: string;
     /** Tema på forsendelsen */
     tema?: string;
+    /** Metadata om behandling */
+    behandlingInfo?: BehandlingInfoResponseDto;
     /** Ident på saksbehandler eller applikasjon som opprettet forsendelsen */
     opprettetAvIdent?: string;
     /** Navn på saksbehandler eller applikasjon som opprettet forsendelsen */
@@ -433,15 +495,9 @@ export interface ForsendelseResponsTo {
     /** Journalpostid som forsendelsen ble arkivert på. Dette vil bli satt hvis status er FERDIGSTILT */
     arkivJournalpostId?: string;
     /** Type på forsendelse. Kan være NOTAT eller UTGÅENDE */
-    forsendelseType?: "UTGÅENDE" | "NOTAT";
+    forsendelseType?: ForsendelseTypeTo;
     /** Status på forsendelsen */
-    status?:
-    | "UNDER_OPPRETTELSE"
-    | "UNDER_PRODUKSJON"
-    | "FERDIGSTILT"
-    | "SLETTET"
-    | "DISTRIBUERT"
-    | "DISTRIBUERT_LOKALT";
+    status?: ForsendelseStatusTo;
     /**
      * Dato forsendelsen ble opprettet
      * @format date
@@ -457,6 +513,16 @@ export interface ForsendelseResponsTo {
      * @format date
      */
     distribuertDato?: string;
+}
+
+/** Status på forsendelsen */
+export enum ForsendelseStatusTo {
+    UNDER_OPPRETTELSE = "UNDER_OPPRETTELSE",
+    UNDER_PRODUKSJON = "UNDER_PRODUKSJON",
+    FERDIGSTILT = "FERDIGSTILT",
+    SLETTET = "SLETTET",
+    DISTRIBUERT = "DISTRIBUERT",
+    DISTRIBUERT_LOKALT = "DISTRIBUERT_LOKALT",
 }
 
 /** Metadata om en aktør */
@@ -562,8 +628,27 @@ export interface JournalpostDto {
     mottattDato?: string;
     /** Inngående (I), utgående (U) journalpost; (X) internt notat */
     dokumentType?: string;
-    /** Journalpostens status, (A, D, J, M, O, R, S, T, U, KP, EJ, E) */
+    /**
+     * Journalpostens status, (A, D, J, M, O, R, S, T, U, KP, EJ, E)
+     * @deprecated
+     */
     journalstatus?: string;
+    /** Journalpostens status */
+    status?:
+    | "MOTTATT"
+    | "JOURNALFØRT"
+    | "EKSPEDERT"
+    | "DISTRIBUERT"
+    | "AVBRUTT"
+    | "KLAR_FOR_DISTRIBUSJON"
+    | "RETUR"
+    | "FERDIGSTILT"
+    | "FEILREGISTRERT"
+    | "RESERVERT"
+    | "UTGÅR"
+    | "UNDER_OPPRETTELSE"
+    | "UNDER_PRODUKSJON"
+    | "UKJENT";
     /** Om journalposten er feilført på bidragssak */
     feilfort?: boolean;
     /** Metadata for kode vs dekode i et kodeobjekt */
@@ -632,22 +717,10 @@ export interface DokumentDetaljer {
 
 export interface DokumentRedigeringMetadataResponsDto {
     tittel: string;
-    status:
-    | "IKKE_BESTILT"
-    | "BESTILLING_FEILET"
-    | "AVBRUTT"
-    | "UNDER_PRODUKSJON"
-    | "UNDER_REDIGERING"
-    | "FERDIGSTILT"
-    | "MÅ_KONTROLLERES"
-    | "KONTROLLERT";
-    forsendelseStatus:
-    | "UNDER_OPPRETTELSE"
-    | "UNDER_PRODUKSJON"
-    | "FERDIGSTILT"
-    | "SLETTET"
-    | "DISTRIBUERT"
-    | "DISTRIBUERT_LOKALT";
+    /** Dette skal være UNDER_PRODUKSJON for redigerbare dokumenter som ikke er ferdigprodusert. Ellers settes det til FERDIGSTILT */
+    status: DokumentStatusTo;
+    /** Status på forsendelsen */
+    forsendelseStatus: ForsendelseStatusTo;
     redigeringMetadata?: string;
     dokumenter: DokumentDetaljer[];
 }
@@ -832,6 +905,24 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ) =>
             this.request<DokumentRespons, any>({
                 path: `/api/forsendelse/${forsendelseIdMedPrefix}/dokument`,
+                method: "POST",
+                body: data,
+                secure: true,
+                type: ContentType.Json,
+                ...params,
+            }),
+
+        /**
+         * @description Henter dokumentmaler som er støttet av applikasjonen
+         *
+         * @tags forsendelse-innsyn-kontroller
+         * @name HentDokumentValg
+         * @request POST:/api/forsendelse/v2/dokumentvalg
+         * @secure
+         */
+        hentDokumentValg: (data: HentDokumentValgRequest, params: RequestParams = {}) =>
+            this.request<Record<string, DokumentMalDetaljer>, any>({
+                path: `/api/forsendelse/v2/dokumentvalg`,
                 method: "POST",
                 body: data,
                 secure: true,
@@ -1300,56 +1391,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             this.request<ForsendelseResponsTo[], any>({
                 path: `/api/forsendelse/v2/sak/${saksnummer}/journal`,
                 method: "GET",
-                secure: true,
-                ...params,
-            }),
-
-        /**
-         * @description Henter dokumentmaler som er støttet av applikasjonen
-         *
-         * @tags forsendelse-innsyn-kontroller
-         * @name HentDokumentValg
-         * @request GET:/api/forsendelse/v2/dokumentvalg
-         * @secure
-         */
-        hentDokumentValg: (
-            query?: {
-                vedtakType?:
-                | "INDEKSREGULERING"
-                | "ALDERSJUSTERING"
-                | "OPPHØR"
-                | "ALDERSOPPHØR"
-                | "REVURDERING"
-                | "FASTSETTELSE"
-                | "INNKREVING"
-                | "KLAGE"
-                | "ENDRING"
-                | "ENDRING_MOTTAKER";
-                behandlingType?: string;
-                soknadFra?:
-                | "BM_I_ANNEN_SAK"
-                | "BARN_18"
-                | "BIDRAGSENHET"
-                | "FYLKESNEMDA"
-                | "NAV_INTERNASJONALT"
-                | "KOMMUNE"
-                | "KONVERTERING"
-                | "BIDRAGSMOTTAKER"
-                | "NORSKE_MYNDIGH"
-                | "BIDRAGSPLIKTIG"
-                | "UTENLANDSKE_MYNDIGH"
-                | "VERGE"
-                | "TRYGDEETATEN_INNKREVING"
-                | "KLAGE_ENHET";
-                erFattetBeregnet?: boolean;
-                enhet?: string;
-            },
-            params: RequestParams = {}
-        ) =>
-            this.request<Record<string, DokumentMalDetaljer>, any>({
-                path: `/api/forsendelse/v2/dokumentvalg`,
-                method: "GET",
-                query: query,
                 secure: true,
                 ...params,
             }),

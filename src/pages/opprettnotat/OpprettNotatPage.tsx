@@ -4,6 +4,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { useMutation } from "react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../../api/api";
+import { JournalTema } from "../../api/BidragForsendelseApi";
 import GjelderSelect from "../../components/detaljer/GjelderSelect";
 import TemaSelect from "../../components/detaljer/TemaSelect";
 import DokumentValgNotat from "../../components/dokument/DokumentValgNotat";
@@ -34,7 +35,7 @@ export default function OpprettNotatPage() {
                 },
                 saksnummer,
                 enhet: enhet ?? "4806",
-                tema: data.tema,
+                tema: data.tema as JournalTema,
                 språk: data.språk,
                 dokumenter: [
                     {

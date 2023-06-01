@@ -3,24 +3,32 @@ import { createContext, useState } from "react";
 import { PropsWithChildren } from "react";
 import { useContext } from "react";
 
-import { SOKNAD_FRA, VEDTAK_TYPE } from "../../hooks/useForsendelseApi";
+import { EngangsbelopType, SoknadFra, StonadType, VedtakType } from "../../api/BidragForsendelseApi";
 
-interface IOpprettForsendelseContext {
-    vedtakType: VEDTAK_TYPE;
+export interface IOpprettForsendelseProviderProps {
+    vedtakType: VedtakType;
     erFattetBeregnet?: boolean;
-    engangsBelopType: string;
-    stonadType: string;
+    engangsBelopType: EngangsbelopType;
+    stonadType: StonadType;
     behandlingType: string;
-    soknadFra: SOKNAD_FRA;
+    soknadFra: SoknadFra;
+    soknadId?: string;
+    vedtakId?: string;
+    behandlingId?: string;
     enhet?: string;
 }
 
 interface IOpprettForsendelsePropsContext {
     behandlingType: string;
-    vedtakType: VEDTAK_TYPE;
+    engangsBelopType: EngangsbelopType;
+    stonadType: StonadType;
+    vedtakType: VedtakType;
     erFattetBeregnet?: boolean;
-    soknadFra: SOKNAD_FRA;
+    soknadFra: SoknadFra;
     enhet?: string;
+    soknadId?: string;
+    vedtakId?: string;
+    behandlingId?: string;
 }
 
 export const OpprettForsendelseContext = createContext<IOpprettForsendelsePropsContext>(
@@ -29,11 +37,9 @@ export const OpprettForsendelseContext = createContext<IOpprettForsendelsePropsC
 
 function OpprettForsendelseProvider({
     children,
-    stonadType,
     behandlingType,
-    engangsBelopType,
     ...otherProps
-}: PropsWithChildren<IOpprettForsendelseContext>) {
+}: PropsWithChildren<IOpprettForsendelseProviderProps>) {
     const [errors, setErrors] = useState<string[]>([]);
 
     // useEffect(() => {
@@ -57,7 +63,7 @@ function OpprettForsendelseProvider({
         <OpprettForsendelseContext.Provider
             value={{
                 ...otherProps,
-                behandlingType: behandlingType ?? stonadType ?? engangsBelopType,
+                behandlingType: behandlingType ?? otherProps.stonadType ?? otherProps.engangsBelopType,
             }}
         >
             {children}

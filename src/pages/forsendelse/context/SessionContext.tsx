@@ -28,7 +28,7 @@ function SessionProvider({ children, ...props }: PropsWithChildren<ISessionProps
     const [sessionId, setSessionId] = useState(props.sessionId);
     const [enhet, setEnhet] = useState(props.enhet);
 
-    function navigateToForsendelse(forsendelseId: string, type: "UTGÅENDE" | "NOTAT" = "UTGÅENDE") {
+    const navigateToForsendelse = (forsendelseId: string, type: "UTGÅENDE" | "NOTAT" = "UTGÅENDE") => {
         const params = new URLSearchParams();
         params.append("enhet", enhet);
         params.append("sessionId", sessionId);
@@ -37,7 +37,7 @@ function SessionProvider({ children, ...props }: PropsWithChildren<ISessionProps
         } else {
             navigate(`/sak/${saksnummer}/forsendelse/${forsendelseId}?${params.toString()}`);
         }
-    }
+    };
     return (
         <SessionContext.Provider
             value={{

@@ -1,8 +1,8 @@
 import { useQuery } from "react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../api/api";
+import { HentDokumentValgRequest } from "../api/BidragForsendelseApi";
 import { useSession } from "../pages/forsendelse/context/SessionContext";
-import { SOKNAD_FRA, VEDTAK_TYPE } from "./useForsendelseApi";
 
 export default function useDokumentApi() {
     const { forsendelseId, saksnummer, enhet } = useSession();
@@ -14,12 +14,7 @@ export default function useDokumentApi() {
             optimisticResults: false,
         });
     }
-    function dokumentMalDetaljer(request: {
-        vedtakType: VEDTAK_TYPE;
-        behandlingType: string;
-        soknadFra: SOKNAD_FRA;
-        erFattetBeregnet?: boolean;
-    }) {
+    function dokumentMalDetaljer(request: HentDokumentValgRequest) {
         return useQuery({
             queryKey: [
                 "dokumentMalDetaljer",
@@ -29,11 +24,7 @@ export default function useDokumentApi() {
                 request.erFattetBeregnet,
                 enhet,
             ],
-            queryFn: ({ signal }) =>
-                BIDRAG_FORSENDELSE_API.api.hentDokumentValg({
-                    ...request,
-                    enhet,
-                }),
+            queryFn: ({ signal }) => BIDRAG_FORSENDELSE_API.api.hentDokumentValg({ ...request, enhet }),
             select: (data) => data.data,
             optimisticResults: false,
         });

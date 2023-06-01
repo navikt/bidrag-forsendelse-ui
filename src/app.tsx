@@ -4,7 +4,7 @@ import React from "react";
 import { BrowserRouter, Route, Routes, useParams, useSearchParams } from "react-router-dom";
 
 import { initMock } from "./__mocks__/msw";
-import { SOKNAD_FRA, VEDTAK_TYPE } from "./hooks/useForsendelseApi";
+import { EngangsbelopType, SoknadFra, StonadType, VedtakType } from "./api/BidragForsendelseApi";
 import { SessionProvider } from "./pages/forsendelse/context/SessionContext";
 import ForsendelsePage from "./pages/forsendelse/ForsendelsePage";
 import Opprettforsendelse from "./pages/opprettforsendelse";
@@ -64,16 +64,19 @@ function OpprettNyForsendelsePageWrapper() {
             enhet={searchParams.get("enhet")}
         >
             <Opprettforsendelse
-                vedtakType={searchParams.get("vedtakType") as VEDTAK_TYPE}
+                vedtakType={searchParams.get("vedtakType") as VedtakType}
                 erFattetBeregnet={
                     searchParams.get("erFattetBeregnet") != undefined
                         ? searchParams.get("erFattetBeregnet") == "true"
                         : null
                 }
-                soknadFra={searchParams.get("soknadFra") as SOKNAD_FRA}
+                soknadId={searchParams.get("soknadId")}
+                behandlingId={searchParams.get("behandlingId")}
+                vedtakId={searchParams.get("vedtakId")}
+                soknadFra={searchParams.get("soknadFra") as SoknadFra}
                 behandlingType={searchParams.get("behandlingType")}
-                engangsBelopType={searchParams.get("engangsBelopType")}
-                stonadType={searchParams.get("stonadType")}
+                engangsBelopType={searchParams.get("engangsBelopType") as EngangsbelopType}
+                stonadType={searchParams.get("stonadType") as StonadType}
             />
         </SessionProvider>
     );

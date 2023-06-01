@@ -4,6 +4,7 @@ import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { useIsMutating, useMutation } from "react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../../api/api";
+import { JournalTema } from "../../api/BidragForsendelseApi";
 import GjelderSelect from "../../components/detaljer/GjelderSelect";
 import { useForsendelseApi, UseForsendelseApiKeys } from "../../hooks/useForsendelseApi";
 import { useSession } from "../forsendelse/context/SessionContext";
@@ -11,6 +12,7 @@ import { queryClient } from "../PageWrapper";
 import DokumentValgOpprett from "./DokumentValgOpprett";
 import LanguageAndTemaSelect from "./LanguageAndTemaSelect";
 import MottakerSelect from "./MottakerSelect";
+import { useOpprettForsendelse } from "./OpprettForsendelseContext";
 
 export type OpprettForsendelseFormProps = {
     gjelderIdent: string;
@@ -45,7 +47,7 @@ function OpprettForsendelseUnderOpprettelse() {
                 mottaker: {
                     ident: data.mottakerIdent,
                 },
-                tema: data.tema,
+                tema: data.tema as JournalTema,
                 språk: data.språk,
                 dokumenter: [
                     {
@@ -83,6 +85,7 @@ function OpprettForsendelseUnderOpprettelse() {
 
 function OpprettForsendelseNy() {
     const { saksnummer, enhet, navigateToForsendelse } = useSession();
+    const options = useOpprettForsendelse();
     const opprettForsendelseFn = useMutation({
         mutationKey: OPPRETT_FORSENDELSE_MUTATION_KEY,
         mutationFn: (data: OpprettForsendelseFormProps) =>
@@ -92,8 +95,18 @@ function OpprettForsendelseNy() {
                     ident: data.mottakerIdent,
                 },
                 saksnummer,
+                behandlingInfo: {
+                    soknadFra: options.soknadFra,
+                    soknadId: options.soknadId,
+                    vedtakId: options.vedtakId,
+                    behandlingId: options.behandlingId,
+                    vedtakType: options.vedtakType,
+                    stonadType: options.stonadType,
+                    engangsBelopType: options.engangsBelopType,
+                    erFattetBeregnet: options.erFattetBeregnet,
+                },
                 enhet: enhet ?? "4806",
-                tema: data.tema,
+                tema: data.tema as JournalTema,
                 språk: data.språk,
                 dokumenter: [
                     {
