@@ -75,7 +75,7 @@ function OpprettNyForsendelsePageWrapper() {
                 vedtakId={searchParams.get("vedtakId")}
                 soknadFra={searchParams.get("soknadFra") as SoknadFra}
                 behandlingType={searchParams.get("behandlingType")}
-                engangsBelopType={searchParams.get("engangsBelopType") as EngangsbelopType}
+                engangsBelopType={searchParams.get("engangsbelopType") as EngangsbelopType}
                 stonadType={searchParams.get("stonadType") as StonadType}
             />
         </SessionProvider>
