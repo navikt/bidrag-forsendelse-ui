@@ -10,6 +10,7 @@ import TemaSelect from "../../components/detaljer/TemaSelect";
 import DokumentValgNotat from "../../components/dokument/DokumentValgNotat";
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
 import { useSession } from "../forsendelse/context/SessionContext";
+import { useOpprettForsendelse } from "../opprettforsendelse/OpprettForsendelseContext";
 
 export type OpprettForsendelseFormProps = {
     gjelderIdent: string;
@@ -26,6 +27,7 @@ export type OpprettForsendelseFormProps = {
 
 export default function OpprettNotatPage() {
     const { saksnummer, enhet, navigateToForsendelse } = useSession();
+    const options = useOpprettForsendelse();
     const opprettForsendelseFn = useMutation({
         mutationFn: (data: OpprettForsendelseFormProps) =>
             BIDRAG_FORSENDELSE_API.api.opprettForsendelse({
@@ -37,6 +39,16 @@ export default function OpprettNotatPage() {
                 enhet: enhet ?? "4806",
                 tema: data.tema as JournalTema,
                 språk: data.språk,
+                behandlingInfo: {
+                    soknadFra: options.soknadFra,
+                    soknadId: options.soknadId,
+                    vedtakId: options.vedtakId,
+                    behandlingId: options.behandlingId,
+                    vedtakType: options.vedtakType,
+                    stonadType: options.stonadType,
+                    engangsBelopType: options.engangsBelopType,
+                    erFattetBeregnet: options.erFattetBeregnet,
+                },
                 dokumenter: [
                     {
                         dokumentmalId: data.dokument.malId,
