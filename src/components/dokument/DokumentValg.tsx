@@ -11,8 +11,9 @@ interface TableRowData {
 
 interface DokumentValgProps {
     malDetaljer: Record<string, DokumentMalDetaljer>;
+    showLegend?: boolean;
 }
-export default function DokumentValg({ malDetaljer }: DokumentValgProps) {
+export default function DokumentValg({ malDetaljer, showLegend }: DokumentValgProps) {
     const { register, setValue } = useFormContext();
 
     const alleBrev: TableRowData[] = Object.keys(malDetaljer).map((key) => ({
@@ -34,7 +35,7 @@ export default function DokumentValg({ malDetaljer }: DokumentValgProps) {
     return (
         <div className="w-9/12">
             <RadioGroup
-                legend={<Heading size="small">Velg dokument</Heading>}
+                legend={showLegend && <Heading size="small">Velg dokument</Heading>}
                 {...methods}
                 onBlur={(e) => {
                     methods.onBlur(e);

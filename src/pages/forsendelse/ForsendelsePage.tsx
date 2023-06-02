@@ -28,7 +28,6 @@ function ForsendelseView() {
     const { forsendelseId } = useSession();
     const forsendelse = useForsendelseApi().hentForsendelse();
 
-    console.log(forsendelse);
     if (forsendelse.status == "UNDER_OPPRETTELSE") {
         return <OpprettForsendelsePage />;
     }

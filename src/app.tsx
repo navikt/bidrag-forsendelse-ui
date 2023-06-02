@@ -38,7 +38,7 @@ function ForsendelsePageWrapper() {
         <ForsendelsePage
             forsendelseId={forsendelseId}
             saksnummer={saksnummer}
-            sessionId={searchParams.get("sessionId")}
+            sessionId={searchParams.get("sessionState")}
             enhet={searchParams.get("enhet")}
         />
     );
@@ -69,7 +69,7 @@ function OpprettNyNotatPageWrapper() {
             >
                 <Opprettnotat
                     saksnummer={saksnummer}
-                    sessionId={searchParams.get("sessionId")}
+                    sessionId={searchParams.get("sessionState")}
                     enhet={searchParams.get("enhet")}
                 />
             </OpprettForsendelseProvider>
@@ -83,7 +83,7 @@ function OpprettNyForsendelsePageWrapper() {
         <SessionProvider
             forsendelseId={forsendelseId}
             saksnummer={saksnummer}
-            sessionId={searchParams.get("sessionId")}
+            sessionId={searchParams.get("sessionState")}
             enhet={searchParams.get("enhet")}
         >
             <Opprettforsendelse

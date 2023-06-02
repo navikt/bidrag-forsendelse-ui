@@ -153,9 +153,6 @@ export function useForsendelseApi(): UseForsendelseDataProps {
                     }),
                 };
             }, []),
-            onSuccess: (data) => {
-                console.log("Hentet forsendelse", data);
-            },
         });
 
         return {

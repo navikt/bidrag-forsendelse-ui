@@ -31,7 +31,7 @@ function SessionProvider({ children, ...props }: PropsWithChildren<ISessionProps
     const navigateToForsendelse = (forsendelseId: string, type: "UTGÅENDE" | "NOTAT" = "UTGÅENDE") => {
         const params = new URLSearchParams();
         params.append("enhet", enhet);
-        params.append("sessionId", sessionId);
+        params.append("sessionState", sessionId);
         if (type == "NOTAT") {
             window.open(`/sak/${saksnummer}/journal/BIF-${forsendelseId}?${params.toString()}`, "_self");
         } else {
