@@ -1,42 +1,58 @@
-import { BodyShort, Heading, Label } from "@navikt/ds-react";
+import "./ForsendelseDetaljer.css";
+
+import { BodyLong, Heading, Label } from "@navikt/ds-react";
 
 import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
-
 export default function ForsendelseDetaljer() {
     const forsendelse = useForsendelseApi().hentForsendelse();
     return (
         <div>
-            <Heading size="small">Forsendelse detaljer</Heading>
-            <table width={"250px"}>
-                <thead>
-                    <tr>
-                        <th style={{ width: "50%" }}></th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <TableRow label="Enhet" value={forsendelse.enhet} />
-                    <TableRow label="Opprettet dato" value={forsendelse.opprettetDato} />
-                    <TableRow label="Tema" value={forsendelse.tema} />
-                </tbody>
-            </table>
+            <Heading size="small">Andre detaljer</Heading>
+            <div className="flex flex-row static_data">
+                <DetailsGrid
+                    rows={[
+                        {
+                            label: "Enhet",
+                            value: forsendelse.enhet,
+                        },
+                        {
+                            label: "Tema",
+                            value: forsendelse.tema,
+                        },
+                        {
+                            label: "Opprettet dato",
+                            value: forsendelse.opprettetDato,
+                        },
+                        {
+                            label: "Opprettet av",
+                            value: forsendelse.opprettetAvIdent,
+                        },
+                    ]}
+                />
+            </div>
         </div>
     );
 }
 
-type TableRowProps = {
-    label: string;
-    value: string;
-};
-function TableRow({ label, value }: TableRowProps) {
+interface DetailsColumnProps {
+    rows: {
+        label: string;
+        value: string;
+    }[];
+}
+function DetailsGrid({ rows }: DetailsColumnProps) {
     return (
-        <tr>
-            <td>
-                <Label size="small">{label}</Label>
-            </td>
-            <td>
-                <BodyShort size="small">{value}</BodyShort>
-            </td>
-        </tr>
+        <BodyLong>
+            <dl className="forsendelse_description_list">
+                {rows.map((row) => (
+                    <div>
+                        <dt>
+                            <Label>{row.label}</Label>
+                        </dt>
+                        <dd>{row.value}</dd>
+                    </div>
+                ))}
+            </dl>
+        </BodyLong>
     );
 }

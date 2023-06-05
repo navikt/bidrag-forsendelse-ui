@@ -7,6 +7,7 @@ import { BIDRAG_FORSENDELSE_API } from "../api/api";
 import { SAK_API } from "../api/api";
 import { BIDRAG_DOKUMENT_API } from "../api/api";
 import { JournalpostDto } from "../api/BidragDokumentApi";
+import { ForsendelseResponsTo } from "../api/BidragForsendelseApi";
 import { BidragSakDto } from "../api/BidragSakApi";
 import { DokumentStatus } from "../constants/DokumentStatus";
 import { SAKSNUMMER } from "../constants/fellestyper";
@@ -134,11 +135,19 @@ export function useForsendelseApi(): UseForsendelseDataProps {
     function hentForsendelseQuery(): IForsendelse {
         const { data: forsendelse, isRefetching } = useQuery({
             queryKey: UseForsendelseApiKeys.hentForsendelse(),
-            queryFn: ({ signal }) => BIDRAG_FORSENDELSE_API.api.hentForsendelse(forsendelseId),
+            queryFn: () => BIDRAG_FORSENDELSE_API.api.hentForsendelse(forsendelseId),
             enabled: forsendelseId != undefined,
             optimisticResults: false,
+            refetchInterval: (data) => {
+                if (!data) return 0;
+                const forsendelse = data as ForsendelseResponsTo;
+                const hasDokumentsWithStatus = forsendelse.dokumenter.some((d) =>
+                    ["UNDER_PRODUKSJON", "BESTILLING_FEILET", "UNDER_PRODUKSJON", "UNDER_REDIGERING"].includes(d.status)
+                );
+                return hasDokumentsWithStatus ? 3000 : 0;
+            },
             select: React.useCallback((response: AxiosResponse) => {
-                const forsendelse = response.data;
+                const forsendelse = response.data as ForsendelseResponsTo;
                 return {
                     ...forsendelse,
                     forsendelseId,

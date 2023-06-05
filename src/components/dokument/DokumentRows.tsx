@@ -137,18 +137,18 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
                 style={getRowStyle()}
                 className={`dokument-row ${errors.dokumenter?.[index]?.message ? "error" : ""}`}
             >
-                <Table.DataCell style={{ width: "1%" }} className={"cursor-all-scroll"} {...listeners} {...attributes}>
+                <Table.DataCell style={{ width: "3px" }} className={"cursor-all-scroll"} {...listeners} {...attributes}>
                     <DragVerticalIcon />
                 </Table.DataCell>
-                <Table.DataCell style={{ width: "1%" }}>{dokindex + 1}</Table.DataCell>
-                <Table.DataCell scope="row" style={{ width: "30%" }}>
+                <Table.DataCell style={{ width: "3px" }}>{dokindex + 1}</Table.DataCell>
+                <Table.DataCell scope="row" style={{ width: "550px" }}>
                     <EditableDokumentTitle dokument={dokument} index={index} />
                 </Table.DataCell>
-                <Table.DataCell style={{ width: "5%" }}>{dayjs(dokumentDato).format("DD.MM.YYYY")}</Table.DataCell>
-                <Table.DataCell style={{ width: "3%" }}>
+                <Table.DataCell style={{ width: "100px" }}>{dayjs(dokumentDato).format("DD.MM.YYYY")}</Table.DataCell>
+                <Table.DataCell style={{ width: "200px" }}>
                     <DokumentStatusTag status={status} />
                 </Table.DataCell>
-                <Table.DataCell style={{ width: "1%" }}>
+                <Table.DataCell style={{ width: "50px" }}>
                     <div className={"flex flex-row gap-1 justify-end"}>
                         {dokument.status == "KONTROLLERT" && (
                             <Button

@@ -32,23 +32,23 @@ export default function DokumenterTable() {
                 <div style={{ marginLeft: "auto" }}>Antall dokumenter: {dokumenter.length}</div>
             </div>
             <div className={"dokument-table "} style={{ borderColor: "var(--a-border-subtle)" }}>
-                <Table size={"small"} style={{ tableLayout: "auto", display: "block" }}>
+                <Table size={"small"} style={{ tableLayout: "auto", display: "block", width: "1028px" }}>
                     <Table.Header>
                         <Table.Row>
-                            <Table.HeaderCell scope="col" style={{ width: "1%" }}></Table.HeaderCell>
-                            <Table.HeaderCell scope="col" style={{ width: "1%" }}>
+                            <Table.HeaderCell scope="col" style={{ width: "3px" }}></Table.HeaderCell>
+                            <Table.HeaderCell scope="col" style={{ width: "3px" }}>
                                 Nr.
                             </Table.HeaderCell>
-                            <Table.HeaderCell scope="col" style={{ width: "30%" }}>
+                            <Table.HeaderCell scope="col" style={{ width: "550px" }}>
                                 Tittel
                             </Table.HeaderCell>
-                            <Table.HeaderCell scope="col" style={{ width: "5%" }}>
+                            <Table.HeaderCell scope="col" style={{ width: "100px" }}>
                                 Dok. dato
                             </Table.HeaderCell>
-                            <Table.HeaderCell scope="col" align={"left"} style={{ width: "5%" }}>
+                            <Table.HeaderCell scope="col" align={"left"} style={{ width: "200px" }}>
                                 Status
                             </Table.HeaderCell>
-                            <Table.HeaderCell scope="col" style={{ width: "1%" }}></Table.HeaderCell>
+                            <Table.HeaderCell scope="col" style={{ width: "50px" }}></Table.HeaderCell>
                         </Table.Row>
                     </Table.Header>
                     <DokumentRows />

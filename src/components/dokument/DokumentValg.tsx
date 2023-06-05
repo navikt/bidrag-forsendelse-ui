@@ -33,7 +33,7 @@ export default function DokumentValg({ malDetaljer, showLegend }: DokumentValgPr
 
     const methods = register("dokument.malId");
     return (
-        <div className="w-9/12">
+        <div className="w-100">
             <RadioGroup
                 legend={showLegend && <Heading size="small">Velg dokument</Heading>}
                 {...methods}

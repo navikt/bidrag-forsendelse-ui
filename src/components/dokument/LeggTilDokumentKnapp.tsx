@@ -273,6 +273,7 @@ function DokumenterForSakTabell({
             <Table.Body>
                 {journalposter
                     .filter((jp) => jp.dokumentType != "X")
+                    .filter((jp) => jp.journalstatus != "UO")
                     .filter((jp) => jp.feilfort != true)
                     .filter((jp) => !dokumenter.some((dok) => dok.journalpostId == jp.journalpostId))
                     .filter((jp) => jp.journalpostId != forsendelse.forsendelseId)

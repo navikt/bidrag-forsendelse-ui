@@ -66,7 +66,7 @@ function LeggTilDokumentFraMalModal({ onClose, open }: LeggTilDokumentFraSakModa
 
     return (
         <FormProvider {...methods}>
-            <Modal open={open} onClose={onClose}>
+            <Modal open={open} onClose={() => onClose()}>
                 <form onSubmit={methods.handleSubmit(onSubmit)}>
                     <Modal.Content
                         style={{
@@ -77,7 +77,7 @@ function LeggTilDokumentFraMalModal({ onClose, open }: LeggTilDokumentFraSakModa
                         }}
                     >
                         <Heading spacing level="1" size="large" id="modal-heading">
-                            Legg til dokumenter
+                            Legg til dokument fra mal
                         </Heading>
                         <React.Suspense fallback={<Loader size={"medium"} />}>
                             <DokumentValgForsendelse showLegend={false} />
