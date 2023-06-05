@@ -38,23 +38,23 @@ export interface IJournalpost {
     journalpostId?: string;
 
     kilde?:
-    | "NAV_NO_BID"
-    | "SKAN_BID"
-    | "NAV_NO"
-    | "SKAN_NETS"
-    | "LOKAL_UTSKRIFT"
-    | "SENTRAL_UTSKRIFT"
-    | "SDP"
-    | "INGEN_DISTRIBUSJON";
+        | "NAV_NO_BID"
+        | "SKAN_BID"
+        | "NAV_NO"
+        | "SKAN_NETS"
+        | "LOKAL_UTSKRIFT"
+        | "SENTRAL_UTSKRIFT"
+        | "SDP"
+        | "INGEN_DISTRIBUSJON";
     kanal?:
-    | "NAV_NO_BID"
-    | "SKAN_BID"
-    | "NAV_NO"
-    | "SKAN_NETS"
-    | "LOKAL_UTSKRIFT"
-    | "SENTRAL_UTSKRIFT"
-    | "SDP"
-    | "INGEN_DISTRIBUSJON";
+        | "NAV_NO_BID"
+        | "SKAN_BID"
+        | "NAV_NO"
+        | "SKAN_NETS"
+        | "LOKAL_UTSKRIFT"
+        | "SENTRAL_UTSKRIFT"
+        | "SDP"
+        | "INGEN_DISTRIBUSJON";
     mottattDato?: string;
     dokumentType?: string;
     journalstatus?: string;

@@ -10,6 +10,7 @@ import DokumenterTable from "../../components/dokument/DokumenterTable";
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
 import OpprettForsendelsePage from "../opprettforsendelse/OpprettForsendelsePage";
 import PageWrapper from "../PageWrapper";
+import ForsendelseDetaljer from "./components/ForsendelseDetaljer";
 import ForsendelseSakHeader from "./components/ForsendelseSakHeader";
 import Gjelder from "./components/Gjelder";
 import Mottaker from "./components/Mottaker";
@@ -46,9 +47,9 @@ function ForsendelseView() {
                                     <Mottaker />
                                 </React.Suspense>
                             </Cell>
-                            {/* <Cell xs={12} md={12} lg={4}>
+                            <Cell xs={12} md={12} lg={4}>
                                 <ForsendelseDetaljer />
-                            </Cell> */}
+                            </Cell>
                         </Grid>
                         <div>
                             <Heading level={"3"} size={"medium"} className={"max-w mt-[32px]"}>
