@@ -16,7 +16,7 @@ import { useFormContext, useWatch } from "react-hook-form";
 import { useMutation } from "react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../../api/api";
-import { DokumentStatus } from "../../constants/DokumentStatus";
+import { DOKUMENT_KAN_IKKE_ÅPNES_STATUS, DokumentStatus } from "../../constants/DokumentStatus";
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
 import { FormIDokument, useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IForsendelseFormProps } from "../../pages/forsendelse/context/DokumenterFormContext";
@@ -160,11 +160,13 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
                                 }
                             />
                         )}
-                        <OpenDokumentButton
-                            dokumentreferanse={dokument.dokumentreferanse}
-                            journalpostId={"BIF-" + forsendelseIdNumeric}
-                            status={dokument.status}
-                        />
+                        {!DOKUMENT_KAN_IKKE_ÅPNES_STATUS.includes(dokument.status) && (
+                            <OpenDokumentButton
+                                dokumentreferanse={dokument.dokumentreferanse}
+                                journalpostId={"BIF-" + forsendelseIdNumeric}
+                                status={dokument.status}
+                            />
+                        )}
                         <Button size={"small"} variant={"tertiary"} icon={<Delete />} onClick={deleteDocument} />
                     </div>
                 </Table.DataCell>

@@ -164,7 +164,9 @@ function OpprettForsendelsContainer({ onSubmit }: OpprettForsendelsContainerProp
                                 <GjelderSelect roller={roller} />
                                 <MottakerSelect />
                                 <LanguageAndTemaSelect />
-                                <DokumentValgOpprett />
+                                <div className="w-2/3">
+                                    <DokumentValgOpprett />
+                                </div>
                                 <div className="flex flex-row gap-2 pt-4">
                                     <Button size="small" loading={isLoading}>
                                         Opprett
