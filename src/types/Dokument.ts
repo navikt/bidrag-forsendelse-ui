@@ -6,6 +6,12 @@ export interface IDokument {
     index: number;
     journalpostId?: string;
     dokumentreferanse?: string;
+    lenkeTilDokumentreferanse?: string;
+    /** Originale dokumentreferanse hvis er kopi av en ekstern dokument (feks fra JOARK) */
+    originalDokumentreferanse?: string;
+    /** Originale journalpostid hvis er kopi av en ekstern dokument (feks fra JOARK) */
+    originalJournalpostId?: string;
+    forsendelseId?: string;
     dokumentmalId?: string;
     språk?: string;
     tittel: string;

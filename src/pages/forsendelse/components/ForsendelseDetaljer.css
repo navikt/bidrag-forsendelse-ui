@@ -14,6 +14,6 @@
 
 .forsendelse_description_list {
     display: grid;
-    grid-template-columns: max-content max-content;
+    grid-template-columns: max-content max-content max-content max-content;
     gap: 0 15px;
 }

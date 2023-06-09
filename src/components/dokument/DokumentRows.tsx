@@ -16,7 +16,7 @@ import { useFormContext, useWatch } from "react-hook-form";
 import { useMutation } from "react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../../api/api";
-import { DOKUMENT_KAN_IKKE_ÅPNES_STATUS, DokumentStatus } from "../../constants/DokumentStatus";
+import { DokumentStatus } from "../../constants/DokumentStatus";
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
 import { FormIDokument, useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IForsendelseFormProps } from "../../pages/forsendelse/context/DokumenterFormContext";
@@ -107,15 +107,7 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
             const { ref: formRef } = register(`dokumenter.${index}`);
             formRef(ref);
         }, []);
-        function getKildeDisplayValue() {
-            if ([DokumentStatus.UNDER_REDIGERING, DokumentStatus.FERDIGSTILT].includes(dokument.status)) {
-                return "Fra mal";
-            }
-            if (dokument.fraSaksnummer == forsendelse.saksnummer) {
-                return "Fra samme sak";
-            }
-            return "Fra sak " + dokument.fraSaksnummer;
-        }
+
         const getRowStyle = () => {
             let styles = { ...style } as CSSProperties;
 
@@ -128,7 +120,8 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
             return styles;
         };
 
-        const forsendelseIdNumeric = forsendelseId?.replace("BIF-", "");
+        const forsendelseIdNumeric = dokument.forsendelseId ?? forsendelseId?.replace("BIF-", "");
+        const originalDokumentreferanse = dokument.lenkeTilDokumentreferanse ?? dokument.dokumentreferanse;
 
         return (
             <Table.Row
@@ -156,17 +149,18 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
                                 variant={"tertiary"}
                                 icon={<EyeIcon />}
                                 onClick={() =>
-                                    OpenDocumentUtils.åpneDokument(`BIF-${forsendelseIdNumeric}`, dokumentreferanse)
+                                    OpenDocumentUtils.åpneDokument(
+                                        `BIF-${forsendelseIdNumeric}`,
+                                        originalDokumentreferanse
+                                    )
                                 }
                             />
                         )}
-                        {!DOKUMENT_KAN_IKKE_ÅPNES_STATUS.includes(dokument.status) && (
-                            <OpenDokumentButton
-                                dokumentreferanse={dokument.dokumentreferanse}
-                                journalpostId={"BIF-" + forsendelseIdNumeric}
-                                status={dokument.status}
-                            />
-                        )}
+                        <OpenDokumentButton
+                            dokumentreferanse={originalDokumentreferanse}
+                            journalpostId={"BIF-" + forsendelseIdNumeric}
+                            status={dokument.status}
+                        />
                         <Button size={"small"} variant={"tertiary"} icon={<Delete />} onClick={deleteDocument} />
                     </div>
                 </Table.DataCell>

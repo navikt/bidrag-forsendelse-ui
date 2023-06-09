@@ -1,5 +1,24 @@
 tr.dokumentrad {
-  border: 1px solid var(--a-border-alt-3);
+  border-left: 2px solid var(--a-border-default);
+  border-right: 2px solid var(--a-border-default);
 }
+
+tr.dokumentrad.last {
+  border-bottom: 2px solid var(--a-border-default);
+}
+
+tr.journalpostrad.open {
+  border-left: 2px solid var(--a-border-default);
+  border-right: 2px solid var(--a-border-default);
+  border-top: 2px solid var(--a-border-default);
+}
+
+/* .dokumentrad {
+  background-color: var(--a-surface-subtle);
+}
+
+.dokumentrad:hover {
+  background-color: var(--a-bg-subtle);
+} */
 
 /*:not(.navds-table__row--selected):not(:hover)*/

@@ -106,9 +106,9 @@ export interface OpprettDokumentForesporsel {
     /** DokumentmalId sier noe om dokumentets innhold og oppbygning. (Også kjent som brevkode) */
     dokumentmalId?: string;
     /** Dette skal være UNDER_PRODUKSJON for redigerbare dokumenter som ikke er ferdigprodusert. Ellers settes det til FERDIGSTILT */
-    status?: DokumentStatusTo;
+    status: DokumentStatusTo;
     /** Om dokumentet med dokumentmalId skal bestilles. Hvis dette er satt til false så antas det at kallende system bestiller dokumentet selv. */
-    bestillDokument?: boolean;
+    bestillDokument: boolean;
 }
 
 /** Metadata for opprettelse av forsendelse */
@@ -181,6 +181,13 @@ export enum VedtakType {
 /** Metadata til en respons etter dokumenter i forsendelse ble opprettet */
 export interface DokumentRespons {
     dokumentreferanse: string;
+    /** Dokumentreferanse hvis dokumentet er lenke til et dokument i annen forsendelse */
+    lenkeTilDokumentreferanse?: string;
+    /** Originale dokumentreferanse hvis er kopi av en ekstern dokument (feks fra JOARK) */
+    originalDokumentreferanse?: string;
+    /** Originale journalpostid hvis er kopi av en ekstern dokument (feks fra JOARK) */
+    originalJournalpostId?: string;
+    forsendelseId?: string;
     tittel: string;
     /** @format date-time */
     dokumentDato: string;
@@ -469,6 +476,7 @@ export interface BehandlingInfoResponseDto {
     vedtakId?: string;
     behandlingId?: string;
     soknadId?: string;
+    behandlingType?: string;
 }
 
 /** Metadata om forsendelse */
@@ -1375,6 +1383,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 path: `/api/forsendelse/v2/${forsendelseIdMedPrefix}`,
                 method: "GET",
                 query: query,
+                secure: true,
+                ...params,
+            }),
+
+        /**
+         * @description Hent alle forsendelse med søknadId
+         *
+         * @tags forsendelse-innsyn-kontroller
+         * @name HentJournalSoknad
+         * @request GET:/api/forsendelse/v2/soknad/{soknadId}
+         * @secure
+         */
+        hentJournalSoknad: (soknadId: string, params: RequestParams = {}) =>
+            this.request<ForsendelseResponsTo[], any>({
+                path: `/api/forsendelse/v2/soknad/${soknadId}`,
+                method: "GET",
                 secure: true,
                 ...params,
             }),

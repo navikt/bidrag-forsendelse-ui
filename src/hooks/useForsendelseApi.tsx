@@ -13,6 +13,7 @@ import { DokumentStatus } from "../constants/DokumentStatus";
 import { SAKSNUMMER } from "../constants/fellestyper";
 import { useSession } from "../pages/forsendelse/context/SessionContext";
 import { IForsendelse } from "../types/Forsendelse";
+import { IJournalpost } from "../types/Journalpost";
 import useSamhandlerPersonApi from "./usePersonApi";
 
 export const UseForsendelseApiKeys = {
@@ -33,8 +34,8 @@ interface UseForsendelseDataProps {
     hentGjelder: () => IRolleDetaljer;
     hentMottaker: () => IRolleDetaljer;
     hentRoller: () => IRolleDetaljer[];
-    hentJournalposterForPerson: (ident: string) => Map<SAKSNUMMER, JournalpostDto[]>;
-    hentJournalposterForSak: (saksnummer: string) => JournalpostDto[];
+    hentJournalposterForPerson: (ident: string) => Map<SAKSNUMMER, IJournalpost[]>;
+    hentJournalposterForSak: (saksnummer: string) => IJournalpost[];
 }
 export function useForsendelseApi(): UseForsendelseDataProps {
     const { forsendelseId, saksnummer: saksnummerFromSession } = useSession();
@@ -59,7 +60,7 @@ export function useForsendelseApi(): UseForsendelseDataProps {
         return journalpostSakMap;
     };
     const hentJournalposterForSak = (saksnummer: string): JournalpostDto[] => {
-        console.log("Henter journalposter for sak", saksnummer);
+        // console.log("Henter journalposter for sak", saksnummer);
         const { data: journalposter } = useQuery({
             queryKey: `journal_sak_${saksnummer}`,
             queryFn: ({ signal }) =>
@@ -72,9 +73,21 @@ export function useForsendelseApi(): UseForsendelseDataProps {
                         },
                     }
                 ),
+            select: React.useCallback((response: AxiosResponse): IJournalpost[] => {
+                const journalposter = response.data as JournalpostDto[];
+                return journalposter.map((journalpost) => ({
+                    ...journalpost,
+                    erForsendelse: journalpost.journalpostId?.startsWith("BIF"),
+                    dokumenter: journalpost.dokumenter.map((dokument) => ({
+                        ...dokument,
+                        originalJournalpostId: dokument.metadata?.originalJournalpostId,
+                        originalDokumentreferanse: dokument.metadata?.originalDokumentreferanse,
+                    })),
+                }));
+            }, []),
         });
 
-        return journalposter.data;
+        return journalposter;
     };
 
     const hentSakerPerson = (ident: string): string[] => {
@@ -140,13 +153,20 @@ export function useForsendelseApi(): UseForsendelseDataProps {
             optimisticResults: false,
             refetchInterval: (data) => {
                 if (!data) return 0;
-                const forsendelse = data as ForsendelseResponsTo;
+                const forsendelse = data as IForsendelse;
                 const hasDokumentsWithStatus = forsendelse.dokumenter.some((d) =>
-                    ["UNDER_PRODUKSJON", "BESTILLING_FEILET", "UNDER_PRODUKSJON", "UNDER_REDIGERING"].includes(d.status)
+                    [
+                        "UNDER_PRODUKSJON",
+                        "BESTILLING_FEILET",
+                        "UNDER_PRODUKSJON",
+                        "UNDER_REDIGERING",
+                        "MÅ_KONTROLLERES",
+                    ].includes(d.status)
                 );
-                return hasDokumentsWithStatus ? 3000 : 0;
+                // return hasDokumentsWithStatus ? 3000 : 0;
+                return 0;
             },
-            select: React.useCallback((response: AxiosResponse) => {
+            select: React.useCallback((response: AxiosResponse): IForsendelse => {
                 const forsendelse = response.data as ForsendelseResponsTo;
                 return {
                     ...forsendelse,

@@ -17,14 +17,19 @@ import { useState } from "react";
 import React from "react";
 import { useEffect } from "react";
 
-import { JournalpostDto } from "../../api/BidragDokumentApi";
-import { DokumentDto } from "../../api/BidragDokumentApi";
 import { DokumentStatus } from "../../constants/DokumentStatus";
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
 import { useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IDokument } from "../../types/Dokument";
-import { journalstatusToDisplayValue } from "../../types/Journalpost";
+import {
+    IDokumentJournalDto,
+    IJournalpost,
+    JournalpostStatus,
+    journalstatusToDisplayValue,
+} from "../../types/Journalpost";
 import { mapRolleToDisplayValue } from "../../types/RolleMapper";
+import JournalpostStatusTag from "../journalpost/JournalpostStatusTag";
+import DokumentStatusTag from "./DokumentStatusTag";
 import OpenDokumentButton from "./OpenDokumentButton";
 
 export default function LeggTilDokumentKnapp() {
@@ -56,12 +61,14 @@ function LeggTilDokumentFraSakModal({ onClose, open }: LeggTilDokumentFraSakModa
     const { hentForsendelse } = useForsendelseApi();
     const saksnummer = hentForsendelse().saksnummer;
     function selectDocument(document: IDokument, toggle = true) {
+        const isSelected = (d) =>
+            d.dokumentreferanse
+                ? d.dokumentreferanse == document.dokumentreferanse
+                : d.journalpostId == document.journalpostId;
         setSelectedDocuments((selectedDocuments) => {
-            const isDocumentSelected = selectedDocuments.some((d) => d.journalpostId == document.journalpostId);
+            const isDocumentSelected = selectedDocuments.some(isSelected);
             if (isDocumentSelected) {
-                return toggle
-                    ? selectedDocuments.filter((d) => d.journalpostId !== document.journalpostId)
-                    : selectedDocuments;
+                return toggle ? selectedDocuments.filter((d) => !isSelected(d)) : selectedDocuments;
             }
             const rolle = document.fraRolle ? mapRolleToDisplayValue(document.fraRolle) : "";
             const title =
@@ -70,6 +77,14 @@ function LeggTilDokumentFraSakModal({ onClose, open }: LeggTilDokumentFraSakModa
                     : `${document.tittel} (Fra ${rolle} sak ${document.fraSaksnummer})`;
             return [...selectedDocuments, { ...document, tittel: title }];
         });
+    }
+
+    function unselectDocument(document: IDokument) {
+        const isSelected = (d) =>
+            d.dokumentreferanse
+                ? d.dokumentreferanse == document.dokumentreferanse
+                : d.journalpostId == document.journalpostId;
+        setSelectedDocuments((selectedDocuments) => selectedDocuments.filter((d) => !isSelected(d)));
     }
 
     useEffect(() => {
@@ -82,12 +97,16 @@ function LeggTilDokumentFraSakModal({ onClose, open }: LeggTilDokumentFraSakModa
 
     return (
         <Modal open={open} onClose={() => onClose([])}>
-            <Modal.Content style={{ minWidth: "900px", minHeight: "700px", padding: "1rem 2rem", overflowY: "auto" }}>
+            <Modal.Content style={{ minWidth: "900px", maxHeight: "80vh", padding: "1rem 2rem", overflowY: "auto" }}>
                 <Heading spacing level="1" size="large" id="modal-heading">
                     Legg til dokumenter
                 </Heading>
                 <React.Suspense fallback={<Loader size={"medium"} />}>
-                    <VelgDokumentTabs selectDocument={selectDocument} selectedDocuments={selectedDocuments} />
+                    <VelgDokumentTabs
+                        selectDocument={selectDocument}
+                        unselectDocument={unselectDocument}
+                        selectedDocuments={selectedDocuments}
+                    />
                 </React.Suspense>
             </Modal.Content>
             <Modal.Content>
@@ -105,9 +124,10 @@ function LeggTilDokumentFraSakModal({ onClose, open }: LeggTilDokumentFraSakModa
 }
 interface VelgDokumentTabsProps {
     selectDocument: (documents: IDokument, toogle: boolean) => void;
+    unselectDocument: (documents: IDokument) => void;
     selectedDocuments: IDokument[];
 }
-function VelgDokumentTabs({ selectDocument, selectedDocuments }: VelgDokumentTabsProps) {
+function VelgDokumentTabs({ selectDocument, selectedDocuments, unselectDocument }: VelgDokumentTabsProps) {
     const { hentForsendelse, hentRoller } = useForsendelseApi();
     const [tabState, setTabState] = useState("fra_samme_sak");
     const forsendelse = hentForsendelse();
@@ -142,6 +162,7 @@ function VelgDokumentTabs({ selectDocument, selectedDocuments }: VelgDokumentTab
                         saksnummer={forsendelse.saksnummer}
                         selectedDocuments={selectedDocuments}
                         selectDocument={selectDocument}
+                        unselectDocument={unselectDocument}
                     />
                 </React.Suspense>
             </Tabs.Panel>
@@ -151,6 +172,7 @@ function VelgDokumentTabs({ selectDocument, selectedDocuments }: VelgDokumentTab
                         <DokumenterForPerson
                             rolle={RolleType.BM}
                             selectedDocuments={selectedDocuments}
+                            unselectDocument={unselectDocument}
                             selectDocument={(dokument, toogle) =>
                                 selectDocument({ ...dokument, fraRolle: RolleType.BM }, toogle)
                             }
@@ -165,6 +187,7 @@ function VelgDokumentTabs({ selectDocument, selectedDocuments }: VelgDokumentTab
                         <DokumenterForPerson
                             rolle={RolleType.BP}
                             selectedDocuments={selectedDocuments}
+                            unselectDocument={unselectDocument}
                             selectDocument={(dokument, toogle) =>
                                 selectDocument({ ...dokument, fraRolle: RolleType.BP }, toogle)
                             }
@@ -181,10 +204,17 @@ interface DokumenterForPersonProps {
     rolle: RolleType;
     ident: string;
     selectDocument: (documents: IDokument, toogle?: boolean) => void;
+    unselectDocument: (documents: IDokument) => void;
     selectedDocuments: IDokument[];
 }
 
-function DokumenterForPerson({ ident, selectDocument, selectedDocuments, rolle }: DokumenterForPersonProps) {
+function DokumenterForPerson({
+    ident,
+    selectDocument,
+    unselectDocument,
+    selectedDocuments,
+    rolle,
+}: DokumenterForPersonProps) {
     const { hentJournalposterForPerson, hentForsendelse } = useForsendelseApi();
     const forsendelseSaksnummer = hentForsendelse().saksnummer;
 
@@ -221,6 +251,7 @@ function DokumenterForPerson({ ident, selectDocument, selectedDocuments, rolle }
                                 saksnummer={saksnummer}
                                 selectedDocuments={selectedDocuments}
                                 selectDocument={selectDocument}
+                                unselectDocument={unselectDocument}
                             />
                         </Accordion.Content>
                     </Accordion.Item>
@@ -234,11 +265,13 @@ interface DokumenterForSakTabellProps {
     fraRolle?: RolleType;
     saksnummer: string;
     selectDocument: (dokument: IDokument, toogle?: boolean) => void;
+    unselectDocument: (documents: IDokument) => void;
     selectedDocuments: IDokument[];
 }
 function DokumenterForSakTabell({
     saksnummer,
     selectDocument,
+    unselectDocument,
     selectedDocuments,
     fraRolle,
 }: DokumenterForSakTabellProps) {
@@ -247,7 +280,7 @@ function DokumenterForSakTabell({
     const journalposter = hentJournalposterForSak(saksnummer);
     const forsendelse = hentForsendelse();
     return (
-        <Table style={{ display: "block", overflowY: "auto", maxHeight: "30rem", width: "100%" }}>
+        <Table style={{ display: "block", overflowY: "auto", maxHeight: "100%", width: "100%" }}>
             <Table.Header style={{ position: "sticky" }}>
                 <Table.Row>
                     <Table.DataCell style={{ width: "2%" }} />
@@ -257,14 +290,15 @@ function DokumenterForSakTabell({
                     <Table.HeaderCell scope="col" style={{ width: "5%" }}>
                         Dok. dato
                     </Table.HeaderCell>
+
                     <Table.HeaderCell scope="col" style={{ width: "5%" }}>
-                        Status
-                    </Table.HeaderCell>
-                    <Table.HeaderCell scope="col" style={{ width: "5%" }}>
-                        J.type
+                        Type
                     </Table.HeaderCell>
                     <Table.HeaderCell scope="col" style={{ width: "5%" }} align={"left"}>
                         Gjelder
+                    </Table.HeaderCell>
+                    <Table.HeaderCell scope="col" style={{ width: "5%" }}>
+                        Status
                     </Table.HeaderCell>
                     <Table.DataCell style={{ width: "2%" }} />
                     <Table.DataCell style={{ width: "2%" }} />
@@ -273,17 +307,17 @@ function DokumenterForSakTabell({
             <Table.Body>
                 {journalposter
                     .filter((jp) => jp.dokumentType != "X")
-                    .filter((jp) => jp.journalstatus != "UO")
+                    .filter((jp) => jp.journalstatus != JournalpostStatus.UNDER_OPPRETELSE)
                     .filter((jp) => jp.feilfort != true)
-                    .filter((jp) => !dokumenter.some((dok) => dok.journalpostId == jp.journalpostId))
-                    .filter((jp) => jp.journalpostId != forsendelse.forsendelseId)
+                    .filter((jp) => jp.journalpostId != `BIF-${forsendelse.forsendelseId?.replace("BIF-", "")}`)
                     .map((journalpost) => {
                         return (
-                            <JournalpostDokumenterRow
+                            <JournalpostDokumenterRowMultiDoc
                                 fraRolle={fraRolle}
                                 saksnummer={saksnummer}
                                 journalpost={journalpost}
                                 selectDocument={selectDocument}
+                                unselectDocument={unselectDocument}
                                 selectedDocuments={selectedDocuments}
                             />
                         );
@@ -296,7 +330,8 @@ function DokumenterForSakTabell({
 interface JournalpostDokumenterRowProps {
     fraRolle?: RolleType;
     saksnummer: string;
-    journalpost: JournalpostDto;
+    journalpost: IJournalpost;
+    unselectDocument: (documents: IDokument) => void;
     selectDocument: (dokument: IDokument, toogle?: boolean) => void;
     selectedDocuments: IDokument[];
 }
@@ -402,52 +437,140 @@ function JournalpostDokumenterRowMultiDoc({
     saksnummer,
     journalpost,
     selectDocument,
+    unselectDocument,
     fraRolle,
     selectedDocuments,
 }: JournalpostDokumenterRowProps) {
     const [showAllDocuments, setShowAllDocuments] = useState(false);
+    const { hentForsendelse } = useForsendelseApi();
+    const forsendelse = hentForsendelse();
+    const forsendelseDokumenter = forsendelse.dokumenter;
 
     function toggleShowAllDocuments() {
         setShowAllDocuments((s) => !s);
     }
 
-    function onDocumentSelected(dokumentDto: DokumentDto, toggle = true) {
+    function onJournalpostSelected() {
+        if (hasDocumentsAlreadyAddedToForsendelse || journalpost.erForsendelse) {
+            journalpost.dokumenter.filter((d) => !erLagtTilIForsendelse(d)).forEach((d) => onDocumentSelected(d));
+            return;
+        }
+        if (isAllDocumentsSelectedNotIncludingAdded && !isJournalpostSelected()) {
+            journalpost.dokumenter.forEach((dok) =>
+                unselectDocument({
+                    journalpostId: journalpost.journalpostId,
+                    dokumentreferanse: dok.dokumentreferanse,
+                    lagret: false,
+                    index: -1,
+                    tittel: "",
+                })
+            );
+        }
+        const leggTilDokument: IDokument = {
+            fraSaksnummer: saksnummer,
+            journalpostId: journalpost.journalpostId,
+            språk: journalpost.språk,
+            dokumentmalId: journalpost.dokumenter[0].dokumentmalId,
+            tittel: journalpost.innhold,
+            fraRolle: fraRolle,
+            lagret: false,
+            dokumentDato: journalpost.dokumentDato,
+            status: DokumentStatus.MÅ_KONTROLLERES,
+            index: -1,
+        };
+        selectDocument(leggTilDokument);
+    }
+
+    function onDocumentSelected(dokumentDto: IDokumentJournalDto, toggle = true) {
         const leggTilDokument: IDokument = {
             fraSaksnummer: saksnummer,
             journalpostId: journalpost.journalpostId,
             dokumentreferanse: dokumentDto.dokumentreferanse,
             språk: journalpost.språk,
             tittel: dokumentDto.tittel,
+            dokumentmalId: dokumentDto.dokumentmalId,
             fraRolle: fraRolle,
             dokumentDato: journalpost.dokumentDato,
-            status: DokumentStatus.MÅ_KONTROLLERES,
+            status: getForsendelseStatus(dokumentDto),
             lagret: false,
             index: -1,
         };
         selectDocument(leggTilDokument, toggle);
     }
-    const isDocumentSelected = (dokref: string) => selectedDocuments.some((d) => d.dokumentreferanse == dokref);
-    const isAllDocumentsSelected = journalpost.dokumenter.every((d) => isDocumentSelected(d.dokumentreferanse));
+
+    function getForsendelseStatus(dokumentDto: IDokumentJournalDto) {
+        if (!journalpost.erForsendelse) return DokumentStatus.MÅ_KONTROLLERES;
+
+        const erKopiAvEksternDokument =
+            dokumentDto.originalDokumentreferanse != null || dokumentDto.originalJournalpostId != null;
+        if (dokumentDto.status == "FERDIGSTILT") {
+            return !erKopiAvEksternDokument ? DokumentStatus.FERDIGSTILT : DokumentStatus.KONTROLLERT;
+        }
+        return erKopiAvEksternDokument ? DokumentStatus.MÅ_KONTROLLERES : DokumentStatus.UNDER_REDIGERING;
+    }
+
+    const isJournalpostSelected = () => {
+        return selectedDocuments.some(
+            (d) => d.journalpostId == journalpost.journalpostId && d.dokumentreferanse == undefined
+        );
+    };
+    const isDocumentSelectedNotIncludingAdded = (dokument: IDokumentJournalDto) => {
+        return selectedDocuments.some((d) => d.dokumentreferanse == dokument.dokumentreferanse);
+    };
+
+    const isDocumentSelected = (dokument: IDokumentJournalDto) => {
+        return (
+            isDocumentSelectedNotIncludingAdded(dokument) || erLagtTilIForsendelse(dokument) || isJournalpostSelected()
+        );
+    };
+
+    const erLagtTilIForsendelse = (dokument: IDokumentJournalDto) =>
+        forsendelseDokumenter.some((forsendelseDokument) =>
+            erSammeDokument(forsendelseDokument, dokument, journalpost.journalpostId)
+        );
+    const isAllDocumentsSelected = journalpost.dokumenter.every(isDocumentSelected);
+    const isAllDocumentsSelectedNotIncludingAdded = journalpost.dokumenter.every(isDocumentSelectedNotIncludingAdded);
+    const isSomeDocumentsSelected = journalpost.dokumenter.some(isDocumentSelected);
+    const hasDocumentsAlreadyAddedToForsendelse = journalpost.dokumenter.some(erLagtTilIForsendelse);
+
+    let tittel = journalpost.dokumenter.length > 0 ? journalpost.dokumenter[0].tittel : journalpost.innhold;
+    tittel = tittel != undefined || tittel.trim().length == 0 ? journalpost.innhold : tittel;
     return (
         <>
-            <Table.Row key={journalpost.journalpostId} selected={isAllDocumentsSelected} className={"journalpost"}>
+            <Table.Row
+                key={journalpost.journalpostId}
+                selected={isAllDocumentsSelected}
+                className={`journalpost journalpostrad ${showAllDocuments ? "open" : ""}`}
+            >
                 <Table.DataCell style={{ width: "2%" }}>
                     <Checkbox
                         hideLabel
                         checked={isAllDocumentsSelected}
-                        onChange={() => {
-                            journalpost.dokumenter.forEach((dok) => onDocumentSelected(dok, isAllDocumentsSelected));
-                        }}
+                        indeterminate={isSomeDocumentsSelected && !isAllDocumentsSelected}
+                        onChange={onJournalpostSelected}
                         aria-labelledby={`id-${journalpost.journalpostId}`}
                     >
                         {" "}
                     </Checkbox>
                 </Table.DataCell>
-                <Table.DataCell style={{ width: "20%" }}>{journalpost.innhold}</Table.DataCell>
+                <Table.DataCell style={{ width: "20%" }}>{tittel}</Table.DataCell>
                 <Table.DataCell style={{ width: "5%" }}>
                     {dayjs(journalpost.dokumentDato).format("DD.MM.YYYY")}
                 </Table.DataCell>
+
+                <Table.DataCell style={{ width: "5%" }}>{journalpost.dokumentType}</Table.DataCell>
                 <Table.DataCell style={{ width: "5%" }}>{journalpost.gjelderAktor?.ident}</Table.DataCell>
+                <Table.DataCell style={{ width: "5%" }}>
+                    <JournalpostStatusTag status={journalpost.journalstatus} />
+                </Table.DataCell>
+                <Table.DataCell style={{ width: "2%" }}>
+                    <div className={"flex flex-row gap-1"}>
+                        <OpenDokumentButton
+                            journalpostId={journalpost.journalpostId}
+                            status={journalpost.journalstatus}
+                        />
+                    </div>
+                </Table.DataCell>
                 <Table.DataCell style={{ width: "2%" }}>
                     <Button
                         icon={showAllDocuments ? <Collapse /> : <Expand />}
@@ -462,29 +585,33 @@ function JournalpostDokumenterRowMultiDoc({
                     <>
                         {journalpost.dokumenter.map((dok, index) => (
                             <Table.Row
-                                className={"dokumentrad"}
+                                className={`dokumentrad ${index == journalpost.dokumenter.length - 1 ? "last" : ""}`}
                                 key={index + dok.dokumentreferanse}
-                                selected={isDocumentSelected(dok.dokumentreferanse)}
+                                selected={isDocumentSelected(dok)}
                             >
                                 <Table.DataCell>
                                     <Checkbox
                                         hideLabel
-                                        checked={isDocumentSelected(dok.dokumentreferanse)}
+                                        checked={isDocumentSelected(dok)}
                                         onChange={() => {
                                             onDocumentSelected(dok, true);
                                         }}
+                                        disabled={erLagtTilIForsendelse(dok)}
                                         aria-labelledby={`id-${journalpost.journalpostId}`}
-                                        className={"pl-2"}
+                                        className={""}
                                     >
                                         {" "}
                                     </Checkbox>
                                 </Table.DataCell>
-                                <Table.DataCell colSpan={3}>{dok.tittel}</Table.DataCell>
-                                <Table.DataCell>
+                                <Table.DataCell colSpan={4}>{dok.tittel}</Table.DataCell>
+                                <Table.DataCell colSpan={1}>
+                                    <DokumentStatusTag status={getForsendelseStatus(dok)} />
+                                </Table.DataCell>
+                                <Table.DataCell colSpan={2}>
                                     <OpenDokumentButton
                                         dokumentreferanse={dok.dokumentreferanse}
                                         journalpostId={journalpost.journalpostId}
-                                        status={"FERDIGSTILT"}
+                                        status={dok.status}
                                     />
                                 </Table.DataCell>
                             </Table.Row>
@@ -494,4 +621,45 @@ function JournalpostDokumenterRowMultiDoc({
             </>
         </>
     );
+}
+
+function erSammeDokument(forsendelseDokument: IDokument, dokumentJournal: IDokumentJournalDto, journalpostId: string) {
+    const harReferanseTilDokument =
+        forsendelseDokument.lenkeTilDokumentreferanse == dokumentJournal.dokumentreferanse &&
+        forsendelseDokument.forsendelseId === journalpostId?.replace(/\D/g, "");
+
+    const erSammeDokument =
+        forsendelseDokument.originalDokumentreferanse == dokumentJournal.dokumentreferanse &&
+        forsendelseDokument.originalJournalpostId?.replace(/\D/g, "") == journalpostId?.replace(/\D/g, "");
+
+    console.debug("#######################");
+    console.debug(
+        "Dokument",
+        "journalpostId",
+        journalpostId,
+        "dokumentreferanse",
+        dokumentJournal.dokumentreferanse,
+        "originalDokumentreferanse",
+        dokumentJournal.originalDokumentreferanse,
+        dokumentJournal.journalpostId,
+        "originalJournalpostId",
+        dokumentJournal.originalJournalpostId
+    );
+    console.debug(
+        "Forsendelse",
+        "dokref",
+        forsendelseDokument.dokumentreferanse,
+        "journalpostId",
+        forsendelseDokument.journalpostId,
+        "lenkeTilDokumentreferanse",
+        forsendelseDokument.lenkeTilDokumentreferanse,
+        "originalDokumentreferanse",
+        forsendelseDokument.originalDokumentreferanse,
+        "originalJournalpostId",
+        forsendelseDokument.originalJournalpostId
+    );
+    console.debug("RESULT", harReferanseTilDokument || erSammeDokument);
+    console.debug("#######################");
+
+    return harReferanseTilDokument || erSammeDokument;
 }

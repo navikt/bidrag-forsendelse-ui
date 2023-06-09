@@ -12,6 +12,7 @@ import OpprettForsendelsePage from "../opprettforsendelse/OpprettForsendelsePage
 import PageWrapper from "../PageWrapper";
 import ForsendelseDetaljer from "./components/ForsendelseDetaljer";
 import ForsendelseSakHeader from "./components/ForsendelseSakHeader";
+import ForsendelseTittel from "./components/ForsendelseTittel";
 import Gjelder from "./components/Gjelder";
 import Mottaker from "./components/Mottaker";
 import SendButton from "./components/SendButton";
@@ -37,9 +38,7 @@ function ForsendelseView() {
             <Grid>
                 <Cell xs={12} md={12} lg={10}>
                     <div className={"py-18 leading-xlarge tracking-wide"}>
-                        <Heading spacing size={"large"} className={"w-max"}>
-                            Forsendelse nr. {forsendelseId}
-                        </Heading>
+                        <ForsendelseTittel />
                         <Grid className={"w-max"}>
                             <Cell xs={12} md={12} lg={10}>
                                 <React.Suspense fallback={<Loader size={"large"} title={"Laster..."} />}>
@@ -52,7 +51,7 @@ function ForsendelseView() {
                             </Cell>
                         </Grid>
                         <div>
-                            <Heading level={"3"} size={"medium"} className={"max-w mt-[32px]"}>
+                            <Heading level={"3"} size={"medium"} className={"max-w"}>
                                 Dokumenter
                             </Heading>
                             <DokumenterTable />

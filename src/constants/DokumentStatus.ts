@@ -1,3 +1,5 @@
+import { JournalpostStatus } from "../types/Journalpost";
+
 export enum DokumentStatus {
     SLETTET = "SLETTET",
     IKKE_BESTILT = "IKKE_BESTILT",
@@ -12,6 +14,7 @@ export const DOKUMENT_KAN_IKKE_ÅPNES_STATUS = [
     DokumentStatus.BESTILLING_FEILET,
     DokumentStatus.IKKE_BESTILT,
     DokumentStatus.UNDER_PRODUKSJON,
+    JournalpostStatus.UNDER_OPPRETELSE,
 ];
 export const DokumentStatusTags = {
     [DokumentStatus.UNDER_PRODUKSJON]: "alt2",
