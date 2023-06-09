@@ -19,7 +19,7 @@ export function journalstatusToDisplayValue(journalstatus: string) {
 }
 
 export enum JournalpostStatus {
-    UNDER_OPPRETELSE = "UI",
+    UNDER_OPPRETELSE = "UO",
     UNDER_PRODUKSJON = "D",
     JOURNALFØRT = "J",
     DISTRIBUERT = "E",
