@@ -1,4 +1,4 @@
-import { MottakerTo } from "../api/BidragForsendelseApi";
+import { BehandlingInfoResponseDto, MottakerTo } from "../api/BidragForsendelseApi";
 import { IDokument } from "./Dokument";
 
 export interface IForsendelse {
@@ -7,6 +7,7 @@ export interface IForsendelse {
     gjelderIdent?: string;
     mottaker?: MottakerTo;
     dokumenter: IDokument[];
+    behandlingInfo?: BehandlingInfoResponseDto;
     saksnummer?: string;
     enhet?: string;
     tema?: string;

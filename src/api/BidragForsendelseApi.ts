@@ -106,9 +106,9 @@ export interface OpprettDokumentForesporsel {
     /** DokumentmalId sier noe om dokumentets innhold og oppbygning. (Også kjent som brevkode) */
     dokumentmalId?: string;
     /** Dette skal være UNDER_PRODUKSJON for redigerbare dokumenter som ikke er ferdigprodusert. Ellers settes det til FERDIGSTILT */
-    status: DokumentStatusTo;
+    status?: DokumentStatusTo;
     /** Om dokumentet med dokumentmalId skal bestilles. Hvis dette er satt til false så antas det at kallende system bestiller dokumentet selv. */
-    bestillDokument: boolean;
+    bestillDokument?: boolean;
 }
 
 /** Metadata for opprettelse av forsendelse */
@@ -341,12 +341,16 @@ export interface OppdaterForsendelseForesporsel {
     tema?: JournalTema;
     /** Språk forsendelsen skal være på */
     språk?: string;
+    /** Tittelen på forsendelse. Dette er tittel som vil vises i journalen i Bisys og i forsendelse skjermbildet */
+    tittel?: string;
 }
 
 /** Metadata til en respons etter journalpost ble oppdatert */
 export interface OppdaterForsendelseResponse {
     /** ForsendelseId på forsendelse som ble opprettet */
     forsendelseId?: string;
+    /** Tittel på forsendelsen */
+    tittel?: string;
     /** Liste med dokumenter som er knyttet til journalposten */
     dokumenter: DokumentRespons[];
 }
@@ -611,24 +615,24 @@ export interface JournalpostDto {
      * @deprecated
      */
     kilde?:
-    | "NAV_NO_BID"
-    | "SKAN_BID"
-    | "NAV_NO"
-    | "SKAN_NETS"
-    | "LOKAL_UTSKRIFT"
-    | "SENTRAL_UTSKRIFT"
-    | "SDP"
-    | "INGEN_DISTRIBUSJON";
+        | "NAV_NO_BID"
+        | "SKAN_BID"
+        | "NAV_NO"
+        | "SKAN_NETS"
+        | "LOKAL_UTSKRIFT"
+        | "SENTRAL_UTSKRIFT"
+        | "SDP"
+        | "INGEN_DISTRIBUSJON";
     /** Journalposten ble mottatt/sendt ut i kanal */
     kanal?:
-    | "NAV_NO_BID"
-    | "SKAN_BID"
-    | "NAV_NO"
-    | "SKAN_NETS"
-    | "LOKAL_UTSKRIFT"
-    | "SENTRAL_UTSKRIFT"
-    | "SDP"
-    | "INGEN_DISTRIBUSJON";
+        | "NAV_NO_BID"
+        | "SKAN_BID"
+        | "NAV_NO"
+        | "SKAN_NETS"
+        | "LOKAL_UTSKRIFT"
+        | "SENTRAL_UTSKRIFT"
+        | "SDP"
+        | "INGEN_DISTRIBUSJON";
     /**
      * Dato for når dokument er mottat, dvs. dato for journalføring eller skanning
      * @format date
@@ -643,20 +647,20 @@ export interface JournalpostDto {
     journalstatus?: string;
     /** Journalpostens status */
     status?:
-    | "MOTTATT"
-    | "JOURNALFØRT"
-    | "EKSPEDERT"
-    | "DISTRIBUERT"
-    | "AVBRUTT"
-    | "KLAR_FOR_DISTRIBUSJON"
-    | "RETUR"
-    | "FERDIGSTILT"
-    | "FEILREGISTRERT"
-    | "RESERVERT"
-    | "UTGÅR"
-    | "UNDER_OPPRETTELSE"
-    | "UNDER_PRODUKSJON"
-    | "UKJENT";
+        | "MOTTATT"
+        | "JOURNALFØRT"
+        | "EKSPEDERT"
+        | "DISTRIBUERT"
+        | "AVBRUTT"
+        | "KLAR_FOR_DISTRIBUSJON"
+        | "RETUR"
+        | "FERDIGSTILT"
+        | "FEILREGISTRERT"
+        | "RESERVERT"
+        | "UTGÅR"
+        | "UNDER_OPPRETTELSE"
+        | "UNDER_PRODUKSJON"
+        | "UKJENT";
     /** Om journalposten er feilført på bidragssak */
     feilfort?: boolean;
     /** Metadata for kode vs dekode i et kodeobjekt */

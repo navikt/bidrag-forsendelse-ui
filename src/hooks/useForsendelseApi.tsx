@@ -34,7 +34,7 @@ interface UseForsendelseDataProps {
     hentGjelder: () => IRolleDetaljer;
     hentMottaker: () => IRolleDetaljer;
     hentRoller: () => IRolleDetaljer[];
-    hentJournalposterForPerson: (ident: string) => Map<SAKSNUMMER, IJournalpost[]>;
+    hentJournalposterForPerson: (ident?: string) => Map<SAKSNUMMER, IJournalpost[]>;
     hentJournalposterForSak: (saksnummer: string) => IJournalpost[];
 }
 export function useForsendelseApi(): UseForsendelseDataProps {
@@ -49,17 +49,17 @@ export function useForsendelseApi(): UseForsendelseDataProps {
         return sak.data;
     };
 
-    const hentJournalposterForPerson = (ident?: string): Map<SAKSNUMMER, JournalpostDto[]> => {
-        if (!ident) return new Map<SAKSNUMMER, JournalpostDto[]>();
+    const hentJournalposterForPerson = (ident?: string): Map<SAKSNUMMER, IJournalpost[]> => {
+        if (!ident) return new Map<SAKSNUMMER, IJournalpost[]>();
         const saker = hentSakerPerson(ident);
-        const journalpostSakMap = new Map<SAKSNUMMER, JournalpostDto[]>();
+        const journalpostSakMap = new Map<SAKSNUMMER, IJournalpost[]>();
 
         saker.forEach((saksnummer) => {
             journalpostSakMap.set(saksnummer, hentJournalposterForSak(saksnummer));
         });
         return journalpostSakMap;
     };
-    const hentJournalposterForSak = (saksnummer: string): JournalpostDto[] => {
+    const hentJournalposterForSak = (saksnummer: string): IJournalpost[] => {
         // console.log("Henter journalposter for sak", saksnummer);
         const { data: journalposter } = useQuery({
             queryKey: `journal_sak_${saksnummer}`,
