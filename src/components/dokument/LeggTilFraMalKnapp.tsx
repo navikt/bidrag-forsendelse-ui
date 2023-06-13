@@ -72,7 +72,7 @@ function LeggTilDokumentFraMalModal({ onClose, open }: LeggTilDokumentFraSakModa
                         style={{
                             minWidth: "max-content",
                             minHeight: "max-content",
-                            padding: "2rem 2rem",
+                            padding: "3rem 2rem 1rem 2rem",
                             overflowY: "auto",
                         }}
                     >

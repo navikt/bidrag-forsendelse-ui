@@ -97,7 +97,7 @@ function LeggTilDokumentFraSakModal({ onClose, open }: LeggTilDokumentFraSakModa
 
     return (
         <Modal open={open} onClose={() => onClose([])}>
-            <Modal.Content style={{ minWidth: "900px", maxHeight: "80vh", padding: "1rem 2rem", overflowY: "auto" }}>
+            <Modal.Content style={{ width: "80vw", height: "70vh", padding: "1rem 2rem", overflow: "hidden" }}>
                 <Heading spacing level="1" size="large" id="modal-heading">
                     Legg til dokumenter
                 </Heading>

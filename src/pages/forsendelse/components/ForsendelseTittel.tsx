@@ -76,6 +76,7 @@ function EditForsendelseTitle({ onCancel, onSubmit, defaultValue }: EditForsende
                 if (e.key.toLowerCase() == "escape") onCancel();
             }}
             autoFocus
+            disabled={updateTitleMutation.isLoading}
             defaultValue={defaultValue}
             name="tittel"
             label="Tittel"
