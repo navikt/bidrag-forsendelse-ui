@@ -1,4 +1,6 @@
 import { PencilIcon } from "@navikt/aksel-icons";
+import { XMarkIcon } from "@navikt/aksel-icons";
+import { CloudUpIcon } from "@navikt/aksel-icons";
 import { Button, Heading, TextField } from "@navikt/ds-react";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "react-query";
@@ -22,14 +24,28 @@ export default function ForsendelseTittel() {
         setForsendelseTittel(updatedTitle);
         disableEditMode();
     };
-    if (editMode) {
-        return <EditForsendelseTitle onSubmit={onSubmit} onCancel={disableEditMode} defaultValue={forsendelseTittel} />;
-    }
     return (
-        <Heading spacing size={"large"} className={"w-max flex flex-row"}>
-            {forsendelseTittel}{" "}
-            <Button size="medium" variant="tertiary-neutral" icon={<PencilIcon />} onClick={enableEditMode} />
-        </Heading>
+        <div>
+            <div className={"w-max flex flex-row gap-[5px]"}>
+                <Heading spacing size={"large"}>
+                    {forsendelseTittel}{" "}
+                </Heading>
+                {!editMode && (
+                    <Button
+                        className="w-max h-max mt-1"
+                        size="small"
+                        variant="tertiary"
+                        icon={<PencilIcon />}
+                        onClick={enableEditMode}
+                    >
+                        Endre tittel
+                    </Button>
+                )}
+            </div>
+            {editMode && (
+                <EditForsendelseTitle onSubmit={onSubmit} onCancel={disableEditMode} defaultValue={forsendelseTittel} />
+            )}
+        </div>
     );
 }
 
@@ -69,21 +85,42 @@ function EditForsendelseTitle({ onCancel, onSubmit, defaultValue }: EditForsende
         }
     }
     return (
-        <TextField
-            onBlur={_onSubmit}
-            onKeyDown={(e) => {
-                if (e.key.toLowerCase() == "enter") _onSubmit();
-                if (e.key.toLowerCase() == "escape") onCancel();
-            }}
-            autoFocus
-            disabled={updateTitleMutation.isLoading}
-            defaultValue={defaultValue}
-            name="tittel"
-            label="Tittel"
-            onChange={onChange}
-            error={updateTitleMutation.isError ? "Kunne ikke lagre endringer" : undefined}
-            hideLabel
-            className="w-2/3"
-        />
+        <div className="flex flex-row gap-[5px] mb-4">
+            <TextField
+                onKeyDown={(e) => {
+                    if (e.key.toLowerCase() == "enter") _onSubmit();
+                    if (e.key.toLowerCase() == "escape") onCancel();
+                }}
+                autoFocus
+                disabled={updateTitleMutation.isLoading}
+                defaultValue={defaultValue}
+                name="tittel"
+                size="small"
+                label="Navn på forsendelsen"
+                onChange={onChange}
+                error={updateTitleMutation.isError ? "Kunne ikke lagre endringer" : undefined}
+                className="w-2/3"
+            />
+            <div className="self-end">
+                <Button
+                    loading={updateTitleMutation.isLoading}
+                    size="small"
+                    variant="tertiary"
+                    icon={<CloudUpIcon />}
+                    onClick={_onSubmit}
+                >
+                    Lagre
+                </Button>
+                <Button
+                    disabled={updateTitleMutation.isLoading}
+                    size="small"
+                    variant="tertiary"
+                    icon={<XMarkIcon />}
+                    onClick={onCancel}
+                >
+                    Avbryt
+                </Button>
+            </div>
+        </div>
     );
 }

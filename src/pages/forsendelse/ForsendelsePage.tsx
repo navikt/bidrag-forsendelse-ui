@@ -14,7 +14,6 @@ import ForsendelseDetaljer from "./components/ForsendelseDetaljer";
 import ForsendelseSakHeader from "./components/ForsendelseSakHeader";
 import ForsendelseTittel from "./components/ForsendelseTittel";
 import Gjelder from "./components/Gjelder";
-import KopierForsendelseButton from "./components/KopierForsendelseButton";
 import Mottaker from "./components/Mottaker";
 import SendButton from "./components/SendButton";
 import ValidationErrorSummary from "./components/ValidationErrorSummary";
@@ -62,7 +61,6 @@ function ForsendelseView() {
 
                             <div className={"mt-2 flex flex-row gap-[5px]"}>
                                 <SendButton />
-                                <KopierForsendelseButton />
                             </div>
                         </div>
                     </div>

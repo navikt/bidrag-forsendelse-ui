@@ -97,7 +97,16 @@ function LeggTilDokumentFraSakModal({ onClose, open }: LeggTilDokumentFraSakModa
 
     return (
         <Modal open={open} onClose={() => onClose([])}>
-            <Modal.Content style={{ width: "80vw", height: "70vh", padding: "1rem 2rem", overflow: "hidden" }}>
+            <Modal.Content
+                style={{
+                    width: "80vw",
+                    maxWidth: "1200px",
+                    height: "70vh",
+                    maxHeight: "1000px",
+                    padding: "1rem 2rem",
+                    overflow: "hidden",
+                }}
+            >
                 <Heading spacing level="1" size="large" id="modal-heading">
                     Legg til dokumenter
                 </Heading>
@@ -156,7 +165,7 @@ function VelgDokumentTabs({ selectDocument, selectedDocuments, unselectDocument 
                 <Tabs.Tab value="bm" label={renderLabel("Fra BM saker", null, RolleType.BM)} />
                 <Tabs.Tab value="bp" label={renderLabel("Fra BP saker", null, RolleType.BP)} />
             </Tabs.List>
-            <Tabs.Panel value="fra_samme_sak" className="w-full ">
+            <Tabs.Panel value="fra_samme_sak" className="w-full overflow-auto">
                 <React.Suspense fallback={<Loader size={"small"} />}>
                     <DokumenterForSakTabell
                         saksnummer={forsendelse.saksnummer}
@@ -280,7 +289,7 @@ function DokumenterForSakTabell({
     const journalposter = hentJournalposterForSak(saksnummer);
     const forsendelse = hentForsendelse();
     return (
-        <Table style={{ display: "block", overflowY: "auto", maxHeight: "100%", width: "100%" }}>
+        <Table style={{ display: "block", height: "730px", width: "100%" }}>
             <Table.Header style={{ position: "sticky" }}>
                 <Table.Row>
                     <Table.DataCell style={{ width: "2%" }} />
@@ -297,7 +306,7 @@ function DokumenterForSakTabell({
                     <Table.HeaderCell scope="col" style={{ width: "5%" }} align={"left"}>
                         Gjelder
                     </Table.HeaderCell>
-                    <Table.HeaderCell scope="col" style={{ width: "5%" }}>
+                    <Table.HeaderCell scope="col" style={{ width: "100px" }}>
                         Status
                     </Table.HeaderCell>
                     <Table.DataCell style={{ width: "2%" }} />
@@ -374,6 +383,7 @@ function JournalpostDokumenterRow({
                     {" "}
                 </Checkbox>
             </Table.DataCell>
+            {/* <Table.DataCell style={{ width: "20%" }}>{tittel + " - " + journalpost.journalpostId}</Table.DataCell> */}
             <Table.DataCell style={{ width: "20%" }}>{tittel}</Table.DataCell>
             <Table.DataCell style={{ width: "5%" }}>
                 {dayjs(journalpost.dokumentDato).format("DD.MM.YYYY")}
@@ -491,11 +501,18 @@ function JournalpostDokumenterRowMultiDoc({
             dokumentmalId: dokumentDto.dokumentmalId,
             fraRolle: fraRolle,
             dokumentDato: journalpost.dokumentDato,
-            status: getForsendelseStatus(dokumentDto),
+            status: getForsendelseStatusEtterKnyttetTilForsendelse(dokumentDto),
             lagret: false,
             index: -1,
         };
         selectDocument(leggTilDokument, toggle);
+    }
+
+    function getForsendelseStatusEtterKnyttetTilForsendelse(dokumentDto: IDokumentJournalDto) {
+        const status = getForsendelseStatus(dokumentDto);
+        if ([DokumentStatus.KONTROLLERT, DokumentStatus.FERDIGSTILT].includes(status))
+            return DokumentStatus.MÅ_KONTROLLERES;
+        return status;
     }
 
     function getForsendelseStatus(dokumentDto: IDokumentJournalDto) {
@@ -554,6 +571,7 @@ function JournalpostDokumenterRowMultiDoc({
                     </Checkbox>
                 </Table.DataCell>
                 <Table.DataCell style={{ width: "20%" }}>{tittel}</Table.DataCell>
+                {/* <Table.DataCell style={{ width: "20%" }}>{tittel + " - " + journalpost.journalpostId}</Table.DataCell> */}
                 <Table.DataCell style={{ width: "5%" }}>
                     {dayjs(journalpost.dokumentDato).format("DD.MM.YYYY")}
                 </Table.DataCell>
@@ -603,7 +621,9 @@ function JournalpostDokumenterRowMultiDoc({
                                         {" "}
                                     </Checkbox>
                                 </Table.DataCell>
-                                <Table.DataCell colSpan={4}>{dok.tittel}</Table.DataCell>
+                                <Table.DataCell colSpan={4}>
+                                    {dok.tittel + " - " + dok.dokumentreferanse}
+                                </Table.DataCell>
                                 <Table.DataCell colSpan={1}>
                                     <DokumentStatusTag status={getForsendelseStatus(dok)} />
                                 </Table.DataCell>

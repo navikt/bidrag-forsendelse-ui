@@ -2,6 +2,7 @@ import { DragEndEvent, DraggableAttributes } from "@dnd-kit/core";
 import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import { EyeIcon } from "@navikt/aksel-icons";
 import { DragVerticalIcon } from "@navikt/aksel-icons";
+import { LinkIcon } from "@navikt/aksel-icons";
 import { OpenDocumentUtils } from "@navikt/bidrag-ui-common";
 import { Delete } from "@navikt/ds-icons";
 import { Table } from "@navikt/ds-react";
@@ -140,6 +141,7 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
                 <Table.DataCell style={{ width: "100px" }}>{dayjs(dokumentDato).format("DD.MM.YYYY")}</Table.DataCell>
                 <Table.DataCell style={{ width: "200px" }}>
                     <DokumentStatusTag status={status} />
+                    {dokument.lenkeTilDokumentreferanse && <LinkIcon />}
                 </Table.DataCell>
                 <Table.DataCell style={{ width: "50px" }}>
                     <div className={"flex flex-row gap-1 justify-end"}>
