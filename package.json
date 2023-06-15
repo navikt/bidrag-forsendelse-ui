@@ -17,7 +17,6 @@
     "types:samhandler": "swagger-typescript-api -p https://bidrag-samhandler-feature.intern.dev.nav.no/v3/api-docs --axios -n BidragSamhandlerApi.ts -o src/api",
     "types:tilgangskontroll": "swagger-typescript-api -p https://bidrag-tilgangskontroll-feature.intern.dev.nav.no/v3/api-docs --axios -n BidragTilgangskontrollApi.ts -o src/api",
     "types:organisasjon": "swagger-typescript-api -p https://bidrag-organisasjon-feature.dev.intern.nav.no/bidrag-organisasjon/v3/api-docs --axios -n BidragOrganisasjontApi.ts -o src/api"
-
   },
   "dependencies": {
     "@dnd-kit/core": "6.0.8",
