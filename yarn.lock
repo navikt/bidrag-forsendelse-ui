@@ -260,10 +260,10 @@
   resolved "https://npm.pkg.github.com/download/@navikt/aksel-icons/3.2.2/05c99d0f26d2092cd8bc5561d46df1d105ceb5cd#05c99d0f26d2092cd8bc5561d46df1d105ceb5cd"
   integrity sha512-heoVEICnWVE9suPn6+zblxzw9JNLMpJ5dKiScrfE3iwZLQ51Q4PfoYjc/UUC4+PP7MCCVIF3Y2JywZSx6Vj6WQ==
 
-"@navikt/bidrag-ui-common@1.6.3":
-  version "1.6.3"
-  resolved "https://npm.pkg.github.com/download/@navikt/bidrag-ui-common/1.6.3/8fecc7a12420ee72aba2a5fbc2019bbbb890d569#8fecc7a12420ee72aba2a5fbc2019bbbb890d569"
-  integrity sha512-ROTF8HIS6+ENOkpjakQXcfJzkuevq6mL8TTKI3CRvgtcswW85uOBBWMksZXFai4aQyC0Evs2WsNOD+sUv3DPDQ==
+"@navikt/bidrag-ui-common@1.6.4":
+  version "1.6.4"
+  resolved "https://npm.pkg.github.com/download/@navikt/bidrag-ui-common/1.6.4/85ba348008b874850178173c29ec6f93acecba38#85ba348008b874850178173c29ec6f93acecba38"
+  integrity sha512-xErkxcfkRUljy995HeuVBulPqixq8/zDqnNCCEvaNAvpD78QDvhHqdclJWmpV35+SPlcz51bdkymTHZbow80Gw==
   dependencies:
     axios "^1.3.4"
     dayjs "1.11.8"

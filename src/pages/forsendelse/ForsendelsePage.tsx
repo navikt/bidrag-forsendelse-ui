@@ -19,7 +19,6 @@ import Mottaker from "./components/Mottaker";
 import SendButton from "./components/SendButton";
 import ValidationErrorSummary from "./components/ValidationErrorSummary";
 import { DokumenterFormProvider } from "./context/DokumenterFormContext";
-import { useSession } from "./context/SessionContext";
 import { SessionProvider } from "./context/SessionContext";
 interface ForsendelsePageProps {
     forsendelseId: string;
@@ -28,7 +27,6 @@ interface ForsendelsePageProps {
     enhet: string;
 }
 function ForsendelseView() {
-    const { forsendelseId, saksnummer, enhet } = useSession();
     const forsendelse = useForsendelseApi().hentForsendelse();
 
     if (forsendelse.status == "UNDER_OPPRETTELSE") {

@@ -1,6 +1,6 @@
 import "./LeggTilDokumentButton.css";
 
-import { RolleType } from "@navikt/bidrag-ui-common";
+import { formatDate, RolleType } from "@navikt/bidrag-ui-common";
 import { Add } from "@navikt/ds-icons";
 import { Collapse } from "@navikt/ds-icons";
 import { Expand } from "@navikt/ds-icons";
@@ -289,13 +289,15 @@ function DokumenterForSakTabell({
     const journalposter = hentJournalposterForSak(saksnummer);
     const forsendelse = hentForsendelse();
     return (
-        <Table style={{ display: "block", height: "730px", width: "100%" }}>
+        <Table style={{ display: "block", height: "100%", width: "1092px" }}>
             <Table.Header style={{ position: "sticky" }}>
                 <Table.Row>
+                    <Table.DataCell style={{ width: "2%" }} />
                     <Table.DataCell style={{ width: "2%" }} />
                     <Table.HeaderCell scope="col" style={{ width: "20%" }}>
                         Tittel
                     </Table.HeaderCell>
+                    <Table.HeaderCell scope="col" style={{ width: "2%" }}></Table.HeaderCell>
                     <Table.HeaderCell scope="col" style={{ width: "5%" }}>
                         Dok. dato
                     </Table.HeaderCell>
@@ -306,10 +308,9 @@ function DokumenterForSakTabell({
                     <Table.HeaderCell scope="col" style={{ width: "5%" }} align={"left"}>
                         Gjelder
                     </Table.HeaderCell>
-                    <Table.HeaderCell scope="col" style={{ width: "100px" }}>
+                    <Table.HeaderCell scope="col" style={{ width: "200px" }}>
                         Status
                     </Table.HeaderCell>
-                    <Table.DataCell style={{ width: "2%" }} />
                     <Table.DataCell style={{ width: "2%" }} />
                 </Table.Row>
             </Table.Header>
@@ -548,6 +549,7 @@ function JournalpostDokumenterRowMultiDoc({
     const isAllDocumentsSelected = journalpost.dokumenter.every(isDocumentSelected);
     const isAllDocumentsSelectedNotIncludingAdded = journalpost.dokumenter.every(isDocumentSelectedNotIncludingAdded);
     const isSomeDocumentsSelected = journalpost.dokumenter.some(isDocumentSelected);
+    const numerOfSelectedDocuments = journalpost.dokumenter.filter(isDocumentSelected).length;
     const hasDocumentsAlreadyAddedToForsendelse = journalpost.dokumenter.some(erLagtTilIForsendelse);
 
     let tittel = journalpost.dokumenter.length > 0 ? journalpost.dokumenter[0].tittel : journalpost.innhold;
@@ -560,10 +562,18 @@ function JournalpostDokumenterRowMultiDoc({
                 className={`journalpost journalpostrad ${showAllDocuments ? "open" : ""}`}
             >
                 <Table.DataCell style={{ width: "2%" }}>
+                    <Button
+                        icon={showAllDocuments ? <Collapse /> : <Expand />}
+                        size={"small"}
+                        variant={"tertiary"}
+                        onClick={toggleShowAllDocuments}
+                    />
+                </Table.DataCell>
+                <Table.DataCell style={{ width: "2%" }}>
                     <Checkbox
                         hideLabel
-                        checked={isAllDocumentsSelected}
-                        indeterminate={isSomeDocumentsSelected && !isAllDocumentsSelected}
+                        checked={isAllDocumentsSelected || isSomeDocumentsSelected}
+                        // indeterminate={isSomeDocumentsSelected && !isAllDocumentsSelected}
                         onChange={onJournalpostSelected}
                         aria-labelledby={`id-${journalpost.journalpostId}`}
                     >
@@ -571,10 +581,15 @@ function JournalpostDokumenterRowMultiDoc({
                     </Checkbox>
                 </Table.DataCell>
                 <Table.DataCell style={{ width: "20%" }}>{tittel}</Table.DataCell>
-                {/* <Table.DataCell style={{ width: "20%" }}>{tittel + " - " + journalpost.journalpostId}</Table.DataCell> */}
                 <Table.DataCell style={{ width: "5%" }}>
-                    {dayjs(journalpost.dokumentDato).format("DD.MM.YYYY")}
+                    {isSomeDocumentsSelected && (
+                        <Tag variant="info" size="small">
+                            {`${numerOfSelectedDocuments} av ${journalpost.dokumenter.length}`}
+                        </Tag>
+                    )}
                 </Table.DataCell>
+                {/* <Table.DataCell style={{ width: "20%" }}>{tittel + " - " + journalpost.journalpostId}</Table.DataCell> */}
+                <Table.DataCell style={{ width: "5%" }}>{formatDate(journalpost.dokumentDato)}</Table.DataCell>
 
                 <Table.DataCell style={{ width: "5%" }}>{journalpost.dokumentType}</Table.DataCell>
                 <Table.DataCell style={{ width: "5%" }}>{journalpost.gjelderAktor?.ident}</Table.DataCell>
@@ -589,14 +604,6 @@ function JournalpostDokumenterRowMultiDoc({
                         />
                     </div>
                 </Table.DataCell>
-                <Table.DataCell style={{ width: "2%" }}>
-                    <Button
-                        icon={showAllDocuments ? <Collapse /> : <Expand />}
-                        size={"small"}
-                        variant={"tertiary"}
-                        onClick={toggleShowAllDocuments}
-                    />
-                </Table.DataCell>
             </Table.Row>
             <>
                 {showAllDocuments && (
@@ -607,6 +614,8 @@ function JournalpostDokumenterRowMultiDoc({
                                 key={index + dok.dokumentreferanse}
                                 selected={isDocumentSelected(dok)}
                             >
+                                <Table.DataCell colSpan={1} />
+
                                 <Table.DataCell>
                                     <Checkbox
                                         hideLabel
@@ -621,13 +630,14 @@ function JournalpostDokumenterRowMultiDoc({
                                         {" "}
                                     </Checkbox>
                                 </Table.DataCell>
-                                <Table.DataCell colSpan={4}>
-                                    {dok.tittel + " - " + dok.dokumentreferanse}
+                                <Table.DataCell colSpan={5}>
+                                    {dok.tittel}
+                                    {/* {dok.tittel + " - " + dok.dokumentreferanse} */}
                                 </Table.DataCell>
                                 <Table.DataCell colSpan={1}>
                                     <DokumentStatusTag status={getForsendelseStatus(dok)} />
                                 </Table.DataCell>
-                                <Table.DataCell colSpan={2}>
+                                <Table.DataCell colSpan={1}>
                                     <OpenDokumentButton
                                         dokumentreferanse={dok.dokumentreferanse}
                                         journalpostId={journalpost.journalpostId}
