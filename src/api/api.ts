@@ -3,6 +3,7 @@ import { useApi } from "@navikt/bidrag-ui-common";
 import environment from "../environment";
 import { Api as BidragDokumentApi } from "./BidragDokumentApi";
 import { Api as BidragForsendelseApi } from "./BidragForsendelseApi";
+import { Api as BidragOrganisasjontApi } from "./BidragOrganisasjontApi";
 import { Api as PersonApi } from "./BidragPersonApi";
 import { Api as SakApi } from "./BidragSakApi";
 import { Api as SamhandlerApi } from "./BidragSamhandlerApi";
@@ -18,6 +19,11 @@ export const SAK_API = useApi(new SakApi({ baseURL: environment.url.bidragSak })
 export const BIDRAG_DOKUMENT_API = useApi(
     new BidragDokumentApi({ baseURL: environment.url.bidragDokument }),
     "bidrag-dokument",
+    "fss"
+);
+export const BIDRAG_ORGANISASJON_API = useApi(
+    new BidragOrganisasjontApi({ baseURL: environment.url.bidragOrganisasjon }),
+    "bidrag-organisasjon",
     "fss"
 );
 export const BIDRAG_FORSENDELSE_API = useApi(

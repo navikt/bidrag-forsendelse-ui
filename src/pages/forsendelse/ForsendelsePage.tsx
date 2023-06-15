@@ -10,6 +10,7 @@ import DokumenterTable from "../../components/dokument/DokumenterTable";
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
 import OpprettForsendelsePage from "../opprettforsendelse/OpprettForsendelsePage";
 import PageWrapper from "../PageWrapper";
+import AvvikshandteringButton from "./avvik/AvvikshandteringButton";
 import ForsendelseDetaljer from "./components/ForsendelseDetaljer";
 import ForsendelseSakHeader from "./components/ForsendelseSakHeader";
 import ForsendelseTittel from "./components/ForsendelseTittel";
@@ -27,7 +28,7 @@ interface ForsendelsePageProps {
     enhet: string;
 }
 function ForsendelseView() {
-    const { forsendelseId } = useSession();
+    const { forsendelseId, saksnummer, enhet } = useSession();
     const forsendelse = useForsendelseApi().hentForsendelse();
 
     if (forsendelse.status == "UNDER_OPPRETTELSE") {
@@ -61,6 +62,7 @@ function ForsendelseView() {
 
                             <div className={"mt-2 flex flex-row gap-[5px]"}>
                                 <SendButton />
+                                <AvvikshandteringButton />
                             </div>
                         </div>
                     </div>

@@ -5,7 +5,7 @@ import { DragVerticalIcon } from "@navikt/aksel-icons";
 import { LinkIcon } from "@navikt/aksel-icons";
 import { OpenDocumentUtils } from "@navikt/bidrag-ui-common";
 import { Delete } from "@navikt/ds-icons";
-import { Table } from "@navikt/ds-react";
+import { Table, Tag } from "@navikt/ds-react";
 import { Button } from "@navikt/ds-react";
 import { Textarea } from "@navikt/ds-react";
 import dayjs from "dayjs";
@@ -140,8 +140,14 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
                 </Table.DataCell>
                 <Table.DataCell style={{ width: "100px" }}>{dayjs(dokumentDato).format("DD.MM.YYYY")}</Table.DataCell>
                 <Table.DataCell style={{ width: "200px" }}>
-                    <DokumentStatusTag status={status} />
-                    {dokument.lenkeTilDokumentreferanse && <LinkIcon />}
+                    <div className="flex flex-row gap-[5px]">
+                        <DokumentStatusTag status={status} />
+                        {dokument.lenkeTilDokumentreferanse && (
+                            <Tag variant="info" size="small" className=" rounded-md">
+                                <LinkIcon />
+                            </Tag>
+                        )}
+                    </div>
                 </Table.DataCell>
                 <Table.DataCell style={{ width: "50px" }}>
                     <div className={"flex flex-row gap-1 justify-end"}>

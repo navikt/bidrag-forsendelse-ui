@@ -260,12 +260,13 @@
   resolved "https://npm.pkg.github.com/download/@navikt/aksel-icons/3.2.2/05c99d0f26d2092cd8bc5561d46df1d105ceb5cd#05c99d0f26d2092cd8bc5561d46df1d105ceb5cd"
   integrity sha512-heoVEICnWVE9suPn6+zblxzw9JNLMpJ5dKiScrfE3iwZLQ51Q4PfoYjc/UUC4+PP7MCCVIF3Y2JywZSx6Vj6WQ==
 
-"@navikt/bidrag-ui-common@1.6.2":
-  version "1.6.2"
-  resolved "https://npm.pkg.github.com/download/@navikt/bidrag-ui-common/1.6.2/54bb8ebad0977ab303e446483da89fbf50a97292#54bb8ebad0977ab303e446483da89fbf50a97292"
-  integrity sha512-Yl11sxJjFZfehUx9KXYQha+fOHh2iE7WubDcm8ZvKWsCF1Lc8iUol5qFbmglo+A5uFWpm7dnCqGDQ3g+bk3dZQ==
+"@navikt/bidrag-ui-common@1.6.3":
+  version "1.6.3"
+  resolved "https://npm.pkg.github.com/download/@navikt/bidrag-ui-common/1.6.3/8fecc7a12420ee72aba2a5fbc2019bbbb890d569#8fecc7a12420ee72aba2a5fbc2019bbbb890d569"
+  integrity sha512-ROTF8HIS6+ENOkpjakQXcfJzkuevq6mL8TTKI3CRvgtcswW85uOBBWMksZXFai4aQyC0Evs2WsNOD+sUv3DPDQ==
   dependencies:
     axios "^1.3.4"
+    dayjs "1.11.8"
     uuid "^9.0.0"
 
 "@navikt/ds-css-internal@3.2.2":
@@ -2085,6 +2086,11 @@ date-fns@2.29.3, date-fns@^2.29.3:
   version "2.29.3"
   resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.29.3.tgz#27402d2fc67eb442b511b70bbdf98e6411cd68a8"
   integrity sha512-dDCnyH2WnnKusqvZZ6+jA1O51Ibt8ZMRNkDZdyAyK4YfbDwa/cEmuztzG5pk6hqlp9aSBPYcjOlktquahGwGeA==
+
+dayjs@1.11.8:
+  version "1.11.8"
+  resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.11.8.tgz#4282f139c8c19dd6d0c7bd571e30c2d0ba7698ea"
+  integrity sha512-LcgxzFoWMEPO7ggRv1Y2N31hUf2R0Vj7fuy/m+Bg1K8rr+KAs1AEy4y9jd5DXe8pbHgX+srkHNS7TH6Q6ZhYeQ==
 
 dayjs@^1.11.7:
   version "1.11.7"

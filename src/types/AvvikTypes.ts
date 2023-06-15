@@ -10,7 +10,6 @@ export type Avvik = EndreFagomrade | FeilforeSak | SlettJournalpost | TrekkJourn
 interface EndreFagomrade {
     type: AvvikType.ENDRE_FAGOMRADE;
     fagomrade: string;
-    bekreftetSendtScanning?: boolean;
 }
 
 export interface FeilforeSak {

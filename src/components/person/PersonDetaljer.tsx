@@ -1,6 +1,7 @@
 import "./PersonDetaljer.css";
 
-import { RolleTag, RolleType } from "@navikt/bidrag-ui-common";
+import { RolleType } from "@navikt/bidrag-ui-common";
+import RolleTag from "@navikt/bidrag-ui-common/esm/react_components/roller/RolleTag";
 import { BodyShort } from "@navikt/ds-react";
 import { CopyToClipboard } from "@navikt/ds-react-internal";
 import React from "react";

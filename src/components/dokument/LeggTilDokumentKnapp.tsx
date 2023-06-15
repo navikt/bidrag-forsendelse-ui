@@ -516,7 +516,7 @@ function JournalpostDokumenterRowMultiDoc({
     }
 
     function getForsendelseStatus(dokumentDto: IDokumentJournalDto) {
-        if (!journalpost.erForsendelse) return DokumentStatus.MÅ_KONTROLLERES;
+        if (!journalpost.erForsendelse) return DokumentStatus.FERDIGSTILT;
 
         const erKopiAvEksternDokument =
             dokumentDto.originalDokumentreferanse != null || dokumentDto.originalJournalpostId != null;

@@ -26,10 +26,20 @@ export enum JournalpostStatus {
     KLAR_FOR_DISTRIBUSJON = "KP",
 }
 export interface IJournalpost extends JournalpostDto {
+    journalpostIdNoPrefix: string;
     erForsendelse: boolean;
     dokumenter: IDokumentJournalDto[];
 }
 export interface IDokumentJournalDto extends DokumentDto {
     originalJournalpostId?: string;
     originalDokumentreferanse?: string;
+}
+
+export enum FAGOMRADE {
+    BID = "BID",
+    FAR = "FAR",
+}
+
+export function isFagomradeBidrag(fagomrade: string) {
+    return fagomrade === FAGOMRADE.BID || fagomrade === FAGOMRADE.FAR;
 }

@@ -14,6 +14,7 @@ import { SAKSNUMMER } from "../constants/fellestyper";
 import { useSession } from "../pages/forsendelse/context/SessionContext";
 import { IForsendelse } from "../types/Forsendelse";
 import { IJournalpost } from "../types/Journalpost";
+import { journalpostMapper } from "./useDokumentApi";
 import useSamhandlerPersonApi from "./usePersonApi";
 
 export const UseForsendelseApiKeys = {
@@ -29,6 +30,7 @@ export const UseForsendelseApiKeys = {
         soknadType,
     ],
 };
+
 interface UseForsendelseDataProps {
     hentForsendelse: () => IForsendelse;
     hentGjelder: () => IRolleDetaljer;
@@ -75,15 +77,7 @@ export function useForsendelseApi(): UseForsendelseDataProps {
                 ),
             select: React.useCallback((response: AxiosResponse): IJournalpost[] => {
                 const journalposter = response.data as JournalpostDto[];
-                return journalposter.map((journalpost) => ({
-                    ...journalpost,
-                    erForsendelse: journalpost.journalpostId?.startsWith("BIF"),
-                    dokumenter: journalpost.dokumenter.map((dokument) => ({
-                        ...dokument,
-                        originalJournalpostId: dokument.metadata?.originalJournalpostId,
-                        originalDokumentreferanse: dokument.metadata?.originalDokumentreferanse,
-                    })),
-                }));
+                return journalposter.map((journalpost) => journalpostMapper(journalpost));
             }, []),
         });
 

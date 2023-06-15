@@ -1,0 +1,50 @@
+import { Button, LinkPanel } from "@navikt/ds-react";
+import React from "react";
+
+import { useAvvikModalContext } from "../AvvikshandteringButton";
+import { AvvikViewModel } from "../model/AvvikViewModel";
+
+interface MainMenuProps {
+    avvikViewModels: AvvikViewModel[];
+    onClick: (avvikViewModel: AvvikViewModel) => void;
+}
+
+function MainMenu({ avvikViewModels, onClick }: MainMenuProps) {
+    const { onCancel } = useAvvikModalContext();
+    return (
+        <div>
+            <div
+                className="grid gap-[5px] mt-4 w-full max-w-[505px]"
+                style={{ gridTemplateColumns: "repeat(auto-fill, minmax(500px, 1fr))" }}
+            >
+                {avvikViewModels.map((viewModel) => (
+                    <MenuEntry avvik={viewModel} onClick={onClick} />
+                ))}
+            </div>
+            <Button className="mt-4" onClick={onCancel} size="small" variant="primary">
+                Avbryt
+            </Button>
+        </div>
+    );
+}
+
+interface MenuEntryProps {
+    avvik: AvvikViewModel;
+    onClick: (avvikViewModel: AvvikViewModel) => void;
+}
+
+function MenuEntry(props: MenuEntryProps) {
+    return (
+        <LinkPanel onClick={() => props.onClick(props.avvik)} href="#" border={true} className="w-[500px]">
+            <LinkPanel.Title className="flex flex-row gap-[5px]">
+                <div className="menu-icon">
+                    <props.avvik.IconComponent className="w-[30px] h-[30px]" />
+                </div>
+                {props.avvik.title}
+            </LinkPanel.Title>
+            {props.avvik.description && <LinkPanel.Description>{props.avvik.description}</LinkPanel.Description>}
+        </LinkPanel>
+    );
+}
+
+export default MainMenu;
