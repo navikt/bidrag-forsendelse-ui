@@ -1,6 +1,6 @@
 import "./LeggTilDokumentButton.css";
 
-import { formatDate, RolleType } from "@navikt/bidrag-ui-common";
+import { dateToDDMMYYYYString, RolleType } from "@navikt/bidrag-ui-common";
 import { Add } from "@navikt/ds-icons";
 import { Collapse } from "@navikt/ds-icons";
 import { Expand } from "@navikt/ds-icons";
@@ -97,16 +97,7 @@ function LeggTilDokumentFraSakModal({ onClose, open }: LeggTilDokumentFraSakModa
 
     return (
         <Modal open={open} onClose={() => onClose([])}>
-            <Modal.Content
-                style={{
-                    width: "80vw",
-                    maxWidth: "1200px",
-                    height: "70vh",
-                    maxHeight: "1000px",
-                    padding: "1rem 2rem",
-                    overflow: "hidden",
-                }}
-            >
+            <Modal.Content className="legg_til_dokument_modal">
                 <Heading spacing level="1" size="large" id="modal-heading">
                     Legg til dokumenter
                 </Heading>
@@ -165,7 +156,7 @@ function VelgDokumentTabs({ selectDocument, selectedDocuments, unselectDocument 
                 <Tabs.Tab value="bm" label={renderLabel("Fra BM saker", null, RolleType.BM)} />
                 <Tabs.Tab value="bp" label={renderLabel("Fra BP saker", null, RolleType.BP)} />
             </Tabs.List>
-            <Tabs.Panel value="fra_samme_sak" className="w-full overflow-auto">
+            <Tabs.Panel value="fra_samme_sak" className="">
                 <React.Suspense fallback={<Loader size={"small"} />}>
                     <DokumenterForSakTabell
                         saksnummer={forsendelse.saksnummer}
@@ -175,8 +166,8 @@ function VelgDokumentTabs({ selectDocument, selectedDocuments, unselectDocument 
                     />
                 </React.Suspense>
             </Tabs.Panel>
-            <Tabs.Panel value="bm" className="h-24 w-full">
-                <Accordion style={{ width: "100%" }}>
+            <Tabs.Panel value="bm" className="h-24 w-full overflow-auto">
+                <Accordion style={{ width: "100%", height: "100%" }} size="small" headingSize="xsmall">
                     <React.Suspense fallback={<Loader size={"small"} />}>
                         <DokumenterForPerson
                             rolle={RolleType.BM}
@@ -190,8 +181,8 @@ function VelgDokumentTabs({ selectDocument, selectedDocuments, unselectDocument 
                     </React.Suspense>
                 </Accordion>
             </Tabs.Panel>
-            <Tabs.Panel value="bp" className="w-full">
-                <Accordion style={{ width: "100%" }}>
+            <Tabs.Panel value="bp" className="w-full overflow-auto">
+                <Accordion style={{ width: "100%" }} size="small" headingSize="xsmall">
                     <React.Suspense fallback={<Loader size={"small"} />}>
                         <DokumenterForPerson
                             rolle={RolleType.BP}
@@ -255,7 +246,7 @@ function DokumenterForPerson({
                 return (
                     <Accordion.Item defaultOpen style={{ minWidth: "3rem" }}>
                         <Accordion.Header>{renderAccordionHeader(saksnummer)}</Accordion.Header>
-                        <Accordion.Content>
+                        <Accordion.Content className="p-4">
                             <DokumenterForSakTabell
                                 saksnummer={saksnummer}
                                 selectedDocuments={selectedDocuments}
@@ -288,39 +279,41 @@ function DokumenterForSakTabell({
     const { dokumenter } = useDokumenterForm();
     const journalposter = hentJournalposterForSak(saksnummer);
     const forsendelse = hentForsendelse();
+    const visJournalposter = journalposter
+        .filter((jp) => jp.dokumentType != "X")
+        .filter((jp) => jp.journalstatus != JournalpostStatus.UNDER_OPPRETELSE)
+        .filter((jp) => jp.feilfort != true)
+        .filter((jp) => jp.journalpostId != `BIF-${forsendelse.forsendelseId?.replace("BIF-", "")}`);
+    if (visJournalposter.length == 0) {
+        return <div className={"p-2"}>Det finnes ikke flere journalposter i samme sak</div>;
+    }
     return (
-        <Table style={{ display: "block", height: "100%", width: "1092px" }}>
-            <Table.Header style={{ position: "sticky" }}>
-                <Table.Row>
-                    <Table.DataCell style={{ width: "2%" }} />
-                    <Table.DataCell style={{ width: "2%" }} />
-                    <Table.HeaderCell scope="col" style={{ width: "20%" }}>
-                        Tittel
-                    </Table.HeaderCell>
-                    <Table.HeaderCell scope="col" style={{ width: "2%" }}></Table.HeaderCell>
-                    <Table.HeaderCell scope="col" style={{ width: "5%" }}>
-                        Dok. dato
-                    </Table.HeaderCell>
+        <div className="bisys-table-container">
+            <Table>
+                <Table.Header style={{ position: "sticky", top: "0", zIndex: 1000, backgroundColor: "white" }}>
+                    <Table.Row>
+                        <Table.HeaderCell style={{ width: "2%" }} />
+                        <Table.HeaderCell style={{ width: "2%" }} />
+                        <Table.HeaderCell scope="col">Tittel</Table.HeaderCell>
+                        <Table.HeaderCell scope="col" style={{ width: "80px" }}></Table.HeaderCell>
+                        <Table.HeaderCell scope="col" style={{ width: "5%" }}>
+                            Dok. dato
+                        </Table.HeaderCell>
 
-                    <Table.HeaderCell scope="col" style={{ width: "5%" }}>
-                        Type
-                    </Table.HeaderCell>
-                    <Table.HeaderCell scope="col" style={{ width: "5%" }} align={"left"}>
-                        Gjelder
-                    </Table.HeaderCell>
-                    <Table.HeaderCell scope="col" style={{ width: "200px" }}>
-                        Status
-                    </Table.HeaderCell>
-                    <Table.DataCell style={{ width: "2%" }} />
-                </Table.Row>
-            </Table.Header>
-            <Table.Body>
-                {journalposter
-                    .filter((jp) => jp.dokumentType != "X")
-                    .filter((jp) => jp.journalstatus != JournalpostStatus.UNDER_OPPRETELSE)
-                    .filter((jp) => jp.feilfort != true)
-                    .filter((jp) => jp.journalpostId != `BIF-${forsendelse.forsendelseId?.replace("BIF-", "")}`)
-                    .map((journalpost) => {
+                        <Table.HeaderCell scope="col" style={{ width: "5%" }}>
+                            Type
+                        </Table.HeaderCell>
+                        <Table.HeaderCell scope="col" style={{ width: "5%" }} align={"left"}>
+                            Gjelder
+                        </Table.HeaderCell>
+                        <Table.HeaderCell scope="col" style={{ width: "150px" }}>
+                            Status
+                        </Table.HeaderCell>
+                        <Table.HeaderCell style={{ width: "2%" }} />
+                    </Table.Row>
+                </Table.Header>
+                <Table.Body>
+                    {visJournalposter.map((journalpost) => {
                         return (
                             <JournalpostDokumenterRowMultiDoc
                                 fraRolle={fraRolle}
@@ -332,8 +325,9 @@ function DokumenterForSakTabell({
                             />
                         );
                     })}
-            </Table.Body>
-        </Table>
+                </Table.Body>
+            </Table>
+        </div>
     );
 }
 
@@ -516,15 +510,21 @@ function JournalpostDokumenterRowMultiDoc({
         return status;
     }
 
+    function erKopiAvEksternDokument(dokumentDto: IDokumentJournalDto) {
+        return dokumentDto.originalDokumentreferanse != null || dokumentDto.originalJournalpostId != null;
+    }
+
     function getForsendelseStatus(dokumentDto: IDokumentJournalDto) {
         if (!journalpost.erForsendelse) return DokumentStatus.FERDIGSTILT;
 
-        const erKopiAvEksternDokument =
-            dokumentDto.originalDokumentreferanse != null || dokumentDto.originalJournalpostId != null;
+        const kopiAvEksternDokument = erKopiAvEksternDokument(dokumentDto);
         if (dokumentDto.status == "FERDIGSTILT") {
-            return !erKopiAvEksternDokument ? DokumentStatus.FERDIGSTILT : DokumentStatus.KONTROLLERT;
+            return !kopiAvEksternDokument ? DokumentStatus.FERDIGSTILT : DokumentStatus.KONTROLLERT;
         }
-        return erKopiAvEksternDokument ? DokumentStatus.MÅ_KONTROLLERES : DokumentStatus.UNDER_REDIGERING;
+        if (dokumentDto.status == "UNDER_PRODUKSJON") {
+            return DokumentStatus.UNDER_PRODUKSJON;
+        }
+        return kopiAvEksternDokument ? DokumentStatus.MÅ_KONTROLLERES : DokumentStatus.UNDER_REDIGERING;
     }
 
     const isJournalpostSelected = () => {
@@ -561,7 +561,7 @@ function JournalpostDokumenterRowMultiDoc({
                 selected={isAllDocumentsSelected}
                 className={`journalpost journalpostrad ${showAllDocuments ? "open" : ""}`}
             >
-                <Table.DataCell style={{ width: "2%" }}>
+                <Table.DataCell>
                     <Button
                         icon={showAllDocuments ? <Collapse /> : <Expand />}
                         size={"small"}
@@ -569,7 +569,7 @@ function JournalpostDokumenterRowMultiDoc({
                         onClick={toggleShowAllDocuments}
                     />
                 </Table.DataCell>
-                <Table.DataCell style={{ width: "2%" }}>
+                <Table.DataCell>
                     <Checkbox
                         hideLabel
                         checked={isAllDocumentsSelected || isSomeDocumentsSelected}
@@ -580,8 +580,8 @@ function JournalpostDokumenterRowMultiDoc({
                         {" "}
                     </Checkbox>
                 </Table.DataCell>
-                <Table.DataCell style={{ width: "20%" }}>{tittel}</Table.DataCell>
-                <Table.DataCell style={{ width: "5%" }}>
+                <Table.DataCell>{tittel}</Table.DataCell>
+                <Table.DataCell>
                     {isSomeDocumentsSelected && (
                         <Tag variant="info" size="small">
                             {`${numerOfSelectedDocuments} av ${journalpost.dokumenter.length}`}
@@ -589,14 +589,14 @@ function JournalpostDokumenterRowMultiDoc({
                     )}
                 </Table.DataCell>
                 {/* <Table.DataCell style={{ width: "20%" }}>{tittel + " - " + journalpost.journalpostId}</Table.DataCell> */}
-                <Table.DataCell style={{ width: "5%" }}>{formatDate(journalpost.dokumentDato)}</Table.DataCell>
+                <Table.DataCell>{dateToDDMMYYYYString(new Date(journalpost.dokumentDato))}</Table.DataCell>
 
-                <Table.DataCell style={{ width: "5%" }}>{journalpost.dokumentType}</Table.DataCell>
-                <Table.DataCell style={{ width: "5%" }}>{journalpost.gjelderAktor?.ident}</Table.DataCell>
-                <Table.DataCell style={{ width: "5%" }}>
+                <Table.DataCell>{journalpost.dokumentType}</Table.DataCell>
+                <Table.DataCell>{journalpost.gjelderAktor?.ident}</Table.DataCell>
+                <Table.DataCell>
                     <JournalpostStatusTag status={journalpost.journalstatus} />
                 </Table.DataCell>
-                <Table.DataCell style={{ width: "2%" }}>
+                <Table.DataCell>
                     <div className={"flex flex-row gap-1"}>
                         <OpenDokumentButton
                             journalpostId={journalpost.journalpostId}

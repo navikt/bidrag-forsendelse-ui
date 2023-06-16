@@ -2,10 +2,9 @@ import { DragEndEvent, DraggableAttributes } from "@dnd-kit/core";
 import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import { EyeIcon } from "@navikt/aksel-icons";
 import { DragVerticalIcon } from "@navikt/aksel-icons";
-import { LinkIcon } from "@navikt/aksel-icons";
 import { OpenDocumentUtils } from "@navikt/bidrag-ui-common";
 import { Delete } from "@navikt/ds-icons";
-import { Table, Tag } from "@navikt/ds-react";
+import { Table } from "@navikt/ds-react";
 import { Button } from "@navikt/ds-react";
 import { Textarea } from "@navikt/ds-react";
 import dayjs from "dayjs";
@@ -24,6 +23,7 @@ import { IForsendelseFormProps } from "../../pages/forsendelse/context/Dokumente
 import { useSession } from "../../pages/forsendelse/context/SessionContext";
 import { IDokument } from "../../types/Dokument";
 import TableDraggableBody from "../table/TableDraggableBody";
+import DokumentLinkedTag from "./DokumentLinkedTag";
 import DokumentStatusTag from "./DokumentStatusTag";
 import OpenDokumentButton from "./OpenDokumentButton";
 export default function DokumentRows() {
@@ -142,11 +142,7 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
                 <Table.DataCell style={{ width: "200px" }}>
                     <div className="flex flex-row gap-[5px]">
                         <DokumentStatusTag status={status} />
-                        {dokument.lenkeTilDokumentreferanse && (
-                            <Tag variant="info" size="small" className=" rounded-md">
-                                <LinkIcon />
-                            </Tag>
-                        )}
+                        {dokument.lenkeTilDokumentreferanse && <DokumentLinkedTag />}
                     </div>
                 </Table.DataCell>
                 <Table.DataCell style={{ width: "50px" }}>

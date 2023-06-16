@@ -22,3 +22,28 @@ tr.journalpostrad.open {
 } */
 
 /*:not(.navds-table__row--selected):not(:hover)*/
+
+
+.bisys-table-container {
+  display: block;
+  overflow: auto;
+  width: 100%;
+  height: inherit;
+}
+.bisys-table-container table {
+  width: 1092px;
+
+}
+
+
+.legg_til_dokument_modal {
+  width: 80vw;
+  max-width: 1200px;
+  height: max-content;
+  max-height: 1000px;
+  padding: "1rem 2rem";
+  overflow: hidden;
+}
+.legg_til_dokument_modal div[role="tabpanel"] {
+  height: 60vh;
+}
