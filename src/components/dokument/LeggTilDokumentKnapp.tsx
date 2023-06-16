@@ -61,8 +61,9 @@ function LeggTilDokumentFraSakModal({ onClose, open }: LeggTilDokumentFraSakModa
     const { hentForsendelse } = useForsendelseApi();
     const saksnummer = hentForsendelse().saksnummer;
     function selectDocument(document: IDokument, toggle = true) {
+        console.log(selectedDocuments, document);
         const isSelected = (d) =>
-            d.dokumentreferanse
+            document.dokumentreferanse
                 ? d.dokumentreferanse == document.dokumentreferanse
                 : d.journalpostId == document.journalpostId;
         setSelectedDocuments((selectedDocuments) => {
@@ -81,7 +82,7 @@ function LeggTilDokumentFraSakModal({ onClose, open }: LeggTilDokumentFraSakModa
 
     function unselectDocument(document: IDokument) {
         const isSelected = (d) =>
-            d.dokumentreferanse
+            document.dokumentreferanse
                 ? d.dokumentreferanse == document.dokumentreferanse
                 : d.journalpostId == document.journalpostId;
         setSelectedDocuments((selectedDocuments) => selectedDocuments.filter((d) => !isSelected(d)));
@@ -460,6 +461,7 @@ function JournalpostDokumenterRowMultiDoc({
             journalpost.dokumenter.filter((d) => !erLagtTilIForsendelse(d)).forEach((d) => onDocumentSelected(d));
             return;
         }
+
         if (isAllDocumentsSelectedNotIncludingAdded && !isJournalpostSelected()) {
             journalpost.dokumenter.forEach((dok) =>
                 unselectDocument({
@@ -486,7 +488,16 @@ function JournalpostDokumenterRowMultiDoc({
         selectDocument(leggTilDokument);
     }
 
-    function onDocumentSelected(dokumentDto: IDokumentJournalDto, toggle = true) {
+    function onDocumentSelected(dokumentDto: IDokumentJournalDto, toggle = true, skipJournalpostCheck = false) {
+        if (isJournalpostSelected() && !skipJournalpostCheck) {
+            unselectDocument({
+                journalpostId: journalpost.journalpostId,
+                lagret: false,
+                index: -1,
+                tittel: "",
+            });
+            journalpost.dokumenter.forEach((d) => onDocumentSelected(d, false, true));
+        }
         const leggTilDokument: IDokument = {
             fraSaksnummer: saksnummer,
             journalpostId: journalpost.journalpostId,
@@ -515,7 +526,12 @@ function JournalpostDokumenterRowMultiDoc({
     }
 
     function getForsendelseStatus(dokumentDto: IDokumentJournalDto) {
-        if (!journalpost.erForsendelse) return DokumentStatus.FERDIGSTILT;
+        if (!journalpost.erForsendelse) {
+            if (journalpost.journalpostId.startsWith("BID-")) {
+                return journalpost.journalstatus == "D" ? DokumentStatus.UNDER_PRODUKSJON : DokumentStatus.FERDIGSTILT;
+            }
+            return DokumentStatus.FERDIGSTILT;
+        }
 
         const kopiAvEksternDokument = erKopiAvEksternDokument(dokumentDto);
         if (dokumentDto.status == "FERDIGSTILT") {

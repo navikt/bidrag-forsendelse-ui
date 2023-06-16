@@ -22,7 +22,9 @@ tr.journalpostrad.open {
 } */
 
 /*:not(.navds-table__row--selected):not(:hover)*/
-
+:root {
+  --bidrag-table-width: 1092px;
+}
 
 .bisys-table-container {
   display: block;
@@ -30,11 +32,11 @@ tr.journalpostrad.open {
   width: 100%;
   height: inherit;
 }
+
 .bisys-table-container table {
-  width: 1092px;
+  width: var(--bidrag-table-width);
 
 }
-
 
 .legg_til_dokument_modal {
   width: 80vw;
@@ -46,4 +48,12 @@ tr.journalpostrad.open {
 }
 .legg_til_dokument_modal div[role="tabpanel"] {
   height: 60vh;
+}
+
+.legg_til_dokument_modal .navds-accordion__content .bisys-table-container {
+  overflow: unset;
+}
+
+.legg_til_dokument_modal .navds-accordion__header {
+  width: var(--bidrag-table-width);
 }
