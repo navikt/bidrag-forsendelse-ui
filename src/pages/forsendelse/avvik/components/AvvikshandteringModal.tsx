@@ -53,12 +53,12 @@ function AvvikshandteringModal(props: AvvikshandteringModalProps) {
             });
             const harEndretFagomradeTilFarskap =
                 avvik.type == AvvikType.ENDRE_FAGOMRADE && avvik.fagomrade == FAGOMRADE.FAR;
-            return false;
+            // return false;
 
-            // return (
-            //     (harTilgangTilTemaFar && harEndretFagomradeTilFarskap) ||
-            //     skalKunneViderebehandleJournalpostEtterUtførtAvvik(avvik.type)
-            // );
+            return (
+                (harTilgangTilTemaFar && harEndretFagomradeTilFarskap) ||
+                skalKunneViderebehandleJournalpostEtterUtførtAvvik(avvik.type)
+            );
         },
     });
 

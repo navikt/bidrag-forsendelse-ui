@@ -13,6 +13,7 @@ import DokumentValgOpprett from "./DokumentValgOpprett";
 import LanguageAndTemaSelect from "./LanguageAndTemaSelect";
 import MottakerSelect from "./MottakerSelect";
 import { useOpprettForsendelse } from "./OpprettForsendelseContext";
+import SlettForsendelseButton from "./SlettForsendelseButton";
 
 export type OpprettForsendelseFormProps = {
     gjelderIdent: string;
@@ -147,7 +148,7 @@ interface OpprettForsendelsContainerProps {
     onSubmit: (data: OpprettForsendelseFormProps) => void;
 }
 function OpprettForsendelsContainer({ onSubmit }: OpprettForsendelsContainerProps) {
-    const { forsendelseId } = useSession();
+    const { forsendelseId, saksnummer } = useSession();
     const roller = useForsendelseApi().hentRoller();
     const methods = useFormContext();
     const isLoading = useIsMutating([OPPRETT_FORSENDELSE_MUTATION_KEY]) > 0;
@@ -171,9 +172,18 @@ function OpprettForsendelsContainer({ onSubmit }: OpprettForsendelsContainerProp
                                     <Button size="small" loading={isLoading}>
                                         Opprett
                                     </Button>
-                                    <Button size="small" variant="tertiary" type="button" disabled={isLoading}>
+                                    {/* <Button
+                                        size="small"
+                                        variant="tertiary"
+                                        type="button"
+                                        disabled={isLoading}
+                                        onClick={() => {
+                                            RedirectTo.sakshistorikk(saksnummer);
+                                        }}
+                                    >
                                         Avbryt
-                                    </Button>
+                                    </Button> */}
+                                    <SlettForsendelseButton />
                                 </div>
                             </form>
                         </FormProvider>

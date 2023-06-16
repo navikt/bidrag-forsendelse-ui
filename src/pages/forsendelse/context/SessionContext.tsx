@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 interface ISessionContext {
     forsendelseId: string;
+    forsendelseIdMedPrefix: string;
     saksnummer: string;
     enhet: string;
     sessionId: string;
@@ -42,6 +43,7 @@ function SessionProvider({ children, ...props }: PropsWithChildren<ISessionProps
         <SessionContext.Provider
             value={{
                 forsendelseId,
+                forsendelseIdMedPrefix: `BIF-${forsendelseId?.replace(/\D/g, "")}`,
                 saksnummer,
                 enhet,
                 sessionId,
