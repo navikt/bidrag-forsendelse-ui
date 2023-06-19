@@ -554,14 +554,27 @@ function JournalpostDokumenterRowMultiDoc({
 
     const isDocumentSelected = (dokument: IDokumentJournalDto) => {
         return (
-            isDocumentSelectedNotIncludingAdded(dokument) || erLagtTilIForsendelse(dokument) || isJournalpostSelected()
+            isDocumentSelectedNotIncludingAdded(dokument) ||
+            erLagtTilIForsendelse(dokument) ||
+            isJournalpostSelected() ||
+            erJournalpostLagtTilIForsendelse()
+        );
+    };
+
+    const erJournalpostLagtTilIForsendelse = () => {
+        return (
+            forsendelseDokumenter.some(
+                (d) =>
+                    d.originalJournalpostId?.replace(/\D/g, "") == journalpost.journalpostId?.replace(/\D/g, "") &&
+                    d.originalDokumentreferanse == undefined
+            ) || journalpost.dokumenter.every(erLagtTilIForsendelse)
         );
     };
 
     const erLagtTilIForsendelse = (dokument: IDokumentJournalDto) =>
         forsendelseDokumenter.some((forsendelseDokument) =>
             erSammeDokument(forsendelseDokument, dokument, journalpost.journalpostId)
-        );
+        ) || erJournalpostLagtTilIForsendelse();
     const isAllDocumentsSelected = journalpost.dokumenter.every(isDocumentSelected);
     const isAllDocumentsSelectedNotIncludingAdded = journalpost.dokumenter.every(isDocumentSelectedNotIncludingAdded);
     const isSomeDocumentsSelected = journalpost.dokumenter.some(isDocumentSelected);
@@ -588,9 +601,12 @@ function JournalpostDokumenterRowMultiDoc({
                 <Table.DataCell>
                     <Checkbox
                         hideLabel
-                        checked={isAllDocumentsSelected || isSomeDocumentsSelected}
+                        checked={
+                            isAllDocumentsSelected || isSomeDocumentsSelected || erJournalpostLagtTilIForsendelse()
+                        }
                         // indeterminate={isSomeDocumentsSelected && !isAllDocumentsSelected}
                         onChange={onJournalpostSelected}
+                        disabled={erJournalpostLagtTilIForsendelse()}
                         aria-labelledby={`id-${journalpost.journalpostId}`}
                     >
                         {" "}
