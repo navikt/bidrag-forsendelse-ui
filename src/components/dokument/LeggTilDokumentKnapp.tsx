@@ -562,14 +562,14 @@ function JournalpostDokumenterRowMultiDoc({
     };
 
     const erJournalpostLagtTilIForsendelse = () => {
-        return (
-            forsendelseDokumenter.some(
-                (d) =>
-                    d.originalJournalpostId?.replace(/\D/g, "") == journalpost.journalpostId?.replace(/\D/g, "") &&
-                    d.originalDokumentreferanse == undefined
-            ) || journalpost.dokumenter.every(erLagtTilIForsendelse)
+        return forsendelseDokumenter.some(
+            (d) =>
+                d.originalJournalpostId?.replace(/\D/g, "") == journalpost.journalpostId?.replace(/\D/g, "") &&
+                d.originalDokumentreferanse == undefined
         );
     };
+
+    const erAllDokumenterLagtTilIForsendelse = () => journalpost.dokumenter.every(erLagtTilIForsendelse);
 
     const erLagtTilIForsendelse = (dokument: IDokumentJournalDto) =>
         forsendelseDokumenter.some((forsendelseDokument) =>
@@ -602,11 +602,14 @@ function JournalpostDokumenterRowMultiDoc({
                     <Checkbox
                         hideLabel
                         checked={
-                            isAllDocumentsSelected || isSomeDocumentsSelected || erJournalpostLagtTilIForsendelse()
+                            isAllDocumentsSelected ||
+                            isSomeDocumentsSelected ||
+                            erJournalpostLagtTilIForsendelse() ||
+                            erAllDokumenterLagtTilIForsendelse()
                         }
                         // indeterminate={isSomeDocumentsSelected && !isAllDocumentsSelected}
                         onChange={onJournalpostSelected}
-                        disabled={erJournalpostLagtTilIForsendelse()}
+                        disabled={erJournalpostLagtTilIForsendelse() || erAllDokumenterLagtTilIForsendelse()}
                         aria-labelledby={`id-${journalpost.journalpostId}`}
                     >
                         {" "}
