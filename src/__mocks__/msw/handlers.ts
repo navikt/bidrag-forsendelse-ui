@@ -12,3 +12,4 @@ export const handlers = [
     ...sakMock(),
     ...dokumentMock(),
 ];
+// export const handlers = [...sakMock(), ...personMock()];

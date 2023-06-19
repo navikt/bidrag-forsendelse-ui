@@ -7,8 +7,8 @@ import { useState } from "react";
 
 import { DistribuerTilAdresse } from "../../../api/BidragDokumentApi";
 import AdresseInfo from "../../../components/AdresseInfo";
+import { EditAddressForm } from "../../../components/EditAddress";
 import Mottaker from "../components/Mottaker";
-import EditAddress from "./EditAddress";
 
 interface BestillDistribusjonContentProps {
     editable?: boolean;
@@ -38,7 +38,7 @@ export default function BestillDistribusjonInfo({
                 <div className={"flex w-full"}>
                     {adressEditable ? (
                         <React.Suspense fallback={<Loader variant="neutral" size="small" fr="true" />}>
-                            <EditAddress
+                            <EditAddressForm
                                 address={adresse}
                                 onSubmit={(adresse) => {
                                     onAdresseChanged(adresse);

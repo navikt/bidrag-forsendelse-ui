@@ -1,7 +1,7 @@
 import { rest, RestHandler } from "msw";
 
 import environment from "../../environment";
-import { simpleForsendelse } from "../testdata/forsendelseData";
+import { dokumentValg, simpleForsendelse } from "../testdata/forsendelseData";
 
 export default function forsendelseMock(): RestHandler[] {
     const baseUrl = environment.url.bidragDokumentForsendelse;
@@ -19,6 +19,14 @@ export default function forsendelseMock(): RestHandler[] {
                 ctx.set("Content-Type", "application/json"),
                 ctx.delay(500)
                 // Respond with the "ArrayBuffer".
+            );
+        }),
+        rest.post(`${baseUrl}/api/forsendelse/v2/dokumentvalg`, (req, res, ctx) => {
+            return res(
+                ctx.set("Content-Type", "application/json"),
+                ctx.delay(500),
+                // Respond with the "ArrayBuffer".
+                ctx.body(JSON.stringify(dokumentValg))
             );
         }),
     ];

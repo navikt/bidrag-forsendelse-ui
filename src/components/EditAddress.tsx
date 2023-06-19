@@ -1,6 +1,6 @@
 import { Locked } from "@navikt/ds-icons";
 import { Cancel } from "@navikt/ds-icons";
-import { TextField } from "@navikt/ds-react";
+import { Loader, TextField } from "@navikt/ds-react";
 import { Select } from "@navikt/ds-react";
 import { Button } from "@navikt/ds-react";
 import { ChangeEvent } from "react";
@@ -10,18 +10,30 @@ import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useFormContext } from "react-hook-form";
 import { useWatch } from "react-hook-form";
 
-import { DistribuerTilAdresse } from "../../../api/BidragForsendelseApi";
-import { hentPostnummere } from "../../../api/queries";
-import { hentLandkoder } from "../../../api/queries";
-import { isCountryCodeNorway } from "../../../types/AdresseUtils";
+import { DistribuerTilAdresse } from "../api/BidragDokumentApi";
+import { hentPostnummere } from "../api/queries";
+import { hentLandkoder } from "../api/queries";
+import { isCountryCodeNorway } from "../types/AdresseUtils";
 
-interface EditAddressProps {
-    address: DistribuerTilAdresse;
+interface EditAddressFormProps {
+    address?: DistribuerTilAdresse;
     onSubmit: (adress: DistribuerTilAdresse) => void;
     onCancel: () => void;
 }
 
-export default function EditAddress({ address, onSubmit, onCancel }: EditAddressProps) {
+export function EditAddress() {
+    return (
+        <div className={"md:grow"}>
+            <EditAddressLines />
+            <div className="flex flex-row gap-[5px] h-max items-center">
+                <EditPostcodeAndState />
+                <EditCountry />
+            </div>
+        </div>
+    );
+}
+
+export function EditAddressForm({ address, onSubmit, onCancel }: EditAddressFormProps) {
     const methods = useForm<DistribuerTilAdresse>({
         defaultValues: {
             ...address,
@@ -33,11 +45,7 @@ export default function EditAddress({ address, onSubmit, onCancel }: EditAddress
     return (
         <FormProvider {...methods}>
             <div>
-                <div className={"md:grow"}>
-                    <EditAddressLines />
-                    <EditPostcodeAndState />
-                    <EditCountry />
-                </div>
+                <EditAddress />
                 <div className={"gap-4 flex flex-row pt-3"}>
                     <Button
                         id={"lagre_adresse_knapp"}
@@ -86,23 +94,25 @@ function EditPostcodeAndState() {
                             validate: (value: string) => (value.length != 4 ? "Postnummer må ha 4 tegn" : true),
                         }}
                         render={({ field: { name, onChange, value, ref }, fieldState: { error } }) => (
-                            <PostnummerInput
-                                defaultValue={value}
-                                inputRef={ref}
-                                error={error?.message ?? errors?.poststed?.message}
-                                name={name}
-                                onChange={(postnummer, poststed) => {
-                                    onChange(postnummer);
-                                    setValue("poststed", poststed);
-                                    clearErrors("poststed");
-                                }}
-                            />
+                            <React.Suspense fallback={<Loader size="xsmall" />}>
+                                <PostnummerInput
+                                    defaultValue={value}
+                                    inputRef={ref}
+                                    error={error?.message ?? errors?.poststed?.message}
+                                    name={name}
+                                    onChange={(postnummer, poststed) => {
+                                        onChange(postnummer);
+                                        setValue("poststed", poststed);
+                                        clearErrors("poststed");
+                                    }}
+                                />
+                            </React.Suspense>
                         )}
                     />
                     <TextField
                         {...register("poststed", { required: "Skriv inn gyldig postnummer" })}
                         size="small"
-                        label={"Poststed"}
+                        label={"Poststed (fylles automatisk)"}
                         disabled={true}
                     />
                 </>
@@ -232,6 +242,7 @@ function SelectableCountry({ onChange, defaultValue, inputRef, name, error }: Se
             name={name}
             size="small"
             label="Land"
+            className="h-max"
             onChange={onSelected}
             defaultValue={defaultValue}
         >

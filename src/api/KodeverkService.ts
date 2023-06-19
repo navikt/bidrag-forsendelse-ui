@@ -12,6 +12,6 @@ export default class KodeverkService extends DefaultRestService {
     }
 
     async getLandkoder(): Promise<LandkodeLand[]> {
-        return this.get<PostnummerPoststed[]>("/api/kodeverk/landkoder").then((res) => res.data);
+        return this.get<PostnummerPoststed[]>("/api/kodeverk/landkoder").then((res) => res.data.sort());
     }
 }

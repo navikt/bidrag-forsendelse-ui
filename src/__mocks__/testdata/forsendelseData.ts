@@ -72,3 +72,9 @@ export const simpleForsendelse = {
     status: "UNDER_PRODUKSJON",
     opprettetDato: "2023-01-23",
 };
+
+export const dokumentValg = {
+    BI01S02: { beskrivelse: "Fritekstbrev", type: "UTGÅENDE", kanBestilles: false },
+    BI01S10: { beskrivelse: "KOPIFORSIDE T", type: "UTGÅENDE", kanBestilles: false },
+    BI01S67: { beskrivelse: "ADRESSEFORESPØRSEL", type: "UTGÅENDE", kanBestilles: false },
+};

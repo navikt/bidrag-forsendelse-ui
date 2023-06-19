@@ -2,8 +2,7 @@ import "./PersonDetaljer.css";
 
 import { RolleType } from "@navikt/bidrag-ui-common";
 import RolleTag from "@navikt/bidrag-ui-common/esm/react_components/roller/RolleTag";
-import { BodyShort } from "@navikt/ds-react";
-import { CopyToClipboard } from "@navikt/ds-react-internal";
+import { BodyShort, CopyButton } from "@navikt/ds-react";
 import React from "react";
 
 interface IPersonDetaljerProps {
@@ -29,9 +28,7 @@ export default function PersonDetaljer({
             {ident && (
                 <>
                     <BodyShort size={"medium"}>{(navn ? " / " : "") + ident}</BodyShort>
-                    {copy && (
-                        <CopyToClipboard size="small" copyText={ident} popoverText={"Kopiert til utklippstavlen"} />
-                    )}
+                    {copy && <CopyButton size="small" copyText={ident} />}
                 </>
             )}
         </div>

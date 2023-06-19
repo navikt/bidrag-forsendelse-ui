@@ -4,7 +4,7 @@ import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { useIsMutating, useMutation } from "react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../../api/api";
-import { JournalTema } from "../../api/BidragForsendelseApi";
+import { JournalTema, MottakerAdresseTo } from "../../api/BidragForsendelseApi";
 import GjelderSelect from "../../components/detaljer/GjelderSelect";
 import { useForsendelseApi, UseForsendelseApiKeys } from "../../hooks/useForsendelseApi";
 import { useSession } from "../forsendelse/context/SessionContext";
@@ -17,7 +17,11 @@ import SlettForsendelseButton from "./SlettForsendelseButton";
 
 export type OpprettForsendelseFormProps = {
     gjelderIdent: string;
-    mottakerIdent: string;
+    mottaker: {
+        ident?: string;
+        navn?: string;
+        adresse?: MottakerAdresseTo;
+    };
     dokument: {
         malId: string;
         tittel: string;
@@ -46,7 +50,8 @@ function OpprettForsendelseUnderOpprettelse() {
             BIDRAG_FORSENDELSE_API.api.oppdaterForsendelse(forsendelseId, {
                 gjelderIdent: data.gjelderIdent,
                 mottaker: {
-                    ident: data.mottakerIdent,
+                    ident: data.mottaker.ident,
+                    navn: data.mottaker.navn,
                 },
                 tema: data.tema as JournalTema,
                 språk: data.språk,
@@ -68,7 +73,9 @@ function OpprettForsendelseUnderOpprettelse() {
     const methods = useForm<OpprettForsendelseFormProps>({
         defaultValues: {
             gjelderIdent: defaultGjelder,
-            mottakerIdent: defaultGjelder,
+            mottaker: {
+                ident: defaultGjelder,
+            },
             tema: "BID",
             språk: "NB",
         },
@@ -93,7 +100,8 @@ function OpprettForsendelseNy() {
             BIDRAG_FORSENDELSE_API.api.opprettForsendelse({
                 gjelderIdent: data.gjelderIdent,
                 mottaker: {
-                    ident: data.mottakerIdent,
+                    ident: data.mottaker.ident,
+                    navn: data.mottaker.navn,
                 },
                 saksnummer,
                 behandlingInfo: {
@@ -128,7 +136,9 @@ function OpprettForsendelseNy() {
     const methods = useForm<OpprettForsendelseFormProps>({
         defaultValues: {
             gjelderIdent: defaultGjelder,
-            mottakerIdent: defaultGjelder,
+            mottaker: {
+                ident: defaultGjelder,
+            },
             tema: "BID",
             språk: "NB",
         },

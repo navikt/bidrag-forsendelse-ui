@@ -16,5 +16,15 @@ export default function personMock(): RestHandler[] {
                 ctx.body(JSON.stringify(personMap.get(personIdent)))
             );
         }),
+        rest.post(
+            `${environment.url.bidragTilgangskontroll}/api/tilgang/tema`,
+            async (req: RestRequest<PersonRequest>, res, ctx) => {
+                const personIdent = (await req.json()).ident;
+                return res(
+                    // Respond with the "ArrayBuffer".
+                    ctx.body("true")
+                );
+            }
+        ),
     ];
 }

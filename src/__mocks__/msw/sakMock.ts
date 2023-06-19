@@ -1,7 +1,7 @@
 import { rest, RestHandler, RestRequest } from "msw";
 
 import environment from "../../environment";
-import { sakMap } from "../testdata/sakData";
+import { sakData1, sakMap } from "../testdata/sakData";
 import { sakerPersonMap } from "../testdata/sakData";
 
 export default function sakMock(): RestHandler[] {
@@ -14,7 +14,7 @@ export default function sakMock(): RestHandler[] {
                 ctx.set("Content-Type", "application/json"),
                 ctx.delay(500),
                 // Respond with the "ArrayBuffer".
-                ctx.body(JSON.stringify(sakMap.get(saksnummer)))
+                ctx.body(JSON.stringify(sakMap.get(saksnummer) ?? sakData1))
             );
         }),
 

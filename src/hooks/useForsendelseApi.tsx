@@ -1,4 +1,5 @@
 import { IRolleDetaljer, RolleType } from "@navikt/bidrag-ui-common";
+import IdentUtils from "@navikt/bidrag-ui-common/esm/utils/IdentUtils";
 import { AxiosResponse } from "axios";
 import React from "react";
 import { useQuery } from "react-query";
@@ -127,8 +128,8 @@ export function useForsendelseApi(): UseForsendelseDataProps {
         let mottaker = forsendelse.mottaker;
         // TODO: Sjekk om mottaker er samhandler
 
-        if (!mottaker.navn) {
-            mottaker = useSamhandlerPersonApi().hentPerson(mottaker.ident);
+        if (!mottaker.navn || IdentUtils.isSamhandlerId(mottaker.ident)) {
+            mottaker = useSamhandlerPersonApi().hentSamhandlerEllerPersonForIdent(mottaker.ident)?.data ?? mottaker;
         }
 
         const ident = mottaker.ident;
