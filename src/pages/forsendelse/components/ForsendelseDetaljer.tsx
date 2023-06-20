@@ -17,7 +17,7 @@ export default function ForsendelseDetaljer() {
                         },
                         {
                             label: "Tema",
-                            value: forsendelse.tema,
+                            value: forsendelse.tema == "FAR" ? "Foreldreskap" : "Bidrag",
                         },
                         {
                             label: "Opprettet dato",
