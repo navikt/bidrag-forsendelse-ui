@@ -32,19 +32,19 @@ module.exports = {
                     {
                         loader: "swc-loader",
                         options: {
-                            env: { mode: "usage" },
-                            minify: !isDevelopment,
                             jsc: {
-                                target: "es2022",
-                                minify: {
-                                    compress: true,
-                                    mangle: true,
-                                },
                                 parser: {
                                     syntax: "typescript",
                                     tsx: true,
-                                    topLevelAwait: true,
                                     dynamicImport: true,
+                                    privateMethod: false,
+                                    functionBind: false,
+                                    exportDefaultFrom: false,
+                                    exportNamespaceFrom: false,
+                                    decorators: false,
+                                    decoratorsBeforeExport: false,
+                                    topLevelAwait: true,
+                                    importMeta: false,
                                 },
                                 transform: {
                                     react: {
@@ -52,7 +52,17 @@ module.exports = {
                                         refresh: isDevelopment,
                                     },
                                 },
+                                minify: {
+                                    compress: false,
+                                    mangle: false,
+                                },
+                                target: "es2022",
+                                loose: false,
+                                externalHelpers: false,
+                                // Requires v1.2.50 or upper and requires target to be es2016 or upper.
+                                keepClassNames: true,
                             },
+                            minify: false,
                         },
                     },
                 ],

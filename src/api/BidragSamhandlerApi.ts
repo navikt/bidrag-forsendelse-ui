@@ -61,7 +61,7 @@ export interface SamhandlerDto {
 export interface SokSamhandlerQuery {
     navn: string;
     postnummer?: string;
-    område?: string;
+    omrade?: string;
     /**
      * Sidenummer med resultater man ønsker, hvis det finnes og man ønsker påfølgende resultater.
      * @format int32
@@ -122,7 +122,7 @@ export class HttpClient<SecurityDataType = unknown> {
     constructor({ securityWorker, secure, format, ...axiosConfig }: ApiConfig<SecurityDataType> = {}) {
         this.instance = axios.create({
             ...axiosConfig,
-            baseURL: axiosConfig.baseURL || "https://bidrag-samhandler-feature.dev.intern.nav.no",
+            baseURL: axiosConfig.baseURL || "https://bidrag-samhandler.intern.dev.nav.no",
         });
         this.secure = secure;
         this.format = format;
@@ -212,7 +212,7 @@ export class HttpClient<SecurityDataType = unknown> {
 /**
  * @title bidrag-samhandler
  * @version v1
- * @baseUrl https://bidrag-samhandler-feature.dev.intern.nav.no
+ * @baseUrl https://bidrag-samhandler.intern.dev.nav.no
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
     samhandler = {
