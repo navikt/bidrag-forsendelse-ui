@@ -1,6 +1,6 @@
 import IdentUtils from "@navikt/bidrag-ui-common/esm/utils/IdentUtils";
 import { Alert, BodyShort, Heading, Loader, Radio, RadioGroup, TextField } from "@navikt/ds-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useWatch } from "react-hook-form";
 
 import PersonDetaljer from "../../components/person/PersonDetaljer";
@@ -22,17 +22,23 @@ export default function MottakerSelect() {
     const gjelderIdent: string = useWatch<OpprettForsendelseFormProps>({ name: "gjelderIdent" }) as string;
     const gjelder = roller.find((rolle) => rolle.ident == gjelderIdent);
     const [selectedRadioOption, setSelectedRadioOption] = useState<RADIO_OPTIONS>("SAMME_SOM_GJELDER");
+    const selectedRadioOptionRef = useRef<RADIO_OPTIONS>(selectedRadioOption);
 
     useEffect(() => {
-        register("mottaker.ident", {
+        register("mottaker", {
             validate: () => {
-                return getValues("mottaker.navn") == undefined ? "Mottaker må settes" : true;
+                if (selectedRadioOptionRef.current == "FRITEKST") {
+                    return getValues("mottaker.navn") == undefined ? "Mottaker må settes" : true;
+                }
+                return getValues("mottaker.ident") == undefined ? "Mottaker må settes" : true;
             },
         });
     }, []);
 
     function onRadioChange(val: RADIO_OPTIONS) {
         setSelectedRadioOption(val);
+        selectedRadioOptionRef.current = val;
+        setValue("mottaker.navn", null);
         if (val == "SAMME_SOM_GJELDER") {
             setValue("mottaker.ident", gjelderIdent);
         } else {
@@ -52,13 +58,14 @@ export default function MottakerSelect() {
             return <MottakerFritekst />;
         }
     }
+
     return (
         <div>
             <RadioGroup
                 defaultValue={"SAMME_SOM_GJELDER"}
                 legend={<Heading size="small">Mottaker</Heading>}
                 onChange={onRadioChange}
-                error={errors.mottaker?.ident?.message}
+                error={errors.mottaker?.message}
                 size="small"
             >
                 <Radio value="SAMME_SOM_GJELDER">
