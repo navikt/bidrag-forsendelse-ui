@@ -4,6 +4,7 @@ const Dotenv = require("dotenv-webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { EnvironmentPlugin } = require("webpack");
 const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
+const buildConfig = require("./buildConfig");
 
 module.exports = merge(webpackCommon, {
     mode: "development",
@@ -35,5 +36,13 @@ module.exports = merge(webpackCommon, {
         new EnvironmentPlugin({
             ENABLE_MOCK: "",
         }),
+        // new ModuleFederationPlugin({
+        //     ...buildConfig.federationConfig,
+        //     remotes: {
+        //         bidrag_dokument_ui: "bidrag_dokument_ui@hhttp://localhost:8081/remoteEntry.js",
+        //         // bidrag_sak_ui:
+        //         //     "bidrag_sak_ui@https://bidrag-ui-static-files.intern.dev.nav.no/bidrag_sak_ui/feature/static/remoteEntry.js",
+        //     },
+        // }),
     ],
 });

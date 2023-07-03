@@ -3,7 +3,9 @@ import "./DokumenterTable.css";
 import { Table } from "@navikt/ds-react";
 import React from "react";
 
+import DokumentStatusInfo from "../../docs/DokumentStatusInfo.mdx";
 import { useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
+import InfoKnapp from "../InfoKnapp";
 import DokumentRows from "./DokumentRows";
 import LeggTilDokumentButton from "./LeggTilDokumentKnapp";
 import LeggTilFraMalKnapp from "./LeggTilFraMalKnapp";
@@ -46,7 +48,12 @@ export default function DokumenterTable() {
                                 Dok. dato
                             </Table.HeaderCell>
                             <Table.HeaderCell scope="col" align={"left"} style={{ width: "200px" }}>
-                                Status
+                                <div className="flex flex-row gap-2">
+                                    Status{" "}
+                                    <InfoKnapp>
+                                        <DokumentStatusInfo />
+                                    </InfoKnapp>
+                                </div>
                             </Table.HeaderCell>
                             <Table.HeaderCell scope="col" style={{ width: "50px" }}></Table.HeaderCell>
                         </Table.Row>

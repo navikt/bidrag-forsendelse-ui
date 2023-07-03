@@ -60,7 +60,7 @@ export enum JournalTema {
 
 /** Adresse til mottaker hvis dokumentet sendes som brev */
 export interface MottakerAdresseTo {
-    adresselinje1: string;
+    adresselinje1?: string;
     adresselinje2?: string;
     adresselinje3?: string;
     bruksenhetsnummer?: string;

@@ -26,6 +26,22 @@ module.exports = {
                 use: [MiniCssExtractPlugin.loader, "css-loader", "postcss-loader"],
             },
             {
+                test: /\.mdx?$/,
+                use: [
+                    {
+                        loader: "@mdx-js/loader",
+                        /** @type {import('@mdx-js/loader').Options} */
+                        options: {
+                            providerImportSource: "@mdx-js/react",
+                        },
+                    },
+                ],
+            },
+            {
+                test: /\.(png|jpg|gif|mov)$/i,
+                type: "asset/inline",
+            },
+            {
                 test: /\.([jt]sx?)?$/,
                 exclude: /node_modules/,
                 use: [

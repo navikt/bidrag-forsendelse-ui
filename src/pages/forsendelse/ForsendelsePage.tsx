@@ -7,6 +7,8 @@ import React from "react";
 import { PropsWithChildren } from "react";
 
 import DokumenterTable from "../../components/dokument/DokumenterTable";
+import InfoKnapp from "../../components/InfoKnapp";
+import DokumentTableInfo from "../../docs/DokumentTable.mdx";
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
 import OpprettForsendelsePage from "../opprettforsendelse/OpprettForsendelsePage";
 import PageWrapper from "../PageWrapper";
@@ -51,7 +53,10 @@ function ForsendelseView() {
                         </Grid>
                         <div>
                             <Heading level={"3"} size={"medium"} className={"max-w"}>
-                                Dokumenter
+                                Dokumenter{" "}
+                                <InfoKnapp>
+                                    <DokumentTableInfo />
+                                </InfoKnapp>
                             </Heading>
                             <DokumenterTable />
                         </div>

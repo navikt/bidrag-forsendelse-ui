@@ -21,13 +21,16 @@ interface EditAddressFormProps {
     onCancel: () => void;
 }
 
-export function EditAddress() {
+type EditAddressProps = {
+    formPrefix?: string;
+};
+export function EditAddress(props: EditAddressProps) {
     return (
         <div className={"md:grow"}>
-            <EditAddressLines />
+            <EditAddressLines {...props} />
             <div className="flex flex-row gap-[5px] h-max items-center">
-                <EditPostcodeAndState />
-                <EditCountry />
+                <EditPostcodeAndState {...props} />
+                <EditCountry {...props} />
             </div>
         </div>
     );
@@ -71,7 +74,7 @@ export function EditAddressForm({ address, onSubmit, onCancel }: EditAddressForm
     );
 }
 
-function EditPostcodeAndState() {
+function EditPostcodeAndState(props: EditAddressProps) {
     const {
         control,
         setValue,
@@ -81,14 +84,17 @@ function EditPostcodeAndState() {
     } = useFormContext<DistribuerTilAdresse>();
     const country = useWatch({ name: "land" });
     const isNorway = isCountryCodeNorway(country);
+    const formPrefix = props.formPrefix ? `${props.formPrefix}.` : "";
 
+    const poststedFormKey = `${formPrefix}poststed`;
+    const postnummerFormKey = `${formPrefix}postnummer`;
     return (
         <div className={`flex gap-x-4 pb-2 pt-2 w-full ${isNorway ? "" : "flex-col"}`}>
             {isNorway ? (
                 <>
                     <Controller
                         control={control}
-                        name="postnummer"
+                        name={postnummerFormKey}
                         rules={{
                             required: "Postnummer påkrevd norske adresser",
                             validate: (value: string) => (value.length != 4 ? "Postnummer må ha 4 tegn" : true),
@@ -102,32 +108,38 @@ function EditPostcodeAndState() {
                                     name={name}
                                     onChange={(postnummer, poststed) => {
                                         onChange(postnummer);
-                                        setValue("poststed", poststed);
-                                        clearErrors("poststed");
+                                        setValue(poststedFormKey, poststed);
+                                        clearErrors(poststedFormKey);
                                     }}
                                 />
                             </React.Suspense>
                         )}
                     />
                     <TextField
-                        {...register("poststed", { required: "Skriv inn gyldig postnummer" })}
+                        {...register(poststedFormKey, { required: "Skriv inn gyldig postnummer" })}
                         size="small"
                         label={"Poststed (fylles automatisk)"}
                         disabled={true}
                     />
                 </>
             ) : (
-                <TextField {...register("poststed")} size="small" label={"Poststed"} />
+                <TextField {...register(poststedFormKey)} size="small" label={"Poststed"} />
             )}
         </div>
     );
 }
-function EditCountry() {
+function EditCountry(props: EditAddressProps) {
     const { control, setValue, resetField } = useFormContext<DistribuerTilAdresse>();
+    const formPrefix = props.formPrefix ? `${props.formPrefix}.` : "";
+
+    const landFormKey = `${formPrefix}land`;
+
+    const poststedFormKey = `${formPrefix}poststed`;
+    const postnummerFormKey = `${formPrefix}postnummer`;
     return (
         <Controller
             control={control}
-            name="land"
+            name={landFormKey}
             rules={{ required: "Land er påkrevd" }}
             render={({ field: { name, onChange, value, ref }, fieldState: { error } }) => (
                 <SelectableCountry
@@ -138,11 +150,11 @@ function EditCountry() {
                     onChange={(landkode) => {
                         onChange(landkode);
                         if (!isCountryCodeNorway(landkode)) {
-                            setValue("postnummer", "");
-                            setValue("poststed", "");
+                            setValue(postnummerFormKey, "");
+                            setValue(poststedFormKey, "");
                         } else {
-                            resetField("postnummer");
-                            resetField("poststed");
+                            resetField(postnummerFormKey);
+                            resetField(poststedFormKey);
                         }
                     }}
                 />
@@ -151,7 +163,7 @@ function EditCountry() {
     );
 }
 
-function EditAddressLines() {
+function EditAddressLines(props: EditAddressProps) {
     const {
         register,
         formState: { errors },
@@ -160,16 +172,17 @@ function EditAddressLines() {
     const country = useWatch({ name: "land" });
     const isNorway = isCountryCodeNorway(country);
 
+    const formPrefix = props.formPrefix ? `${props.formPrefix}.` : "";
     return (
         <div className={"flex flex-col gap-y-4"}>
             <TextField
                 size="small"
                 error={errors.adresselinje1?.message}
-                {...register("adresselinje1", { required: isNorway ? false : "Adresselinje1 er påkrevd" })}
+                {...register(`${formPrefix}adresselinje1`, { required: isNorway ? false : "Adresselinje1 er påkrevd" })}
                 label={"Adresse"}
             />
-            <TextField size="small" hideLabel {...register("adresselinje2")} label={"Adresselinje2"} />
-            <TextField size="small" hideLabel {...register("adresselinje3")} label={"Adresselinje3"} />
+            <TextField size="small" hideLabel {...register(`${formPrefix}adresselinje2`)} label={"Adresselinje2"} />
+            <TextField size="small" hideLabel {...register(`${formPrefix}adresselinje3`)} label={"Adresselinje3"} />
         </div>
     );
 }

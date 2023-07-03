@@ -1,14 +1,20 @@
+import { MagnifyingGlassIcon, PersonIcon, PersonPencilIcon } from "@navikt/aksel-icons";
 import IdentUtils from "@navikt/bidrag-ui-common/esm/utils/IdentUtils";
-import { Alert, BodyShort, Heading, Loader, Radio, RadioGroup, TextField } from "@navikt/ds-react";
+import { Alert, Heading, Loader, Panel, Tabs, TextField } from "@navikt/ds-react";
 import React, { useEffect, useRef, useState } from "react";
 import { useWatch } from "react-hook-form";
 
+import AdresseInfo from "../../components/AdresseInfo";
+import { EditAddress } from "../../components/EditAddress";
 import PersonDetaljer from "../../components/person/PersonDetaljer";
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
 import useSamhandlerPersonApi from "../../hooks/usePersonApi";
-import { OpprettForsendelseFormProps, useOpprettForsendelseFormContext } from "./OpprettForsendelsePage";
+import {
+    MottakerFormProps,
+    OpprettForsendelseFormProps,
+    useOpprettForsendelseFormContext,
+} from "./OpprettForsendelsePage";
 import PersonSok from "./PersonSok";
-
 type RADIO_OPTIONS = "SAMME_SOM_GJELDER" | "ANNEN_MOTTAKER" | "FRITEKST";
 export default function MottakerSelect() {
     const roller = useForsendelseApi().hentRoller();
@@ -22,12 +28,13 @@ export default function MottakerSelect() {
     const gjelderIdent: string = useWatch<OpprettForsendelseFormProps>({ name: "gjelderIdent" }) as string;
     const gjelder = roller.find((rolle) => rolle.ident == gjelderIdent);
     const [selectedRadioOption, setSelectedRadioOption] = useState<RADIO_OPTIONS>("SAMME_SOM_GJELDER");
-    const selectedRadioOptionRef = useRef<RADIO_OPTIONS>(selectedRadioOption);
+    const selectedTabOption = useRef<RADIO_OPTIONS>(selectedRadioOption);
 
+    const mottakerCache = useRef<Map<string, MottakerFormProps>>(new Map());
     useEffect(() => {
         register("mottaker", {
             validate: () => {
-                if (selectedRadioOptionRef.current == "FRITEKST") {
+                if (selectedTabOption.current == "FRITEKST") {
                     return getValues("mottaker.navn") == undefined ? "Mottaker må settes" : true;
                 }
                 return getValues("mottaker.ident") == undefined ? "Mottaker må settes" : true;
@@ -35,64 +42,58 @@ export default function MottakerSelect() {
         });
     }, []);
 
-    function onRadioChange(val: RADIO_OPTIONS) {
+    function onTabChange(val: RADIO_OPTIONS) {
         setSelectedRadioOption(val);
-        selectedRadioOptionRef.current = val;
-        setValue("mottaker.navn", null);
+        mottakerCache.current.set(selectedTabOption.current, getValues("mottaker"));
+        selectedTabOption.current = val;
+        setValue("mottaker", null);
         if (val == "SAMME_SOM_GJELDER") {
             setValue("mottaker.ident", gjelderIdent);
         } else {
-            setValue("mottaker.ident", null);
+            setValue("mottaker", mottakerCache.current.get(val) ?? null);
         }
     }
 
-    function renderMottaker() {
-        if (selectedRadioOption == "ANNEN_MOTTAKER") {
-            return (
-                <div className="flex flex-col gap-3 w-max gap-[5px]">
-                    <PersonSok onChange={(ident) => setValue("mottaker.ident", ident)} />
-                    <MottakerNavn />
-                </div>
-            );
-        } else if (selectedRadioOption == "FRITEKST") {
-            return <MottakerFritekst />;
-        }
-    }
-
+    console.log(watch("mottaker"));
     return (
         <div>
-            <RadioGroup
-                defaultValue={"SAMME_SOM_GJELDER"}
-                legend={<Heading size="small">Mottaker</Heading>}
-                onChange={onRadioChange}
-                error={errors.mottaker?.message}
-                size="small"
-            >
-                <Radio value="SAMME_SOM_GJELDER">
-                    <BodyShort spacing size="small">
-                        Samme som gjelder
-                    </BodyShort>
-                </Radio>
-                <div className="mb-2 ml-2">
-                    <PersonDetaljer copy={false} spacing={false} ident={gjelderIdent} navn={gjelder?.navn} />
-                </div>
+            <Heading size="small">Mottaker</Heading>
+            <Tabs defaultValue={"SAMME_SOM_GJELDER"} onChange={onTabChange} size="small" className="w-max h-max">
+                <Tabs.List>
+                    <Tabs.Tab
+                        value="SAMME_SOM_GJELDER"
+                        label="Samme som gjelder"
+                        icon={<PersonIcon title="Samme som gjelder" />}
+                    />
+                    <Tabs.Tab
+                        value="ANNEN_MOTTAKER"
+                        label="Søk annen mottaker"
+                        icon={<MagnifyingGlassIcon title="Søk annen mottaker" />}
+                    />
+                    <Tabs.Tab value="FRITEKST" label="Fritekst" icon={<PersonPencilIcon title="Fritekst" />} />
+                </Tabs.List>
 
-                <Radio value="ANNEN_MOTTAKER">
-                    <div>
-                        <BodyShort spacing size="small">
-                            Søk annen mottaker
-                        </BodyShort>
+                <Tabs.Panel value="SAMME_SOM_GJELDER" className="h-max  w-full bg-gray-50 p-4">
+                    <PersonDetaljer copy={false} spacing={false} ident={gjelderIdent} navn={gjelder?.navn} />
+                </Tabs.Panel>
+                <Tabs.Panel value="ANNEN_MOTTAKER" className="h-max min-h-[100px] w-full bg-gray-50 p-4">
+                    <div className="flex flex-col gap-4 w-max gap-[5px]">
+                        <PersonSok
+                            defaultValue={watch("mottaker.ident")}
+                            onChange={(ident) => setValue("mottaker.ident", ident)}
+                        />
+                        <MottakerNavn />
                     </div>
-                </Radio>
-                <Radio value="FRITEKST">
-                    <div>
-                        <BodyShort spacing size="small">
-                            Fritekst
-                        </BodyShort>
-                    </div>
-                </Radio>
-            </RadioGroup>
-            <div className="mt-2 mb-2 font-bold">{renderMottaker()}</div>
+                </Tabs.Panel>
+                <Tabs.Panel value="FRITEKST" className="h-max w-full bg-gray-50 p-4">
+                    <MottakerFritekst />
+                </Tabs.Panel>
+            </Tabs>
+            {errors.mottaker?.message && (
+                <Alert inline variant="error">
+                    {errors.mottaker?.message}
+                </Alert>
+            )}
         </div>
     );
 }
@@ -101,8 +102,11 @@ function MottakerFritekst() {
     const { register, setValue, watch, control } = useOpprettForsendelseFormContext();
 
     return (
-        <div className="w-[300px]">
+        <div className="w-[300px] h-max">
             <TextField className="mb-2" size="small" label="Navn" {...register("mottaker.navn")} />
+            <React.Suspense fallback={<Loader />}>
+                <EditAddress formPrefix="mottaker.adresse" />
+            </React.Suspense>
         </div>
     );
 }
@@ -127,12 +131,18 @@ function MottakerNavn() {
     }
     if (!data?.valid) return null;
     return (
-        <PersonDetaljer
-            copy={false}
-            spacing={false}
-            navn={data.navn ?? "UKJENT NAVN"}
-            ident={data.ident}
-            rolle={hentRolle(data.ident)}
-        />
+        <Panel>
+            <PersonDetaljer
+                copy={false}
+                spacing={false}
+                navn={data.navn ?? "UKJENT NAVN"}
+                // ident={data.ident}
+                rolle={hentRolle(data.ident)}
+            />
+            <div className="pt-3">
+                <Heading size="xsmall">Adresse:</Heading>
+                <AdresseInfo adresse={data.adresse} />
+            </div>
+        </Panel>
     );
 }

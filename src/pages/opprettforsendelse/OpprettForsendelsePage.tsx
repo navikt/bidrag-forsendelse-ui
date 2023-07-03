@@ -15,13 +15,14 @@ import MottakerSelect from "./MottakerSelect";
 import { useOpprettForsendelse } from "./OpprettForsendelseContext";
 import SlettForsendelseButton from "./SlettForsendelseButton";
 
+export type MottakerFormProps = {
+    ident?: string;
+    navn?: string;
+    adresse?: MottakerAdresseTo;
+};
 export type OpprettForsendelseFormProps = {
     gjelderIdent: string;
-    mottaker: {
-        ident?: string;
-        navn?: string;
-        adresse?: MottakerAdresseTo;
-    };
+    mottaker: MottakerFormProps;
     dokument: {
         malId: string;
         tittel: string;
