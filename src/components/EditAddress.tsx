@@ -89,7 +89,7 @@ function EditPostcodeAndState(props: EditAddressProps) {
     const poststedFormKey = `${formPrefix}poststed`;
     const postnummerFormKey = `${formPrefix}postnummer`;
     return (
-        <div className={`flex gap-x-4 pb-2 pt-2 w-full ${isNorway ? "" : "flex-col"}`}>
+        <div className={`flex gap-x-4 pb-2 pt-2 w-auto ${isNorway ? "" : "flex-col"}`}>
             {isNorway ? (
                 <>
                     <Controller
@@ -118,6 +118,7 @@ function EditPostcodeAndState(props: EditAddressProps) {
                     <TextField
                         {...register(poststedFormKey, { required: "Skriv inn gyldig postnummer" })}
                         size="small"
+                        className="w-full"
                         label={"Poststed (fylles automatisk)"}
                         disabled={true}
                     />

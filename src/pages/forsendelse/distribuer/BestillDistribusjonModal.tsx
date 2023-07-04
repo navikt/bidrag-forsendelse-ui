@@ -8,8 +8,8 @@ import { useQuery } from "react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../../../api/api";
 import { PERSON_API } from "../../../api/api";
+import { DistribuerTilAdresse } from "../../../api/BidragDokumentApi";
 import { DistribuerJournalpostRequest } from "../../../api/BidragForsendelseApi";
-import { DistribuerTilAdresse } from "../../../api/BidragForsendelseApi";
 import { hentPostnummere } from "../../../api/queries";
 import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
 import { RedirectTo } from "../../../utils/RedirectUtils";
@@ -56,7 +56,7 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
                 adresselinje1: adresseResponse.adresselinje1 ?? "",
             });
         }
-    }, [personAdresseQuery]);
+    }, [personAdresseQuery.status]);
 
     const distribuerMutation = useMutation({
         mutationFn: () => {
@@ -155,7 +155,7 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
                         <BodyShort>Distribusjon bestilt. Åpner sakshistorikk</BodyShort>
                     </Alert>
                 )}
-                <div className={"min-w-[35rem] relative px-2 w-full max-w-2xl h-full md:h-auto"}>
+                <div className={"min-w-[35rem] relative px-2 w-full max-w-3xl h-full md:h-auto"}>
                     {renderModalBody()}
                 </div>
             </Modal.Content>

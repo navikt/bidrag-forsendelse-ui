@@ -1,11 +1,12 @@
 import { BodyShort } from "@navikt/ds-react";
 import React from "react";
 
+import { DistribuerTilAdresse } from "../api/BidragDokumentApi";
 import { MottakerAdresseTo } from "../api/BidragForsendelseApi";
 import { countryCodeToName } from "../utils/AdresseUtils";
 
 interface AdresseInfoProps {
-    adresse?: MottakerAdresseTo;
+    adresse?: MottakerAdresseTo & DistribuerTilAdresse;
 }
 
 function renderDetailWhenExists(...values: string[]) {
@@ -22,7 +23,7 @@ export default function AdresseInfo({ adresse }: AdresseInfoProps) {
             {renderDetailWhenExists(adresse?.adresselinje2)}
             {renderDetailWhenExists(adresse?.adresselinje3)}
             {renderDetailWhenExists(adresse?.postnummer, adresse?.poststed)}
-            {renderDetailWhenExists(countryCodeToName(adresse?.landkode))}
+            {renderDetailWhenExists(countryCodeToName(adresse?.landkode ?? adresse.land))}
         </>
     );
 }
