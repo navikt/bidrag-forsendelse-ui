@@ -82,7 +82,6 @@ function OpprettForsendelseUnderOpprettelse() {
         },
     });
     function onSubmit(data: OpprettForsendelseFormProps) {
-        console.log("onSubmit", data);
         opprettForsendelseFn.mutate(data);
     }
     return (
@@ -145,7 +144,6 @@ function OpprettForsendelseNy() {
         },
     });
     function onSubmit(data: OpprettForsendelseFormProps) {
-        console.log("onSubmit", data);
         opprettForsendelseFn.mutate(data);
     }
     return (
@@ -183,17 +181,6 @@ function OpprettForsendelsContainer({ onSubmit }: OpprettForsendelsContainerProp
                                     <Button size="small" loading={isLoading}>
                                         Opprett
                                     </Button>
-                                    {/* <Button
-                                        size="small"
-                                        variant="tertiary"
-                                        type="button"
-                                        disabled={isLoading}
-                                        onClick={() => {
-                                            RedirectTo.sakshistorikk(saksnummer);
-                                        }}
-                                    >
-                                        Avbryt
-                                    </Button> */}
                                     <SlettForsendelseButton />
                                 </div>
                             </form>

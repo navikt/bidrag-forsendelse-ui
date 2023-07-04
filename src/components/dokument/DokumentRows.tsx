@@ -17,7 +17,6 @@ import { useMutation } from "react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../../api/api";
 import { DokumentStatus } from "../../constants/DokumentStatus";
-import { useForsendelseApi } from "../../hooks/useForsendelseApi";
 import { FormIDokument, useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IForsendelseFormProps } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { useSession } from "../../pages/forsendelse/context/SessionContext";
@@ -69,13 +68,14 @@ export default function DokumentRows() {
 }
 
 function DokumenterTableBottomButtons() {
-    const { isSavingChanges, hasChanged, saveChanges, resetDocumentChanges } = useDokumenterForm();
+    const { isSavingChanges, hasChanged, saveChanges, resetDocumentChanges, dokumenter } = useDokumenterForm();
+    const isOneOrMoreDocumentsDeleted = dokumenter.some((d) => d.status == DokumentStatus.SLETTET);
     return (
         <div className={"flex flex-row mt-[10px]"}>
-            {hasChanged && (
+            {hasChanged && isOneOrMoreDocumentsDeleted && (
                 <>
-                    <Button loading={isSavingChanges} onClick={saveChanges} variant={"secondary"} size={"small"}>
-                        Bekreft
+                    <Button loading={isSavingChanges} onClick={saveChanges} variant={"danger"} size={"small"}>
+                        Bekreft sletting
                     </Button>
                     <Button onClick={resetDocumentChanges} variant={"tertiary"} size={"small"}>
                         Angre
@@ -96,9 +96,20 @@ interface IDokumentRowProps {
     style: CSSProperties;
 }
 const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
-    ({ id, dokument, forsendelseId, index, deleteDocument, listeners, attributes, style }: IDokumentRowProps, ref) => {
+    (
+        {
+            id,
+            dokument,
+            forsendelseId,
+            index: rowIndex,
+            deleteDocument,
+            listeners,
+            attributes,
+            style,
+        }: IDokumentRowProps,
+        ref
+    ) => {
         const { tittel, index: dokindex, status, journalpostId, dokumentreferanse, dokumentDato } = dokument;
-        const forsendelse = useForsendelseApi().hentForsendelse();
         const {
             register,
             formState: { errors },
@@ -124,19 +135,20 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
         const forsendelseIdNumeric = dokument.forsendelseId ?? forsendelseId?.replace("BIF-", "");
         const originalDokumentreferanse = dokument.lenkeTilDokumentreferanse ?? dokument.dokumentreferanse;
 
+        const index = dokindex == -1 ? rowIndex : dokindex;
         return (
             <Table.Row
-                key={index + dokumentreferanse + journalpostId}
+                key={rowIndex + dokumentreferanse + journalpostId}
                 ref={ref}
                 style={getRowStyle()}
-                className={`dokument-row ${errors.dokumenter?.[index]?.message ? "error" : ""}`}
+                className={`dokument-row ${errors.dokumenter?.[rowIndex]?.message ? "error" : ""}`}
             >
                 <Table.DataCell style={{ width: "3px" }} className={"cursor-all-scroll"} {...listeners} {...attributes}>
                     <DragVerticalIcon />
                 </Table.DataCell>
-                <Table.DataCell style={{ width: "3px" }}>{dokindex + 1}</Table.DataCell>
+                <Table.DataCell style={{ width: "3px" }}>{index + 1}</Table.DataCell>
                 <Table.DataCell scope="row" style={{ width: "550px" }}>
-                    <EditableDokumentTitle dokument={dokument} index={index} />
+                    <EditableDokumentTitle dokument={dokument} index={rowIndex} />
                 </Table.DataCell>
                 <Table.DataCell style={{ width: "100px" }}>{dayjs(dokumentDato).format("DD.MM.YYYY")}</Table.DataCell>
                 <Table.DataCell style={{ width: "200px" }}>

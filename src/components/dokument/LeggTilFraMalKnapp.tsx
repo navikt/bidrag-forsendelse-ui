@@ -15,7 +15,7 @@ import { IDokument } from "../../types/Dokument";
 import DokumentValgForsendelse from "./DokumentValgForsendelse";
 
 export default function LeggTilFraMalKnapp() {
-    const { addDocuments } = useDokumenterForm();
+    const { addDocuments, saveChanges } = useDokumenterForm();
     const [modalOpen, setModalOpen] = useState(false);
 
     return (
@@ -27,6 +27,7 @@ export default function LeggTilFraMalKnapp() {
                 open={modalOpen}
                 onClose={(selectedDocuments) => {
                     selectedDocuments && addDocuments([selectedDocuments]);
+                    saveChanges();
                     setModalOpen(false);
                 }}
             />

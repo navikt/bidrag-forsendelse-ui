@@ -33,7 +33,7 @@ import DokumentStatusTag from "./DokumentStatusTag";
 import OpenDokumentButton from "./OpenDokumentButton";
 
 export default function LeggTilDokumentKnapp() {
-    const { addDocuments } = useDokumenterForm();
+    const { addDocuments, saveChanges } = useDokumenterForm();
     const [modalOpen, setModalOpen] = useState(false);
 
     return (
@@ -45,6 +45,7 @@ export default function LeggTilDokumentKnapp() {
                 open={modalOpen}
                 onClose={(selectedDocuments) => {
                     addDocuments(selectedDocuments);
+                    saveChanges();
                     setModalOpen(false);
                 }}
             />
