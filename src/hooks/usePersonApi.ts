@@ -5,6 +5,7 @@ import { useQuery } from "react-query";
 import { PERSON_API, SAMHANDLER_API } from "../api/api";
 import { MottakerAdresseTo } from "../api/BidragForsendelseApi";
 import { PersonDto } from "../api/BidragPersonApi";
+import { countryCodeIso3ToIso2 } from "../utils/AdresseUtils";
 
 type PersonInfo = { ident: string; navn?: string; valid?: boolean; adresse?: MottakerAdresseTo };
 
@@ -41,6 +42,8 @@ export default function useSamhandlerPersonApi() {
                         adresse: {
                             adresselinje1: "",
                             ...result.data.adresse,
+                            landkode: countryCodeIso3ToIso2(result.data.adresse?.land),
+                            landkode3: result.data.adresse?.land,
                         },
                     };
                 } else if (IdentUtils.isFnr(ident)) {

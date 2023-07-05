@@ -53,6 +53,7 @@ function OpprettForsendelseUnderOpprettelse() {
                 mottaker: {
                     ident: data.mottaker.ident,
                     navn: data.mottaker.navn,
+                    adresse: data.mottaker?.adresse,
                 },
                 tema: data.tema as JournalTema,
                 språk: data.språk,
@@ -102,6 +103,7 @@ function OpprettForsendelseNy() {
                 mottaker: {
                     ident: data.mottaker.ident,
                     navn: data.mottaker.navn,
+                    adresse: data.mottaker?.adresse,
                 },
                 saksnummer,
                 behandlingInfo: {

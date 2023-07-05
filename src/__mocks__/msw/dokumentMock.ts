@@ -16,5 +16,12 @@ export default function dokumentMock(): RestHandler[] {
                 ctx.body(JSON.stringify(journalposterSakMap.get(saksnummer)))
             );
         }),
+        rest.get(`${baseUrl}/journal/:forsendelseId/avvik`, async (req: RestRequest, res, ctx) => {
+            return res(
+                ctx.set("Content-Type", "application/json"),
+                ctx.delay(500),
+                ctx.body(JSON.stringify(["FEILFORE_SAK", "SLETT_JOURNALPOST", "ENDRE_FAGOMRADE"]))
+            );
+        }),
     ];
 }

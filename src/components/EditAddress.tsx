@@ -13,7 +13,7 @@ import { useWatch } from "react-hook-form";
 import { DistribuerTilAdresse } from "../api/BidragDokumentApi";
 import { hentPostnummere } from "../api/queries";
 import { hentLandkoder } from "../api/queries";
-import { isCountryCodeNorway } from "../types/AdresseUtils";
+import { isCountryCodeNorway } from "../utils/AdresseUtils";
 
 interface EditAddressFormProps {
     address?: DistribuerTilAdresse;

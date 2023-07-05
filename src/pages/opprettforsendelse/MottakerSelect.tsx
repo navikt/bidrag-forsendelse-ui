@@ -54,7 +54,6 @@ export default function MottakerSelect() {
         }
     }
 
-    console.log(watch("mottaker"));
     return (
         <div>
             <Heading size="small">Mottaker</Heading>
@@ -82,7 +81,7 @@ export default function MottakerSelect() {
                             defaultValue={watch("mottaker.ident")}
                             onChange={(ident) => setValue("mottaker.ident", ident)}
                         />
-                        <MottakerNavn />
+                        <MottakerNavnOgAdresse />
                     </div>
                 </Tabs.Panel>
                 <Tabs.Panel value="FRITEKST" className="h-max w-full bg-gray-50 p-4">
@@ -111,13 +110,19 @@ function MottakerFritekst() {
     );
 }
 
-function MottakerNavn() {
+function MottakerNavnOgAdresse() {
+    const { setValue } = useOpprettForsendelseFormContext();
     const mottakerIdent: string = useWatch<OpprettForsendelseFormProps>({ name: "mottaker.ident" }) as string;
     const { data, isFetching, isError } = useSamhandlerPersonApi().hentSamhandlerEllerPersonForIdent(mottakerIdent);
     const roller = useForsendelseApi().hentRoller();
     function hentRolle(ident: string) {
         return roller.find((rolle) => rolle.ident == ident)?.rolleType;
     }
+    useEffect(() => {
+        if (data?.adresse) {
+            setValue("mottaker.adresse", data.adresse);
+        }
+    }, [data?.adresse]);
 
     if (isFetching) {
         return <Loader size="xsmall" />;
@@ -130,6 +135,7 @@ function MottakerNavn() {
         );
     }
     if (!data?.valid) return null;
+
     return (
         <Panel>
             <PersonDetaljer
