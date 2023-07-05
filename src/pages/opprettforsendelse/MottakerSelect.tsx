@@ -50,7 +50,12 @@ export default function MottakerSelect() {
         if (val == "SAMME_SOM_GJELDER") {
             setValue("mottaker.ident", gjelderIdent);
         } else {
-            setValue("mottaker", mottakerCache.current.get(val) ?? null);
+            const mottakerCacheValue = mottakerCache.current.get(val) ?? null;
+            if (val == "FRITEKST" && !mottakerCacheValue) {
+                setValue("mottaker.adresse.land", "NO");
+            } else {
+                setValue("mottaker", mottakerCacheValue);
+            }
         }
     }
 
@@ -101,7 +106,7 @@ function MottakerFritekst() {
     const { register, setValue, watch, control } = useOpprettForsendelseFormContext();
 
     return (
-        <div className="w-[300px] h-max">
+        <div className="w-[400px] h-max">
             <TextField className="mb-2" size="small" label="Navn" {...register("mottaker.navn")} />
             <React.Suspense fallback={<Loader />}>
                 <EditAddress formPrefix="mottaker.adresse" />
@@ -120,7 +125,10 @@ function MottakerNavnOgAdresse() {
     }
     useEffect(() => {
         if (data?.adresse) {
-            setValue("mottaker.adresse", data.adresse);
+            setValue("mottaker.adresse", {
+                ...data.adresse,
+                land: data.adresse.landkode,
+            });
         }
     }, [data?.adresse]);
 

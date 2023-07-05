@@ -25,10 +25,13 @@ type EditAddressProps = {
     formPrefix?: string;
 };
 export function EditAddress(props: EditAddressProps) {
+    const formPrefix = props.formPrefix ? `${props.formPrefix}.` : "";
+    const country = useWatch({ name: `${formPrefix}land` });
+    const isNorway = isCountryCodeNorway(country);
     return (
         <div className={"md:grow"}>
             <EditAddressLines {...props} />
-            <div className="flex flex-row gap-[5px] h-max items-center">
+            <div className="flex  gap-[5px] h-max items-center" style={{ flexDirection: isNorway ? "column" : "row" }}>
                 <EditPostcodeAndState {...props} />
                 <EditCountry {...props} />
             </div>
@@ -82,9 +85,9 @@ function EditPostcodeAndState(props: EditAddressProps) {
         clearErrors,
         formState: { errors },
     } = useFormContext<DistribuerTilAdresse>();
-    const country = useWatch({ name: "land" });
-    const isNorway = isCountryCodeNorway(country);
     const formPrefix = props.formPrefix ? `${props.formPrefix}.` : "";
+    const country = useWatch({ name: `${formPrefix}land` });
+    const isNorway = isCountryCodeNorway(country);
 
     const poststedFormKey = `${formPrefix}poststed`;
     const postnummerFormKey = `${formPrefix}postnummer`;
@@ -169,11 +172,11 @@ function EditAddressLines(props: EditAddressProps) {
         register,
         formState: { errors },
     } = useFormContext<DistribuerTilAdresse>();
+    const formPrefix = props.formPrefix ? `${props.formPrefix}.` : "";
 
-    const country = useWatch({ name: "land" });
+    const country = useWatch({ name: `${formPrefix}land` });
     const isNorway = isCountryCodeNorway(country);
 
-    const formPrefix = props.formPrefix ? `${props.formPrefix}.` : "";
     return (
         <div className={"flex flex-col gap-y-4"}>
             <TextField
@@ -249,6 +252,7 @@ function SelectableCountry({ onChange, defaultValue, inputRef, name, error }: Se
     function getLandByLandkode(landkode: string) {
         return landkoder.find((value) => Object.keys(value)[0] === landkode)[landkode];
     }
+
     return (
         <Select
             error={error}
@@ -261,15 +265,23 @@ function SelectableCountry({ onChange, defaultValue, inputRef, name, error }: Se
             defaultValue={defaultValue}
         >
             <option value={undefined}>{""}</option>
-            {landkoder.map((value) => {
-                const landkode = Object.keys(value)[0];
-                const land = value[landkode];
-                return (
-                    <option key={landkode} value={landkode}>
-                        {land}
-                    </option>
-                );
-            })}
+            {landkoder
+                .sort((a, b) => {
+                    const landkodeA = Object.keys(a)[0];
+                    const landkodeB = Object.keys(b)[0];
+                    const landA = a[landkodeA];
+                    const landB = b[landkodeB];
+                    return landA.localeCompare(landB);
+                })
+                .map((value) => {
+                    const landkode = Object.keys(value)[0];
+                    const land = value[landkode];
+                    return (
+                        <option key={landkode} value={landkode}>
+                            {land}
+                        </option>
+                    );
+                })}
         </Select>
     );
 }

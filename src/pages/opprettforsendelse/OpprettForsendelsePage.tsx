@@ -4,7 +4,7 @@ import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { useIsMutating, useMutation } from "react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../../api/api";
-import { JournalTema, MottakerAdresseTo } from "../../api/BidragForsendelseApi";
+import { JournalTema } from "../../api/BidragForsendelseApi";
 import GjelderSelect from "../../components/detaljer/GjelderSelect";
 import { useForsendelseApi, UseForsendelseApiKeys } from "../../hooks/useForsendelseApi";
 import { useSession } from "../forsendelse/context/SessionContext";
@@ -18,8 +18,18 @@ import SlettForsendelseButton from "./SlettForsendelseButton";
 export type MottakerFormProps = {
     ident?: string;
     navn?: string;
-    adresse?: MottakerAdresseTo;
+    adresse?: MottakerAdresseFormTo;
 };
+
+export interface MottakerAdresseFormTo {
+    adresselinje1?: string;
+    adresselinje2?: string;
+    adresselinje3?: string;
+    bruksenhetsnummer?: string;
+    land?: string;
+    postnummer?: string;
+    poststed?: string;
+}
 export type OpprettForsendelseFormProps = {
     gjelderIdent: string;
     mottaker: MottakerFormProps;
@@ -53,7 +63,7 @@ function OpprettForsendelseUnderOpprettelse() {
                 mottaker: {
                     ident: data.mottaker.ident,
                     navn: data.mottaker.navn,
-                    adresse: data.mottaker?.adresse,
+                    adresse: { ...data.mottaker?.adresse, landkode: data.mottaker?.adresse.land },
                 },
                 tema: data.tema as JournalTema,
                 språk: data.språk,
@@ -103,7 +113,7 @@ function OpprettForsendelseNy() {
                 mottaker: {
                     ident: data.mottaker.ident,
                     navn: data.mottaker.navn,
-                    adresse: data.mottaker?.adresse,
+                    adresse: { ...data.mottaker?.adresse, landkode: data.mottaker?.adresse.land },
                 },
                 saksnummer,
                 behandlingInfo: {
