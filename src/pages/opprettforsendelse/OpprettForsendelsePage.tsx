@@ -63,7 +63,9 @@ function OpprettForsendelseUnderOpprettelse() {
                 mottaker: {
                     ident: data.mottaker.ident,
                     navn: data.mottaker.navn,
-                    adresse: { ...data.mottaker?.adresse, landkode: data.mottaker?.adresse?.land },
+                    adresse: data.mottaker?.adresse
+                        ? { ...data.mottaker?.adresse, landkode: data.mottaker?.adresse?.land }
+                        : undefined,
                 },
                 tema: data.tema as JournalTema,
                 språk: data.språk,
@@ -113,7 +115,9 @@ function OpprettForsendelseNy() {
                 mottaker: {
                     ident: data.mottaker.ident,
                     navn: data.mottaker.navn,
-                    adresse: { ...data.mottaker?.adresse, landkode: data.mottaker?.adresse?.land },
+                    adresse: data.mottaker?.adresse
+                        ? { ...data.mottaker?.adresse, landkode: data.mottaker?.adresse?.land }
+                        : undefined,
                 },
                 saksnummer,
                 behandlingInfo: {
