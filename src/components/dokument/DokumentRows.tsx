@@ -13,13 +13,10 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { CSSProperties } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
-import { useMutation } from "react-query";
 
-import { BIDRAG_FORSENDELSE_API } from "../../api/api";
 import { DokumentStatus } from "../../constants/DokumentStatus";
 import { FormIDokument, useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IForsendelseFormProps } from "../../pages/forsendelse/context/DokumenterFormContext";
-import { useSession } from "../../pages/forsendelse/context/SessionContext";
 import { IDokument } from "../../types/Dokument";
 import TableDraggableBody from "../table/TableDraggableBody";
 import DokumentLinkedTag from "./DokumentLinkedTag";
@@ -191,12 +188,9 @@ interface IEditableDokumentTitleProps {
 }
 function EditableDokumentTitle({ dokument, index }: IEditableDokumentTitleProps) {
     const [inEditMode, setInEditMode] = useState(false);
-    const { forsendelseId } = useSession();
     const enableBlurEvent = useRef(false);
-    const oppdaterDokumentTittelFn = useMutation({
-        mutationFn: (tittel: string) =>
-            BIDRAG_FORSENDELSE_API.api.oppdaterDokument(forsendelseId, dokument.dokumentreferanse, { tittel }),
-    });
+    const { updateTitle } = useDokumenterForm();
+
     const {
         register,
         setValue,
@@ -204,9 +198,9 @@ function EditableDokumentTitle({ dokument, index }: IEditableDokumentTitleProps)
     } = useFormContext<IForsendelseFormProps>();
     const value = useWatch({ name: `dokumenter.${index}.tittel` });
 
-    function updateTitle(e) {
+    function _updateTitle(e) {
         setInEditMode(false);
-        oppdaterDokumentTittelFn.mutate(value);
+        updateTitle(value, dokument.dokumentreferanse);
     }
 
     function onKeyDown(e: React.KeyboardEvent) {
@@ -224,7 +218,7 @@ function EditableDokumentTitle({ dokument, index }: IEditableDokumentTitleProps)
                 setTimeout(() => (enableBlurEvent.current = true), 500);
                 setInEditMode(true);
             }}
-            onBlur={updateTitle}
+            onBlur={_updateTitle}
             onKeyDown={onKeyDown}
         >
             {inEditMode ? (

@@ -10,6 +10,7 @@ import { QueryClient } from "react-query";
 
 import { initMock } from "../__mocks__/msw";
 import DokumentStatusTag from "../components/dokument/DokumentStatusTag";
+import ErrorProvider from "../context/ErrorProvider";
 const mdxComponents = { Heading, DokumentStatusTag, BodyShort };
 
 dayjs.extend(customParseFormat);
@@ -23,6 +24,9 @@ const initReactQuery = () =>
                 retry: 3,
                 retryDelay: 3000,
             },
+            mutations: {
+                onError: (err, variables, context) => console.log("err", err, variables, context),
+            },
         },
     });
 
@@ -33,11 +37,13 @@ interface PageWrapperProps {
 export default function PageWrapper({ children, name }: PropsWithChildren<PageWrapperProps>) {
     return (
         <MDXProvider components={mdxComponents}>
-            <QueryClientProvider client={queryClient}>
-                <div id={name} className={"w-full"}>
-                    {children}
-                </div>
-            </QueryClientProvider>
+            <ErrorProvider>
+                <QueryClientProvider client={queryClient}>
+                    <div id={name} className={"w-full"}>
+                        {children}
+                    </div>
+                </QueryClientProvider>
+            </ErrorProvider>
         </MDXProvider>
     );
 }

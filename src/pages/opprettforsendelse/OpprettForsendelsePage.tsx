@@ -4,8 +4,10 @@ import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { useIsMutating, useMutation } from "react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../../api/api";
-import { JournalTema } from "../../api/BidragForsendelseApi";
+import { JournalTema, OppdaterForsendelseForesporsel } from "../../api/BidragForsendelseApi";
 import GjelderSelect from "../../components/detaljer/GjelderSelect";
+import BidragErrorPanel from "../../context/BidragErrorPanel";
+import { useErrorContext } from "../../context/ErrorProvider";
 import { useForsendelseApi, UseForsendelseApiKeys } from "../../hooks/useForsendelseApi";
 import { useSession } from "../forsendelse/context/SessionContext";
 import { queryClient } from "../PageWrapper";
@@ -43,6 +45,29 @@ export type OpprettForsendelseFormProps = {
     enhet: string;
 };
 
+function mapToOpprettEllerOppdaterForsendelseRequest(
+    data: OpprettForsendelseFormProps
+): OppdaterForsendelseForesporsel {
+    return {
+        gjelderIdent: data.gjelderIdent,
+        mottaker: {
+            ident: data.mottaker.ident,
+            navn: data.mottaker.navn,
+            adresse: data.mottaker?.adresse
+                ? { ...data.mottaker?.adresse, landkode: data.mottaker?.adresse?.land }
+                : undefined,
+        },
+        tema: data.tema as JournalTema,
+        språk: data.språk,
+        dokumenter: [
+            {
+                dokumentmalId: data.dokument.malId,
+                tittel: data.dokument.tittel,
+            },
+        ],
+    };
+}
+
 const OPPRETT_FORSENDELSE_MUTATION_KEY = "opprettForsendelse";
 export const useOpprettForsendelseFormContext = () => useFormContext<OpprettForsendelseFormProps>();
 
@@ -54,31 +79,21 @@ export default function OpprettForsendelsePage() {
     return <OpprettForsendelseNy />;
 }
 function OpprettForsendelseUnderOpprettelse() {
+    const { addError } = useErrorContext();
     const { forsendelseId, navigateToForsendelse } = useSession();
     const opprettForsendelseFn = useMutation({
         mutationKey: OPPRETT_FORSENDELSE_MUTATION_KEY,
         mutationFn: (data: OpprettForsendelseFormProps) =>
-            BIDRAG_FORSENDELSE_API.api.oppdaterForsendelse(forsendelseId, {
-                gjelderIdent: data.gjelderIdent,
-                mottaker: {
-                    ident: data.mottaker.ident,
-                    navn: data.mottaker.navn,
-                    adresse: data.mottaker?.adresse
-                        ? { ...data.mottaker?.adresse, landkode: data.mottaker?.adresse?.land }
-                        : undefined,
-                },
-                tema: data.tema as JournalTema,
-                språk: data.språk,
-                dokumenter: [
-                    {
-                        dokumentmalId: data.dokument.malId,
-                        tittel: data.dokument.tittel,
-                    },
-                ],
-            }),
+            BIDRAG_FORSENDELSE_API.api.oppdaterForsendelse(
+                forsendelseId,
+                mapToOpprettEllerOppdaterForsendelseRequest(data)
+            ),
         onSuccess: (data) => {
             navigateToForsendelse(forsendelseId, "UTGÅENDE");
             queryClient.refetchQueries(UseForsendelseApiKeys.forsendelse);
+        },
+        onError: () => {
+            addError("Kunne ikke opprette forsendelse. Vennligst prøv på nytt");
         },
     });
 
@@ -106,19 +121,16 @@ function OpprettForsendelseUnderOpprettelse() {
 
 function OpprettForsendelseNy() {
     const { saksnummer, enhet, navigateToForsendelse } = useSession();
+    const { addError } = useErrorContext();
     const options = useOpprettForsendelse();
     const opprettForsendelseFn = useMutation({
         mutationKey: OPPRETT_FORSENDELSE_MUTATION_KEY,
-        mutationFn: (data: OpprettForsendelseFormProps) =>
-            BIDRAG_FORSENDELSE_API.api.opprettForsendelse({
+        mutationFn: (data: OpprettForsendelseFormProps) => {
+            const request = mapToOpprettEllerOppdaterForsendelseRequest(data);
+            return BIDRAG_FORSENDELSE_API.api.opprettForsendelse({
+                ...request,
                 gjelderIdent: data.gjelderIdent,
-                mottaker: {
-                    ident: data.mottaker.ident,
-                    navn: data.mottaker.navn,
-                    adresse: data.mottaker?.adresse
-                        ? { ...data.mottaker?.adresse, landkode: data.mottaker?.adresse?.land }
-                        : undefined,
-                },
+                enhet: enhet ?? "4806",
                 saksnummer,
                 behandlingInfo: {
                     soknadFra: options.soknadFra,
@@ -130,17 +142,19 @@ function OpprettForsendelseNy() {
                     engangsBelopType: options.engangsBelopType,
                     erFattetBeregnet: options.erFattetBeregnet,
                 },
-                enhet: enhet ?? "4806",
-                tema: data.tema as JournalTema,
-                språk: data.språk,
                 dokumenter: [
                     {
                         dokumentmalId: data.dokument.malId,
                         tittel: data.dokument.tittel,
                         språk: data.språk,
+                        bestillDokument: true,
                     },
                 ],
-            }),
+            });
+        },
+        onError: () => {
+            addError("Kunne ikke opprette forsendelse. Vennligst prøv på nytt");
+        },
         onSuccess: (data) => {
             const forsendelseId = data.data.forsendelseId;
             navigateToForsendelse(forsendelseId?.toString(), data.data.forsendelseType);
@@ -193,6 +207,7 @@ function OpprettForsendelsContainer({ onSubmit }: OpprettForsendelsContainerProp
                                 <div className="w-2/3">
                                     <DokumentValgOpprett />
                                 </div>
+                                <BidragErrorPanel />
                                 <div className="flex flex-row gap-2 pt-4">
                                     <Button size="small" loading={isLoading}>
                                         Opprett

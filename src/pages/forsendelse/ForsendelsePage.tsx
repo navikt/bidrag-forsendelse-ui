@@ -8,6 +8,7 @@ import { PropsWithChildren } from "react";
 
 import DokumenterTable from "../../components/dokument/DokumenterTable";
 import InfoKnapp from "../../components/InfoKnapp";
+import BidragErrorPanel from "../../context/BidragErrorPanel";
 import DokumentTableInfo from "../../docs/DokumentTable.mdx";
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
 import OpprettForsendelsePage from "../opprettforsendelse/OpprettForsendelsePage";
@@ -62,6 +63,7 @@ function ForsendelseView() {
                         </div>
                         <div className={"mt-10"}>
                             <ValidationErrorSummary />
+                            <BidragErrorPanel />
 
                             <div className={"mt-2 flex flex-row gap-[5px]"}>
                                 <SendButton />

@@ -13,6 +13,7 @@ import { useMutation } from "react-query";
 import { BIDRAG_FORSENDELSE_API } from "../../../api/api";
 import { OppdaterForsendelseForesporsel } from "../../../api/BidragForsendelseApi";
 import { DokumentStatus } from "../../../constants/DokumentStatus";
+import { useErrorContext } from "../../../context/ErrorProvider";
 import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
 import { IDokument } from "../../../types/Dokument";
 import { queryClient } from "../../PageWrapper";
@@ -30,6 +31,7 @@ interface IDokumenterContext {
     deleteDocument: (deleteDocument: FormIDokument) => void;
     updateDocument: (updatedDocument: FormIDokument) => void;
     resetDocumentChanges: () => void;
+    updateTitle: (tittel: string, dokumentreferanse: string) => void;
 }
 
 interface IDokumenterPropsContext {
@@ -40,6 +42,7 @@ export interface IForsendelseFormProps {
     dokumenter: IDokument[];
 }
 
+export type OppdaterDokumentTittelMutationProps = { tittel: string; dokumentreferanse: string };
 export const DokumenterFormContext = createContext<IDokumenterContext>({} as IDokumenterContext);
 
 function DokumenterFormProvider({ children, ...props }: PropsWithChildren<IDokumenterPropsContext>) {
@@ -58,6 +61,7 @@ function DokumenterFormProvider({ children, ...props }: PropsWithChildren<IDokum
 }
 
 function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumenterPropsContext>) {
+    const { addError } = useErrorContext();
     const forsendelse = useForsendelseApi().hentForsendelse();
     const {
         reset,
@@ -67,6 +71,15 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
     } = useFormContext<IForsendelseFormProps>();
     const { fields, append, update, swap } = useFieldArray<IForsendelseFormProps>({
         name: "dokumenter",
+    });
+
+    const oppdaterDokumentTittelFn = useMutation<unknown, unknown, OppdaterDokumentTittelMutationProps>({
+        mutationFn: ({ tittel, dokumentreferanse }) =>
+            BIDRAG_FORSENDELSE_API.api.oppdaterDokument(forsendelse.forsendelseId, dokumentreferanse, { tittel }),
+        onError: (error, variables, context) => {
+            console.log(error, variables, context);
+            addError(`Det skjedde en feil ved lagring av dokumentittel "${variables.tittel}"`);
+        },
     });
 
     const oppdaterDokumenterMutation = useMutation({
@@ -88,6 +101,7 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
         },
         onError: (error, variables, context) => {
             console.log(error, variables, context);
+            addError("Det skjedde en feil ved lagring");
         },
     });
     useEffect(() => {
@@ -160,6 +174,8 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
                 saveChanges: handleSubmit(saveChanges),
                 swapDocuments: swap,
                 resetDocumentChanges: resetForm,
+                updateTitle: (tittel, dokumentreferanse) =>
+                    oppdaterDokumentTittelFn.mutate({ tittel, dokumentreferanse }),
             }}
         >
             {children}
