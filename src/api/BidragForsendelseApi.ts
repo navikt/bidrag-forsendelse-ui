@@ -19,7 +19,7 @@ export interface BehandlingInfoDto {
     vedtakType?: VedtakType;
     erFattetBeregnet?: boolean;
     soknadFra?: SoknadFra;
-    roller?: string[];
+    roller: string[];
 }
 
 /** Arkivsystem hvor dokument er lagret */
@@ -60,7 +60,7 @@ export enum JournalTema {
 
 /** Adresse til mottaker hvis dokumentet sendes som brev */
 export interface MottakerAdresseTo {
-    adresselinje1?: string;
+    adresselinje1: string;
     adresselinje2?: string;
     adresselinje3?: string;
     bruksenhetsnummer?: string;
@@ -106,9 +106,9 @@ export interface OpprettDokumentForesporsel {
     /** DokumentmalId sier noe om dokumentets innhold og oppbygning. (Også kjent som brevkode) */
     dokumentmalId?: string;
     /** Dette skal være UNDER_PRODUKSJON for redigerbare dokumenter som ikke er ferdigprodusert. Ellers settes det til FERDIGSTILT */
-    status?: DokumentStatusTo;
+    status: DokumentStatusTo;
     /** Om dokumentet med dokumentmalId skal bestilles. Hvis dette er satt til false så antas det at kallende system bestiller dokumentet selv. */
-    bestillDokument?: boolean;
+    bestillDokument: boolean;
 }
 
 /** Metadata for opprettelse av forsendelse */
@@ -219,22 +219,6 @@ export interface OpprettForsendelseRespons {
     dokumenter: DokumentRespons[];
 }
 
-export interface HentDokumentValgRequest {
-    vedtakType?: VedtakType;
-    behandlingType?: string;
-    soknadFra?: SoknadFra;
-    erFattetBeregnet?: boolean;
-    vedtakId?: string;
-    behandlingId?: string;
-    enhet?: string;
-}
-
-export interface DokumentMalDetaljer {
-    beskrivelse: string;
-    type: "UTGÅENDE" | "NOTAT";
-    kanBestilles: boolean;
-}
-
 /** En avvikshendelse som kan utføres på en journalpost */
 export interface Avvikshendelse {
     /** Type avvik */
@@ -242,7 +226,7 @@ export interface Avvikshendelse {
     /** Manuell beskrivelse av avvik */
     beskrivelse?: string;
     /** Eventuelle detaljer som skal følge avviket */
-    detaljer?: Record<string, any>;
+    detaljer: Record<string, string>;
     /** Saksnummer til sak når journalpost er journalført */
     saksnummer?: string;
     /** Adresse for hvor brev sendes ved sentral print */
@@ -310,6 +294,22 @@ export interface DistribuerJournalpostResponse {
     bestillingsId?: string;
 }
 
+export interface HentDokumentValgRequest {
+    vedtakType?: VedtakType;
+    behandlingType?: string;
+    soknadFra?: SoknadFra;
+    erFattetBeregnet?: boolean;
+    vedtakId?: string;
+    behandlingId?: string;
+    enhet?: string;
+}
+
+export interface DokumentMalDetaljer {
+    beskrivelse: string;
+    type: "UTGÅENDE" | "NOTAT";
+    kanBestilles: boolean;
+}
+
 /** Metadata for dokument som skal knyttes til forsendelsen. Første dokument i listen blir automatisk satt som hoveddokument i forsendelsen */
 export interface OppdaterDokumentForesporsel {
     /** JournalpostId til dokumentet hvis det er allerede er lagret i arkivsystem */
@@ -353,31 +353,6 @@ export interface OppdaterForsendelseResponse {
     tittel?: string;
     /** Liste med dokumenter som er knyttet til journalposten */
     dokumenter: DokumentRespons[];
-}
-
-/** Metadata for dokument som skal knyttes til journalpost */
-export interface OpprettDokumentDto {
-    /** Dokumentets tittel */
-    tittel: string;
-    /** Typen dokument. Brevkoden sier noe om dokumentets innhold og oppbygning. */
-    brevkode?: string;
-    /** Referansen til dokumentet hvis det er lagret i et annet arkivsystem */
-    dokumentreferanse?: string;
-    /**
-     * Selve PDF dokumentet formatert som Base64
-     * @deprecated
-     */
-    dokument?: string;
-    /** @format byte */
-    fysiskDokument?: string;
-}
-
-/** Metadata til en respons etter journalpost ble opprettet */
-export interface OpprettJournalpostResponse {
-    /** Journalpostid på journalpost som ble opprettet */
-    journalpostId?: string;
-    /** Liste med dokumenter som er knyttet til journalposten */
-    dokumenter: OpprettDokumentDto[];
 }
 
 export interface FerdigstillDokumentRequest {
@@ -745,6 +720,23 @@ export interface JournalpostResponse {
     sakstilknytninger: string[];
 }
 
+/** Metadata om forsendelse */
+export interface ForsendelseIkkeDistribuertResponsTo {
+    /** Forsendelseid med BIF- prefiks */
+    forsendelseId?: string;
+    /** Bidragsak som forsendelsen er knyttet til */
+    saksnummer?: string;
+    /** NAV-enheten som oppretter forsendelsen */
+    enhet?: string;
+    /** Tittel på hoveddokumentet i forsendelsen */
+    tittel?: string;
+    /**
+     * Dato forsendelsen ble opprettet
+     * @format date-time
+     */
+    opprettetDato?: string;
+}
+
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType } from "axios";
 
 export type QueryParamsType = Record<string | number, any>;
@@ -925,24 +917,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             }),
 
         /**
-         * @description Henter dokumentmaler som er støttet av applikasjonen
-         *
-         * @tags forsendelse-innsyn-kontroller
-         * @name HentDokumentValg
-         * @request POST:/api/forsendelse/v2/dokumentvalg
-         * @secure
-         */
-        hentDokumentValg: (data: HentDokumentValgRequest, params: RequestParams = {}) =>
-            this.request<Record<string, DokumentMalDetaljer>, any>({
-                path: `/api/forsendelse/v2/dokumentvalg`,
-                method: "POST",
-                body: data,
-                secure: true,
-                type: ContentType.Json,
-                ...params,
-            }),
-
-        /**
          * @description Hent gyldige avvikstyper for forsendelse
          *
          * @tags avvik-kontroller
@@ -1043,6 +1017,48 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             }),
 
         /**
+         * @description Henter dokumentmaler som er støttet av applikasjonen
+         *
+         * @tags forsendelse-innsyn-kontroller
+         * @name HentDokumentValg
+         * @request POST:/api/forsendelse/dokumentvalg
+         * @secure
+         */
+        hentDokumentValg: (data: HentDokumentValgRequest, params: RequestParams = {}) =>
+            this.request<Record<string, DokumentMalDetaljer>, any>({
+                path: `/api/forsendelse/dokumentvalg`,
+                method: "POST",
+                body: data,
+                secure: true,
+                type: ContentType.Json,
+                ...params,
+            }),
+
+        /**
+         * @description Hent forsendelse med forsendelseid
+         *
+         * @tags forsendelse-innsyn-kontroller
+         * @name HentForsendelse
+         * @request GET:/api/forsendelse/{forsendelseIdMedPrefix}
+         * @secure
+         */
+        hentForsendelse: (
+            forsendelseIdMedPrefix: string,
+            query?: {
+                /** journalposten tilhører sak */
+                saksnummer?: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<any, ForsendelseResponsTo>({
+                path: `/api/forsendelse/${forsendelseIdMedPrefix}`,
+                method: "GET",
+                query: query,
+                secure: true,
+                ...params,
+            }),
+
+        /**
          * No description
          *
          * @tags endre-forsendelse-kontroller
@@ -1069,23 +1085,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * No description
          *
          * @tags endre-forsendelse-kontroller
-         * @name FerdigstillForsendelse
-         * @summary Ferdigstiller forsendelse ved å arkivere forsendelsen i Joark og dermed klargjør for eventuell distribuering
-         * @request PATCH:/api/forsendelse/{forsendelseIdMedPrefix}/ferdigstill
-         * @secure
-         */
-        ferdigstillForsendelse: (forsendelseIdMedPrefix: string, params: RequestParams = {}) =>
-            this.request<OpprettJournalpostResponse, OpprettJournalpostResponse>({
-                path: `/api/forsendelse/${forsendelseIdMedPrefix}/ferdigstill`,
-                method: "PATCH",
-                secure: true,
-                ...params,
-            }),
-
-        /**
-         * No description
-         *
-         * @tags endre-forsendelse-kontroller
          * @name OppdaterDokument
          * @summary Oppdater dokument i en forsendelsee
          * @request PATCH:/api/forsendelse/{forsendelseIdMedPrefix}/dokument/{dokumentreferanse}
@@ -1103,27 +1102,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 body: data,
                 secure: true,
                 type: ContentType.Json,
-                ...params,
-            }),
-
-        /**
-         * No description
-         *
-         * @tags endre-forsendelse-kontroller
-         * @name OpphevFerdigstillingAvDokument
-         * @summary Opphev ferdigstilling av dokument i en forsendelse
-         * @request PATCH:/api/forsendelse/{forsendelseIdMedPrefix}/dokument/{dokumentreferanse}/opphevFerdigstill
-         * @secure
-         */
-        opphevFerdigstillingAvDokument: (
-            forsendelseIdMedPrefix: string,
-            dokumentreferanse: string,
-            params: RequestParams = {}
-        ) =>
-            this.request<DokumentRespons, any>({
-                path: `/api/forsendelse/${forsendelseIdMedPrefix}/dokument/${dokumentreferanse}/opphevFerdigstill`,
-                method: "PATCH",
-                secure: true,
                 ...params,
             }),
 
@@ -1269,12 +1247,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          *
          * @tags forsendelse-innsyn-kontroller
          * @name StottedeDokumentmaler
-         * @request OPTIONS:/api/forsendelse/v2/dokumentmaler
+         * @request OPTIONS:/api/forsendelse/dokumentmaler
          * @secure
          */
         stottedeDokumentmaler: (params: RequestParams = {}) =>
             this.request<string[], any>({
-                path: `/api/forsendelse/v2/dokumentmaler`,
+                path: `/api/forsendelse/dokumentmaler`,
                 method: "OPTIONS",
                 secure: true,
                 ...params,
@@ -1285,28 +1263,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          *
          * @tags forsendelse-innsyn-kontroller
          * @name StottedeDokumentmalDetaljer
-         * @request OPTIONS:/api/forsendelse/v2/dokumentmaler/detaljer
+         * @request OPTIONS:/api/forsendelse/dokumentmaler/detaljer
          * @secure
          */
         stottedeDokumentmalDetaljer: (params: RequestParams = {}) =>
             this.request<Record<string, DokumentMalDetaljer>, any>({
-                path: `/api/forsendelse/v2/dokumentmaler/detaljer`,
-                method: "OPTIONS",
-                secure: true,
-                ...params,
-            }),
-
-        /**
-         * @description Henter dokumentmaler som er støttet av applikasjonen
-         *
-         * @tags forsendelse-journal-kontroller
-         * @name StottedeDokumentmaler1
-         * @request OPTIONS:/api/forsendelse/dokumentmaler
-         * @secure
-         */
-        stottedeDokumentmaler1: (params: RequestParams = {}) =>
-            this.request<string[], any>({
-                path: `/api/forsendelse/dokumentmaler`,
+                path: `/api/forsendelse/dokumentmaler/detaljer`,
                 method: "OPTIONS",
                 secure: true,
                 ...params,
@@ -1368,102 +1330,14 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             }),
 
         /**
-         * @description Hent forsendelse med forsendelseid
-         *
-         * @tags forsendelse-innsyn-kontroller
-         * @name HentForsendelse
-         * @request GET:/api/forsendelse/v2/{forsendelseIdMedPrefix}
-         * @secure
-         */
-        hentForsendelse: (
-            forsendelseIdMedPrefix: string,
-            query?: {
-                /** journalposten tilhører sak */
-                saksnummer?: string;
-            },
-            params: RequestParams = {}
-        ) =>
-            this.request<any, ForsendelseResponsTo>({
-                path: `/api/forsendelse/v2/${forsendelseIdMedPrefix}`,
-                method: "GET",
-                query: query,
-                secure: true,
-                ...params,
-            }),
-
-        /**
-         * @description Hent alle forsendelse med søknadId
-         *
-         * @tags forsendelse-innsyn-kontroller
-         * @name HentJournalSoknad
-         * @request GET:/api/forsendelse/v2/soknad/{soknadId}
-         * @secure
-         */
-        hentJournalSoknad: (soknadId: string, params: RequestParams = {}) =>
-            this.request<ForsendelseResponsTo[], any>({
-                path: `/api/forsendelse/v2/soknad/${soknadId}`,
-                method: "GET",
-                secure: true,
-                ...params,
-            }),
-
-        /**
-         * @description Hent alle forsendelse med saksnummer
-         *
-         * @tags forsendelse-innsyn-kontroller
-         * @name HentJournal
-         * @request GET:/api/forsendelse/v2/sak/{saksnummer}/journal
-         * @secure
-         */
-        hentJournal: (saksnummer: string, params: RequestParams = {}) =>
-            this.request<ForsendelseResponsTo[], any>({
-                path: `/api/forsendelse/v2/sak/${saksnummer}/journal`,
-                method: "GET",
-                secure: true,
-                ...params,
-            }),
-
-        /**
-         * @description Henter dokumentmaler som er støttet av applikasjonen
-         *
-         * @tags forsendelse-innsyn-kontroller
-         * @name HentDokumentValgNotater
-         * @request GET:/api/forsendelse/v2/dokumentvalg/notat
-         * @secure
-         */
-        hentDokumentValgNotater: (params: RequestParams = {}) =>
-            this.request<Record<string, DokumentMalDetaljer>, any>({
-                path: `/api/forsendelse/v2/dokumentvalg/notat`,
-                method: "GET",
-                secure: true,
-                ...params,
-            }),
-
-        /**
-         * @description Henter dokumentmaler som er støttet av applikasjonen
-         *
-         * @tags forsendelse-innsyn-kontroller
-         * @name HentDokumentValgForForsendelse
-         * @request GET:/api/forsendelse/v2/dokumentvalg/forsendelse/{forsendelseIdMedPrefix}
-         * @secure
-         */
-        hentDokumentValgForForsendelse: (forsendelseIdMedPrefix: string, params: RequestParams = {}) =>
-            this.request<Record<string, DokumentMalDetaljer>, any>({
-                path: `/api/forsendelse/v2/dokumentvalg/forsendelse/${forsendelseIdMedPrefix}`,
-                method: "GET",
-                secure: true,
-                ...params,
-            }),
-
-        /**
          * @description Hent alle forsendelse som har saksnummer
          *
          * @tags forsendelse-journal-kontroller
-         * @name HentJournal1
+         * @name HentJournal
          * @request GET:/api/forsendelse/sak/{saksnummer}/journal
          * @secure
          */
-        hentJournal1: (
+        hentJournal: (
             saksnummer: string,
             query?: {
                 fagomrade?: ("BID" | "FAR")[];
@@ -1474,6 +1348,38 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 path: `/api/forsendelse/sak/${saksnummer}/journal`,
                 method: "GET",
                 query: query,
+                secure: true,
+                ...params,
+            }),
+
+        /**
+         * @description Hent alle forsendelse med saksnummer
+         *
+         * @tags forsendelse-innsyn-kontroller
+         * @name HentJournal1
+         * @request GET:/api/forsendelse/sak/{saksnummer}/forsendelser
+         * @secure
+         */
+        hentJournal1: (saksnummer: string, params: RequestParams = {}) =>
+            this.request<ForsendelseResponsTo[], any>({
+                path: `/api/forsendelse/sak/${saksnummer}/forsendelser`,
+                method: "GET",
+                secure: true,
+                ...params,
+            }),
+
+        /**
+         * @description Hent alle forsendelse som er opprettet før dagens dato og ikke er distribuert
+         *
+         * @tags forsendelse-journal-kontroller
+         * @name HentForsendelserIkkeDistribuert
+         * @request GET:/api/forsendelse/journal/ikkedistribuert
+         * @secure
+         */
+        hentForsendelserIkkeDistribuert: (params: RequestParams = {}) =>
+            this.request<ForsendelseIkkeDistribuertResponsTo[], any>({
+                path: `/api/forsendelse/journal/ikkedistribuert`,
+                method: "GET",
                 secure: true,
                 ...params,
             }),
@@ -1490,6 +1396,38 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         kanDistribuere: (forsendelseIdMedPrefix: string, params: RequestParams = {}) =>
             this.request<void, void>({
                 path: `/api/forsendelse/journal/distribuer/${forsendelseIdMedPrefix}/enabled`,
+                method: "GET",
+                secure: true,
+                ...params,
+            }),
+
+        /**
+         * @description Henter dokumentmaler som er støttet av applikasjonen
+         *
+         * @tags forsendelse-innsyn-kontroller
+         * @name HentDokumentValgNotater
+         * @request GET:/api/forsendelse/dokumentvalg/notat
+         * @secure
+         */
+        hentDokumentValgNotater: (params: RequestParams = {}) =>
+            this.request<Record<string, DokumentMalDetaljer>, any>({
+                path: `/api/forsendelse/dokumentvalg/notat`,
+                method: "GET",
+                secure: true,
+                ...params,
+            }),
+
+        /**
+         * @description Henter dokumentmaler som er støttet av applikasjonen
+         *
+         * @tags forsendelse-innsyn-kontroller
+         * @name HentDokumentValgForForsendelse
+         * @request GET:/api/forsendelse/dokumentvalg/forsendelse/{forsendelseIdMedPrefix}
+         * @secure
+         */
+        hentDokumentValgForForsendelse: (forsendelseIdMedPrefix: string, params: RequestParams = {}) =>
+            this.request<Record<string, DokumentMalDetaljer>, any>({
+                path: `/api/forsendelse/dokumentvalg/forsendelse/${forsendelseIdMedPrefix}`,
                 method: "GET",
                 secure: true,
                 ...params,

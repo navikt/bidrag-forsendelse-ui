@@ -62,7 +62,6 @@ function LeggTilDokumentFraSakModal({ onClose, open }: LeggTilDokumentFraSakModa
     const { hentForsendelse } = useForsendelseApi();
     const saksnummer = hentForsendelse().saksnummer;
     function selectDocument(document: IDokument, toggle = true) {
-        console.log(selectedDocuments, document);
         const isSelected = (d) =>
             document.dokumentreferanse
                 ? d.dokumentreferanse == document.dokumentreferanse
