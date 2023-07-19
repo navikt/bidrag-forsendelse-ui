@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import { useQuery, UseQueryResult } from "react-query";
 
 import { BIDRAG_DOKUMENT_API, BIDRAG_FORSENDELSE_API } from "../api/api";
@@ -32,8 +33,12 @@ export default function useDokumentApi() {
                 request.erFattetBeregnet,
                 enhet,
             ],
-            queryFn: ({ signal }) => BIDRAG_FORSENDELSE_API.api.hentDokumentValg({ ...request, enhet }),
+            queryFn: () => BIDRAG_FORSENDELSE_API.api.hentDokumentValg({ ...request, enhet }),
             select: (data) => data.data,
+            retry: (failureCount, error: AxiosError) => {
+                if (error.response.status == 400) return false;
+                return failureCount < 3;
+            },
             optimisticResults: false,
         });
     }

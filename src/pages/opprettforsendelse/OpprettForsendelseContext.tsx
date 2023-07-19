@@ -8,6 +8,7 @@ import { EngangsbelopType, SoknadFra, StonadType, VedtakType } from "../../api/B
 export interface IOpprettForsendelseProviderProps {
     vedtakType: VedtakType;
     erFattetBeregnet?: boolean;
+    erVedtakIkkeTilbakekreving?: boolean;
     engangsBelopType: EngangsbelopType;
     stonadType: StonadType;
     behandlingType: string;
@@ -24,6 +25,7 @@ interface IOpprettForsendelsePropsContext {
     stonadType: StonadType;
     vedtakType: VedtakType;
     erFattetBeregnet?: boolean;
+    erVedtakIkkeTilbakekreving?: boolean;
     soknadFra: SoknadFra;
     enhet?: string;
     soknadId?: string;

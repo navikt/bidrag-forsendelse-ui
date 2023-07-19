@@ -9,6 +9,7 @@ import GjelderSelect from "../../components/detaljer/GjelderSelect";
 import BidragErrorPanel from "../../context/BidragErrorPanel";
 import { useErrorContext } from "../../context/ErrorProvider";
 import { useForsendelseApi, UseForsendelseApiKeys } from "../../hooks/useForsendelseApi";
+import { ENHET_FARSKAP } from "../../types/EnhetTypes";
 import { useSession } from "../forsendelse/context/SessionContext";
 import { queryClient } from "../PageWrapper";
 import DokumentValgOpprett from "./DokumentValgOpprett";
@@ -72,7 +73,7 @@ const OPPRETT_FORSENDELSE_MUTATION_KEY = "opprettForsendelse";
 export const useOpprettForsendelseFormContext = () => useFormContext<OpprettForsendelseFormProps>();
 
 export default function OpprettForsendelsePage() {
-    const { forsendelseId } = useSession();
+    const { forsendelseId, enhet } = useSession();
     if (forsendelseId) {
         return <OpprettForsendelseUnderOpprettelse />;
     }
@@ -80,7 +81,7 @@ export default function OpprettForsendelsePage() {
 }
 function OpprettForsendelseUnderOpprettelse() {
     const { addError } = useErrorContext();
-    const { forsendelseId, navigateToForsendelse } = useSession();
+    const { forsendelseId, navigateToForsendelse, enhet } = useSession();
     const opprettForsendelseFn = useMutation({
         mutationKey: OPPRETT_FORSENDELSE_MUTATION_KEY,
         mutationFn: (data: OpprettForsendelseFormProps) =>
@@ -105,7 +106,7 @@ function OpprettForsendelseUnderOpprettelse() {
             mottaker: {
                 ident: defaultGjelder,
             },
-            tema: "BID",
+            tema: enhet == ENHET_FARSKAP ? "FAR" : "BID",
             språk: "NB",
         },
     });
@@ -142,6 +143,7 @@ function OpprettForsendelseNy() {
                     stonadType: options.stonadType,
                     engangsBelopType: options.engangsBelopType,
                     erFattetBeregnet: options.erFattetBeregnet,
+                    erVedtakIkkeTilbakekreving: options.erVedtakIkkeTilbakekreving,
                 },
                 dokumenter: [
                     {
@@ -170,7 +172,7 @@ function OpprettForsendelseNy() {
             mottaker: {
                 ident: defaultGjelder,
             },
-            tema: "BID",
+            tema: enhet == ENHET_FARSKAP ? "FAR" : "BID",
             språk: "NB",
         },
     });

@@ -20,6 +20,8 @@ export interface BehandlingInfoDto {
     behandlingType?: string;
     vedtakType?: VedtakType;
     erFattetBeregnet?: boolean;
+    /** Hvis resultatkoden fra BBM er IT så skal denne være sann */
+    erVedtakIkkeTilbakekreving?: boolean;
     soknadFra?: SoknadFra;
 }
 
@@ -300,6 +302,7 @@ export interface HentDokumentValgRequest {
     behandlingType?: string;
     soknadFra?: SoknadFra;
     erFattetBeregnet?: boolean;
+    erVedtakIkkeTilbakekreving?: boolean;
     vedtakId?: string;
     behandlingId?: string;
     enhet?: string;

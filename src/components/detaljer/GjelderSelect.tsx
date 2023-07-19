@@ -18,7 +18,7 @@ export default function GjelderSelect({ roller }: GjelderSelectProps) {
         return (
             <optgroup label="Barn">
                 {barn.map((rolle) => (
-                    <option value={rolle.ident}>
+                    <option key={rolle.ident} value={rolle.ident}>
                         {rolle.navn} / {rolle.ident}
                     </option>
                 ))}
@@ -36,7 +36,7 @@ export default function GjelderSelect({ roller }: GjelderSelectProps) {
                 defaultValue={getValues("gjelderIdent")}
             >
                 {rollerIkkeBarn.map((rolle) => (
-                    <option value={rolle.ident}>
+                    <option key={rolle.ident} value={rolle.ident}>
                         {rolle.navn} / {rolle.ident}
                     </option>
                 ))}

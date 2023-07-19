@@ -19,3 +19,5 @@ export enum EnhetType {
     FORVALTNING = "Forvaltning",
     SPESIALENHETER = "Spesialenheter",
 }
+
+export const ENHET_FARSKAP = "4860";
