@@ -16,10 +16,11 @@ export interface BehandlingInfoDto {
     soknadId?: string;
     engangsBelopType?: EngangsbelopType;
     stonadType?: StonadType;
+    /** Brukes bare hvis stonadType og engangsbelopType er null */
+    behandlingType?: string;
     vedtakType?: VedtakType;
     erFattetBeregnet?: boolean;
     soknadFra?: SoknadFra;
-    roller: string[];
 }
 
 /** Arkivsystem hvor dokument er lagret */

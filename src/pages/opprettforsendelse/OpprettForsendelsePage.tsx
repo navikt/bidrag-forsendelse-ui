@@ -138,6 +138,7 @@ function OpprettForsendelseNy() {
                     vedtakId: options.vedtakId,
                     behandlingId: options.behandlingId,
                     vedtakType: options.vedtakType,
+                    behandlingType: options.behandlingType,
                     stonadType: options.stonadType,
                     engangsBelopType: options.engangsBelopType,
                     erFattetBeregnet: options.erFattetBeregnet,
