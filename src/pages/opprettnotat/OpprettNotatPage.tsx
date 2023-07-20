@@ -36,6 +36,7 @@ export default function OpprettNotatPage() {
                     ident: data.mottakerIdent,
                 },
                 saksnummer,
+                opprettTittel: true,
                 enhet: enhet ?? "4806",
                 tema: data.tema as JournalTema,
                 språk: data.språk,

@@ -140,6 +140,8 @@ export interface OpprettForsendelseForesporsel {
     språk?: string;
     /** Ident til saksbehandler som oppretter journalpost. Dette vil prioriteres over ident som tilhører tokenet til kallet. */
     saksbehandlerIdent?: string;
+    /** Opprett tittel på forsendelse automatisk basert på behandling detaljer. Skal bare settes til false hvis gamle brevmeny (Bisys) brukes */
+    opprettTittel?: boolean;
 }
 
 export enum SoknadFra {

@@ -20,7 +20,6 @@ export default function ForsendelseTittel() {
     const enableEditMode = () => setEditMode(true);
     const disableEditMode = () => setEditMode(false);
     const onSubmit = (updatedTitle: string) => {
-        console.log(updatedTitle);
         setForsendelseTittel(updatedTitle);
         disableEditMode();
     };
@@ -75,7 +74,6 @@ function EditForsendelseTitle({ onCancel, onSubmit, defaultValue }: EditForsende
         setUpdatedTitle(value);
     }
     async function _onSubmit() {
-        console.log("SUBMIT");
         if (isCanceled.current) return;
         if (updatedTitle) {
             await updateTitleMutation.mutate({ title: updatedTitle });

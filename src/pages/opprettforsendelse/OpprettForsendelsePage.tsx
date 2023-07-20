@@ -133,6 +133,7 @@ function OpprettForsendelseNy() {
                 gjelderIdent: data.gjelderIdent,
                 enhet: enhet ?? "4806",
                 saksnummer,
+                opprettTittel: true,
                 behandlingInfo: {
                     soknadFra: options.soknadFra,
                     soknadId: options.soknadId,

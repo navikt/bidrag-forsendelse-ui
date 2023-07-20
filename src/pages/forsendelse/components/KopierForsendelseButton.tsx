@@ -88,6 +88,7 @@ function KopierForsendelseModal({ onClose, open }: KopierForsendelseModalProps) 
                 behandlingInfo: {
                     ...forsendelse.behandlingInfo,
                 },
+                opprettTittel: true,
                 enhet: forsendelse.enhet,
                 tema: forsendelse.tema as JournalTema,
                 språk: data.språk,
