@@ -31,6 +31,7 @@ export enum DokumentArkivSystemDto {
     MIDLERTIDLIG_BREVLAGER = "MIDLERTIDLIG_BREVLAGER",
     UKJENT = "UKJENT",
     BIDRAG = "BIDRAG",
+    FORSENDELSE = "FORSENDELSE",
 }
 
 /** Dette skal være UNDER_PRODUKSJON for redigerbare dokumenter som ikke er ferdigprodusert. Ellers settes det til FERDIGSTILT */
@@ -276,7 +277,7 @@ export interface DokumentDto {
     /** Dokumentets status. Benyttes hvis journalposten er av typen forsendelse */
     status?: "IKKE_BESTILT" | "BESTILLING_FEILET" | "UNDER_PRODUKSJON" | "UNDER_REDIGERING" | "FERDIGSTILT" | "AVBRUTT";
     /** Arkivsystem hvor dokumentet er produsert og lagret */
-    arkivSystem?: "JOARK" | "MIDLERTIDLIG_BREVLAGER" | "UKJENT" | "BIDRAG";
+    arkivSystem?: "JOARK" | "MIDLERTIDLIG_BREVLAGER" | "UKJENT" | "BIDRAG" | "FORSENDELSE";
     /** Metadata om dokumentet */
     metadata: Record<string, string>;
 }
@@ -326,7 +327,7 @@ export interface OppdaterDokumentForesporsel {
     fjernTilknytning?: boolean;
     /** @format date-time */
     dokumentDato?: string;
-    arkivsystem?: "JOARK" | "MIDLERTIDLIG_BREVLAGER" | "UKJENT" | "BIDRAG";
+    arkivsystem?: "JOARK" | "MIDLERTIDLIG_BREVLAGER" | "UKJENT" | "BIDRAG" | "FORSENDELSE";
 }
 
 /** Metadata for oppdatering av forsendelse */
@@ -453,7 +454,7 @@ export interface DokumentMetadata {
     /** Status på dokumentet */
     status: "IKKE_BESTILT" | "BESTILLING_FEILET" | "UNDER_PRODUKSJON" | "UNDER_REDIGERING" | "FERDIGSTILT" | "AVBRUTT";
     /** Hvilken arkivsystem dokumentet er lagret på */
-    arkivsystem: "JOARK" | "MIDLERTIDLIG_BREVLAGER" | "UKJENT" | "BIDRAG";
+    arkivsystem: "JOARK" | "MIDLERTIDLIG_BREVLAGER" | "UKJENT" | "BIDRAG" | "FORSENDELSE";
 }
 
 /** Metadata om behandling */

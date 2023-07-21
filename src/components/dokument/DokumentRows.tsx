@@ -15,6 +15,7 @@ import { CSSProperties } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
 import { DokumentStatus } from "../../constants/DokumentStatus";
+import { useErrorContext } from "../../context/ErrorProvider";
 import { FormIDokument, useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IForsendelseFormProps } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IDokument } from "../../types/Dokument";
@@ -65,8 +66,13 @@ export default function DokumentRows() {
 }
 
 function DokumenterTableBottomButtons() {
-    const { isSavingChanges, hasChanged, saveChanges, resetDocumentChanges, dokumenter } = useDokumenterForm();
+    const { isSavingChanges, hasChanged, saveChanges, resetDocumentChanges, dokumenter, forsendelseId } =
+        useDokumenterForm();
     const isOneOrMoreDocumentsDeleted = dokumenter.some((d) => d.status == DokumentStatus.SLETTET);
+    const isAllDocumentsFinished = dokumenter.every(
+        (d) => d.status == DokumentStatus.FERDIGSTILT || d.status == DokumentStatus.KONTROLLERT
+    );
+    const { addWarning } = useErrorContext();
     return (
         <div className={"flex flex-row mt-[10px]"}>
             {hasChanged && isOneOrMoreDocumentsDeleted && (
@@ -79,6 +85,22 @@ function DokumenterTableBottomButtons() {
                     </Button>
                 </>
             )}
+            <Button
+                size="small"
+                variant="tertiary"
+                className="ml-auto justify-end"
+                onClick={() => {
+                    if (!isAllDocumentsFinished) {
+                        addWarning(
+                            "Alle dokumenter må kontrolleres/ferdigstilles før du kan åpne alle dokumenter samtidig"
+                        );
+                    } else {
+                        OpenDocumentUtils.åpneDokument("BIF-" + forsendelseId);
+                    }
+                }}
+            >
+                Åpne alle
+            </Button>
         </div>
     );
 }

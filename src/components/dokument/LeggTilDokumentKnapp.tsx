@@ -28,9 +28,19 @@ import {
     journalstatusToDisplayValue,
 } from "../../types/Journalpost";
 import { mapRolleToDisplayValue } from "../../types/RolleMapper";
+import { isEqualIgnoreNull } from "../../utils/ObjectUtils";
 import JournalpostStatusTag from "../journalpost/JournalpostStatusTag";
 import DokumentStatusTag from "./DokumentStatusTag";
 import OpenDokumentButton from "./OpenDokumentButton";
+
+const isSameDocument = (
+    document: IDokument | IDokumentJournalDto,
+    compareToDocument: IDokument | IDokumentJournalDto
+) =>
+    document.dokumentreferanse == compareToDocument.dokumentreferanse ||
+    isEqualIgnoreNull(document.dokumentreferanse, compareToDocument.originalDokumentreferanse) ||
+    isEqualIgnoreNull(document.originalDokumentreferanse, compareToDocument.originalDokumentreferanse) ||
+    isEqualIgnoreNull(document.originalDokumentreferanse, compareToDocument.dokumentreferanse);
 
 export default function LeggTilDokumentKnapp() {
     const { addDocuments, saveChanges } = useDokumenterForm();
@@ -62,10 +72,13 @@ function LeggTilDokumentFraSakModal({ onClose, open }: LeggTilDokumentFraSakModa
     const { hentForsendelse } = useForsendelseApi();
     const saksnummer = hentForsendelse().saksnummer;
     function selectDocument(document: IDokument, toggle = true) {
-        const isSelected = (d) =>
-            document.dokumentreferanse
-                ? d.dokumentreferanse == document.dokumentreferanse
-                : d.journalpostId == document.journalpostId;
+        const isSelected = (d: IDokument) => {
+            if (document.dokumentreferanse) {
+                return isSameDocument(d, document);
+            }
+            return d.journalpostId == document.journalpostId;
+        };
+
         setSelectedDocuments((selectedDocuments) => {
             const isDocumentSelected = selectedDocuments.some(isSelected);
             if (isDocumentSelected) {
@@ -502,6 +515,7 @@ function JournalpostDokumenterRowMultiDoc({
             fraSaksnummer: saksnummer,
             journalpostId: journalpost.journalpostId,
             dokumentreferanse: dokumentDto.dokumentreferanse,
+            originalDokumentreferanse: dokumentDto.originalDokumentreferanse,
             språk: journalpost.språk,
             tittel: dokumentDto.tittel,
             dokumentmalId: dokumentDto.dokumentmalId,
@@ -528,7 +542,9 @@ function JournalpostDokumenterRowMultiDoc({
     function getForsendelseStatus(dokumentDto: IDokumentJournalDto) {
         if (!journalpost.erForsendelse) {
             if (journalpost.journalpostId.startsWith("BID-")) {
-                return journalpost.journalstatus == "D" ? DokumentStatus.UNDER_PRODUKSJON : DokumentStatus.FERDIGSTILT;
+                return journalpost.status == "UNDER_PRODUKSJON"
+                    ? DokumentStatus.UNDER_PRODUKSJON
+                    : DokumentStatus.FERDIGSTILT;
             }
             return DokumentStatus.FERDIGSTILT;
         }
@@ -540,7 +556,10 @@ function JournalpostDokumenterRowMultiDoc({
         if (dokumentDto.status == "UNDER_PRODUKSJON") {
             return DokumentStatus.UNDER_PRODUKSJON;
         }
-        return kopiAvEksternDokument ? DokumentStatus.MÅ_KONTROLLERES : DokumentStatus.UNDER_REDIGERING;
+        const erLenkeTilAnnenForsendelse = dokumentDto.arkivSystem == "FORSENDELSE";
+        return kopiAvEksternDokument && !erLenkeTilAnnenForsendelse
+            ? DokumentStatus.MÅ_KONTROLLERES
+            : DokumentStatus.UNDER_REDIGERING;
     }
 
     const isJournalpostSelected = () => {
@@ -549,7 +568,7 @@ function JournalpostDokumenterRowMultiDoc({
         );
     };
     const isDocumentSelectedNotIncludingAdded = (dokument: IDokumentJournalDto) => {
-        return selectedDocuments.some((d) => d.dokumentreferanse == dokument.dokumentreferanse);
+        return selectedDocuments.some((d) => isSameDocument(d, dokument));
     };
 
     const isDocumentSelected = (dokument: IDokumentJournalDto) => {
@@ -615,6 +634,7 @@ function JournalpostDokumenterRowMultiDoc({
                         {" "}
                     </Checkbox>
                 </Table.DataCell>
+                {/* <Table.DataCell style={{ width: "20%" }}>{tittel + " - " + journalpost.journalpostId}</Table.DataCell> */}
                 <Table.DataCell>{tittel}</Table.DataCell>
                 <Table.DataCell>
                     {isSomeDocumentsSelected && (
@@ -623,7 +643,6 @@ function JournalpostDokumenterRowMultiDoc({
                         </Tag>
                     )}
                 </Table.DataCell>
-                {/* <Table.DataCell style={{ width: "20%" }}>{tittel + " - " + journalpost.journalpostId}</Table.DataCell> */}
                 <Table.DataCell>{dateToDDMMYYYYString(new Date(journalpost.dokumentDato))}</Table.DataCell>
 
                 <Table.DataCell>{journalpost.dokumentType}</Table.DataCell>
@@ -667,7 +686,11 @@ function JournalpostDokumenterRowMultiDoc({
                                 </Table.DataCell>
                                 <Table.DataCell colSpan={5}>
                                     {dok.tittel}
-                                    {/* {dok.tittel + " - " + dok.dokumentreferanse} */}
+                                    {/* {dok.tittel +
+                                        " - " +
+                                        dok.originalDokumentreferanse +
+                                        " - " +
+                                        dok.originalJournalpostId} */}
                                 </Table.DataCell>
                                 <Table.DataCell colSpan={1}>
                                     <DokumentStatusTag status={getForsendelseStatus(dok)} />
@@ -689,42 +712,26 @@ function JournalpostDokumenterRowMultiDoc({
 }
 
 function erSammeDokument(forsendelseDokument: IDokument, dokumentJournal: IDokumentJournalDto, journalpostId: string) {
-    const harReferanseTilDokument =
+    const harReferanseTilDokumentIJournal =
         forsendelseDokument.lenkeTilDokumentreferanse == dokumentJournal.dokumentreferanse &&
         forsendelseDokument.forsendelseId === journalpostId?.replace(/\D/g, "");
 
-    const erSammeDokument =
+    const erLenketTilSammeDokument =
+        isEqualIgnoreNull(forsendelseDokument.originalDokumentreferanse, dokumentJournal.originalDokumentreferanse) &&
+        isEqualIgnoreNull(forsendelseDokument.originalJournalpostId, dokumentJournal.originalJournalpostId);
+
+    const erDokumentIJournalLenketTilDokument =
+        forsendelseDokument.dokumentreferanse == dokumentJournal.originalDokumentreferanse &&
+        forsendelseDokument.forsendelseId == dokumentJournal.originalJournalpostId?.replace(/\D/g, "");
+
+    const erForsendelseDokumentLenketTilDokumentIJournal =
         forsendelseDokument.originalDokumentreferanse == dokumentJournal.dokumentreferanse &&
         forsendelseDokument.originalJournalpostId?.replace(/\D/g, "") == journalpostId?.replace(/\D/g, "");
 
-    console.debug("#######################");
-    console.debug(
-        "Dokument",
-        "journalpostId",
-        journalpostId,
-        "dokumentreferanse",
-        dokumentJournal.dokumentreferanse,
-        "originalDokumentreferanse",
-        dokumentJournal.originalDokumentreferanse,
-        dokumentJournal.journalpostId,
-        "originalJournalpostId",
-        dokumentJournal.originalJournalpostId
+    return (
+        harReferanseTilDokumentIJournal ||
+        erForsendelseDokumentLenketTilDokumentIJournal ||
+        erLenketTilSammeDokument ||
+        erDokumentIJournalLenketTilDokument
     );
-    console.debug(
-        "Forsendelse",
-        "dokref",
-        forsendelseDokument.dokumentreferanse,
-        "journalpostId",
-        forsendelseDokument.journalpostId,
-        "lenkeTilDokumentreferanse",
-        forsendelseDokument.lenkeTilDokumentreferanse,
-        "originalDokumentreferanse",
-        forsendelseDokument.originalDokumentreferanse,
-        "originalJournalpostId",
-        forsendelseDokument.originalJournalpostId
-    );
-    console.debug("RESULT", harReferanseTilDokument || erSammeDokument);
-    console.debug("#######################");
-
-    return harReferanseTilDokument || erSammeDokument;
 }

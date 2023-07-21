@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import dayjs from "dayjs";
 import { createContext } from "react";
 import { PropsWithChildren } from "react";
@@ -99,9 +100,9 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
         onSuccess: () => {
             queryClient.invalidateQueries("forsendelse");
         },
-        onError: (error, variables, context) => {
-            console.log(error, variables, context);
-            addError("Det skjedde en feil ved lagring");
+        onError: (error: AxiosError, variables, context) => {
+            const errorMessage = error.response?.headers?.["warning"];
+            addError(`Kunne ikke lagre endringer: ${errorMessage}`);
         },
     });
     useEffect(() => {
