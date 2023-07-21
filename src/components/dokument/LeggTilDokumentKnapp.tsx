@@ -550,13 +550,15 @@ function JournalpostDokumenterRowMultiDoc({
         }
 
         const kopiAvEksternDokument = erKopiAvEksternDokument(dokumentDto);
+        const erLenkeTilAnnenForsendelse = dokumentDto.arkivSystem == "FORSENDELSE";
         if (dokumentDto.status == "FERDIGSTILT") {
-            return !kopiAvEksternDokument ? DokumentStatus.FERDIGSTILT : DokumentStatus.KONTROLLERT;
+            return kopiAvEksternDokument && !erLenkeTilAnnenForsendelse
+                ? DokumentStatus.KONTROLLERT
+                : DokumentStatus.FERDIGSTILT;
         }
         if (dokumentDto.status == "UNDER_PRODUKSJON") {
             return DokumentStatus.UNDER_PRODUKSJON;
         }
-        const erLenkeTilAnnenForsendelse = dokumentDto.arkivSystem == "FORSENDELSE";
         return kopiAvEksternDokument && !erLenkeTilAnnenForsendelse
             ? DokumentStatus.MÅ_KONTROLLERES
             : DokumentStatus.UNDER_REDIGERING;
