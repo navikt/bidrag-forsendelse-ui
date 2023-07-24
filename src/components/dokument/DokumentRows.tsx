@@ -14,6 +14,7 @@ import { useEffect } from "react";
 import { CSSProperties } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
+import { DokumentArkivSystemDto } from "../../api/BidragForsendelseApi";
 import { DokumentStatus } from "../../constants/DokumentStatus";
 import { useErrorContext } from "../../context/ErrorProvider";
 import { FormIDokument, useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
@@ -151,8 +152,14 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
             return styles;
         };
 
-        const forsendelseIdNumeric = dokument.forsendelseId ?? forsendelseId?.replace("BIF-", "");
-        const originalDokumentreferanse = dokument.lenkeTilDokumentreferanse ?? dokument.dokumentreferanse;
+        const erLenkeTilDokumentIAnnenForsendelse = dokument.arkivsystem == DokumentArkivSystemDto.FORSENDELSE;
+
+        const forsendelseIdNumeric = erLenkeTilDokumentIAnnenForsendelse
+            ? dokument.originalJournalpostId
+            : forsendelseId?.replace("BIF-", "");
+        const originalDokumentreferanse = erLenkeTilDokumentIAnnenForsendelse
+            ? dokument.originalDokumentreferanse
+            : dokument.dokumentreferanse;
 
         const index = dokindex == -1 ? rowIndex : dokindex;
         return (
@@ -173,7 +180,7 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
                 <Table.DataCell style={{ width: "200px" }}>
                     <div className="flex flex-row gap-[5px]">
                         <DokumentStatusTag status={status} />
-                        {dokument.lenkeTilDokumentreferanse && <DokumentLinkedTag />}
+                        {erLenkeTilDokumentIAnnenForsendelse && <DokumentLinkedTag />}
                     </div>
                 </Table.DataCell>
                 <Table.DataCell style={{ width: "50px" }}>

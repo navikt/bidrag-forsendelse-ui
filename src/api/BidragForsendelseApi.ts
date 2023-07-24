@@ -187,8 +187,6 @@ export enum VedtakType {
 /** Metadata til en respons etter dokumenter i forsendelse ble opprettet */
 export interface DokumentRespons {
     dokumentreferanse: string;
-    /** Dokumentreferanse hvis dokumentet er lenke til et dokument i annen forsendelse */
-    lenkeTilDokumentreferanse?: string;
     /** Originale dokumentreferanse hvis er kopi av en ekstern dokument (feks fra JOARK) */
     originalDokumentreferanse?: string;
     /** Originale journalpostid hvis er kopi av en ekstern dokument (feks fra JOARK) */

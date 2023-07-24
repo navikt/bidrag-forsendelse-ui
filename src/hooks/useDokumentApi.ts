@@ -104,6 +104,7 @@ export function journalpostMapper(journalpost: JournalpostDto, sakstilknytninger
 export function dokumentMapper(journalpost: JournalpostDto, dokument: DokumentDto, index: number): IDokumentJournalDto {
     return {
         ...dokument,
+        journalpostId: journalpost.journalpostId,
         originalJournalpostId: dokument.metadata?.originalJournalpostId,
         originalDokumentreferanse: dokument.metadata?.originalDokumentreferanse,
     };

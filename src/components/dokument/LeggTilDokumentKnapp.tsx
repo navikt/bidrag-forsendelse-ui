@@ -36,11 +36,16 @@ import OpenDokumentButton from "./OpenDokumentButton";
 const isSameDocument = (
     document: IDokument | IDokumentJournalDto,
     compareToDocument: IDokument | IDokumentJournalDto
-) =>
-    document.dokumentreferanse == compareToDocument.dokumentreferanse ||
-    isEqualIgnoreNull(document.dokumentreferanse, compareToDocument.originalDokumentreferanse) ||
-    isEqualIgnoreNull(document.originalDokumentreferanse, compareToDocument.originalDokumentreferanse) ||
-    isEqualIgnoreNull(document.originalDokumentreferanse, compareToDocument.dokumentreferanse);
+) => {
+    return (
+        document.dokumentreferanse == compareToDocument.dokumentreferanse ||
+        (document.dokumentreferanse == null &&
+            isEqualIgnoreNull(document.journalpostId?.replace(/\D/g, ""), compareToDocument.originalJournalpostId)) ||
+        isEqualIgnoreNull(document.dokumentreferanse, compareToDocument.originalDokumentreferanse) ||
+        isEqualIgnoreNull(document.originalDokumentreferanse, compareToDocument.originalDokumentreferanse) ||
+        isEqualIgnoreNull(document.originalDokumentreferanse, compareToDocument.dokumentreferanse)
+    );
+};
 
 export default function LeggTilDokumentKnapp() {
     const { addDocuments, saveChanges } = useDokumenterForm();
@@ -714,10 +719,17 @@ function JournalpostDokumenterRowMultiDoc({
 }
 
 function erSammeDokument(forsendelseDokument: IDokument, dokumentJournal: IDokumentJournalDto, journalpostId: string) {
-    const harReferanseTilDokumentIJournal =
-        forsendelseDokument.lenkeTilDokumentreferanse == dokumentJournal.dokumentreferanse &&
-        forsendelseDokument.forsendelseId === journalpostId?.replace(/\D/g, "");
+    // const harReferanseTilDokumentIJournal =
+    //     forsendelseDokument.lenkeTilDokumentreferanse == dokumentJournal.dokumentreferanse &&
+    //     forsendelseDokument.forsendelseId === journalpostId?.replace(/\D/g, "");
 
+    const erLenketTilEtAvDokumenteneIJournalpost =
+        forsendelseDokument.originalDokumentreferanse == null &&
+        forsendelseDokument.originalJournalpostId != null &&
+        isEqualIgnoreNull(
+            forsendelseDokument.originalJournalpostId,
+            dokumentJournal.originalJournalpostId?.replace(/\D/g, "")
+        );
     const erLenketTilSammeDokument =
         isEqualIgnoreNull(forsendelseDokument.originalDokumentreferanse, dokumentJournal.originalDokumentreferanse) &&
         isEqualIgnoreNull(forsendelseDokument.originalJournalpostId, dokumentJournal.originalJournalpostId);
@@ -731,7 +743,8 @@ function erSammeDokument(forsendelseDokument: IDokument, dokumentJournal: IDokum
         forsendelseDokument.originalJournalpostId?.replace(/\D/g, "") == journalpostId?.replace(/\D/g, "");
 
     return (
-        harReferanseTilDokumentIJournal ||
+        // harReferanseTilDokumentIJournal ||
+        erLenketTilEtAvDokumenteneIJournalpost ||
         erForsendelseDokumentLenketTilDokumentIJournal ||
         erLenketTilSammeDokument ||
         erDokumentIJournalLenketTilDokument
