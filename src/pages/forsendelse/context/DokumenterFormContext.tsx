@@ -64,15 +64,12 @@ function DokumenterFormProvider({ children, ...props }: PropsWithChildren<IDokum
 function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumenterPropsContext>) {
     const { addError } = useErrorContext();
     const forsendelse = useForsendelseApi().hentForsendelse();
-    const {
-        reset,
-        handleSubmit,
-        formState: { isDirty, dirtyFields },
-        setError,
-    } = useFormContext<IForsendelseFormProps>();
+    const { reset, handleSubmit, formState, setError } = useFormContext<IForsendelseFormProps>();
     const { fields, append, update, swap } = useFieldArray<IForsendelseFormProps>({
         name: "dokumenter",
     });
+
+    const { isDirty, dirtyFields } = formState;
 
     const oppdaterDokumentTittelFn = useMutation<unknown, unknown, OppdaterDokumentTittelMutationProps>({
         mutationFn: ({ tittel, dokumentreferanse }) =>
@@ -117,6 +114,7 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
         });
     };
     const saveChanges = (formProps: IForsendelseFormProps) => {
+        console.log(formProps);
         oppdaterDokumenterMutation.mutate(formProps.dokumenter);
     };
 
@@ -156,6 +154,12 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
         }
         return isValid;
     }
+
+    useEffect(() => {
+        const isSwapped = dirtyFields.dokumenter?.some((d) => d.index == true);
+        if (isSwapped) handleSubmit(saveChanges)();
+    }, [dirtyFields]);
+
     const hasChanged =
         isDirty &&
         dirtyFields.dokumenter?.filter((dok) => {
