@@ -114,7 +114,6 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
         });
     };
     const saveChanges = (formProps: IForsendelseFormProps) => {
-        console.log(formProps);
         oppdaterDokumenterMutation.mutate(formProps.dokumenter);
     };
 
@@ -155,10 +154,10 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
         return isValid;
     }
 
-    useEffect(() => {
-        const isSwapped = dirtyFields.dokumenter?.some((d) => d.index == true);
-        if (isSwapped) handleSubmit(saveChanges)();
-    }, [dirtyFields]);
+    function swapDocuments(indexA: number, indexB: number) {
+        swap(indexA, indexB);
+        handleSubmit(saveChanges)();
+    }
 
     const hasChanged =
         isDirty &&
@@ -177,7 +176,7 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
                 validateCanSendForsendelse,
                 updateDocument,
                 saveChanges: handleSubmit(saveChanges),
-                swapDocuments: swap,
+                swapDocuments,
                 resetDocumentChanges: resetForm,
                 updateTitle: (tittel, dokumentreferanse) =>
                     oppdaterDokumentTittelFn.mutate({ tittel, dokumentreferanse }),

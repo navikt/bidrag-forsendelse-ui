@@ -227,7 +227,7 @@ function EditableDokumentTitle({ dokument, index }: IEditableDokumentTitleProps)
     } = useFormContext<IForsendelseFormProps>();
     const value = useWatch({ name: `dokumenter.${index}.tittel` });
 
-    function _updateTitle(e) {
+    function _updateTitle() {
         setInEditMode(false);
         updateTitle(value, dokument.dokumentreferanse);
     }
@@ -236,6 +236,10 @@ function EditableDokumentTitle({ dokument, index }: IEditableDokumentTitleProps)
         if (e.code == "Escape") {
             setInEditMode(false);
             setValue(`dokumenter.${index}.tittel`, dokument.tittel);
+        }
+
+        if (e.code == "Enter" && !e.shiftKey) {
+            _updateTitle();
         }
     }
     return (
