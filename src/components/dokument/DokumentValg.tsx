@@ -35,19 +35,26 @@ export default function DokumentValg({ malDetaljer, showLegend }: DokumentValgPr
     function updateValues(malId?: string) {
         const dokument = alleBrev.find((d) => d.malId == malId);
         if (dokument) {
-            setValue("dokument.malId", malId);
-            setValue("dokument.tittel", dokument.tittel);
-            setValue("dokument.type", dokument.type);
+            setValue(
+                "dokument",
+                {
+                    malId,
+                    tittel: dokument.tittel,
+                    type: dokument.type,
+                },
+                { shouldDirty: true, shouldTouch: true }
+            );
         }
     }
 
-    const methods = register("dokument.malId", { required: "Dokument må velges" });
+    const methods = register("dokument", { validate: (d) => (d?.malId == null ? "Dokument må velges" : true) });
     return (
         <div className="w-100">
             <RadioGroup
                 legend={showLegend && <Heading size="small">Velg dokument</Heading>}
                 {...methods}
-                error={errors?.dokument?.malId?.message}
+                error={errors?.dokument?.message}
+                name={methods.name}
                 onBlur={(e) => {
                     methods.onBlur(e);
                     // @ts-ignore
