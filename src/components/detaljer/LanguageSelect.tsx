@@ -29,7 +29,9 @@ export default function LanguageSelect() {
     return (
         <Select size="small" label="Språk" {...register("språk")} defaultValue={getValues("språk")}>
             {languageOptions.map((opt) => (
-                <option value={opt.value}>{opt.label}</option>
+                <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                </option>
             ))}
         </Select>
     );

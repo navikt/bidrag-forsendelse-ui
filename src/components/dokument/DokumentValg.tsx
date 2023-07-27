@@ -1,5 +1,5 @@
 import { Heading, Radio, RadioGroup, Table } from "@navikt/ds-react";
-import { useFormContext } from "react-hook-form";
+import { useFormContext, useWatch } from "react-hook-form";
 
 import { DokumentMalDetaljer } from "../../api/BidragForsendelseApi";
 
@@ -26,6 +26,8 @@ export default function DokumentValg({ malDetaljer, showLegend }: DokumentValgPr
         };
     }>();
 
+    const dokument = useWatch({ name: "dokument" });
+
     const alleBrev: TableRowData[] = Object.keys(malDetaljer).map((key) => ({
         malId: key,
         tittel: malDetaljer[key].beskrivelse,
@@ -35,26 +37,22 @@ export default function DokumentValg({ malDetaljer, showLegend }: DokumentValgPr
     function updateValues(malId?: string) {
         const dokument = alleBrev.find((d) => d.malId == malId);
         if (dokument) {
-            setValue(
-                "dokument",
-                {
-                    malId,
-                    tittel: dokument.tittel,
-                    type: dokument.type,
-                },
-                { shouldDirty: true, shouldTouch: true }
-            );
+            setValue("dokument", {
+                malId,
+                tittel: dokument.tittel,
+                type: dokument.type,
+            });
         }
     }
 
-    const methods = register("dokument", { validate: (d) => (d?.malId == null ? "Dokument må velges" : true) });
+    const methods = register("dokument", { validate: (dok) => (dok.malId == null ? "Dokument må velges" : true) });
     return (
         <div className="w-100">
             <RadioGroup
                 legend={showLegend && <Heading size="small">Velg dokument</Heading>}
                 {...methods}
+                value={dokument?.malId ?? ""}
                 error={errors?.dokument?.message}
-                name={methods.name}
                 onBlur={(e) => {
                     methods.onBlur(e);
                     // @ts-ignore
