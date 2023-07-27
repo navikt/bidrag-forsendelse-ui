@@ -34,18 +34,6 @@ export enum DokumentArkivSystemDto {
     FORSENDELSE = "FORSENDELSE",
 }
 
-/** Dette skal være UNDER_PRODUKSJON for redigerbare dokumenter som ikke er ferdigprodusert. Ellers settes det til FERDIGSTILT */
-export enum DokumentStatusTo {
-    IKKE_BESTILT = "IKKE_BESTILT",
-    BESTILLING_FEILET = "BESTILLING_FEILET",
-    AVBRUTT = "AVBRUTT",
-    UNDER_PRODUKSJON = "UNDER_PRODUKSJON",
-    UNDER_REDIGERING = "UNDER_REDIGERING",
-    FERDIGSTILT = "FERDIGSTILT",
-    MAKONTROLLERES = "MÅ_KONTROLLERES",
-    KONTROLLERT = "KONTROLLERT",
-}
-
 export enum EngangsbelopType {
     DIREKTE_OPPGJOR = "DIREKTE_OPPGJOR",
     ETTERGIVELSE = "ETTERGIVELSE",
@@ -109,8 +97,6 @@ export interface OpprettDokumentForesporsel {
     journalpostId?: string;
     /** DokumentmalId sier noe om dokumentets innhold og oppbygning. (Også kjent som brevkode) */
     dokumentmalId?: string;
-    /** Dette skal være UNDER_PRODUKSJON for redigerbare dokumenter som ikke er ferdigprodusert. Ellers settes det til FERDIGSTILT */
-    status: DokumentStatusTo;
     /** Om dokumentet med dokumentmalId skal bestilles. Hvis dette er satt til false så antas det at kallende system bestiller dokumentet selv. */
     bestillDokument: boolean;
 }
@@ -202,6 +188,18 @@ export interface DokumentRespons {
     status?: DokumentStatusTo;
     /** Arkivsystem hvor dokument er lagret */
     arkivsystem?: DokumentArkivSystemDto;
+}
+
+/** Dette skal være UNDER_PRODUKSJON for redigerbare dokumenter som ikke er ferdigprodusert. Ellers settes det til FERDIGSTILT */
+export enum DokumentStatusTo {
+    IKKE_BESTILT = "IKKE_BESTILT",
+    BESTILLING_FEILET = "BESTILLING_FEILET",
+    AVBRUTT = "AVBRUTT",
+    UNDER_PRODUKSJON = "UNDER_PRODUKSJON",
+    UNDER_REDIGERING = "UNDER_REDIGERING",
+    FERDIGSTILT = "FERDIGSTILT",
+    MAKONTROLLERES = "MÅ_KONTROLLERES",
+    KONTROLLERT = "KONTROLLERT",
 }
 
 /** Type på forsendelse. Kan være NOTAT eller UTGÅENDE */

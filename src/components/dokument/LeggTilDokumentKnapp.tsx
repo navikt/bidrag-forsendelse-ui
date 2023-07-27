@@ -18,6 +18,7 @@ import React from "react";
 import { useEffect } from "react";
 
 import { DokumentStatus } from "../../constants/DokumentStatus";
+import useIsDebugMode from "../../hooks/useDebugMode";
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
 import { useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IDokument } from "../../types/Dokument";
@@ -28,6 +29,7 @@ import {
     journalstatusToDisplayValue,
 } from "../../types/Journalpost";
 import { mapRolleToDisplayValue } from "../../types/RolleMapper";
+import { cleanupAfterClosedModal } from "../../utils/ModalUtils";
 import { isEqualIgnoreNull } from "../../utils/ObjectUtils";
 import JournalpostStatusTag from "../journalpost/JournalpostStatusTag";
 import DokumentStatusTag from "./DokumentStatusTag";
@@ -40,7 +42,22 @@ const isSameDocument = (
     return (
         document.dokumentreferanse == compareToDocument.dokumentreferanse ||
         (document.dokumentreferanse == null &&
-            isEqualIgnoreNull(document.journalpostId?.replace(/\D/g, ""), compareToDocument.originalJournalpostId)) ||
+            isEqualIgnoreNull(
+                document.journalpostId?.replace(/\D/g, ""),
+                compareToDocument.originalJournalpostId?.replace(/\D/g, "")
+            )) ||
+        (compareToDocument.originalDokumentreferanse == null &&
+            compareToDocument.originalJournalpostId != null &&
+            isEqualIgnoreNull(
+                compareToDocument.originalJournalpostId?.replace(/\D/g, ""),
+                document.journalpostId?.replace(/\D/g, "")
+            )) ||
+        (document.originalDokumentreferanse == null &&
+            document.originalJournalpostId != null &&
+            isEqualIgnoreNull(
+                compareToDocument.journalpostId?.replace(/\D/g, ""),
+                document.originalJournalpostId?.replace(/\D/g, "")
+            )) ||
         isEqualIgnoreNull(document.dokumentreferanse, compareToDocument.originalDokumentreferanse) ||
         isEqualIgnoreNull(document.originalDokumentreferanse, compareToDocument.originalDokumentreferanse) ||
         isEqualIgnoreNull(document.originalDokumentreferanse, compareToDocument.dokumentreferanse)
@@ -51,6 +68,11 @@ export default function LeggTilDokumentKnapp() {
     const { addDocuments, saveChanges } = useDokumenterForm();
     const [modalOpen, setModalOpen] = useState(false);
 
+    const closeModal = () => {
+        setModalOpen(false);
+        cleanupAfterClosedModal();
+    };
+
     return (
         <div>
             <Button onClick={() => setModalOpen(true)} variant={"tertiary"} size={"small"} icon={<Add />}>
@@ -60,8 +82,7 @@ export default function LeggTilDokumentKnapp() {
                 open={modalOpen}
                 onClose={(selectedDocuments) => {
                     addDocuments(selectedDocuments);
-                    saveChanges();
-                    setModalOpen(false);
+                    closeModal();
                 }}
             />
         </div>
@@ -81,7 +102,7 @@ function LeggTilDokumentFraSakModal({ onClose, open }: LeggTilDokumentFraSakModa
             if (document.dokumentreferanse) {
                 return isSameDocument(d, document);
             }
-            return d.journalpostId == document.journalpostId;
+            return d.journalpostId?.replace(/\D/g, "") == document.journalpostId?.replace(/\D/g, "");
         };
 
         setSelectedDocuments((selectedDocuments) => {
@@ -335,6 +356,7 @@ function DokumenterForSakTabell({
                     {visJournalposter.map((journalpost) => {
                         return (
                             <JournalpostDokumenterRowMultiDoc
+                                key={journalpost.journalpostId}
                                 fraRolle={fraRolle}
                                 saksnummer={saksnummer}
                                 journalpost={journalpost}
@@ -469,7 +491,7 @@ function JournalpostDokumenterRowMultiDoc({
     const { hentForsendelse } = useForsendelseApi();
     const forsendelse = hentForsendelse();
     const forsendelseDokumenter = forsendelse.dokumenter;
-
+    const isDebugMode = useIsDebugMode();
     function toggleShowAllDocuments() {
         setShowAllDocuments((s) => !s);
     }
@@ -521,6 +543,7 @@ function JournalpostDokumenterRowMultiDoc({
             journalpostId: journalpost.journalpostId,
             dokumentreferanse: dokumentDto.dokumentreferanse,
             originalDokumentreferanse: dokumentDto.originalDokumentreferanse,
+            originalJournalpostId: dokumentDto.originalJournalpostId,
             språk: journalpost.språk,
             tittel: dokumentDto.tittel,
             dokumentmalId: dokumentDto.dokumentmalId,
@@ -641,8 +664,7 @@ function JournalpostDokumenterRowMultiDoc({
                         {" "}
                     </Checkbox>
                 </Table.DataCell>
-                {/* <Table.DataCell style={{ width: "20%" }}>{tittel + " - " + journalpost.journalpostId}</Table.DataCell> */}
-                <Table.DataCell>{tittel}</Table.DataCell>
+                <Table.DataCell>{isDebugMode ? `${tittel}  -  ${journalpost.journalpostId}` : tittel}</Table.DataCell>
                 <Table.DataCell>
                     {isSomeDocumentsSelected && (
                         <Tag variant="info" size="small">
@@ -692,12 +714,9 @@ function JournalpostDokumenterRowMultiDoc({
                                     </Checkbox>
                                 </Table.DataCell>
                                 <Table.DataCell colSpan={5}>
-                                    {dok.tittel}
-                                    {/* {dok.tittel +
-                                        " - " +
-                                        dok.originalDokumentreferanse +
-                                        " - " +
-                                        dok.originalJournalpostId} */}
+                                    {isDebugMode
+                                        ? `${dok.tittel} - ${dok.originalDokumentreferanse} - ${dok.originalJournalpostId}`
+                                        : dok.tittel}
                                 </Table.DataCell>
                                 <Table.DataCell colSpan={1}>
                                     <DokumentStatusTag status={getForsendelseStatus(dok)} />

@@ -1,13 +1,15 @@
 import "./ForsendelseDetaljer.css";
 
-import { BodyLong, Heading, Label } from "@navikt/ds-react";
+import { dateToDDMMYYYYString } from "@navikt/bidrag-ui-common";
+import { BodyLong, Label } from "@navikt/ds-react";
 
 import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
 export default function ForsendelseDetaljer() {
     const forsendelse = useForsendelseApi().hentForsendelse();
     return (
         <div>
-            <Heading size="small">Andre detaljer</Heading>
+            {/* <Heading size="small">Andre detaljer</Heading> */}
+            <div className="h-px w-full bg-border-divider" />
             <div className="flex flex-row static_data">
                 <DetailsGrid
                     rows={[
@@ -21,7 +23,7 @@ export default function ForsendelseDetaljer() {
                         },
                         {
                             label: "Opprettet dato",
-                            value: forsendelse.opprettetDato,
+                            value: dateToDDMMYYYYString(new Date(forsendelse.opprettetDato)),
                         },
                         {
                             label: "Opprettet av",
@@ -42,17 +44,15 @@ interface DetailsColumnProps {
 }
 function DetailsGrid({ rows }: DetailsColumnProps) {
     return (
-        <BodyLong>
-            <dl className="forsendelse_description_list">
-                {rows.map((row) => (
-                    <div>
-                        <dt>
-                            <Label>{row.label}</Label>
-                        </dt>
-                        <dd>{row.value}</dd>
-                    </div>
-                ))}
-            </dl>
-        </BodyLong>
+        <dl className="forsendelse_description_list">
+            {rows.map((row) => (
+                <BodyLong key={row.value + row.label}>
+                    <dt>
+                        <Label>{row.label}</Label>
+                    </dt>
+                    <dd>{row.value}</dd>
+                </BodyLong>
+            ))}
+        </dl>
     );
 }

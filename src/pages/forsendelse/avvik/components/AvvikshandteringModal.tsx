@@ -53,8 +53,6 @@ function AvvikshandteringModal(props: AvvikshandteringModalProps) {
             });
             const harEndretFagomradeTilFarskap =
                 avvik.type == AvvikType.ENDRE_FAGOMRADE && avvik.fagomrade == FAGOMRADE.FAR;
-            // return false;
-
             return (
                 (harTilgangTilTemaFar && harEndretFagomradeTilFarskap) ||
                 skalKunneViderebehandleJournalpostEtterUtførtAvvik(avvik.type)
@@ -148,6 +146,10 @@ function AvvikshandteringModal(props: AvvikshandteringModalProps) {
         if (sendAvvikFn.isLoading) return "loading";
         return "idle";
     }
+
+    useEffect(() => {
+        Modal.setAppElement("#forsendelse-page");
+    }, []);
 
     return (
         <Modal

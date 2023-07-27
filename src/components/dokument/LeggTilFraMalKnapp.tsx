@@ -12,25 +12,31 @@ import { FormProvider, useForm } from "react-hook-form";
 
 import { useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IDokument } from "../../types/Dokument";
+import { cleanupAfterClosedModal } from "../../utils/ModalUtils";
 import DokumentValgForsendelse from "./DokumentValgForsendelse";
 
 export default function LeggTilFraMalKnapp() {
     const { addDocuments, saveChanges } = useDokumenterForm();
     const [modalOpen, setModalOpen] = useState(false);
 
+    const closeModal = () => {
+        setModalOpen(false);
+        cleanupAfterClosedModal();
+    };
     return (
         <div>
             <Button onClick={() => setModalOpen(true)} variant={"tertiary"} size={"small"} icon={<Add />}>
                 Legg til fra mal
             </Button>
-            <LeggTilDokumentFraMalModal
-                open={modalOpen}
-                onClose={(selectedDocuments) => {
-                    selectedDocuments && addDocuments([selectedDocuments]);
-                    saveChanges();
-                    setModalOpen(false);
-                }}
-            />
+            {modalOpen && (
+                <LeggTilDokumentFraMalModal
+                    open={modalOpen}
+                    onClose={(selectedDocuments) => {
+                        selectedDocuments && addDocuments([selectedDocuments]);
+                        closeModal();
+                    }}
+                />
+            )}
         </div>
     );
 }
@@ -51,7 +57,6 @@ function LeggTilDokumentFraMalModal({ onClose, open }: LeggTilDokumentFraSakModa
     const methods = useForm<OpprettDokumentFraMalFormProps>();
 
     function onSubmit(data: OpprettDokumentFraMalFormProps) {
-        console.log(data);
         if (data.dokument) {
             onClose({
                 dokumentmalId: data.dokument.malId,

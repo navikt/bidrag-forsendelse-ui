@@ -1,6 +1,7 @@
 import { RolleType } from "@navikt/bidrag-ui-common";
-import { Button, Cell, ContentContainer, Grid, Heading } from "@navikt/ds-react";
-import { FormProvider, useForm, useFormContext } from "react-hook-form";
+import { Button, Cell, ContentContainer, ErrorSummary, Grid, Heading } from "@navikt/ds-react";
+import ErrorSummaryItem from "@navikt/ds-react/esm/form/error-summary/ErrorSummaryItem";
+import { FieldErrors, FormProvider, useForm, useFormContext } from "react-hook-form";
 import { useIsMutating, useMutation } from "react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../../api/api";
@@ -115,7 +116,7 @@ function OpprettForsendelseUnderOpprettelse() {
     }
     return (
         <FormProvider {...methods}>
-            <OpprettForsendelsContainer onSubmit={onSubmit} />
+            <OpprettForsendelsContainer tittel={forsendelse.tittel} onSubmit={onSubmit} />
         </FormProvider>
     );
 }
@@ -189,8 +190,9 @@ function OpprettForsendelseNy() {
 
 interface OpprettForsendelsContainerProps {
     onSubmit: (data: OpprettForsendelseFormProps) => void;
+    tittel?: string;
 }
-function OpprettForsendelsContainer({ onSubmit }: OpprettForsendelsContainerProps) {
+function OpprettForsendelsContainer({ onSubmit, tittel }: OpprettForsendelsContainerProps) {
     const { forsendelseId, saksnummer } = useSession();
     const roller = useForsendelseApi().hentRoller();
     const methods = useFormContext();
@@ -200,9 +202,8 @@ function OpprettForsendelsContainer({ onSubmit }: OpprettForsendelsContainerProp
             <Grid>
                 <Cell xs={12} md={12} lg={10}>
                     <div className={"leading-xlarge tracking-wide"}>
-                        <Heading spacing size="large">
-                            {forsendelseId ? `Opprett forsendelse ${forsendelseId}` : "Opprett forsendelse"}
-                        </Heading>
+                        <Heading size="large">{tittel ? `${tittel}` : "Opprett forsendelse"}</Heading>
+
                         <FormProvider {...methods}>
                             <form onSubmit={methods.handleSubmit(onSubmit)}>
                                 <GjelderSelect roller={roller} />
@@ -212,6 +213,7 @@ function OpprettForsendelsContainer({ onSubmit }: OpprettForsendelsContainerProp
                                     <DokumentValgOpprett />
                                 </div>
                                 <BidragErrorPanel />
+                                <OpprettForsendelsValidationErrorSummary />
                                 <div className="flex flex-row gap-2 pt-4">
                                     <Button size="small" loading={isLoading}>
                                         Opprett
@@ -224,5 +226,39 @@ function OpprettForsendelsContainer({ onSubmit }: OpprettForsendelsContainerProp
                 </Cell>
             </Grid>
         </ContentContainer>
+    );
+}
+
+function OpprettForsendelsValidationErrorSummary() {
+    const {
+        formState: { errors },
+    } = useFormContext<OpprettForsendelseFormProps>();
+
+    function getAllErrors(errors: FieldErrors<OpprettForsendelseFormProps>): string[] {
+        const allErrors = [];
+        Object.keys(errors).forEach((key) => {
+            const errorsValue = errors[key];
+            if (errorsValue && !errorsValue.ref) {
+                const errorMessages = getAllErrors(errorsValue);
+                errorMessages.forEach((d) => allErrors.push(d));
+            } else {
+                const message = errors[key].message;
+                if (message) {
+                    allErrors.push(message);
+                }
+            }
+        });
+        return allErrors.filter((error) => error && error.trim().length > 0);
+    }
+    if (getAllErrors(errors).length == 0) {
+        return null;
+    }
+
+    return (
+        <ErrorSummary heading={"Følgende må rettes opp før forsendelse kan opprettes"} className="mt-4">
+            {getAllErrors(errors)?.map((err) => (
+                <ErrorSummaryItem>{err}</ErrorSummaryItem>
+            ))}
+        </ErrorSummary>
     );
 }

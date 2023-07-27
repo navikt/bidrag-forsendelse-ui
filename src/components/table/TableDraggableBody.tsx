@@ -75,11 +75,17 @@ export default function TableDraggableBody<T>({ children, onChange, rowData, get
             >
                 <Table.Body style={{ overflowY: "auto" }}>
                     {rowData.map((data, i) => (
-                        <SortableItem data={data} index={i} id={getRowKey(data)} children={children} />
+                        <SortableItem
+                            key={getRowKey(data) + i}
+                            data={data}
+                            index={i}
+                            id={getRowKey(data)}
+                            children={children}
+                        />
                     ))}
                 </Table.Body>
             </SortableContext>
-            <DragOverlay>
+            <DragOverlay dropAnimation={null}>
                 {activeId ? (
                     <OverlayItem id={activeId} data={activeData} index={activeIndex} children={children} />
                 ) : null}

@@ -156,9 +156,19 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
 
     function swapDocuments(indexA: number, indexB: number) {
         swap(indexA, indexB);
+        submitAndSaveChanges();
+    }
+
+    function submitAndSaveChanges() {
         handleSubmit(saveChanges)();
     }
 
+    function addDocuments(selectedDocuments: IDokument[]) {
+        if (selectedDocuments != null && selectedDocuments.length > 0) {
+            append(selectedDocuments);
+            submitAndSaveChanges();
+        }
+    }
     const hasChanged =
         isDirty &&
         dirtyFields.dokumenter?.filter((dok) => {
@@ -171,7 +181,7 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
                 dokumenter: fields,
                 hasChanged: hasChanged,
                 isSavingChanges: oppdaterDokumenterMutation.isLoading,
-                addDocuments: append,
+                addDocuments,
                 deleteDocument,
                 validateCanSendForsendelse,
                 updateDocument,

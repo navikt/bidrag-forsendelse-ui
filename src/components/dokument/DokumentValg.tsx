@@ -14,7 +14,17 @@ interface DokumentValgProps {
     showLegend?: boolean;
 }
 export default function DokumentValg({ malDetaljer, showLegend }: DokumentValgProps) {
-    const { register, setValue } = useFormContext();
+    const {
+        register,
+        setValue,
+        formState: { errors },
+    } = useFormContext<{
+        dokument: {
+            malId: string;
+            tittel: string;
+            type: "UTGÅENDE" | "NOTAT";
+        };
+    }>();
 
     const alleBrev: TableRowData[] = Object.keys(malDetaljer).map((key) => ({
         malId: key,
@@ -31,12 +41,13 @@ export default function DokumentValg({ malDetaljer, showLegend }: DokumentValgPr
         }
     }
 
-    const methods = register("dokument.malId");
+    const methods = register("dokument.malId", { required: "Dokument må velges" });
     return (
         <div className="w-100">
             <RadioGroup
                 legend={showLegend && <Heading size="small">Velg dokument</Heading>}
                 {...methods}
+                error={errors?.dokument?.malId?.message}
                 onBlur={(e) => {
                     methods.onBlur(e);
                     // @ts-ignore

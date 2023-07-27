@@ -89,6 +89,18 @@ function EditPostcodeAndState(props: EditAddressProps) {
     const country = useWatch({ name: `${formPrefix}land` });
     const isNorway = isCountryCodeNorway(country);
 
+    const getErrorMessage = () => {
+        let error = errors;
+        if (formPrefix) {
+            formPrefix.split(".").forEach((splitKey) => {
+                if (splitKey.length > 0 && error) {
+                    error = error[splitKey];
+                }
+            });
+        }
+        return error?.poststed?.message;
+    };
+
     const poststedFormKey = `${formPrefix}poststed`;
     const postnummerFormKey = `${formPrefix}postnummer`;
     return (
@@ -97,7 +109,7 @@ function EditPostcodeAndState(props: EditAddressProps) {
                 <>
                     <Controller
                         control={control}
-                        name={postnummerFormKey}
+                        name={postnummerFormKey as "postnummer"}
                         rules={{
                             required: "Postnummer påkrevd norske adresser",
                             validate: (value: string) => (value.length != 4 ? "Postnummer må ha 4 tegn" : true),
@@ -107,19 +119,19 @@ function EditPostcodeAndState(props: EditAddressProps) {
                                 <PostnummerInput
                                     defaultValue={value}
                                     inputRef={ref}
-                                    error={error?.message ?? errors?.poststed?.message}
+                                    error={error?.message ?? getErrorMessage()}
                                     name={name}
                                     onChange={(postnummer, poststed) => {
                                         onChange(postnummer);
-                                        setValue(poststedFormKey, poststed);
-                                        clearErrors(poststedFormKey);
+                                        setValue(poststedFormKey as "poststed", poststed);
+                                        clearErrors(poststedFormKey as "poststed");
                                     }}
                                 />
                             </React.Suspense>
                         )}
                     />
                     <TextField
-                        {...register(poststedFormKey, { required: "Skriv inn gyldig postnummer" })}
+                        {...register(poststedFormKey as "poststed", { required: "Skriv inn gyldig postnummer" })}
                         size="small"
                         className="w-full"
                         label={"Poststed (fylles automatisk)"}
@@ -127,7 +139,7 @@ function EditPostcodeAndState(props: EditAddressProps) {
                     />
                 </>
             ) : (
-                <TextField {...register(poststedFormKey)} size="small" label={"Poststed"} />
+                <TextField {...register(poststedFormKey as "poststed")} size="small" label={"Poststed"} />
             )}
         </div>
     );
@@ -143,7 +155,7 @@ function EditCountry(props: EditAddressProps) {
     return (
         <Controller
             control={control}
-            name={landFormKey}
+            name={landFormKey as "land"}
             rules={{ required: "Land er påkrevd" }}
             render={({ field: { name, onChange, value, ref }, fieldState: { error } }) => (
                 <SelectableCountry
@@ -154,11 +166,11 @@ function EditCountry(props: EditAddressProps) {
                     onChange={(landkode) => {
                         onChange(landkode);
                         if (!isCountryCodeNorway(landkode)) {
-                            setValue(postnummerFormKey, "");
-                            setValue(poststedFormKey, "");
+                            setValue(postnummerFormKey as "postnummer", "");
+                            setValue(poststedFormKey as "poststed", "");
                         } else {
-                            resetField(postnummerFormKey);
-                            resetField(poststedFormKey);
+                            resetField(postnummerFormKey as "postnummer");
+                            resetField(poststedFormKey as "poststed");
                         }
                     }}
                 />
@@ -176,17 +188,41 @@ function EditAddressLines(props: EditAddressProps) {
 
     const country = useWatch({ name: `${formPrefix}land` });
     const isNorway = isCountryCodeNorway(country);
+    const getError = () => {
+        let error = errors;
+        if (formPrefix) {
+            formPrefix.split(".").forEach((splitKey) => {
+                if (splitKey.length > 0 && error) {
+                    error = error[splitKey];
+                }
+            });
+        }
+        return error?.adresselinje1?.message;
+    };
+    console.log(getError());
 
     return (
         <div className={"flex flex-col gap-y-4"}>
             <TextField
                 size="small"
-                error={errors.adresselinje1?.message}
-                {...register(`${formPrefix}adresselinje1`, { required: isNorway ? false : "Adresselinje1 er påkrevd" })}
+                error={getError()}
+                {...register(`${formPrefix}adresselinje1` as "adresselinje1", {
+                    required: isNorway ? false : "Adresselinje1 er påkrevd",
+                })}
                 label={"Adresse"}
             />
-            <TextField size="small" hideLabel {...register(`${formPrefix}adresselinje2`)} label={"Adresselinje2"} />
-            <TextField size="small" hideLabel {...register(`${formPrefix}adresselinje3`)} label={"Adresselinje3"} />
+            <TextField
+                size="small"
+                hideLabel
+                {...register(`${formPrefix}adresselinje2` as "adresselinje2")}
+                label={"Adresselinje2"}
+            />
+            <TextField
+                size="small"
+                hideLabel
+                {...register(`${formPrefix}adresselinje3` as "adresselinje3")}
+                label={"Adresselinje3"}
+            />
         </div>
     );
 }

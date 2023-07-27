@@ -309,7 +309,7 @@
     strict-event-emitter "^0.2.4"
     web-encoding "^1.1.5"
 
-"@navikt/aksel-icons@4.1.7", "@navikt/aksel-icons@^4.1.7":
+"@navikt/aksel-icons@4.1.7":
   version "4.1.7"
   resolved "https://npm.pkg.github.com/download/@navikt/aksel-icons/4.1.7/d4d108a125a38ff2b99e80bb7b64121f6b1e25ef#d4d108a125a38ff2b99e80bb7b64121f6b1e25ef"
   integrity sha512-cnouKXnrUEHJLCOgjt7jjSXY/1bcRzsB5fN/HRbyUbYItGNB/OOMM2mxOTdfjviqJDLXW0RedbIFQa3fm9RA3A==
@@ -318,6 +318,11 @@
   version "3.4.2"
   resolved "https://npm.pkg.github.com/download/@navikt/aksel-icons/3.4.2/fa858e1a5fb0557d61b62ad7cdf0d75e26fc89d7#fa858e1a5fb0557d61b62ad7cdf0d75e26fc89d7"
   integrity sha512-9fj+Jb4UrX3SDDzqJpKP3fvizdxtACIFNXgDiPaP/N/61pbeY4tZz/zrtWGtExLpDeg7dAyaiFH/hfo7nBg6nw==
+
+"@navikt/aksel-icons@^4.7.2":
+  version "4.7.2"
+  resolved "https://npm.pkg.github.com/download/@navikt/aksel-icons/4.7.2/217c844b451f517a7262e532c3848c53509295be#217c844b451f517a7262e532c3848c53509295be"
+  integrity sha512-pFZg5yCX6QMsyyl8j/O3bF3EBqMiIF00Bo2CAdVl4V1JVQNBTJ5Ed6Tktmq0mtv4vBE5C7NvRelUeUN+Jex+/Q==
 
 "@navikt/bidrag-ui-common@1.6.10":
   version "1.6.10"
@@ -332,10 +337,10 @@
   resolved "https://npm.pkg.github.com/download/@navikt/ds-css-internal/3.4.3/7c67c4b52264eb7833ca35788a83cc29af01d1ae#7c67c4b52264eb7833ca35788a83cc29af01d1ae"
   integrity sha512-VusM4uwHZoQWiX8N/1zD6ycgNFIzYQ40TXhlP7tqpdH6sVwwzFPWCWXaZtpyjUfHxU9WyNEDYoeRAECkC0qfzg==
 
-"@navikt/ds-css@4.1.7":
-  version "4.1.7"
-  resolved "https://npm.pkg.github.com/download/@navikt/ds-css/4.1.7/531ff46edd0e967f74695105135f1740bd1a5771#531ff46edd0e967f74695105135f1740bd1a5771"
-  integrity sha512-ntgPiInI+qwy0L3VZMVYHYRJRm+fhdWv2rfv55drW5JL9f+9hknrxIjugfahY4Go6o+wFKApPV1QL6w7sA8uHg==
+"@navikt/ds-css@4.7.2":
+  version "4.7.2"
+  resolved "https://npm.pkg.github.com/download/@navikt/ds-css/4.7.2/68cc42891f6ac554168c6249ab2d799229982e51#68cc42891f6ac554168c6249ab2d799229982e51"
+  integrity sha512-EvbwCbsCoVprOBz+f83IkNLLvkA/dkkKVhKlSEHFrSNPbp7GR1zIRuNOQ8LLr9xhhQAace4HQCRhOV4iR8+rWQ==
 
 "@navikt/ds-icons@3.4.3":
   version "3.4.3"
@@ -353,13 +358,13 @@
     clsx "^1.1.1"
     copy-to-clipboard "^3.3.1"
 
-"@navikt/ds-react@4.1.7":
-  version "4.1.7"
-  resolved "https://npm.pkg.github.com/download/@navikt/ds-react/4.1.7/19ada8dbef6896887514baad998fbf79d129c7f8#19ada8dbef6896887514baad998fbf79d129c7f8"
-  integrity sha512-3WX2AwrRzaAJleggzoYOHigqr0u0nnDsA65Yd11jPiBQxb9nXvX88Y50EYgl9ebQUclMiSALVX3CWfnqOwTgtA==
+"@navikt/ds-react@4.7.2":
+  version "4.7.2"
+  resolved "https://npm.pkg.github.com/download/@navikt/ds-react/4.7.2/06504ebc7d27702f80c8fde9144ff42be5efb177#06504ebc7d27702f80c8fde9144ff42be5efb177"
+  integrity sha512-u62Z0OevPx3tDcxuX6JEEzfjDAPBBsPAXa5+OfM+jV1tw8wEuv2Vy/55BV5lzkbnYTAeMaXw+ZZeKrx9EEq/ug==
   dependencies:
     "@floating-ui/react" "0.24.1"
-    "@navikt/aksel-icons" "^4.1.7"
+    "@navikt/aksel-icons" "^4.7.2"
     "@radix-ui/react-tabs" "1.0.0"
     "@radix-ui/react-toggle-group" "1.0.0"
     clsx "^1.2.1"
@@ -381,10 +386,10 @@
     react-day-picker "8.3.4"
     react-modal "3.15.1"
 
-"@navikt/ds-tailwind@4.1.7":
-  version "4.1.7"
-  resolved "https://npm.pkg.github.com/download/@navikt/ds-tailwind/4.1.7/32bedb024023b5a323e2bf00314cefb54f528b6e#32bedb024023b5a323e2bf00314cefb54f528b6e"
-  integrity sha512-GjkCRR6mP9VbqjHM6ZmD6BUTXaqI8tjT9jpGKqfxW6NGhIQj3ECfuK6LDF4oLJqZBNVwi9kGc1x2GKgrH2P2yA==
+"@navikt/ds-tailwind@^4.7.2":
+  version "4.7.2"
+  resolved "https://npm.pkg.github.com/download/@navikt/ds-tailwind/4.7.2/9dc35f67dea3181c7cb502e90ef3a6841e5bbd12#9dc35f67dea3181c7cb502e90ef3a6841e5bbd12"
+  integrity sha512-9gQMoKboOYm8v5haiDxzTcvlSeX/ziz/kUnHG0MIrJAraRoS6bptpd3JM1gfDoDENLgPunFgVdGb/tWlr5C9dA==
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"

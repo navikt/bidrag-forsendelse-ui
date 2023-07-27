@@ -23,7 +23,7 @@ interface JournalpostStatusTagProps {
 
 export default function JournalpostStatusTag({ status }: JournalpostStatusTagProps) {
     return (
-        <Tag variant={JournalpostStatusTags[status]} size="small" className="w-18 p-2 rounded-md">
+        <Tag variant={JournalpostStatusTags[status]} size="small" className="w-max p-2 rounded-md">
             {JournalpostStatusDisplayName[status] ?? "Ukjent"}
         </Tag>
     );

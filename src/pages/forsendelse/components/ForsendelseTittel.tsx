@@ -26,19 +26,22 @@ export default function ForsendelseTittel() {
     return (
         <div>
             <div className={"w-max flex flex-row gap-[5px]"}>
-                <Heading spacing size={"large"}>
-                    {forsendelseTittel}{" "}
-                </Heading>
                 {!editMode && (
-                    <Button
-                        className="w-max h-max mt-1"
-                        size="small"
-                        variant="tertiary"
-                        icon={<PencilIcon />}
-                        onClick={enableEditMode}
-                    >
-                        Endre tittel
-                    </Button>
+                    <>
+                        <Heading spacing size={"large"}>
+                            {forsendelseTittel}{" "}
+                        </Heading>
+
+                        <Button
+                            className="w-max h-max mt-1"
+                            size="small"
+                            variant="tertiary"
+                            icon={<PencilIcon />}
+                            onClick={enableEditMode}
+                        >
+                            Endre tittel
+                        </Button>
+                    </>
                 )}
             </div>
             {editMode && (

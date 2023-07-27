@@ -1,8 +1,11 @@
 import "./DokumenterTable.css";
 
-import { Table } from "@navikt/ds-react";
+import { OpenDocumentUtils } from "@navikt/bidrag-ui-common";
+import { Button, Table } from "@navikt/ds-react";
 import React from "react";
 
+import { DokumentStatus } from "../../constants/DokumentStatus";
+import { useErrorContext } from "../../context/ErrorProvider";
 import DokumentStatusInfo from "../../docs/DokumentStatusInfo.mdx";
 import { useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
 import InfoKnapp from "../InfoKnapp";
@@ -60,7 +63,46 @@ export default function DokumenterTable() {
                     </Table.Header>
                     <DokumentRows />
                 </Table>
+                <DokumenterTableBottomButtons />
             </div>
         </div>
+    );
+}
+
+function DokumenterTableBottomButtons() {
+    const { isSavingChanges, hasChanged, saveChanges, resetDocumentChanges, dokumenter, forsendelseId } =
+        useDokumenterForm();
+    const isOneOrMoreDocumentsDeleted = dokumenter.some((d) => d.status == DokumentStatus.SLETTET);
+    const isAllDocumentsFinished = dokumenter.every(
+        (d) => d.status == DokumentStatus.FERDIGSTILT || d.status == DokumentStatus.KONTROLLERT
+    );
+    const { addWarning } = useErrorContext();
+    return (
+        <span className={"flex flex-row mt-[10px]"}>
+            {hasChanged && isOneOrMoreDocumentsDeleted && (
+                <>
+                    <Button loading={isSavingChanges} onClick={saveChanges} variant={"danger"} size={"small"}>
+                        Bekreft sletting
+                    </Button>
+                    <Button onClick={resetDocumentChanges} variant={"tertiary"} size={"small"}>
+                        Angre
+                    </Button>
+                </>
+            )}
+            <Button
+                size="small"
+                variant="tertiary"
+                className="ml-auto justify-end"
+                onClick={() => {
+                    if (!isAllDocumentsFinished) {
+                        addWarning("Alle dokumenter må kontrolleres/ferdigstilles før de kan åpnes samtidig");
+                    } else {
+                        OpenDocumentUtils.åpneDokument("BIF-" + forsendelseId);
+                    }
+                }}
+            >
+                Åpne alle
+            </Button>
+        </span>
     );
 }

@@ -10,7 +10,7 @@ interface DokumentStatusTagProps {
 }
 export default function DokumentStatusTag({ status }: DokumentStatusTagProps) {
     return (
-        <Tag variant={DokumentStatusTags[status]} size="small" className="w-18 p-2 rounded-md">
+        <Tag variant={DokumentStatusTags[status]} size="small" className="w-max p-2 rounded-md">
             {DokumentStatusDisplayName[status] ?? "Ukjent"}
         </Tag>
     );

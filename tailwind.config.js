@@ -1,6 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
     content: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx,mdx}"],
+    presets: [require("@navikt/ds-tailwind")],
+    safelist: ["border-border-danger", "border-solid", "border-2"],
     theme: {
         extend: {
             gridTemplateColumns: {

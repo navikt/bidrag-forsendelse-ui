@@ -158,7 +158,7 @@ export function useForsendelseApi(): UseForsendelseDataProps {
                         "MÅ_KONTROLLERES",
                     ].includes(d.status)
                 );
-                return hasDokumentsWithStatus ? 3000 : 0;
+                return hasDokumentsWithStatus ? 0 : 0;
                 // return 0;
             },
             select: React.useCallback((response: AxiosResponse): IForsendelse => {

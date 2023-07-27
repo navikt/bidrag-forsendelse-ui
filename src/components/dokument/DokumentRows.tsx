@@ -2,12 +2,11 @@ import { DragEndEvent, DraggableAttributes } from "@dnd-kit/core";
 import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import { EyeIcon } from "@navikt/aksel-icons";
 import { DragVerticalIcon } from "@navikt/aksel-icons";
-import { OpenDocumentUtils } from "@navikt/bidrag-ui-common";
+import { dateToDDMMYYYYString, OpenDocumentUtils } from "@navikt/bidrag-ui-common";
 import { Delete } from "@navikt/ds-icons";
 import { Table } from "@navikt/ds-react";
 import { Button } from "@navikt/ds-react";
 import { Textarea } from "@navikt/ds-react";
-import dayjs from "dayjs";
 import React, { useRef } from "react";
 import { useState } from "react";
 import { useEffect } from "react";
@@ -16,7 +15,6 @@ import { useFormContext, useWatch } from "react-hook-form";
 
 import { DokumentArkivSystemDto } from "../../api/BidragForsendelseApi";
 import { DokumentStatus } from "../../constants/DokumentStatus";
-import { useErrorContext } from "../../context/ErrorProvider";
 import { FormIDokument, useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IForsendelseFormProps } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IDokument } from "../../types/Dokument";
@@ -54,6 +52,7 @@ export default function DokumentRows() {
                         index={i}
                         ref={ref}
                         id={id}
+                        key={id + i}
                         listeners={listeners}
                         attributes={attributes}
                         style={style}
@@ -61,50 +60,10 @@ export default function DokumentRows() {
                     />
                 )}
             </TableDraggableBody>
-            <DokumenterTableBottomButtons />
         </>
     );
 }
 
-function DokumenterTableBottomButtons() {
-    const { isSavingChanges, hasChanged, saveChanges, resetDocumentChanges, dokumenter, forsendelseId } =
-        useDokumenterForm();
-    const isOneOrMoreDocumentsDeleted = dokumenter.some((d) => d.status == DokumentStatus.SLETTET);
-    const isAllDocumentsFinished = dokumenter.every(
-        (d) => d.status == DokumentStatus.FERDIGSTILT || d.status == DokumentStatus.KONTROLLERT
-    );
-    const { addWarning } = useErrorContext();
-    return (
-        <div className={"flex flex-row mt-[10px]"}>
-            {hasChanged && isOneOrMoreDocumentsDeleted && (
-                <>
-                    <Button loading={isSavingChanges} onClick={saveChanges} variant={"danger"} size={"small"}>
-                        Bekreft sletting
-                    </Button>
-                    <Button onClick={resetDocumentChanges} variant={"tertiary"} size={"small"}>
-                        Angre
-                    </Button>
-                </>
-            )}
-            <Button
-                size="small"
-                variant="tertiary"
-                className="ml-auto justify-end"
-                onClick={() => {
-                    if (!isAllDocumentsFinished) {
-                        addWarning(
-                            "Alle dokumenter må kontrolleres/ferdigstilles før du kan åpne alle dokumenter samtidig"
-                        );
-                    } else {
-                        OpenDocumentUtils.åpneDokument("BIF-" + forsendelseId);
-                    }
-                }}
-            >
-                Åpne alle
-            </Button>
-        </div>
-    );
-}
 interface IDokumentRowProps {
     id: string;
     index: number;
@@ -176,7 +135,9 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
                 <Table.DataCell scope="row" style={{ width: "550px" }}>
                     <EditableDokumentTitle dokument={dokument} index={rowIndex} />
                 </Table.DataCell>
-                <Table.DataCell style={{ width: "100px" }}>{dayjs(dokumentDato).format("DD.MM.YYYY")}</Table.DataCell>
+                <Table.DataCell style={{ width: "100px" }}>
+                    {dateToDDMMYYYYString(new Date(dokumentDato))}
+                </Table.DataCell>
                 <Table.DataCell style={{ width: "200px" }}>
                     <div className="flex flex-row gap-[5px]">
                         <DokumentStatusTag status={status} />

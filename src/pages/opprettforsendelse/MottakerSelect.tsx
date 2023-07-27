@@ -59,8 +59,11 @@ export default function MottakerSelect() {
         }
     }
 
+    const errorMessage = errors.mottaker?.message;
+    const borderColor = errorMessage ? "border-2 border-solid border-border-danger" : "";
+
     return (
-        <div>
+        <div className="pt-2">
             <Heading size="small">Mottaker</Heading>
             <Tabs defaultValue={"SAMME_SOM_GJELDER"} onChange={onTabChange} size="small" className="w-max h-max">
                 <Tabs.List>
@@ -77,10 +80,13 @@ export default function MottakerSelect() {
                     <Tabs.Tab value="FRITEKST" label="Fritekst" icon={<PersonPencilIcon title="Fritekst" />} />
                 </Tabs.List>
 
-                <Tabs.Panel value="SAMME_SOM_GJELDER" className="h-max  w-full bg-gray-50 p-4">
+                <Tabs.Panel value="SAMME_SOM_GJELDER" className={`h-max w-full bg-gray-50 p-4 ${borderColor}`}>
                     <PersonDetaljer copy={false} spacing={false} ident={gjelderIdent} navn={gjelder?.navn} />
                 </Tabs.Panel>
-                <Tabs.Panel value="ANNEN_MOTTAKER" className="h-max min-h-[100px] w-full bg-gray-50 p-4">
+                <Tabs.Panel
+                    value="ANNEN_MOTTAKER"
+                    className={`h-max min-h-[100px] w-full bg-gray-50 p-4 ${borderColor}`}
+                >
                     <div className="flex flex-col gap-4 w-max gap-[5px]">
                         <PersonSok
                             defaultValue={watch("mottaker.ident")}
@@ -89,12 +95,12 @@ export default function MottakerSelect() {
                         <MottakerNavnOgAdresse />
                     </div>
                 </Tabs.Panel>
-                <Tabs.Panel value="FRITEKST" className="h-max w-full bg-gray-50 p-4">
+                <Tabs.Panel value="FRITEKST" className={`h-max w-full bg-gray-50 p-4 ${borderColor}`}>
                     <MottakerFritekst />
                 </Tabs.Panel>
             </Tabs>
             {errors.mottaker?.message && (
-                <Alert inline variant="error">
+                <Alert inline size="small" variant="error">
                     {errors.mottaker?.message}
                 </Alert>
             )}

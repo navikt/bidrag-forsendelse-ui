@@ -39,7 +39,7 @@ function ForsendelseView() {
         <ContentContainer>
             <Grid>
                 <Cell xs={12} md={12} lg={10}>
-                    <div className={"py-18 leading-xlarge tracking-wide"}>
+                    <div className={"leading-xlarge tracking-wide"}>
                         <ForsendelseTittel />
                         <Grid className={"w-max"}>
                             <Cell xs={12} md={12} lg={10}>
