@@ -11,8 +11,6 @@ import { Heading } from "@navikt/ds-react";
 import { Accordion } from "@navikt/ds-react";
 import { Tag } from "@navikt/ds-react";
 import { Checkbox } from "@navikt/ds-react";
-import { BodyShort } from "@navikt/ds-react";
-import dayjs from "dayjs";
 import { useState } from "react";
 import React from "react";
 import { useEffect } from "react";
@@ -22,12 +20,7 @@ import useIsDebugMode from "../../hooks/useDebugMode";
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
 import { useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IDokument } from "../../types/Dokument";
-import {
-    IDokumentJournalDto,
-    IJournalpost,
-    JournalpostStatus,
-    journalstatusToDisplayValue,
-} from "../../types/Journalpost";
+import { IDokumentJournalDto, IJournalpost, JournalpostStatus } from "../../types/Journalpost";
 import { mapRolleToDisplayValue } from "../../types/RolleMapper";
 import { cleanupAfterClosedModal } from "../../utils/ModalUtils";
 import { isEqualIgnoreNull } from "../../utils/ObjectUtils";
@@ -316,7 +309,6 @@ function DokumenterForSakTabell({
     fraRolle,
 }: DokumenterForSakTabellProps) {
     const { hentJournalposterForSak, hentForsendelse } = useForsendelseApi();
-    const { dokumenter } = useDokumenterForm();
     const journalposter = hentJournalposterForSak(saksnummer);
     const forsendelse = hentForsendelse();
     const visJournalposter = journalposter
@@ -379,104 +371,6 @@ interface JournalpostDokumenterRowProps {
     unselectDocument: (documents: IDokument) => void;
     selectDocument: (dokument: IDokument, toogle?: boolean) => void;
     selectedDocuments: IDokument[];
-}
-function JournalpostDokumenterRow({
-    saksnummer,
-    journalpost,
-    selectDocument,
-    fraRolle,
-    selectedDocuments,
-}: JournalpostDokumenterRowProps) {
-    function onDocumentSelected() {
-        const leggTilDokument: IDokument = {
-            fraSaksnummer: saksnummer,
-            journalpostId: journalpost.journalpostId,
-            språk: journalpost.språk,
-            dokumentmalId: journalpost.dokumenter[0].dokumentmalId,
-            tittel: journalpost.innhold,
-            fraRolle: fraRolle,
-            lagret: false,
-            dokumentDato: journalpost.dokumentDato,
-            status: DokumentStatus.MÅ_KONTROLLERES,
-            index: -1,
-        };
-        selectDocument(leggTilDokument);
-    }
-    const isSelected = selectedDocuments.some((d) => d.journalpostId == journalpost.journalpostId);
-
-    let tittel = journalpost.dokumenter.length > 0 ? journalpost.dokumenter[0].tittel : journalpost.innhold;
-    tittel = tittel != undefined || tittel.trim().length == 0 ? journalpost.innhold : tittel;
-    const hasOnlyOneDocument = journalpost.dokumenter.length == 1;
-    const renderTableRowContent = () => (
-        <>
-            <Table.DataCell style={{ width: "2%" }}>
-                <Checkbox
-                    hideLabel
-                    checked={isSelected}
-                    onChange={onDocumentSelected}
-                    aria-labelledby={`id-${journalpost.journalpostId}`}
-                >
-                    {" "}
-                </Checkbox>
-            </Table.DataCell>
-            {/* <Table.DataCell style={{ width: "20%" }}>{tittel + " - " + journalpost.journalpostId}</Table.DataCell> */}
-            <Table.DataCell style={{ width: "20%" }}>{tittel}</Table.DataCell>
-            <Table.DataCell style={{ width: "5%" }}>
-                {dayjs(journalpost.dokumentDato).format("DD.MM.YYYY")}
-            </Table.DataCell>
-            <Table.DataCell style={{ width: "5%" }}>
-                {journalstatusToDisplayValue(journalpost.journalstatus)}
-            </Table.DataCell>
-            <Table.DataCell style={{ width: "5%" }}>{journalpost.dokumentType}</Table.DataCell>
-            <Table.DataCell style={{ width: "5%" }}>{journalpost.gjelderAktor?.ident}</Table.DataCell>
-            <Table.DataCell style={{ width: "2%" }}>
-                <div className={"flex flex-row gap-1"}>
-                    <OpenDokumentButton journalpostId={journalpost.journalpostId} status={journalpost.journalstatus} />
-                </div>
-            </Table.DataCell>
-            {hasOnlyOneDocument && <Table.DataCell></Table.DataCell>}
-        </>
-    );
-    if (hasOnlyOneDocument) {
-        return (
-            <Table.Row key={journalpost.journalpostId} selected={isSelected} className={"journalpost"}>
-                {renderTableRowContent()}
-            </Table.Row>
-        );
-    }
-    return (
-        <>
-            <Table.ExpandableRow
-                key={journalpost.journalpostId}
-                selected={isSelected}
-                className={"journalpost"}
-                togglePlacement={"right"}
-                content={
-                    <div>
-                        <Heading spacing size={"small"}>
-                            Dokumenter
-                        </Heading>
-                        <ul>
-                            {journalpost.dokumenter.map((dok, index) => (
-                                <li>
-                                    <div className={"flex flex-row gap-2 items-center"}>
-                                        <BodyShort>{dok.tittel}</BodyShort>
-                                        <OpenDokumentButton
-                                            dokumentreferanse={dok.dokumentreferanse}
-                                            journalpostId={journalpost.journalpostId}
-                                            status={"FERDIGSTILT"}
-                                        />
-                                    </div>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                }
-            >
-                {renderTableRowContent()}
-            </Table.ExpandableRow>
-        </>
-    );
 }
 
 function JournalpostDokumenterRowMultiDoc({
