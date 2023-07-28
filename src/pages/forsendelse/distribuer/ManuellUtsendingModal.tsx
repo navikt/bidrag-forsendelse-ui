@@ -72,10 +72,10 @@ export default function ManuellUtsendingModal({ onCancel }: ManuellUtsendingModa
                     </div>
                 </div>
                 <div className="flex items-center p-2 space-x-2 ">
-                    <Button variant={"primary"} onClick={onSubmit} loading={submitState === "pending"}>
+                    <Button size="small" variant={"primary"} onClick={onSubmit} loading={submitState === "pending"}>
                         Bekreft og gå tilbake til sakshistorikk
                     </Button>
-                    <Button variant={"tertiary"} disabled={submitState === "pending"} onClick={onCancel}>
+                    <Button size="small" variant={"tertiary"} disabled={submitState === "pending"} onClick={onCancel}>
                         Avbryt
                     </Button>
                 </div>

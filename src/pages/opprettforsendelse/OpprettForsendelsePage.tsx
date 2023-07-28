@@ -11,6 +11,7 @@ import BidragErrorPanel from "../../context/BidragErrorPanel";
 import { useErrorContext } from "../../context/ErrorProvider";
 import { useForsendelseApi, UseForsendelseApiKeys } from "../../hooks/useForsendelseApi";
 import { ENHET_FARSKAP } from "../../types/EnhetTypes";
+import { mapToBehandlingInfo } from "../../types/Forsendelse";
 import { useSession } from "../forsendelse/context/SessionContext";
 import { queryClient } from "../PageWrapper";
 import DokumentValgOpprett from "./DokumentValgOpprett";
@@ -135,18 +136,7 @@ function OpprettForsendelseNy() {
                 enhet: enhet,
                 saksnummer,
                 opprettTittel: true,
-                behandlingInfo: {
-                    soknadFra: options.soknadFra,
-                    soknadId: options.soknadId,
-                    vedtakId: options.vedtakId,
-                    behandlingId: options.behandlingId,
-                    vedtakType: options.vedtakType,
-                    behandlingType: options.behandlingType,
-                    stonadType: options.stonadType,
-                    engangsBelopType: options.engangsBelopType,
-                    erFattetBeregnet: options.erFattetBeregnet,
-                    erVedtakIkkeTilbakekreving: options.erVedtakIkkeTilbakekreving,
-                },
+                behandlingInfo: mapToBehandlingInfo(options),
                 dokumenter: [
                     {
                         dokumentmalId: data.dokument.malId,

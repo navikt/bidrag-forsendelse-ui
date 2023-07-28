@@ -19,7 +19,7 @@ export interface IOpprettForsendelseProviderProps {
     enhet?: string;
 }
 
-interface IOpprettForsendelsePropsContext {
+export interface IOpprettForsendelsePropsContext {
     behandlingType: string;
     engangsBelopType: EngangsbelopType;
     stonadType: StonadType;

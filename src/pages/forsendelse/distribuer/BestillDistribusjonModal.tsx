@@ -117,12 +117,13 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
                     <Button
                         variant={"primary"}
                         onClick={onSubmit}
+                        size="small"
                         loading={submitState === "pending"}
                         disabled={submitButtonDisabled}
                     >
                         Bekreft og gå tilbake til sakshistorikk
                     </Button>
-                    <Button variant={"secondary"} disabled={cancelButtonDisabled} onClick={onCancel}>
+                    <Button size="small" variant={"secondary"} disabled={cancelButtonDisabled} onClick={onCancel}>
                         Avbryt
                     </Button>
                 </div>

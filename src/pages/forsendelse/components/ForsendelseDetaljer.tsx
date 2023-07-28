@@ -27,7 +27,7 @@ export default function ForsendelseDetaljer() {
                         },
                         {
                             label: "Opprettet av",
-                            value: forsendelse.opprettetAvIdent,
+                            value: forsendelse.opprettetAvNavn,
                         },
                     ]}
                 />

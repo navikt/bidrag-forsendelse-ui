@@ -9,6 +9,7 @@ import GjelderSelect from "../../components/detaljer/GjelderSelect";
 import TemaSelect from "../../components/detaljer/TemaSelect";
 import DokumentValgNotat from "../../components/dokument/DokumentValgNotat";
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
+import { mapToBehandlingInfoDto } from "../../types/Forsendelse";
 import { useSession } from "../forsendelse/context/SessionContext";
 import { useOpprettForsendelse } from "../opprettforsendelse/OpprettForsendelseContext";
 
@@ -29,37 +30,29 @@ export default function OpprettNotatPage() {
     const { saksnummer, enhet, navigateToForsendelse } = useSession();
     const options = useOpprettForsendelse();
     const opprettForsendelseFn = useMutation({
-        mutationFn: (data: OpprettForsendelseFormProps) =>
-            BIDRAG_FORSENDELSE_API.api.opprettForsendelse({
+        mutationFn: (data: OpprettForsendelseFormProps) => {
+            return BIDRAG_FORSENDELSE_API.api.opprettForsendelse({
                 gjelderIdent: data.gjelderIdent,
                 mottaker: {
                     ident: data.mottakerIdent,
                 },
                 saksnummer,
                 opprettTittel: true,
-                enhet: enhet ?? "4806",
+                enhet: enhet,
                 tema: data.tema as JournalTema,
                 språk: data.språk,
-                behandlingInfo: {
-                    soknadFra: options.soknadFra,
-                    soknadId: options.soknadId,
-                    vedtakId: options.vedtakId,
-                    behandlingId: options.behandlingId,
-                    vedtakType: options.vedtakType,
-                    stonadType: options.stonadType,
-                    engangsBelopType: options.engangsBelopType,
-                    erFattetBeregnet: options.erFattetBeregnet,
-                },
+                behandlingInfo: mapToBehandlingInfoDto(options),
                 dokumenter: [
                     {
                         dokumentmalId: data.dokument.malId,
                         tittel: data.dokument.tittel,
                         språk: data.språk,
+                        bestillDokument: true,
                     },
                 ],
-            }),
+            });
+        },
         onSuccess: (data) => {
-            console.log(data);
             const forsendelseId = data.data.forsendelseId;
             navigateToForsendelse(forsendelseId?.toString(), data.data.forsendelseType);
         },
