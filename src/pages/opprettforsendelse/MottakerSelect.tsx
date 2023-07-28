@@ -109,7 +109,7 @@ export default function MottakerSelect() {
 }
 
 function MottakerFritekst() {
-    const { register, setValue, watch, control } = useOpprettForsendelseFormContext();
+    const { register } = useOpprettForsendelseFormContext();
 
     return (
         <div className="w-[400px] h-max">

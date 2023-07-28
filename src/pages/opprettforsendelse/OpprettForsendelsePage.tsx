@@ -132,7 +132,7 @@ function OpprettForsendelseNy() {
             return BIDRAG_FORSENDELSE_API.api.opprettForsendelse({
                 ...request,
                 gjelderIdent: data.gjelderIdent,
-                enhet: enhet ?? "4806",
+                enhet: enhet,
                 saksnummer,
                 opprettTittel: true,
                 behandlingInfo: {
@@ -193,7 +193,6 @@ interface OpprettForsendelsContainerProps {
     tittel?: string;
 }
 function OpprettForsendelsContainer({ onSubmit, tittel }: OpprettForsendelsContainerProps) {
-    const { forsendelseId, saksnummer } = useSession();
     const roller = useForsendelseApi().hentRoller();
     const methods = useFormContext();
     const isLoading = useIsMutating([OPPRETT_FORSENDELSE_MUTATION_KEY]) > 0;

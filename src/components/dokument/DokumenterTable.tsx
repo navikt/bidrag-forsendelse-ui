@@ -31,41 +31,47 @@ export default function DokumenterTable() {
     const { dokumenter, forsendelseId } = useDokumenterForm();
     return (
         <div>
-            <div className={"flex flex-rpw mt-[10px] border-b-[1px]"}>
+            <div className={"flex flex-rpw mt-[10px] border-b-[1px] w-[1028px]"}>
                 <LeggTilDokumentButton />
                 <LeggTilFraMalKnapp />
                 <div style={{ marginLeft: "auto" }}>Antall dokumenter: {dokumenter.length}</div>
             </div>
             <div className={"dokument-table "} style={{ borderColor: "var(--a-border-subtle)" }}>
                 <Table size={"small"} style={{ tableLayout: "auto", display: "block", width: "1028px" }}>
-                    <Table.Header>
-                        <Table.Row>
-                            <Table.HeaderCell scope="col" style={{ width: "3px" }}></Table.HeaderCell>
-                            <Table.HeaderCell scope="col" style={{ width: "3px" }}>
-                                Nr.
-                            </Table.HeaderCell>
-                            <Table.HeaderCell scope="col" style={{ width: "550px" }}>
-                                Tittel
-                            </Table.HeaderCell>
-                            <Table.HeaderCell scope="col" style={{ width: "100px" }}>
-                                Dok. dato
-                            </Table.HeaderCell>
-                            <Table.HeaderCell scope="col" align={"left"} style={{ width: "200px" }}>
-                                <div className="flex flex-row gap-2">
-                                    Status{" "}
-                                    <InfoKnapp>
-                                        <DokumentStatusInfo />
-                                    </InfoKnapp>
-                                </div>
-                            </Table.HeaderCell>
-                            <Table.HeaderCell scope="col" style={{ width: "50px" }}></Table.HeaderCell>
-                        </Table.Row>
-                    </Table.Header>
+                    <DokumenterTableHeader />
                     <DokumentRows />
                 </Table>
                 <DokumenterTableBottomButtons />
             </div>
         </div>
+    );
+}
+
+function DokumenterTableHeader() {
+    return (
+        <Table.Header>
+            <Table.Row>
+                <Table.HeaderCell scope="col" style={{ width: "3px" }}></Table.HeaderCell>
+                <Table.HeaderCell scope="col" style={{ width: "3px" }}>
+                    Nr.
+                </Table.HeaderCell>
+                <Table.HeaderCell scope="col" style={{ width: "550px" }}>
+                    Tittel
+                </Table.HeaderCell>
+                <Table.HeaderCell scope="col" style={{ width: "100px" }}>
+                    Dok. dato
+                </Table.HeaderCell>
+                <Table.HeaderCell scope="col" align={"left"} style={{ width: "200px" }}>
+                    <div className="flex flex-row gap-2">
+                        Status{" "}
+                        <InfoKnapp>
+                            <DokumentStatusInfo />
+                        </InfoKnapp>
+                    </div>
+                </Table.HeaderCell>
+                <Table.HeaderCell scope="col" style={{ width: "50px" }}></Table.HeaderCell>
+            </Table.Row>
+        </Table.Header>
     );
 }
 
@@ -78,7 +84,7 @@ function DokumenterTableBottomButtons() {
     );
     const { addWarning } = useErrorContext();
     return (
-        <span className={"flex flex-row mt-[10px]"}>
+        <span className={"flex flex-row mt-[10px] w-[1028px]"}>
             {hasChanged && isOneOrMoreDocumentsDeleted && (
                 <>
                     <Button loading={isSavingChanges} onClick={saveChanges} variant={"danger"} size={"small"}>

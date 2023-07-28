@@ -45,7 +45,7 @@ export default function DokumentValg({ malDetaljer, showLegend }: DokumentValgPr
         }
     }
 
-    const methods = register("dokument", { validate: (dok) => (dok.malId == null ? "Dokument må velges" : true) });
+    const methods = register("dokument", { validate: (dok) => (dok?.malId == null ? "Dokument må velges" : true) });
     return (
         <div className="w-100">
             <RadioGroup

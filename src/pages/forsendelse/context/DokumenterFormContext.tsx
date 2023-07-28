@@ -74,9 +74,10 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
     const oppdaterDokumentTittelFn = useMutation<unknown, unknown, OppdaterDokumentTittelMutationProps>({
         mutationFn: ({ tittel, dokumentreferanse }) =>
             BIDRAG_FORSENDELSE_API.api.oppdaterDokument(forsendelse.forsendelseId, dokumentreferanse, { tittel }),
-        onError: (error, variables, context) => {
+        onError: (error: AxiosError, variables, context) => {
             console.log(error, variables, context);
-            addError(`Det skjedde en feil ved lagring av dokumentittel "${variables.tittel}"`);
+            const errorMessage = error.response?.headers?.["warning"];
+            addError(`Det skjedde en feil ved lagring av dokumentittel "${variables.tittel}": ${errorMessage}`);
         },
     });
 

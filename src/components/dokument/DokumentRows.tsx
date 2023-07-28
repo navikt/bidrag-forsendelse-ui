@@ -136,7 +136,7 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
                     <EditableDokumentTitle dokument={dokument} index={rowIndex} />
                 </Table.DataCell>
                 <Table.DataCell style={{ width: "100px" }}>
-                    {dateToDDMMYYYYString(new Date(dokumentDato))}
+                    {dateToDDMMYYYYString(dokumentDato ? new Date(dokumentDato) : new Date())}
                 </Table.DataCell>
                 <Table.DataCell style={{ width: "200px" }}>
                     <div className="flex flex-row gap-[5px]">

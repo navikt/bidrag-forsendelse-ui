@@ -10,6 +10,7 @@ import React from "react";
 import { useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 
+import { DokumentStatus } from "../../constants/DokumentStatus";
 import { useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IDokument } from "../../types/Dokument";
 import { cleanupAfterClosedModal } from "../../utils/ModalUtils";
@@ -61,6 +62,7 @@ function LeggTilDokumentFraMalModal({ onClose, open }: LeggTilDokumentFraSakModa
             onClose({
                 dokumentmalId: data.dokument.malId,
                 tittel: data.dokument.tittel,
+                status: DokumentStatus.IKKE_BESTILT,
                 index: -1,
                 lagret: false,
             });
