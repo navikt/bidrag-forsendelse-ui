@@ -136,6 +136,9 @@ function MottakerNavnOgAdresse() {
                 land: data.adresse.landkode,
             });
         }
+        if (data?.navn) {
+            setValue("mottaker.navn", data.navn);
+        }
     }, [data?.adresse]);
 
     if (isFetching) {
