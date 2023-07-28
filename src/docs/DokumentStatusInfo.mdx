@@ -1,0 +1,38 @@
+
+<Heading size="small">Forklaring av dokumentstatuser</Heading>
+<div className="">
+    <ul>
+        <li>
+            <DokumentStatusTag status="UNDER_PRODUKSJON"/>
+            <BodyShort size="small">
+                Hvis du har akkurat bestilt nytt dokument fra mal så vil dokumentet ha denne statusen i en kort periode. 
+                Det betyr at dokumentet er i ferd med å produseres og er ikke klar for å åpnes og redigeres enda.
+            </BodyShort>
+        </li>
+       <li>
+            <DokumentStatusTag status="UNDER_REDIGERING"/>
+            <BodyShort size="small">
+                Dokumentet er under redigering og må ferdigstilles
+            </BodyShort>
+        </li>
+       <li>
+            <DokumentStatusTag status="MÅ_KONTROLLERES"/>
+            <BodyShort size="small">
+                Dokumentet er importert fra et annen kilde og må kontrolleres og maskeres for sensitivt info 
+            </BodyShort>
+        </li>
+        <li>
+            <DokumentStatusTag status="KONTROLLERT"/>
+            <BodyShort size="small">
+                Dokumentet er kontrollert og maskert ferdig
+            </BodyShort>
+        </li>
+        <li>
+            <DokumentStatusTag status="FERDIGSTILT"/>
+            <BodyShort size="small">
+                Dokumentet er ferdigstilt
+            </BodyShort>
+        </li>
+    </ul>
+
+</div>

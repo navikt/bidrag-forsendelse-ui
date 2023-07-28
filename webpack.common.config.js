@@ -23,8 +23,23 @@ module.exports = {
         rules: [
             {
                 test: /\.css$/,
-                include: path.resolve(__dirname, "src"),
                 use: [MiniCssExtractPlugin.loader, "css-loader", "postcss-loader"],
+            },
+            {
+                test: /\.mdx?$/,
+                use: [
+                    {
+                        loader: "@mdx-js/loader",
+                        /** @type {import('@mdx-js/loader').Options} */
+                        options: {
+                            providerImportSource: "@mdx-js/react",
+                        },
+                    },
+                ],
+            },
+            {
+                test: /\.(png|jpg|gif|mov)$/i,
+                type: "asset/inline",
             },
             {
                 test: /\.([jt]sx?)?$/,
@@ -33,19 +48,19 @@ module.exports = {
                     {
                         loader: "swc-loader",
                         options: {
-                            env: { mode: "usage" },
-                            minify: !isDevelopment,
                             jsc: {
-                                target: "es2022",
-                                minify: {
-                                    compress: true,
-                                    mangle: true,
-                                },
                                 parser: {
                                     syntax: "typescript",
                                     tsx: true,
-                                    topLevelAwait: true,
                                     dynamicImport: true,
+                                    privateMethod: false,
+                                    functionBind: false,
+                                    exportDefaultFrom: false,
+                                    exportNamespaceFrom: false,
+                                    decorators: false,
+                                    decoratorsBeforeExport: false,
+                                    topLevelAwait: true,
+                                    importMeta: false,
                                 },
                                 transform: {
                                     react: {
@@ -53,22 +68,17 @@ module.exports = {
                                         refresh: isDevelopment,
                                     },
                                 },
+                                minify: {
+                                    compress: false,
+                                    mangle: false,
+                                },
+                                target: "es2022",
+                                loose: false,
+                                externalHelpers: false,
+                                // Requires v1.2.50 or upper and requires target to be es2016 or upper.
+                                keepClassNames: true,
                             },
-                        },
-                    },
-                ],
-            },
-            {
-                test: /\.less$/i,
-                use: [
-                    MiniCssExtractPlugin.loader,
-                    "css-loader",
-                    {
-                        loader: "less-loader",
-                        options: {
-                            lessOptions: {
-                                paths: [path.resolve(__dirname, "node_modules")],
-                            },
+                            minify: false,
                         },
                     },
                 ],
@@ -89,10 +99,10 @@ module.exports = {
             ignoreOrder: true,
         }),
         new ModuleFederationPlugin({
-            name: "bidrag_dokument_redigering_ui",
+            name: "bidrag_forsendelse_ui",
             filename: "remoteEntry.js",
             exposes: {
-                "./DokumentRedigering": "./src/pages/App.tsx",
+                "./Forsendelse": "./src/app.tsx",
             },
             shared: {
                 react: { singleton: true, requiredVersion: deps.react },

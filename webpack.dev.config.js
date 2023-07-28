@@ -4,10 +4,11 @@ const Dotenv = require("dotenv-webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { EnvironmentPlugin } = require("webpack");
 const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
+const buildConfig = require("./buildConfig");
 
 module.exports = merge(webpackCommon, {
     mode: "development",
-    devtool: "eval-source-map",
+    devtool: "source-map",
     devServer: {
         historyApiFallback: true,
         devMiddleware: {
@@ -17,7 +18,7 @@ module.exports = merge(webpackCommon, {
             webSocketTransport: "ws",
         },
         webSocketServer: "ws",
-        port: 5252,
+        port: 8082,
         hot: true,
         headers: {
             "Access-Control-Allow-Origin": "*",
@@ -35,5 +36,13 @@ module.exports = merge(webpackCommon, {
         new EnvironmentPlugin({
             ENABLE_MOCK: "",
         }),
+        // new ModuleFederationPlugin({
+        //     ...buildConfig.federationConfig,
+        //     remotes: {
+        //         bidrag_dokument_ui: "bidrag_dokument_ui@hhttp://localhost:8081/remoteEntry.js",
+        //         // bidrag_sak_ui:
+        //         //     "bidrag_sak_ui@https://bidrag-ui-static-files.intern.dev.nav.no/bidrag_sak_ui/feature/static/remoteEntry.js",
+        //     },
+        // }),
     ],
 });
