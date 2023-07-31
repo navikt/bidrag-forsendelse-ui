@@ -128,31 +128,30 @@ export function erSammeDokument(
     );
 }
 
-export function isSameDocument(
-    document: IDokument | IDokumentJournalDto,
-    compareToDocument: IDokument | IDokumentJournalDto
-) {
-    return (
-        document.dokumentreferanse == compareToDocument.dokumentreferanse ||
-        (document.dokumentreferanse == null &&
+export function isSameDocument(documentA: IDokument | IDokumentJournalDto, documentB: IDokument | IDokumentJournalDto) {
+    const erReferanseTilSammeHeleJournalpost =
+        (documentB.originalDokumentreferanse == null &&
+            documentB.originalJournalpostId != null &&
             isEqualIgnoreNull(
-                document.journalpostId?.replace(/\D/g, ""),
-                compareToDocument.originalJournalpostId?.replace(/\D/g, "")
+                documentB.originalJournalpostId?.replace(/\D/g, ""),
+                documentA.journalpostId?.replace(/\D/g, "")
             )) ||
-        (compareToDocument.originalDokumentreferanse == null &&
-            compareToDocument.originalJournalpostId != null &&
+        (documentA.originalDokumentreferanse == null &&
+            documentA.originalJournalpostId != null &&
             isEqualIgnoreNull(
-                compareToDocument.originalJournalpostId?.replace(/\D/g, ""),
-                document.journalpostId?.replace(/\D/g, "")
+                documentB.journalpostId?.replace(/\D/g, ""),
+                documentA.originalJournalpostId?.replace(/\D/g, "")
             )) ||
-        (document.originalDokumentreferanse == null &&
-            document.originalJournalpostId != null &&
+        (documentA.dokumentreferanse == null &&
             isEqualIgnoreNull(
-                compareToDocument.journalpostId?.replace(/\D/g, ""),
-                document.originalJournalpostId?.replace(/\D/g, "")
-            )) ||
-        isEqualIgnoreNull(document.dokumentreferanse, compareToDocument.originalDokumentreferanse) ||
-        isEqualIgnoreNull(document.originalDokumentreferanse, compareToDocument.originalDokumentreferanse) ||
-        isEqualIgnoreNull(document.originalDokumentreferanse, compareToDocument.dokumentreferanse)
-    );
+                documentA.journalpostId?.replace(/\D/g, ""),
+                documentB.originalJournalpostId?.replace(/\D/g, "")
+            ));
+    const erReferanseTilSammeDokument =
+        isEqualIgnoreNull(documentA.dokumentreferanse, documentB.originalDokumentreferanse) ||
+        isEqualIgnoreNull(documentA.originalDokumentreferanse, documentB.originalDokumentreferanse) ||
+        isEqualIgnoreNull(documentA.originalDokumentreferanse, documentB.dokumentreferanse);
+    const erSammeDokument = documentA.dokumentreferanse == documentB.dokumentreferanse;
+
+    return erSammeDokument || erReferanseTilSammeHeleJournalpost || erReferanseTilSammeDokument;
 }

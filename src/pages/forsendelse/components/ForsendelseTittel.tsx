@@ -1,7 +1,7 @@
 import { PencilIcon } from "@navikt/aksel-icons";
 import { XMarkIcon } from "@navikt/aksel-icons";
 import { CloudUpIcon } from "@navikt/aksel-icons";
-import { Button, Heading, TextField } from "@navikt/ds-react";
+import { Alert, Button, Heading, TextField } from "@navikt/ds-react";
 import { AxiosError } from "axios";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "react-query";
@@ -73,10 +73,7 @@ function EditForsendelseTitle({ onCancel, onSubmit, defaultValue }: EditForsende
                 })
                 .then((res) => res.data),
         onSuccess: (data) => onSubmit(data.tittel ?? defaultValue),
-        onError: (error: AxiosError, variables, context) => {
-            const errorMessage = error.response?.headers?.["warning"];
-            addError({ message: `Kunne ikke lagre tittel: ${errorMessage}`, type: "forsendelsetittel" });
-        },
+        useErrorBoundary: false,
     });
 
     function onChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -92,43 +89,59 @@ function EditForsendelseTitle({ onCancel, onSubmit, defaultValue }: EditForsende
             onSubmit(defaultValue);
         }
     }
+
+    function renderError() {
+        if (updateTitleMutation.isError == true) {
+            const error = updateTitleMutation.error as AxiosError;
+            const errorMessage = error?.response?.headers?.["warning"];
+            return (
+                <Alert
+                    className="w-max mb-2"
+                    variant="error"
+                    size="small"
+                >{`Kunne ikke lagre tittel: ${errorMessage}`}</Alert>
+            );
+        }
+    }
     return (
-        <div className="flex flex-row gap-[5px] mb-4">
-            <TextField
-                onKeyDown={(e) => {
-                    if (e.key.toLowerCase() == "enter") _onSubmit();
-                    if (e.key.toLowerCase() == "escape") onCancel();
-                }}
-                autoFocus
-                disabled={updateTitleMutation.isLoading}
-                defaultValue={defaultValue}
-                name="tittel"
-                size="small"
-                label="Navn på forsendelsen"
-                onChange={onChange}
-                error={updateTitleMutation.isError ? "Kunne ikke lagre endringer" : undefined}
-                className="w-2/3"
-            />
-            <div className="self-end">
-                <Button
-                    loading={updateTitleMutation.isLoading}
-                    size="small"
-                    variant="tertiary"
-                    icon={<CloudUpIcon />}
-                    onClick={_onSubmit}
-                >
-                    Lagre
-                </Button>
-                <Button
+        <div>
+            <div className="flex flex-row gap-[5px] mb-4">
+                <TextField
+                    onKeyDown={(e) => {
+                        if (e.key.toLowerCase() == "enter") _onSubmit();
+                        if (e.key.toLowerCase() == "escape") onCancel();
+                    }}
+                    autoFocus
                     disabled={updateTitleMutation.isLoading}
+                    defaultValue={defaultValue}
+                    name="tittel"
                     size="small"
-                    variant="tertiary"
-                    icon={<XMarkIcon />}
-                    onClick={onCancel}
-                >
-                    Avbryt
-                </Button>
+                    label="Navn på forsendelsen"
+                    onChange={onChange}
+                    className="w-2/3"
+                />
+                <div className="self-end">
+                    <Button
+                        loading={updateTitleMutation.isLoading}
+                        size="small"
+                        variant="tertiary"
+                        icon={<CloudUpIcon />}
+                        onClick={_onSubmit}
+                    >
+                        Lagre
+                    </Button>
+                    <Button
+                        disabled={updateTitleMutation.isLoading}
+                        size="small"
+                        variant="tertiary"
+                        icon={<XMarkIcon />}
+                        onClick={onCancel}
+                    >
+                        Avbryt
+                    </Button>
+                </div>
             </div>
+            {renderError()}
         </div>
     );
 }

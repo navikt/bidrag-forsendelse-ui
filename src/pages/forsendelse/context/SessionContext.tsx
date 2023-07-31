@@ -10,7 +10,7 @@ interface ISessionContext {
     saksnummer: string;
     enhet: string;
     sessionId: string;
-    navigateToForsendelse: (forsendelseId: string, type: "UTGÅENDE" | "NOTAT") => void;
+    navigateToForsendelse: (forsendelseId: string, type: "UTGÅENDE" | "NOTAT", erFerdigstilt?: boolean) => void;
 }
 
 interface ISessionPropsContext {
@@ -29,11 +29,15 @@ function SessionProvider({ children, ...props }: PropsWithChildren<ISessionProps
     const [sessionId, setSessionId] = useState(props.sessionId);
     const [enhet, setEnhet] = useState(props.enhet);
 
-    const navigateToForsendelse = (forsendelseId: string, type: "UTGÅENDE" | "NOTAT" = "UTGÅENDE") => {
+    const navigateToForsendelse = (
+        forsendelseId: string,
+        type: "UTGÅENDE" | "NOTAT" = "UTGÅENDE",
+        erFerdigstilt = false
+    ) => {
         const params = new URLSearchParams();
         params.append("enhet", enhet);
         params.append("sessionState", sessionId);
-        if (type == "NOTAT") {
+        if (type == "NOTAT" || erFerdigstilt) {
             window.open(`/sak/${saksnummer}/journal/BIF-${forsendelseId}?${params.toString()}`, "_self");
         } else {
             navigate(`/sak/${saksnummer}/forsendelse/${forsendelseId}?${params.toString()}`);

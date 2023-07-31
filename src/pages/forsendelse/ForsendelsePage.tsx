@@ -1,9 +1,9 @@
 import "./ForsendelsePage.css";
 
-import { Cell, Grid, Heading } from "@navikt/ds-react";
+import { Alert, BodyShort, Cell, Grid, Heading } from "@navikt/ds-react";
 import { Loader } from "@navikt/ds-react";
 import { ContentContainer } from "@navikt/ds-react";
-import React from "react";
+import React, { useEffect } from "react";
 import { PropsWithChildren } from "react";
 import { useIsMutating } from "react-query";
 
@@ -13,6 +13,7 @@ import SaveStatusIndicator from "../../components/SaveStatusIndicator";
 import BidragErrorPanel from "../../context/BidragErrorPanel";
 import { useErrorContext } from "../../context/ErrorProvider";
 import DokumentTableInfo from "../../docs/DokumentTable.mdx";
+import useIsDebugMode from "../../hooks/useDebugMode";
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
 import OpprettForsendelsePage from "../opprettforsendelse/OpprettForsendelsePage";
 import PageWrapper from "../PageWrapper";
@@ -25,7 +26,7 @@ import Mottaker from "./components/Mottaker";
 import SendButton from "./components/SendButton";
 import ValidationErrorSummary from "./components/ValidationErrorSummary";
 import { DokumenterFormProvider } from "./context/DokumenterFormContext";
-import { SessionProvider } from "./context/SessionContext";
+import { SessionProvider, useSession } from "./context/SessionContext";
 interface ForsendelsePageProps {
     forsendelseId: string;
     saksnummer: string;
@@ -34,8 +35,16 @@ interface ForsendelsePageProps {
 }
 function ForsendelseView() {
     const forsendelse = useForsendelseApi().hentForsendelse();
+    const { navigateToForsendelse } = useSession();
+    const isDebug = useIsDebugMode();
     const { errorType } = useErrorContext();
     const lagrerDokumenter = useIsMutating("oppdaterDokumenterMutation");
+
+    useEffect(() => {
+        if (["FERDIGSTILT", "DISTRIBUERT", "DISTRIBUERT_LOKALT"].includes(forsendelse.status) && !isDebug) {
+            navigateToForsendelse(forsendelse.forsendelseId, "UTGÅENDE", true);
+        }
+    }, []);
 
     if (forsendelse.status == "UNDER_OPPRETTELSE") {
         return <OpprettForsendelsePage />;
@@ -44,6 +53,7 @@ function ForsendelseView() {
         <ContentContainer>
             <Grid>
                 <Cell xs={12} md={12} lg={10}>
+                    <ForsendelseNotEditableWarning />
                     <div className={"leading-xlarge tracking-wide"}>
                         <ForsendelseTittel />
                         <Grid className={"w-max"}>
@@ -78,15 +88,54 @@ function ForsendelseView() {
                             <ValidationErrorSummary />
                             <BidragErrorPanel />
 
-                            <div className={"mt-2 flex flex-row gap-[5px]"}>
-                                <SendButton />
-                                <AvvikshandteringButton />
-                            </div>
+                            <BottomButtons />
                         </div>
                     </div>
                 </Cell>
             </Grid>
         </ContentContainer>
+    );
+}
+
+function ForsendelseNotEditableWarning() {
+    const forsendelse = useForsendelseApi().hentForsendelse();
+
+    const erForsendelseUnderProduksjon = forsendelse.status == "UNDER_PRODUKSJON";
+
+    function renderForsendelseState() {
+        switch (forsendelse.status) {
+            case "FERDIGSTILT":
+                return "ferdigstilt";
+            case "SLETTET":
+                return "slettet";
+            case "DISTRIBUERT":
+            case "DISTRIBUERT_LOKALT":
+                return "distribuert";
+            default:
+                return forsendelse.status;
+        }
+    }
+
+    if (erForsendelseUnderProduksjon) return null;
+
+    return (
+        <Alert variant="warning" size="small" className="mb-2">
+            <BodyShort>{`Forsendelsen har status ${renderForsendelseState()} og kan derfor ikke endres.`}</BodyShort>
+        </Alert>
+    );
+}
+
+function BottomButtons() {
+    const forsendelse = useForsendelseApi().hentForsendelse();
+
+    const erForsendelseUnderProduksjon = forsendelse.status == "UNDER_PRODUKSJON";
+
+    if (!erForsendelseUnderProduksjon) return null;
+    return (
+        <div className={"mt-2 flex flex-row gap-[5px]"}>
+            <SendButton />
+            <AvvikshandteringButton />
+        </div>
     );
 }
 
