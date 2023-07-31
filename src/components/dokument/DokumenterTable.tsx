@@ -78,11 +78,16 @@ function DokumenterTableHeader() {
 function DokumenterTableBottomButtons() {
     const { isSavingChanges, hasChanged, saveChanges, resetDocumentChanges, dokumenter, forsendelseId } =
         useDokumenterForm();
+    const { errorSource, resetError } = useErrorContext();
     const isOneOrMoreDocumentsDeleted = dokumenter.some((d) => d.status == DokumentStatus.SLETTET);
     const isAllDocumentsFinished = dokumenter.every(
         (d) => d.status == DokumentStatus.FERDIGSTILT || d.status == DokumentStatus.KONTROLLERT
     );
     const { addWarning } = useErrorContext();
+    function resetErrorAndChanges() {
+        resetDocumentChanges();
+        resetError();
+    }
     return (
         <span className={"flex flex-row mt-[10px] w-[1028px]"}>
             {hasChanged && isOneOrMoreDocumentsDeleted && (
@@ -94,6 +99,11 @@ function DokumenterTableBottomButtons() {
                         Angre
                     </Button>
                 </>
+            )}
+            {errorSource == "dokumenter" && (
+                <Button onClick={resetErrorAndChanges} variant={"tertiary"} size={"small"}>
+                    Angre siste endringer
+                </Button>
             )}
             <Button
                 size="small"

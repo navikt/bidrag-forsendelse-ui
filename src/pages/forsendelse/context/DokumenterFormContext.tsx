@@ -137,10 +137,7 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
     };
     const updateDocument = (updatedDocument: FormIDokument) => {
         const index = fields.indexOf(updatedDocument);
-        update(index, {
-            ...updatedDocument,
-            status: DokumentStatus.SLETTET,
-        });
+        update(index, updatedDocument);
     };
 
     function validateCanSendForsendelse() {
@@ -171,6 +168,13 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
     }
 
     function submitAndSaveChanges() {
+        if (formState.isSubmitted || formState.errors) {
+            reset(undefined, {
+                keepDirty: true,
+                keepDirtyValues: true,
+                keepValues: true,
+            });
+        }
         handleSubmit(saveChanges)();
     }
 
