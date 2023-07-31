@@ -153,7 +153,7 @@ export function useForsendelseApi(): UseForsendelseDataProps {
             enabled: forsendelseId != undefined,
             optimisticResults: false,
             retry: (retryCount, error: AxiosError) => {
-                return error?.response?.status == HttpStatusCode.NotFound ? false : retryCount < 3;
+                return error?.response?.status == HttpStatusCode.NotFound ? retryCount < 1 : retryCount < 3;
             },
             refetchInterval: (data) => {
                 if (!data) return 0;
@@ -187,13 +187,15 @@ export function useForsendelseApi(): UseForsendelseDataProps {
                 };
             }, []),
             onError: (error: AxiosError) => {
+                console.log("HERE", error);
                 const errorMessage = parseErrorMessageFromAxiosError(error);
                 addError({
                     message: `Kunne ikke hente forsendelse: ${errorMessage}`,
                     source: "hentforsendelse",
                 });
             },
-            useErrorBoundary: false,
+            suspense: true,
+            useErrorBoundary: (error: AxiosError) => error?.response?.status != HttpStatusCode.NotFound,
         });
 
         return {

@@ -160,9 +160,7 @@ export default function ForsendelsePage({
                     <React.Suspense fallback={<Loader size={"3xlarge"} title={"Laster..."} />}>
                         <div>
                             <ForsendelseSakHeader />
-                            <React.Suspense fallback={<Loader size={"3xlarge"} title={"Laster..."} />}>
-                                <ForsendelseView />
-                            </React.Suspense>
+                            <ForsendelseView />
                         </div>
                     </React.Suspense>
                 </DokumenterFormProvider>
