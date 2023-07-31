@@ -132,7 +132,7 @@ export function useForsendelseApi(): UseForsendelseDataProps {
         let mottaker = forsendelse.mottaker;
         // TODO: Sjekk om mottaker er samhandler
 
-        if (!mottaker) return {};
+        if (!mottaker) return {} as IRolleDetaljer;
 
         if (!mottaker.navn || IdentUtils.isSamhandlerId(mottaker.ident)) {
             mottaker = useSamhandlerPersonApi().hentSamhandlerEllerPersonForIdent(mottaker.ident)?.data ?? mottaker;

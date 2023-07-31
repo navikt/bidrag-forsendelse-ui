@@ -1,20 +1,10 @@
 import { CheckmarkCircleIcon, XMarkOctagonIcon } from "@navikt/aksel-icons";
 import { BodyShort, Loader } from "@navikt/ds-react";
-import { useRef, useState } from "react";
 type StateType = "idle" | "saving" | "error";
 type SaveStatusIndicatorProps = {
     state?: StateType;
 };
 export default function SaveStatusIndicator({ state = "idle" }: SaveStatusIndicatorProps) {
-    const [showText, setShowText] = useState(true);
-    const prevState = useRef<StateType>("saving");
-    // useEffect(() => {
-    //     if (state == "idle" && prevState.current !== "idle") {
-    //         setTimeout(() => setShowText(false), 1000);
-    //     }
-    //     setShowText(true);
-    //     prevState.current = state;
-    // }, [state]);
     function renderContent() {
         if (state == "error") {
             return (
@@ -36,7 +26,7 @@ export default function SaveStatusIndicator({ state = "idle" }: SaveStatusIndica
                 <div className="text-green-500">
                     <CheckmarkCircleIcon />
                 </div>{" "}
-                {showText && <BodyShort size="small">Lagret</BodyShort>}
+                <BodyShort size="small">Lagret</BodyShort>
             </div>
         );
     }
@@ -51,11 +41,4 @@ export default function SaveStatusIndicator({ state = "idle" }: SaveStatusIndica
         return `transition-[width] ease-in-out border-border-success duration-300 w-[65px]`;
     }
     return <div className={`${getStyles()} self-center`}>{renderContent()}</div>;
-    // return (
-    //     <div
-    //         className={`${getStyles()} w-max w-max pr-1 pl-1 pt-[2px] pb-[2px] rounded-3xl border-solid border self-center`}
-    //     >
-    //         {renderContent()}
-    //     </div>
-    // );
 }
