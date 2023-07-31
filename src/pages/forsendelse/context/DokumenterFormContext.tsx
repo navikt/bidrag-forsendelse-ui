@@ -17,6 +17,7 @@ import { DokumentStatus } from "../../../constants/DokumentStatus";
 import { useErrorContext } from "../../../context/ErrorProvider";
 import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
 import { IDokument } from "../../../types/Dokument";
+import { parseErrorMessageFromAxiosError } from "../../../utils/ErrorUtils";
 import { queryClient } from "../../PageWrapper";
 
 export type FormIDokument = FieldArrayWithId<IForsendelseFormProps, "dokumenter">;
@@ -80,10 +81,10 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
         },
 
         onError: (error: AxiosError, variables, context) => {
-            const errorMessage = error.response?.headers?.["warning"];
+            const errorMessage = parseErrorMessageFromAxiosError(error);
             addError({
                 message: `Det skjedde en feil ved lagring av dokumentittel "${variables.tittel}": ${errorMessage}`,
-                type: "dokumenter",
+                source: "dokumenter",
             });
         },
     });
@@ -108,8 +109,8 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
             queryClient.invalidateQueries("forsendelse");
         },
         onError: (error: AxiosError, variables, context) => {
-            const errorMessage = error.response?.headers?.["warning"];
-            addError({ message: `Kunne ikke lagre endringer: ${errorMessage}`, type: "dokumenter" });
+            const errorMessage = parseErrorMessageFromAxiosError(error);
+            addError({ message: `Kunne ikke lagre endringer: ${errorMessage}`, source: "dokumenter" });
         },
     });
     useEffect(() => {

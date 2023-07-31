@@ -4,17 +4,17 @@ import { PropsWithChildren, useContext } from "react";
 type ErrorContextProps = {
     warningMessage?: string;
     errorMessage?: string;
-    errorType?: ErrorType;
+    errorSource?: ErrorSource;
     resetError: () => void;
     resetErrorMessage: () => void;
     addError: (error: IForsendelseApiError) => void;
     addWarning: (warningMessage: string) => void;
 };
 
-type ErrorType = "dokumenter" | "forsendelsetittel" | "opprettforsendelse";
+type ErrorSource = "dokumenter" | "opprettforsendelse" | "hentforsendelse";
 interface IForsendelseApiError {
     message: string;
-    type?: ErrorType;
+    source?: ErrorSource;
 }
 export const useErrorContext = () => {
     const context = useContext(ErrorContext);
@@ -49,7 +49,7 @@ export default function ErrorProvider({ children }: PropsWithChildren<unknown>) 
                 addError,
                 addWarning,
                 errorMessage: error?.message,
-                errorType: error?.type,
+                errorSource: error?.source,
                 warningMessage,
             }}
         >

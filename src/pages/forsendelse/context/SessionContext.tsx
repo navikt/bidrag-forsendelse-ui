@@ -1,4 +1,6 @@
-import { createContext } from "react";
+import { CustomError } from "@navikt/bidrag-ui-common";
+import ObjectUtils from "@navikt/bidrag-ui-common/esm/utils/ObjectUtils";
+import { createContext, useEffect } from "react";
 import { PropsWithChildren } from "react";
 import { useState } from "react";
 import { useContext } from "react";
@@ -29,6 +31,19 @@ function SessionProvider({ children, ...props }: PropsWithChildren<ISessionProps
     const [saksnummer, setSaksnummer] = useState(props.saksnummer);
     const [sessionId, setSessionId] = useState(props.sessionId);
     const [enhet, setEnhet] = useState(props.enhet);
+
+    useEffect(() => {
+        if (ObjectUtils.isEmpty(enhet)) {
+            throw new CustomError(
+                "UserError",
+                "",
+                "Mangler pålogget enhet på url. " +
+                    "Dette blir lagt til hvis bruker ble videresendt fra Bisys. " +
+                    "Hvis bruker har gjort noe endringer på URL så bør ikke enhet= fjernes fra URL da denne informasjonen blir brukt under opprettelse av forsendelse",
+                ""
+            );
+        }
+    }, []);
 
     const navigateToForsendelse = (forsendelseId: string, type: "UTGÅENDE" | "NOTAT" = "UTGÅENDE") => {
         const params = new URLSearchParams();

@@ -1,7 +1,7 @@
 import "../index.css";
 
 import { MDXProvider } from "@mdx-js/react";
-import { BodyShort, Heading } from "@navikt/ds-react";
+import { BodyShort, Heading, Loader } from "@navikt/ds-react";
 import * as dayjs from "dayjs";
 import * as customParseFormat from "dayjs/plugin/customParseFormat";
 import React, { PropsWithChildren } from "react";
@@ -39,9 +39,11 @@ export default function PageWrapper({ children, name }: PropsWithChildren<PageWr
         <MDXProvider components={mdxComponents}>
             <ErrorProvider>
                 <QueryClientProvider client={queryClient}>
-                    <div id={name} className={"w-full"}>
-                        {children}
-                    </div>
+                    <React.Suspense fallback={<Loader size={"3xlarge"} title={"Laster..."} />}>
+                        <div id={name} className={"w-full"}>
+                            {children}
+                        </div>
+                    </React.Suspense>
                 </QueryClientProvider>
             </ErrorProvider>
         </MDXProvider>

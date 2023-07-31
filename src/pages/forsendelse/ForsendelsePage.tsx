@@ -37,7 +37,7 @@ function ForsendelseView() {
     const forsendelse = useForsendelseApi().hentForsendelse();
     const { navigateToJournalpost } = useSession();
     const isDebug = useIsDebugMode();
-    const { errorType } = useErrorContext();
+    const { errorSource, errorMessage } = useErrorContext();
     const lagrerDokumenter = useIsMutating("oppdaterDokumenterMutation");
 
     useEffect(() => {
@@ -45,6 +45,14 @@ function ForsendelseView() {
             navigateToJournalpost(forsendelse.arkivJournalpostId);
         }
     }, []);
+
+    if (errorSource == "hentforsendelse") {
+        return (
+            <Alert className="m-auto w-max" variant="error">
+                {errorMessage}
+            </Alert>
+        );
+    }
 
     if (forsendelse.status == "UNDER_OPPRETTELSE") {
         return <OpprettForsendelsePage />;
@@ -77,7 +85,7 @@ function ForsendelseView() {
                                 </InfoKnapp>
                                 <SaveStatusIndicator
                                     state={
-                                        errorType == "dokumenter" ? "error" : lagrerDokumenter > 0 ? "saving" : "idle"
+                                        errorSource == "dokumenter" ? "error" : lagrerDokumenter > 0 ? "saving" : "idle"
                                     }
                                 />
                             </div>

@@ -98,7 +98,7 @@ function OpprettForsendelseUnderOpprettelse() {
         onError: () => {
             addError({
                 message: "Kunne ikke opprette forsendelse. Vennligst prøv på nytt",
-                type: "opprettforsendelse",
+                source: "opprettforsendelse",
             });
         },
     });
@@ -153,7 +153,7 @@ function OpprettForsendelseNy() {
         onError: () => {
             addError({
                 message: "Kunne ikke opprette forsendelse. Vennligst prøv på nytt",
-                type: "opprettforsendelse",
+                source: "opprettforsendelse",
             });
         },
         onSuccess: (data) => {

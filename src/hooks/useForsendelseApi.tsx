@@ -1,6 +1,6 @@
 import { IRolleDetaljer, RolleType } from "@navikt/bidrag-ui-common";
 import IdentUtils from "@navikt/bidrag-ui-common/esm/utils/IdentUtils";
-import { AxiosResponse } from "axios";
+import { AxiosError, AxiosResponse, HttpStatusCode } from "axios";
 import React from "react";
 import { useQuery } from "react-query";
 
@@ -12,9 +12,11 @@ import { ForsendelseResponsTo } from "../api/BidragForsendelseApi";
 import { BidragSakDto } from "../api/BidragSakApi";
 import { DokumentStatus } from "../constants/DokumentStatus";
 import { SAKSNUMMER } from "../constants/fellestyper";
+import { useErrorContext } from "../context/ErrorProvider";
 import { useSession } from "../pages/forsendelse/context/SessionContext";
 import { IForsendelse } from "../types/Forsendelse";
 import { IJournalpost } from "../types/Journalpost";
+import { parseErrorMessageFromAxiosError } from "../utils/ErrorUtils";
 import { journalpostMapper } from "./useDokumentApi";
 import useSamhandlerPersonApi from "./usePersonApi";
 
@@ -33,6 +35,7 @@ export const UseForsendelseApiKeys = {
 };
 
 interface UseForsendelseDataProps {
+    kanEndre: () => boolean;
     hentForsendelse: () => IForsendelse;
     hentGjelder: () => IRolleDetaljer;
     hentMottaker: () => IRolleDetaljer;
@@ -42,6 +45,7 @@ interface UseForsendelseDataProps {
 }
 export function useForsendelseApi(): UseForsendelseDataProps {
     const { forsendelseId, saksnummer: saksnummerFromSession } = useSession();
+    const { addError } = useErrorContext();
     const saksnummer = saksnummerFromSession ?? hentForsendelseQuery().saksnummer;
     const hentSak = (): BidragSakDto => {
         const { data: sak, refetch } = useQuery({
@@ -128,6 +132,8 @@ export function useForsendelseApi(): UseForsendelseDataProps {
         let mottaker = forsendelse.mottaker;
         // TODO: Sjekk om mottaker er samhandler
 
+        if (!mottaker) return {};
+
         if (!mottaker.navn || IdentUtils.isSamhandlerId(mottaker.ident)) {
             mottaker = useSamhandlerPersonApi().hentSamhandlerEllerPersonForIdent(mottaker.ident)?.data ?? mottaker;
         }
@@ -143,9 +149,12 @@ export function useForsendelseApi(): UseForsendelseDataProps {
     function hentForsendelseQuery(): IForsendelse {
         const { data: forsendelse, isRefetching } = useQuery({
             queryKey: UseForsendelseApiKeys.hentForsendelse(),
-            queryFn: () => BIDRAG_FORSENDELSE_API.api.hentForsendelse(forsendelseId),
+            queryFn: () => BIDRAG_FORSENDELSE_API.api.hentForsendelse(forsendelseId, { saksnummer }),
             enabled: forsendelseId != undefined,
             optimisticResults: false,
+            retry: (retryCount, error: AxiosError) => {
+                return error?.response?.status == HttpStatusCode.NotFound ? false : retryCount < 3;
+            },
             refetchInterval: (data) => {
                 if (!data) return 0;
                 const forsendelse = data as IForsendelse;
@@ -158,7 +167,7 @@ export function useForsendelseApi(): UseForsendelseDataProps {
                         "MÅ_KONTROLLERES",
                     ].includes(d.status)
                 );
-                return hasDokumentsWithStatus ? 3000 : 0;
+                return hasDokumentsWithStatus ? 0 : 0;
                 // return 0;
             },
             select: React.useCallback((response: AxiosResponse): IForsendelse => {
@@ -177,12 +186,25 @@ export function useForsendelseApi(): UseForsendelseDataProps {
                     }),
                 };
             }, []),
+            onError: (error: AxiosError) => {
+                const errorMessage = parseErrorMessageFromAxiosError(error);
+                addError({
+                    message: `Kunne ikke hente forsendelse: ${errorMessage}`,
+                    source: "hentforsendelse",
+                });
+            },
+            useErrorBoundary: false,
         });
 
         return {
             ...forsendelse,
             isStaleData: isRefetching,
         };
+    }
+
+    function kanEndre() {
+        const forsendelse = hentForsendelseQuery();
+        return forsendelse.status == "UNDER_PRODUKSJON";
     }
 
     return {
@@ -192,5 +214,6 @@ export function useForsendelseApi(): UseForsendelseDataProps {
         hentRoller,
         hentJournalposterForPerson,
         hentJournalposterForSak,
+        kanEndre,
     };
 }
