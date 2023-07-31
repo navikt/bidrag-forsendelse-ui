@@ -158,7 +158,7 @@ export default function ForsendelsePage({
             <SessionProvider forsendelseId={forsendelseId} saksnummer={saksnummer} sessionId={sessionId} enhet={enhet}>
                 <div>
                     <ForsendelseSakHeader />
-                    <React.Suspense fallback={<LoadingIndicator2 />}>
+                    <React.Suspense fallback={<LoadingIndicator />}>
                         <DokumenterFormProvider forsendelseId={forsendelseId}>
                             <ForsendelseView />
                         </DokumenterFormProvider>
