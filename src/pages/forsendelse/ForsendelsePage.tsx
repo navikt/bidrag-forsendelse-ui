@@ -66,10 +66,8 @@ function ForsendelseView() {
                         <ForsendelseTittel />
                         <Grid className={"w-max"}>
                             <Cell xs={12} md={12} lg={10}>
-                                <React.Suspense fallback={<Loader size={"large"} title={"Laster..."} />}>
-                                    <Gjelder />
-                                    <Mottaker />
-                                </React.Suspense>
+                                <Gjelder />
+                                <Mottaker />
                             </Cell>
                             <Cell xs={12} md={12} lg={4}>
                                 <ForsendelseDetaljer />
@@ -158,7 +156,7 @@ export default function ForsendelsePage({
             <SessionProvider forsendelseId={forsendelseId} saksnummer={saksnummer} sessionId={sessionId} enhet={enhet}>
                 <div>
                     <ForsendelseSakHeader />
-                    <React.Suspense fallback={<LoadingIndicator />}>
+                    <React.Suspense fallback={<LoadingIndicatorSkeleton />}>
                         <DokumenterFormProvider forsendelseId={forsendelseId}>
                             <ForsendelseView />
                         </DokumenterFormProvider>
@@ -178,18 +176,18 @@ function LoadingIndicator() {
     );
 }
 
-function LoadingIndicator2() {
+function LoadingIndicatorSkeleton() {
     return (
         <ContentContainer>
             <Grid>
                 <Cell xs={12} md={12} lg={10}>
-                    <div className="flex flex-col gap-[10px]">
-                        <Skeleton variant="rectangle" width="100%" height="50px" />
+                    <div className="flex flex-col gap-[20px]">
+                        <Skeleton variant="rectangle" width="70%" height="50px" />
 
-                        <Skeleton variant="rectangle" width="100%" height="200px" />
-                        <Skeleton variant="rectangle" width="100%" height="100px" />
+                        <Skeleton variant="rectangle" width="70%" height="270px" />
+                        <Skeleton variant="rectangle" width="100%" height="317px" />
                         {/* 'as'-prop kan brukes på all typografien vår med Skeleton */}
-                        <Skeleton variant="rectangle" width="100%" height="400px" />
+                        <Skeleton variant="rectangle" width="50%" height="50px" />
                     </div>
                 </Cell>
             </Grid>
