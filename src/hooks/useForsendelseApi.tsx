@@ -149,11 +149,16 @@ export function useForsendelseApi(): UseForsendelseDataProps {
     function hentForsendelseQuery(): IForsendelse {
         const { data: forsendelse, isRefetching } = useQuery({
             queryKey: UseForsendelseApiKeys.hentForsendelse(),
-            queryFn: () => BIDRAG_FORSENDELSE_API.api.hentForsendelse(forsendelseId, { saksnummer }),
+            queryFn: () =>
+                BIDRAG_FORSENDELSE_API.api.hentForsendelse(forsendelseId, { saksnummer: saksnummerFromSession }),
             enabled: forsendelseId != undefined,
             optimisticResults: false,
             retry: (retryCount, error: AxiosError) => {
                 return error?.response?.status == HttpStatusCode.NotFound ? retryCount < 1 : retryCount < 3;
+            },
+            refetchOnWindowFocus: (query) => {
+                const state = query.state;
+                return state?.error?.response?.status != HttpStatusCode.NotFound;
             },
             refetchInterval: (data) => {
                 if (!data) return 0;
@@ -187,7 +192,6 @@ export function useForsendelseApi(): UseForsendelseDataProps {
                 };
             }, []),
             onError: (error: AxiosError) => {
-                console.log("HERE", error);
                 const errorMessage = parseErrorMessageFromAxiosError(error);
                 addError({
                     message: `Kunne ikke hente forsendelse: ${errorMessage}`,

@@ -1,6 +1,6 @@
 import "./ForsendelsePage.css";
 
-import { Alert, BodyShort, Cell, Grid, Heading } from "@navikt/ds-react";
+import { Alert, BodyShort, Cell, Grid, Heading, Skeleton } from "@navikt/ds-react";
 import { Loader } from "@navikt/ds-react";
 import { ContentContainer } from "@navikt/ds-react";
 import React, { useEffect } from "react";
@@ -156,15 +156,43 @@ export default function ForsendelsePage({
     return (
         <PageWrapper name={"forsendelse-page"}>
             <SessionProvider forsendelseId={forsendelseId} saksnummer={saksnummer} sessionId={sessionId} enhet={enhet}>
-                <DokumenterFormProvider forsendelseId={forsendelseId}>
-                    <React.Suspense fallback={<Loader size={"3xlarge"} title={"Laster..."} />}>
-                        <div>
-                            <ForsendelseSakHeader />
+                <div>
+                    <ForsendelseSakHeader />
+                    <React.Suspense fallback={<LoadingIndicator2 />}>
+                        <DokumenterFormProvider forsendelseId={forsendelseId}>
                             <ForsendelseView />
-                        </div>
+                        </DokumenterFormProvider>
                     </React.Suspense>
-                </DokumenterFormProvider>
+                </div>
             </SessionProvider>
         </PageWrapper>
+    );
+}
+
+function LoadingIndicator() {
+    return (
+        <div className="m-auto w-max flex flex-col justify-center">
+            <Loader size={"3xlarge"} title={"Laster..."} className="m-auto" />
+            <BodyShort>Laster forsendelse...</BodyShort>
+        </div>
+    );
+}
+
+function LoadingIndicator2() {
+    return (
+        <ContentContainer>
+            <Grid>
+                <Cell xs={12} md={12} lg={10}>
+                    <div className="flex flex-col gap-[10px]">
+                        <Skeleton variant="rectangle" width="100%" height="50px" />
+
+                        <Skeleton variant="rectangle" width="100%" height="200px" />
+                        <Skeleton variant="rectangle" width="100%" height="100px" />
+                        {/* 'as'-prop kan brukes på all typografien vår med Skeleton */}
+                        <Skeleton variant="rectangle" width="100%" height="400px" />
+                    </div>
+                </Cell>
+            </Grid>
+        </ContentContainer>
     );
 }
