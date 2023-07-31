@@ -4,10 +4,18 @@ import { PropsWithChildren, useContext } from "react";
 type ErrorContextProps = {
     warningMessage?: string;
     errorMessage?: string;
+    errorSource?: ErrorSource;
     resetError: () => void;
-    addError: (errorMessage: string) => void;
+    resetErrorMessage: () => void;
+    addError: (error: IForsendelseApiError) => void;
     addWarning: (warningMessage: string) => void;
 };
+
+type ErrorSource = "dokumenter" | "opprettforsendelse" | "hentforsendelse";
+interface IForsendelseApiError {
+    message: string;
+    source?: ErrorSource;
+}
 export const useErrorContext = () => {
     const context = useContext(ErrorContext);
     if (context === undefined) {
@@ -18,23 +26,30 @@ export const useErrorContext = () => {
 export const ErrorContext = React.createContext<ErrorContextProps>({} as ErrorContextProps);
 
 export default function ErrorProvider({ children }: PropsWithChildren<unknown>) {
-    const [errorMessage, setErrorMessage] = useState<string>();
+    const [error, setError] = useState<IForsendelseApiError>();
     const [warningMessage, setWarningMessage] = useState<string>();
 
     const resetError = () => {
-        setErrorMessage(undefined);
+        setError(undefined);
         setWarningMessage(undefined);
     };
-    const addError = (errorMessage: string) => setErrorMessage(errorMessage);
+
+    const resetErrorMessage = () => {
+        setError((prev) => ({ ...prev, message: undefined }));
+        setWarningMessage(undefined);
+    };
+    const addError = (error) => setError(error);
     const addWarning = (warningMessage: string) => setWarningMessage(warningMessage);
 
     return (
         <ErrorContext.Provider
             value={{
                 resetError,
+                resetErrorMessage,
                 addError,
                 addWarning,
-                errorMessage,
+                errorMessage: error?.message,
+                errorSource: error?.source,
                 warningMessage,
             }}
         >

@@ -3,7 +3,7 @@ import { Alert, Button, Heading } from "@navikt/ds-react";
 
 import { useErrorContext } from "./ErrorProvider";
 export default function BidragErrorPanel() {
-    const { errorMessage, warningMessage, resetError } = useErrorContext();
+    const { errorMessage, warningMessage, resetErrorMessage } = useErrorContext();
 
     if (errorMessage) {
         return (
@@ -16,7 +16,7 @@ export default function BidragErrorPanel() {
                     size="small"
                     icon={<XMarkIcon />}
                     variant="tertiary-neutral"
-                    onClick={resetError}
+                    onClick={resetErrorMessage}
                     className="absolute top-0 right-0"
                 ></Button>
             </Alert>
@@ -31,7 +31,7 @@ export default function BidragErrorPanel() {
                     size="xsmall"
                     icon={<XMarkIcon />}
                     variant="tertiary-neutral"
-                    onClick={resetError}
+                    onClick={resetErrorMessage}
                     className="absolute top-0 right-0"
                 ></Button>
             </Alert>

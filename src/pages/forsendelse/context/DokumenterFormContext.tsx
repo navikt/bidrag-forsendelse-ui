@@ -17,6 +17,7 @@ import { DokumentStatus } from "../../../constants/DokumentStatus";
 import { useErrorContext } from "../../../context/ErrorProvider";
 import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
 import { IDokument } from "../../../types/Dokument";
+import { parseErrorMessageFromAxiosError } from "../../../utils/ErrorUtils";
 import { queryClient } from "../../PageWrapper";
 
 export type FormIDokument = FieldArrayWithId<IForsendelseFormProps, "dokumenter">;
@@ -62,7 +63,7 @@ function DokumenterFormProvider({ children, ...props }: PropsWithChildren<IDokum
 }
 
 function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumenterPropsContext>) {
-    const { addError } = useErrorContext();
+    const { addError, resetError } = useErrorContext();
     const forsendelse = useForsendelseApi().hentForsendelse();
     const { reset, handleSubmit, formState, setError } = useFormContext<IForsendelseFormProps>();
     const { fields, append, update, swap } = useFieldArray<IForsendelseFormProps>({
@@ -72,17 +73,26 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
     const { isDirty, dirtyFields } = formState;
 
     const oppdaterDokumentTittelFn = useMutation<unknown, unknown, OppdaterDokumentTittelMutationProps>({
-        mutationFn: ({ tittel, dokumentreferanse }) =>
-            BIDRAG_FORSENDELSE_API.api.oppdaterDokument(forsendelse.forsendelseId, dokumentreferanse, { tittel }),
+        mutationFn: ({ tittel, dokumentreferanse }) => {
+            resetError();
+            return BIDRAG_FORSENDELSE_API.api.oppdaterDokument(forsendelse.forsendelseId, dokumentreferanse, {
+                tittel,
+            });
+        },
+
         onError: (error: AxiosError, variables, context) => {
-            console.log(error, variables, context);
-            const errorMessage = error.response?.headers?.["warning"];
-            addError(`Det skjedde en feil ved lagring av dokumentittel "${variables.tittel}": ${errorMessage}`);
+            const errorMessage = parseErrorMessageFromAxiosError(error);
+            addError({
+                message: `Det skjedde en feil ved lagring av dokumentittel "${variables.tittel}": ${errorMessage}`,
+                source: "dokumenter",
+            });
         },
     });
 
     const oppdaterDokumenterMutation = useMutation({
+        mutationKey: "oppdaterDokumenterMutation",
         mutationFn: (dokumenter: IDokument[]) => {
+            resetError();
             const request: OppdaterForsendelseForesporsel = {
                 dokumenter: dokumenter.map((dokument) => ({
                     dokumentreferanse: dokument.dokumentreferanse,
@@ -99,8 +109,8 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
             queryClient.invalidateQueries("forsendelse");
         },
         onError: (error: AxiosError, variables, context) => {
-            const errorMessage = error.response?.headers?.["warning"];
-            addError(`Kunne ikke lagre endringer: ${errorMessage}`);
+            const errorMessage = parseErrorMessageFromAxiosError(error);
+            addError({ message: `Kunne ikke lagre endringer: ${errorMessage}`, source: "dokumenter" });
         },
     });
     useEffect(() => {
@@ -127,10 +137,7 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
     };
     const updateDocument = (updatedDocument: FormIDokument) => {
         const index = fields.indexOf(updatedDocument);
-        update(index, {
-            ...updatedDocument,
-            status: DokumentStatus.SLETTET,
-        });
+        update(index, updatedDocument);
     };
 
     function validateCanSendForsendelse() {
@@ -161,6 +168,13 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
     }
 
     function submitAndSaveChanges() {
+        if (formState.isSubmitted || formState.errors) {
+            reset(undefined, {
+                keepDirty: true,
+                keepDirtyValues: true,
+                keepValues: true,
+            });
+        }
         handleSubmit(saveChanges)();
     }
 

@@ -9,7 +9,24 @@
  * ---------------------------------------------------------------
  */
 
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType } from "axios";
+/** Ekstrainformasjonsfelter. Navn og verdi. Eksempelvis mapOf("saksnummer" to "2302845") */
+export interface PairStringString {
+    first: string;
+    second: string;
+}
+
+/** Sporingdata til auditlogging */
+export interface Sporingsdata {
+    /** Fødselsnummer på primærpersonen i oppslaget. */
+    personIdent: string;
+    /** Hvor vist personen som gjør oppslaget har tilgang til å gjøre oppslaget. */
+    tilgang: boolean;
+    /** Ekstrainformasjonsfelter. Navn og verdi. Eksempelvis mapOf("saksnummer" to "2302845") */
+    ekstrafelter: PairStringString[];
+}
+
+import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType } from "axios";
+import axios from "axios";
 
 export type QueryParamsType = Record<string | number, any>;
 
@@ -53,10 +70,7 @@ export class HttpClient<SecurityDataType = unknown> {
     private format?: ResponseType;
 
     constructor({ securityWorker, secure, format, ...axiosConfig }: ApiConfig<SecurityDataType> = {}) {
-        this.instance = axios.create({
-            ...axiosConfig,
-            baseURL: axiosConfig.baseURL || "https://bidrag-tilgangskontroll-feature.intern.dev.nav.no",
-        });
+        this.instance = axios.create({ ...axiosConfig, baseURL: axiosConfig.baseURL || "http://localhost:8991" });
         this.secure = secure;
         this.format = format;
         this.securityWorker = securityWorker;
@@ -145,7 +159,7 @@ export class HttpClient<SecurityDataType = unknown> {
 /**
  * @title bidrag-tilgangskontroll
  * @version v1
- * @baseUrl https://bidrag-tilgangskontroll-feature.intern.dev.nav.no
+ * @baseUrl http://localhost:8991
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
     api = {
@@ -205,6 +219,44 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         sjekkTilgangPerson: (data: string, params: RequestParams = {}) =>
             this.request<boolean, any>({
                 path: `/api/tilgang/person`,
+                method: "POST",
+                body: data,
+                secure: true,
+                type: ContentType.Json,
+                format: "json",
+                ...params,
+            }),
+
+        /**
+         * @description Sjekk tilgang sak
+         *
+         * @tags sporingsdata-controller
+         * @name HentSakSporingsdata
+         * @request POST:/api/sporingsdata/sak
+         * @secure
+         */
+        hentSakSporingsdata: (data: string, params: RequestParams = {}) =>
+            this.request<Sporingsdata, any>({
+                path: `/api/sporingsdata/sak`,
+                method: "POST",
+                body: data,
+                secure: true,
+                type: ContentType.Json,
+                format: "json",
+                ...params,
+            }),
+
+        /**
+         * @description Sjekker om bruker har tilgang til person
+         *
+         * @tags sporingsdata-controller
+         * @name HentPersonSporingsdata
+         * @request POST:/api/sporingsdata/person
+         * @secure
+         */
+        hentPersonSporingsdata: (data: string, params: RequestParams = {}) =>
+            this.request<Sporingsdata, any>({
+                path: `/api/sporingsdata/person`,
                 method: "POST",
                 body: data,
                 secure: true,

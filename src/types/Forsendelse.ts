@@ -18,6 +18,7 @@ export interface IForsendelse {
     opprettetAvIdent?: string;
     opprettetAvNavn?: string;
     tittel?: string;
+    arkivJournalpostId?: string;
 
     forsendelseType?: "UTGÅENDE" | "NOTAT";
 

@@ -4,14 +4,14 @@ import { dateToDDMMYYYYString, RolleType } from "@navikt/bidrag-ui-common";
 import { Add } from "@navikt/ds-icons";
 import { Collapse } from "@navikt/ds-icons";
 import { Expand } from "@navikt/ds-icons";
-import { Button, Table, Tabs } from "@navikt/ds-react";
+import { Button, Detail, Table, Tabs } from "@navikt/ds-react";
 import { Modal } from "@navikt/ds-react";
 import { Loader } from "@navikt/ds-react";
 import { Heading } from "@navikt/ds-react";
 import { Accordion } from "@navikt/ds-react";
 import { Tag } from "@navikt/ds-react";
 import { Checkbox } from "@navikt/ds-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import React from "react";
 import { useEffect } from "react";
 
@@ -23,39 +23,10 @@ import { IDokument } from "../../types/Dokument";
 import { IDokumentJournalDto, IJournalpost, JournalpostStatus } from "../../types/Journalpost";
 import { mapRolleToDisplayValue } from "../../types/RolleMapper";
 import { cleanupAfterClosedModal } from "../../utils/ModalUtils";
-import { isEqualIgnoreNull } from "../../utils/ObjectUtils";
 import JournalpostStatusTag from "../journalpost/JournalpostStatusTag";
 import DokumentStatusTag from "./DokumentStatusTag";
+import { isSameDocument, JournalpostForsendelseRelasjoner } from "./JournalpostStatusMapper";
 import OpenDokumentButton from "./OpenDokumentButton";
-
-const isSameDocument = (
-    document: IDokument | IDokumentJournalDto,
-    compareToDocument: IDokument | IDokumentJournalDto
-) => {
-    return (
-        document.dokumentreferanse == compareToDocument.dokumentreferanse ||
-        (document.dokumentreferanse == null &&
-            isEqualIgnoreNull(
-                document.journalpostId?.replace(/\D/g, ""),
-                compareToDocument.originalJournalpostId?.replace(/\D/g, "")
-            )) ||
-        (compareToDocument.originalDokumentreferanse == null &&
-            compareToDocument.originalJournalpostId != null &&
-            isEqualIgnoreNull(
-                compareToDocument.originalJournalpostId?.replace(/\D/g, ""),
-                document.journalpostId?.replace(/\D/g, "")
-            )) ||
-        (document.originalDokumentreferanse == null &&
-            document.originalJournalpostId != null &&
-            isEqualIgnoreNull(
-                compareToDocument.journalpostId?.replace(/\D/g, ""),
-                document.originalJournalpostId?.replace(/\D/g, "")
-            )) ||
-        isEqualIgnoreNull(document.dokumentreferanse, compareToDocument.originalDokumentreferanse) ||
-        isEqualIgnoreNull(document.originalDokumentreferanse, compareToDocument.originalDokumentreferanse) ||
-        isEqualIgnoreNull(document.originalDokumentreferanse, compareToDocument.dokumentreferanse)
-    );
-};
 
 export default function LeggTilDokumentKnapp() {
     const { addDocuments, saveChanges } = useDokumenterForm();
@@ -386,17 +357,23 @@ function JournalpostDokumenterRowMultiDoc({
     const forsendelse = hentForsendelse();
     const forsendelseDokumenter = forsendelse.dokumenter;
     const isDebugMode = useIsDebugMode();
+    const jpForsendelseRelasjoner = useMemo(
+        () => new JournalpostForsendelseRelasjoner(journalpost, selectedDocuments, forsendelseDokumenter),
+        [journalpost, selectedDocuments, forsendelseDokumenter]
+    );
     function toggleShowAllDocuments() {
         setShowAllDocuments((s) => !s);
     }
 
     function onJournalpostSelected() {
-        if (hasDocumentsAlreadyAddedToForsendelse || journalpost.erForsendelse) {
-            journalpost.dokumenter.filter((d) => !erLagtTilIForsendelse(d)).forEach((d) => onDocumentSelected(d));
+        if (jpForsendelseRelasjoner.erJournalpostDokumenterLagtTilIForsendelse() || journalpost.erForsendelse) {
+            journalpost.dokumenter
+                .filter((d) => !jpForsendelseRelasjoner.erLagtTilIForsendelse(d))
+                .forEach((d) => onDocumentSelected(d));
             return;
         }
 
-        if (isAllDocumentsSelectedNotIncludingAdded && !isJournalpostSelected()) {
+        if (jpForsendelseRelasjoner.erAlleDokumenterValgt(false) && !jpForsendelseRelasjoner.isJournalpostSelected()) {
             journalpost.dokumenter.forEach((dok) =>
                 unselectDocument({
                     journalpostId: journalpost.journalpostId,
@@ -423,7 +400,7 @@ function JournalpostDokumenterRowMultiDoc({
     }
 
     function onDocumentSelected(dokumentDto: IDokumentJournalDto, toggle = true, skipJournalpostCheck = false) {
-        if (isJournalpostSelected() && !skipJournalpostCheck) {
+        if (jpForsendelseRelasjoner.isJournalpostSelected() && !skipJournalpostCheck) {
             unselectDocument({
                 journalpostId: journalpost.journalpostId,
                 lagret: false,
@@ -486,81 +463,61 @@ function JournalpostDokumenterRowMultiDoc({
             : DokumentStatus.UNDER_REDIGERING;
     }
 
-    const isJournalpostSelected = () => {
-        return selectedDocuments.some(
-            (d) => d.journalpostId == journalpost.journalpostId && d.dokumentreferanse == undefined
-        );
-    };
-    const isDocumentSelectedNotIncludingAdded = (dokument: IDokumentJournalDto) => {
-        return selectedDocuments.some((d) => isSameDocument(d, dokument));
-    };
-
-    const isDocumentSelected = (dokument: IDokumentJournalDto) => {
-        return (
-            isDocumentSelectedNotIncludingAdded(dokument) ||
-            erLagtTilIForsendelse(dokument) ||
-            isJournalpostSelected() ||
-            erJournalpostLagtTilIForsendelse()
-        );
-    };
-
-    const erJournalpostLagtTilIForsendelse = () => {
-        return forsendelseDokumenter.some(
-            (d) =>
-                d.originalJournalpostId?.replace(/\D/g, "") == journalpost.journalpostId?.replace(/\D/g, "") &&
-                d.originalDokumentreferanse == undefined
-        );
-    };
-
-    const erAllDokumenterLagtTilIForsendelse = () => journalpost.dokumenter.every(erLagtTilIForsendelse);
-
-    const erLagtTilIForsendelse = (dokument: IDokumentJournalDto) =>
-        forsendelseDokumenter.some((forsendelseDokument) =>
-            erSammeDokument(forsendelseDokument, dokument, journalpost.journalpostId)
-        ) || erJournalpostLagtTilIForsendelse();
-    const isAllDocumentsSelected = journalpost.dokumenter.every(isDocumentSelected);
-    const isAllDocumentsSelectedNotIncludingAdded = journalpost.dokumenter.every(isDocumentSelectedNotIncludingAdded);
-    const isSomeDocumentsSelected = journalpost.dokumenter.some(isDocumentSelected);
-    const numerOfSelectedDocuments = journalpost.dokumenter.filter(isDocumentSelected).length;
-    const hasDocumentsAlreadyAddedToForsendelse = journalpost.dokumenter.some(erLagtTilIForsendelse);
+    const numerOfSelectedDocuments = journalpost.dokumenter.filter(
+        jpForsendelseRelasjoner.erDokumentValgt.bind(jpForsendelseRelasjoner)
+    ).length;
 
     let tittel = journalpost.dokumenter.length > 0 ? journalpost.dokumenter[0].tittel : journalpost.innhold;
     tittel = tittel != undefined || tittel.trim().length == 0 ? journalpost.innhold : tittel;
+    const tittelDebug = isDebugMode ? `${tittel}  -  ${journalpost.journalpostId}` : tittel;
+    const harBareEttDokument = journalpost.dokumenter.length == 1;
     return (
         <>
             <Table.Row
                 key={journalpost.journalpostId}
-                selected={isAllDocumentsSelected}
+                selected={jpForsendelseRelasjoner.erAlleDokumenterValgt()}
                 className={`journalpost journalpostrad ${showAllDocuments ? "open" : ""}`}
             >
                 <Table.DataCell>
-                    <Button
-                        icon={showAllDocuments ? <Collapse /> : <Expand />}
-                        size={"small"}
-                        variant={"tertiary"}
-                        onClick={toggleShowAllDocuments}
-                    />
+                    {!harBareEttDokument && (
+                        <Button
+                            icon={showAllDocuments ? <Collapse /> : <Expand />}
+                            size={"small"}
+                            variant={"tertiary"}
+                            onClick={toggleShowAllDocuments}
+                        />
+                    )}
                 </Table.DataCell>
                 <Table.DataCell>
                     <Checkbox
                         hideLabel
                         checked={
-                            isAllDocumentsSelected ||
-                            isSomeDocumentsSelected ||
-                            erJournalpostLagtTilIForsendelse() ||
-                            erAllDokumenterLagtTilIForsendelse()
+                            jpForsendelseRelasjoner.erAlleDokumenterValgt() ||
+                            jpForsendelseRelasjoner.erNoenDokumenterValgt() ||
+                            jpForsendelseRelasjoner.erJournalpostLagtTilIForsendelse() ||
+                            jpForsendelseRelasjoner.erAllDokumenterLagtTilIForsendelse()
                         }
                         // indeterminate={isSomeDocumentsSelected && !isAllDocumentsSelected}
                         onChange={onJournalpostSelected}
-                        disabled={erJournalpostLagtTilIForsendelse() || erAllDokumenterLagtTilIForsendelse()}
+                        disabled={
+                            jpForsendelseRelasjoner.erJournalpostLagtTilIForsendelse() ||
+                            jpForsendelseRelasjoner.erAllDokumenterLagtTilIForsendelse()
+                        }
                         aria-labelledby={`id-${journalpost.journalpostId}`}
                     >
                         {" "}
                     </Checkbox>
                 </Table.DataCell>
-                <Table.DataCell>{isDebugMode ? `${tittel}  -  ${journalpost.journalpostId}` : tittel}</Table.DataCell>
+                {harBareEttDokument ? (
+                    <Table.DataCell>
+                        <div>{tittelDebug}</div>
+                        <Detail size="small">{journalpost.dokumenter[0].tittel}</Detail>
+                    </Table.DataCell>
+                ) : (
+                    <Table.DataCell>{tittelDebug}</Table.DataCell>
+                )}
                 <Table.DataCell>
-                    {isSomeDocumentsSelected && (
+                    {jpForsendelseRelasjoner.erNoenDokumenterValgt() && (
                         <Tag variant="info" size="small">
                             {`${numerOfSelectedDocuments} av ${journalpost.dokumenter.length}`}
                         </Tag>
@@ -584,82 +541,68 @@ function JournalpostDokumenterRowMultiDoc({
             </Table.Row>
             <>
                 {showAllDocuments && (
-                    <>
-                        {journalpost.dokumenter.map((dok, index) => (
-                            <Table.Row
-                                className={`dokumentrad ${index == journalpost.dokumenter.length - 1 ? "last" : ""}`}
-                                key={index + dok.dokumentreferanse}
-                                selected={isDocumentSelected(dok)}
-                            >
-                                <Table.DataCell colSpan={1} />
-
-                                <Table.DataCell>
-                                    <Checkbox
-                                        hideLabel
-                                        checked={isDocumentSelected(dok)}
-                                        onChange={() => {
-                                            onDocumentSelected(dok, true);
-                                        }}
-                                        disabled={erLagtTilIForsendelse(dok)}
-                                        aria-labelledby={`id-${journalpost.journalpostId}`}
-                                        className={""}
-                                    >
-                                        {" "}
-                                    </Checkbox>
-                                </Table.DataCell>
-                                <Table.DataCell colSpan={5}>
-                                    {isDebugMode
-                                        ? `${dok.tittel} - ${dok.originalDokumentreferanse} - ${dok.originalJournalpostId}`
-                                        : dok.tittel}
-                                </Table.DataCell>
-                                <Table.DataCell colSpan={1}>
-                                    <DokumentStatusTag status={getForsendelseStatus(dok)} />
-                                </Table.DataCell>
-                                <Table.DataCell colSpan={1}>
-                                    <OpenDokumentButton
-                                        dokumentreferanse={dok.dokumentreferanse}
-                                        journalpostId={journalpost.journalpostId}
-                                        status={dok.status}
-                                    />
-                                </Table.DataCell>
-                            </Table.Row>
-                        ))}
-                    </>
+                    <JournalpostDokumenter
+                        selectedDocuments={selectedDocuments}
+                        journalpost={journalpost}
+                        onDocumentSelected={onDocumentSelected}
+                    />
                 )}
             </>
         </>
     );
 }
 
-function erSammeDokument(forsendelseDokument: IDokument, dokumentJournal: IDokumentJournalDto, journalpostId: string) {
-    // const harReferanseTilDokumentIJournal =
-    //     forsendelseDokument.lenkeTilDokumentreferanse == dokumentJournal.dokumentreferanse &&
-    //     forsendelseDokument.forsendelseId === journalpostId?.replace(/\D/g, "");
-
-    const erLenketTilEtAvDokumenteneIJournalpost =
-        forsendelseDokument.originalDokumentreferanse == null &&
-        forsendelseDokument.originalJournalpostId != null &&
-        isEqualIgnoreNull(
-            forsendelseDokument.originalJournalpostId,
-            dokumentJournal.originalJournalpostId?.replace(/\D/g, "")
-        );
-    const erLenketTilSammeDokument =
-        isEqualIgnoreNull(forsendelseDokument.originalDokumentreferanse, dokumentJournal.originalDokumentreferanse) &&
-        isEqualIgnoreNull(forsendelseDokument.originalJournalpostId, dokumentJournal.originalJournalpostId);
-
-    const erDokumentIJournalLenketTilDokument =
-        forsendelseDokument.dokumentreferanse == dokumentJournal.originalDokumentreferanse &&
-        forsendelseDokument.forsendelseId == dokumentJournal.originalJournalpostId?.replace(/\D/g, "");
-
-    const erForsendelseDokumentLenketTilDokumentIJournal =
-        forsendelseDokument.originalDokumentreferanse == dokumentJournal.dokumentreferanse &&
-        forsendelseDokument.originalJournalpostId?.replace(/\D/g, "") == journalpostId?.replace(/\D/g, "");
-
-    return (
-        // harReferanseTilDokumentIJournal ||
-        erLenketTilEtAvDokumenteneIJournalpost ||
-        erForsendelseDokumentLenketTilDokumentIJournal ||
-        erLenketTilSammeDokument ||
-        erDokumentIJournalLenketTilDokument
+type JournalpostDokumenterProps = {
+    journalpost: IJournalpost;
+    selectedDocuments: IDokument[];
+    onDocumentSelected: (dokumentDto: IDokumentJournalDto, toggle?: boolean, skipJournalpostCheck?: boolean) => void;
+};
+function JournalpostDokumenter({ journalpost, onDocumentSelected, selectedDocuments }: JournalpostDokumenterProps) {
+    const forsendelse = useForsendelseApi().hentForsendelse();
+    const forsendelseDokumenter = forsendelse.dokumenter;
+    const isDebugMode = useIsDebugMode();
+    const jpForsendelseRelasjoner = useMemo(
+        () => new JournalpostForsendelseRelasjoner(journalpost, selectedDocuments, forsendelseDokumenter),
+        [journalpost, selectedDocuments, forsendelseDokumenter]
     );
+
+    return journalpost.dokumenter.map((dok, index) => (
+        <Table.Row
+            className={`dokumentrad ${index == journalpost.dokumenter.length - 1 ? "last" : ""}`}
+            key={index + dok.dokumentreferanse}
+            selected={jpForsendelseRelasjoner.erDokumentValgt(dok)}
+        >
+            <Table.DataCell colSpan={1} />
+
+            <Table.DataCell>
+                <Checkbox
+                    hideLabel
+                    checked={jpForsendelseRelasjoner.erDokumentValgt(dok)}
+                    onChange={() => {
+                        onDocumentSelected(dok, true);
+                    }}
+                    disabled={jpForsendelseRelasjoner.erLagtTilIForsendelse(dok)}
+                    aria-labelledby={`id-${journalpost.journalpostId}`}
+                    className={""}
+                >
+                    {" "}
+                </Checkbox>
+            </Table.DataCell>
+            <Table.DataCell colSpan={5}>
+                {isDebugMode
+                    ? `${dok.tittel} - ${dok.originalDokumentreferanse} - ${dok.originalJournalpostId}`
+                    : dok.tittel}
+            </Table.DataCell>
+            <Table.DataCell colSpan={1}>
+                <DokumentStatusTag status={jpForsendelseRelasjoner.getForsendelseStatus(dok)} />
+            </Table.DataCell>
+            <Table.DataCell colSpan={1}>
+                <OpenDokumentButton
+                    dokumentreferanse={dok.dokumentreferanse}
+                    journalpostId={journalpost.journalpostId}
+                    status={dok.status}
+                />
+            </Table.DataCell>
+        </Table.Row>
+    ));
 }
