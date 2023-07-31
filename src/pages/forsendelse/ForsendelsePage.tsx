@@ -35,14 +35,14 @@ interface ForsendelsePageProps {
 }
 function ForsendelseView() {
     const forsendelse = useForsendelseApi().hentForsendelse();
-    const { navigateToForsendelse } = useSession();
+    const { navigateToJournalpost } = useSession();
     const isDebug = useIsDebugMode();
     const { errorType } = useErrorContext();
     const lagrerDokumenter = useIsMutating("oppdaterDokumenterMutation");
 
     useEffect(() => {
         if (["FERDIGSTILT", "DISTRIBUERT", "DISTRIBUERT_LOKALT"].includes(forsendelse.status) && !isDebug) {
-            navigateToForsendelse(forsendelse.forsendelseId, "UTGÅENDE", true);
+            navigateToJournalpost(forsendelse.arkivJournalpostId);
         }
     }, []);
 

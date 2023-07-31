@@ -11,6 +11,7 @@ interface ISessionContext {
     enhet: string;
     sessionId: string;
     navigateToForsendelse: (forsendelseId: string, type: "UTGÅENDE" | "NOTAT", erFerdigstilt?: boolean) => void;
+    navigateToJournalpost: (journalpostId: string) => void;
 }
 
 interface ISessionPropsContext {
@@ -29,19 +30,22 @@ function SessionProvider({ children, ...props }: PropsWithChildren<ISessionProps
     const [sessionId, setSessionId] = useState(props.sessionId);
     const [enhet, setEnhet] = useState(props.enhet);
 
-    const navigateToForsendelse = (
-        forsendelseId: string,
-        type: "UTGÅENDE" | "NOTAT" = "UTGÅENDE",
-        erFerdigstilt = false
-    ) => {
+    const navigateToForsendelse = (forsendelseId: string, type: "UTGÅENDE" | "NOTAT" = "UTGÅENDE") => {
         const params = new URLSearchParams();
         params.append("enhet", enhet);
         params.append("sessionState", sessionId);
-        if (type == "NOTAT" || erFerdigstilt) {
+        if (type == "NOTAT") {
             window.open(`/sak/${saksnummer}/journal/BIF-${forsendelseId}?${params.toString()}`, "_self");
         } else {
             navigate(`/sak/${saksnummer}/forsendelse/${forsendelseId}?${params.toString()}`);
         }
+    };
+
+    const navigateToJournalpost = (journalpostId: string) => {
+        const params = new URLSearchParams();
+        params.append("enhet", enhet);
+        params.append("sessionState", sessionId);
+        window.open(`/sak/${saksnummer}/journal/JOARK-${journalpostId}?${params.toString()}`, "_self");
     };
     return (
         <SessionContext.Provider
@@ -52,6 +56,7 @@ function SessionProvider({ children, ...props }: PropsWithChildren<ISessionProps
                 enhet,
                 sessionId,
                 navigateToForsendelse,
+                navigateToJournalpost,
             }}
         >
             {children}
