@@ -62,7 +62,7 @@ function DokumenterFormProvider({ children, ...props }: PropsWithChildren<IDokum
 }
 
 function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumenterPropsContext>) {
-    const { addError } = useErrorContext();
+    const { addError, resetError } = useErrorContext();
     const forsendelse = useForsendelseApi().hentForsendelse();
     const { reset, handleSubmit, formState, setError } = useFormContext<IForsendelseFormProps>();
     const { fields, append, update, swap } = useFieldArray<IForsendelseFormProps>({
@@ -72,17 +72,26 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
     const { isDirty, dirtyFields } = formState;
 
     const oppdaterDokumentTittelFn = useMutation<unknown, unknown, OppdaterDokumentTittelMutationProps>({
-        mutationFn: ({ tittel, dokumentreferanse }) =>
-            BIDRAG_FORSENDELSE_API.api.oppdaterDokument(forsendelse.forsendelseId, dokumentreferanse, { tittel }),
+        mutationFn: ({ tittel, dokumentreferanse }) => {
+            resetError();
+            return BIDRAG_FORSENDELSE_API.api.oppdaterDokument(forsendelse.forsendelseId, dokumentreferanse, {
+                tittel,
+            });
+        },
+
         onError: (error: AxiosError, variables, context) => {
-            console.log(error, variables, context);
             const errorMessage = error.response?.headers?.["warning"];
-            addError(`Det skjedde en feil ved lagring av dokumentittel "${variables.tittel}": ${errorMessage}`);
+            addError({
+                message: `Det skjedde en feil ved lagring av dokumentittel "${variables.tittel}": ${errorMessage}`,
+                type: "dokumenter",
+            });
         },
     });
 
     const oppdaterDokumenterMutation = useMutation({
+        mutationKey: "oppdaterDokumenterMutation",
         mutationFn: (dokumenter: IDokument[]) => {
+            resetError();
             const request: OppdaterForsendelseForesporsel = {
                 dokumenter: dokumenter.map((dokument) => ({
                     dokumentreferanse: dokument.dokumentreferanse,
@@ -100,7 +109,7 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
         },
         onError: (error: AxiosError, variables, context) => {
             const errorMessage = error.response?.headers?.["warning"];
-            addError(`Kunne ikke lagre endringer: ${errorMessage}`);
+            addError({ message: `Kunne ikke lagre endringer: ${errorMessage}`, type: "dokumenter" });
         },
     });
     useEffect(() => {

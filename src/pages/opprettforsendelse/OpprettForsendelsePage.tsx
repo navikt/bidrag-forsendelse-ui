@@ -11,7 +11,7 @@ import BidragErrorPanel from "../../context/BidragErrorPanel";
 import { useErrorContext } from "../../context/ErrorProvider";
 import { useForsendelseApi, UseForsendelseApiKeys } from "../../hooks/useForsendelseApi";
 import { ENHET_FARSKAP } from "../../types/EnhetTypes";
-import { mapToBehandlingInfo } from "../../types/Forsendelse";
+import { mapToBehandlingInfoDto } from "../../types/Forsendelse";
 import { useSession } from "../forsendelse/context/SessionContext";
 import { queryClient } from "../PageWrapper";
 import DokumentValgOpprett from "./DokumentValgOpprett";
@@ -96,7 +96,10 @@ function OpprettForsendelseUnderOpprettelse() {
             queryClient.refetchQueries(UseForsendelseApiKeys.forsendelse);
         },
         onError: () => {
-            addError("Kunne ikke opprette forsendelse. Vennligst prøv på nytt");
+            addError({
+                message: "Kunne ikke opprette forsendelse. Vennligst prøv på nytt",
+                type: "opprettforsendelse",
+            });
         },
     });
 
@@ -136,7 +139,7 @@ function OpprettForsendelseNy() {
                 enhet: enhet,
                 saksnummer,
                 opprettTittel: true,
-                behandlingInfo: mapToBehandlingInfo(options),
+                behandlingInfo: mapToBehandlingInfoDto(options),
                 dokumenter: [
                     {
                         dokumentmalId: data.dokument.malId,
@@ -148,7 +151,10 @@ function OpprettForsendelseNy() {
             });
         },
         onError: () => {
-            addError("Kunne ikke opprette forsendelse. Vennligst prøv på nytt");
+            addError({
+                message: "Kunne ikke opprette forsendelse. Vennligst prøv på nytt",
+                type: "opprettforsendelse",
+            });
         },
         onSuccess: (data) => {
             const forsendelseId = data.data.forsendelseId;

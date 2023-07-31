@@ -5,10 +5,13 @@ import { Loader } from "@navikt/ds-react";
 import { ContentContainer } from "@navikt/ds-react";
 import React from "react";
 import { PropsWithChildren } from "react";
+import { useIsMutating } from "react-query";
 
 import DokumenterTable from "../../components/dokument/DokumenterTable";
 import InfoKnapp from "../../components/InfoKnapp";
+import SaveStatusIndicator from "../../components/SaveStatusIndicator";
 import BidragErrorPanel from "../../context/BidragErrorPanel";
+import { useErrorContext } from "../../context/ErrorProvider";
 import DokumentTableInfo from "../../docs/DokumentTable.mdx";
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
 import OpprettForsendelsePage from "../opprettforsendelse/OpprettForsendelsePage";
@@ -31,6 +34,8 @@ interface ForsendelsePageProps {
 }
 function ForsendelseView() {
     const forsendelse = useForsendelseApi().hentForsendelse();
+    const { errorType } = useErrorContext();
+    const lagrerDokumenter = useIsMutating("oppdaterDokumenterMutation");
 
     if (forsendelse.status == "UNDER_OPPRETTELSE") {
         return <OpprettForsendelsePage />;
@@ -53,12 +58,20 @@ function ForsendelseView() {
                             </Cell>
                         </Grid>
                         <div>
-                            <Heading level={"3"} size={"medium"} className={"max-w"}>
-                                Dokumenter{" "}
+                            <div className="flex flex-row gap-[2px]">
+                                <Heading level={"3"} size={"medium"} className={"max-w"}>
+                                    Dokumenter
+                                </Heading>
                                 <InfoKnapp>
                                     <DokumentTableInfo />
                                 </InfoKnapp>
-                            </Heading>
+                                <SaveStatusIndicator
+                                    state={
+                                        errorType == "dokumenter" ? "error" : lagrerDokumenter > 0 ? "saving" : "idle"
+                                    }
+                                />
+                            </div>
+
                             <DokumenterTable />
                         </div>
                         <div className={"mt-10"}>

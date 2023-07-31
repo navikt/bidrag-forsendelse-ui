@@ -2,11 +2,13 @@ import { PencilIcon } from "@navikt/aksel-icons";
 import { XMarkIcon } from "@navikt/aksel-icons";
 import { CloudUpIcon } from "@navikt/aksel-icons";
 import { Button, Heading, TextField } from "@navikt/ds-react";
+import { AxiosError } from "axios";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../../../api/api";
 import { OppdaterForsendelseResponse } from "../../../api/BidragForsendelseApi";
+import { useErrorContext } from "../../../context/ErrorProvider";
 import { useForsendelseApi, UseForsendelseApiKeys } from "../../../hooks/useForsendelseApi";
 export default function ForsendelseTittel() {
     const forsendelse = useForsendelseApi().hentForsendelse();
@@ -58,6 +60,7 @@ interface EditForsendelseTitleProps {
 }
 function EditForsendelseTitle({ onCancel, onSubmit, defaultValue }: EditForsendelseTitleProps) {
     const forsendelse = useForsendelseApi().hentForsendelse();
+    const { addError } = useErrorContext();
     const [updatedTitle, setUpdatedTitle] = useState<string>();
     const queryClient = useQueryClient();
     const isCanceled = useRef(false);
@@ -70,6 +73,10 @@ function EditForsendelseTitle({ onCancel, onSubmit, defaultValue }: EditForsende
                 })
                 .then((res) => res.data),
         onSuccess: (data) => onSubmit(data.tittel ?? defaultValue),
+        onError: (error: AxiosError, variables, context) => {
+            const errorMessage = error.response?.headers?.["warning"];
+            addError({ message: `Kunne ikke lagre tittel: ${errorMessage}`, type: "forsendelsetittel" });
+        },
     });
 
     function onChange(e: React.ChangeEvent<HTMLInputElement>) {
