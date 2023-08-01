@@ -518,7 +518,7 @@ function JournalpostDokumenterRowMultiDoc({
                 )}
                 <Table.DataCell>
                     {jpForsendelseRelasjoner.erNoenDokumenterValgt() && (
-                        <Tag variant="info" size="small">
+                        <Tag variant="info" size="small" className="w-max">
                             {`${numerOfSelectedDocuments} av ${journalpost.dokumenter.length}`}
                         </Tag>
                     )}
