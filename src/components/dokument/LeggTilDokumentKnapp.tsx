@@ -74,13 +74,28 @@ function LeggTilDokumentFraSakModal({ onClose, open }: LeggTilDokumentFraSakModa
             if (isDocumentSelected) {
                 return toggle ? selectedDocuments.filter((d) => !isSelected(d)) : selectedDocuments;
             }
-            const rolle = document.fraRolle ? mapRolleToDisplayValue(document.fraRolle) : "";
+            const rolle = document.fraRolle ? mapRolleToDisplayValue(document.fraRolle)?.toLowerCase() : "";
             const title =
                 saksnummer == document.fraSaksnummer
                     ? document.tittel
-                    : `${document.tittel} (Fra ${rolle} sak ${document.fraSaksnummer})`;
+                    : `${fjernRollereferanseFraTittel(document.tittel)} (fra ${rolle} sak ${document.fraSaksnummer})`;
             return [...selectedDocuments, { ...document, tittel: title }];
         });
+    }
+
+    function fjernRollereferanseFraTittel(tittel: string): string {
+        const hentFraRolleSakStartIndex = (rolletype: RolleType) =>
+            tittel.indexOf(`(fra ${mapRolleToDisplayValue(rolletype)?.toLowerCase()}`);
+        const fraRolleSakStartIndex = Math.max(
+            hentFraRolleSakStartIndex(RolleType.BA),
+            hentFraRolleSakStartIndex(RolleType.BM),
+            hentFraRolleSakStartIndex(RolleType.BP)
+        );
+        if (fraRolleSakStartIndex > 0) {
+            const fraRolleSakSluttIndex = tittel.indexOf(")", fraRolleSakStartIndex);
+            return tittel.substring(0, fraRolleSakStartIndex - 1) + tittel.substring(fraRolleSakSluttIndex + 1);
+        }
+        return tittel;
     }
 
     function unselectDocument(document: IDokument) {
@@ -248,7 +263,7 @@ function DokumenterForPerson({
         <>
             {rolleSaksnummere.map((saksnummer) => {
                 return (
-                    <Accordion.Item defaultOpen style={{ minWidth: "3rem" }}>
+                    <Accordion.Item defaultOpen style={{ minWidth: "3rem" }} key={`${rolle} ${saksnummer}`}>
                         <Accordion.Header>{renderAccordionHeader(saksnummer)}</Accordion.Header>
                         <Accordion.Content className="p-4">
                             <DokumenterForSakTabell
