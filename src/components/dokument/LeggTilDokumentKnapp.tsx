@@ -20,7 +20,7 @@ import useIsDebugMode from "../../hooks/useDebugMode";
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
 import { useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IDokument } from "../../types/Dokument";
-import { IDokumentJournalDto, IJournalpost, JournalpostStatus } from "../../types/Journalpost";
+import { IDokumentJournalDto, IJournalpost, IJournalpostStatus } from "../../types/Journalpost";
 import { mapRolleToDisplayValue } from "../../types/RolleMapper";
 import { cleanupAfterClosedModal } from "../../utils/ModalUtils";
 import JournalpostStatusTag from "../journalpost/JournalpostStatusTag";
@@ -74,13 +74,28 @@ function LeggTilDokumentFraSakModal({ onClose, open }: LeggTilDokumentFraSakModa
             if (isDocumentSelected) {
                 return toggle ? selectedDocuments.filter((d) => !isSelected(d)) : selectedDocuments;
             }
-            const rolle = document.fraRolle ? mapRolleToDisplayValue(document.fraRolle) : "";
+            const rolle = document.fraRolle ? mapRolleToDisplayValue(document.fraRolle)?.toLowerCase() : "";
             const title =
                 saksnummer == document.fraSaksnummer
                     ? document.tittel
-                    : `${document.tittel} (Fra ${rolle} sak ${document.fraSaksnummer})`;
+                    : `${fjernRollereferanseFraTittel(document.tittel)} (fra ${rolle} sak ${document.fraSaksnummer})`;
             return [...selectedDocuments, { ...document, tittel: title }];
         });
+    }
+
+    function fjernRollereferanseFraTittel(tittel: string): string {
+        const hentFraRolleSakStartIndex = (rolletype: RolleType) =>
+            tittel.indexOf(`(fra ${mapRolleToDisplayValue(rolletype)?.toLowerCase()}`);
+        const fraRolleSakStartIndex = Math.max(
+            hentFraRolleSakStartIndex(RolleType.BA),
+            hentFraRolleSakStartIndex(RolleType.BM),
+            hentFraRolleSakStartIndex(RolleType.BP)
+        );
+        if (fraRolleSakStartIndex > 0) {
+            const fraRolleSakSluttIndex = tittel.indexOf(")", fraRolleSakStartIndex);
+            return tittel.substring(0, fraRolleSakStartIndex - 1) + tittel.substring(fraRolleSakSluttIndex + 1);
+        }
+        return tittel;
     }
 
     function unselectDocument(document: IDokument) {
@@ -248,7 +263,7 @@ function DokumenterForPerson({
         <>
             {rolleSaksnummere.map((saksnummer) => {
                 return (
-                    <Accordion.Item defaultOpen style={{ minWidth: "3rem" }}>
+                    <Accordion.Item defaultOpen style={{ minWidth: "3rem" }} key={`${rolle} ${saksnummer}`}>
                         <Accordion.Header>{renderAccordionHeader(saksnummer)}</Accordion.Header>
                         <Accordion.Content className="p-4">
                             <DokumenterForSakTabell
@@ -283,10 +298,12 @@ function DokumenterForSakTabell({
     const journalposter = hentJournalposterForSak(saksnummer);
     const forsendelse = hentForsendelse();
     const visJournalposter = journalposter
-        .filter((jp) => jp.dokumentType != "X")
-        .filter((jp) => jp.journalstatus != JournalpostStatus.UNDER_OPPRETELSE)
+        .filter((jp) => jp.journalstatus != IJournalpostStatus.UNDER_OPPRETELSE)
         .filter((jp) => jp.feilfort != true)
-        .filter((jp) => jp.journalpostId != `BIF-${forsendelse.forsendelseId?.replace("BIF-", "")}`);
+        .filter((jp) => jp.journalpostId != `BIF-${forsendelse.forsendelseId?.replace("BIF-", "")}`)
+        .sort((a, b) => {
+            return b.dokumentDato?.localeCompare(a.dokumentDato);
+        });
     if (visJournalposter.length == 0) {
         return <div className={"p-2"}>Det finnes ikke flere journalposter i samme sak</div>;
     }
@@ -511,14 +528,14 @@ function JournalpostDokumenterRowMultiDoc({
                 {harBareEttDokument ? (
                     <Table.DataCell>
                         <div>{tittelDebug}</div>
-                        <Detail size="small">{journalpost.dokumenter[0].tittel}</Detail>
+                        <Detail>{journalpost.dokumenter[0].tittel}</Detail>
                     </Table.DataCell>
                 ) : (
                     <Table.DataCell>{tittelDebug}</Table.DataCell>
                 )}
                 <Table.DataCell>
                     {jpForsendelseRelasjoner.erNoenDokumenterValgt() && (
-                        <Tag variant="info" size="small">
+                        <Tag variant="info" size="small" className="w-max">
                             {`${numerOfSelectedDocuments} av ${journalpost.dokumenter.length}`}
                         </Tag>
                     )}

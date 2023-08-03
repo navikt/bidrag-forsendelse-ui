@@ -34,6 +34,7 @@ export interface IForsendelse {
 
 export function mapToBehandlingInfoDto(options: IOpprettForsendelsePropsContext): BehandlingInfoDto {
     const behandlingInfo = {
+        soknadType: options.soknadType,
         soknadFra: options.soknadFra,
         soknadId: options.soknadId,
         vedtakId: options.vedtakId,

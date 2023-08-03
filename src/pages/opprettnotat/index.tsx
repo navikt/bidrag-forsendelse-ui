@@ -15,13 +15,21 @@ export default function ({ saksnummer, sessionId, enhet }: OpprettNotatProps) {
     return (
         <PageWrapper name={"opprett-forsendelse-page"}>
             <SessionProvider saksnummer={saksnummer} sessionId={sessionId} enhet={enhet}>
-                <React.Suspense fallback={<Loader size={"3xlarge"} title={"Laster..."} />}>
-                    <div>
-                        <ForsendelseSakHeader />
+                <div>
+                    <ForsendelseSakHeader />
+                    <React.Suspense fallback={<LoadingIndicator />}>
                         <OpprettNotatPage />
-                    </div>
-                </React.Suspense>
+                    </React.Suspense>
+                </div>
             </SessionProvider>
         </PageWrapper>
+    );
+}
+
+function LoadingIndicator() {
+    return (
+        <div className="m-auto w-max flex flex-col justify-center">
+            <Loader size={"3xlarge"} title={"Laster..."} className="m-auto" />
+        </div>
     );
 }

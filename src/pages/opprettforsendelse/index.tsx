@@ -10,13 +10,20 @@ export default function ({ ...otherProps }: IOpprettForsendelseProviderProps) {
     return (
         <PageWrapper name={"opprett-forsendelse-page"}>
             <OpprettForsendelseProvider {...otherProps}>
-                <React.Suspense fallback={<Loader size={"3xlarge"} title={"Laster..."} />}>
-                    <div>
-                        <ForsendelseSakHeader />
+                <div>
+                    <ForsendelseSakHeader />
+                    <React.Suspense fallback={<LoadingIndicator />}>
                         <OpprettForsendelsePage />
-                    </div>
-                </React.Suspense>
+                    </React.Suspense>
+                </div>
             </OpprettForsendelseProvider>
         </PageWrapper>
+    );
+}
+function LoadingIndicator() {
+    return (
+        <div className="m-auto w-max flex flex-col justify-center">
+            <Loader size={"3xlarge"} title={"Laster..."} className="m-auto" />
+        </div>
     );
 }

@@ -113,7 +113,7 @@ function DokumenterTableBottomButtons() {
                     if (!isAllDocumentsFinished) {
                         addWarning("Alle dokumenter må kontrolleres/ferdigstilles før de kan åpnes samtidig");
                     } else {
-                        OpenDocumentUtils.åpneDokument("BIF-" + forsendelseId);
+                        OpenDocumentUtils.åpneDokument("BIF-" + forsendelseId, null, false);
                     }
                 }}
             >

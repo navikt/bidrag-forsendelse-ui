@@ -1,24 +1,26 @@
 import { Tag } from "@navikt/ds-react";
 
-import { JournalpostStatus } from "../../types/Journalpost";
+import { IJournalpostStatus } from "../../types/Journalpost";
 
 export const JournalpostStatusTags = {
-    [JournalpostStatus.UNDER_PRODUKSJON]: "alt2",
-    [JournalpostStatus.DISTRIBUERT]: "success",
-    [JournalpostStatus.JOURNALFØRT]: "success",
-    [JournalpostStatus.UNDER_OPPRETELSE]: "alt2",
-    [JournalpostStatus.KLAR_FOR_DISTRIBUSJON]: "warning",
+    [IJournalpostStatus.UNDER_PRODUKSJON]: "alt2",
+    [IJournalpostStatus.DISTRIBUERT]: "success",
+    [IJournalpostStatus.JOURNALFØRT]: "success",
+    [IJournalpostStatus.RESERVERT]: "success",
+    [IJournalpostStatus.UNDER_OPPRETELSE]: "alt2",
+    [IJournalpostStatus.KLAR_FOR_DISTRIBUSJON]: "warning",
 } as const;
 export const JournalpostStatusDisplayName = {
-    [JournalpostStatus.UNDER_PRODUKSJON]: "Under produksjon",
-    [JournalpostStatus.DISTRIBUERT]: "Distribuert",
-    [JournalpostStatus.JOURNALFØRT]: "Journalført",
-    [JournalpostStatus.UNDER_OPPRETELSE]: "Under opprettelse",
-    [JournalpostStatus.KLAR_FOR_DISTRIBUSJON]: "Klar for distribusjon",
+    [IJournalpostStatus.UNDER_PRODUKSJON]: "Under produksjon",
+    [IJournalpostStatus.DISTRIBUERT]: "Distribuert",
+    [IJournalpostStatus.JOURNALFØRT]: "Journalført",
+    [IJournalpostStatus.RESERVERT]: "Ferdigstilt",
+    [IJournalpostStatus.UNDER_OPPRETELSE]: "Under opprettelse",
+    [IJournalpostStatus.KLAR_FOR_DISTRIBUSJON]: "Klar for distribusjon",
 } as const;
 
 interface JournalpostStatusTagProps {
-    status: JournalpostStatus | string;
+    status: IJournalpostStatus | string;
 }
 
 export default function JournalpostStatusTag({ status }: JournalpostStatusTagProps) {

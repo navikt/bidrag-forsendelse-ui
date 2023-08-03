@@ -1,4 +1,4 @@
-import { JournalpostStatus } from "../types/Journalpost";
+import { IJournalpostStatus } from "../types/Journalpost";
 
 export enum DokumentStatus {
     SLETTET = "SLETTET",
@@ -14,19 +14,21 @@ export const DOKUMENT_KAN_IKKE_ÅPNES_STATUS = [
     DokumentStatus.BESTILLING_FEILET,
     DokumentStatus.IKKE_BESTILT,
     DokumentStatus.UNDER_PRODUKSJON,
-    JournalpostStatus.UNDER_OPPRETELSE,
+    IJournalpostStatus.UNDER_OPPRETELSE,
 ];
 export const DokumentStatusTags = {
     [DokumentStatus.UNDER_PRODUKSJON]: "alt2",
+    [DokumentStatus.BESTILLING_FEILET]: "alt2",
     [DokumentStatus.UNDER_REDIGERING]: "warning",
     [DokumentStatus.MÅ_KONTROLLERES]: "warning",
     [DokumentStatus.FERDIGSTILT]: "success",
     [DokumentStatus.KONTROLLERT]: "success",
     [DokumentStatus.IKKE_BESTILT]: "warning",
-    [DokumentStatus.SLETTET]: "danger",
+    [DokumentStatus.SLETTET]: "error",
 } as const;
 export const DokumentStatusDisplayName = {
     [DokumentStatus.UNDER_PRODUKSJON]: "Under produksjon",
+    [DokumentStatus.BESTILLING_FEILET]: "Under produksjon",
     [DokumentStatus.UNDER_REDIGERING]: "Under redigering",
     [DokumentStatus.MÅ_KONTROLLERES]: "Må kontrolleres",
     [DokumentStatus.FERDIGSTILT]: "Ferdigstilt",
