@@ -20,7 +20,7 @@ import useIsDebugMode from "../../hooks/useDebugMode";
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
 import { useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IDokument } from "../../types/Dokument";
-import { IDokumentJournalDto, IJournalpost, JournalpostStatus } from "../../types/Journalpost";
+import { IDokumentJournalDto, IJournalpost, IJournalpostStatus } from "../../types/Journalpost";
 import { mapRolleToDisplayValue } from "../../types/RolleMapper";
 import { cleanupAfterClosedModal } from "../../utils/ModalUtils";
 import JournalpostStatusTag from "../journalpost/JournalpostStatusTag";
@@ -298,10 +298,12 @@ function DokumenterForSakTabell({
     const journalposter = hentJournalposterForSak(saksnummer);
     const forsendelse = hentForsendelse();
     const visJournalposter = journalposter
-        .filter((jp) => jp.dokumentType != "X")
-        .filter((jp) => jp.journalstatus != JournalpostStatus.UNDER_OPPRETELSE)
+        .filter((jp) => jp.journalstatus != IJournalpostStatus.UNDER_OPPRETELSE)
         .filter((jp) => jp.feilfort != true)
-        .filter((jp) => jp.journalpostId != `BIF-${forsendelse.forsendelseId?.replace("BIF-", "")}`);
+        .filter((jp) => jp.journalpostId != `BIF-${forsendelse.forsendelseId?.replace("BIF-", "")}`)
+        .sort((a, b) => {
+            return b.dokumentDato?.localeCompare(a.dokumentDato);
+        });
     if (visJournalposter.length == 0) {
         return <div className={"p-2"}>Det finnes ikke flere journalposter i samme sak</div>;
     }
@@ -526,7 +528,7 @@ function JournalpostDokumenterRowMultiDoc({
                 {harBareEttDokument ? (
                     <Table.DataCell>
                         <div>{tittelDebug}</div>
-                        <Detail size="small">{journalpost.dokumenter[0].tittel}</Detail>
+                        <Detail>{journalpost.dokumenter[0].tittel}</Detail>
                     </Table.DataCell>
                 ) : (
                     <Table.DataCell>{tittelDebug}</Table.DataCell>

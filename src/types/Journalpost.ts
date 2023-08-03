@@ -3,24 +3,25 @@ import { DokumentDto } from "../api/BidragDokumentApi";
 
 export function journalstatusToDisplayValue(journalstatus: string) {
     switch (journalstatus) {
-        case JournalpostStatus.UNDER_PRODUKSJON:
+        case IJournalpostStatus.UNDER_PRODUKSJON:
             return "Under prod.";
-        case JournalpostStatus.DISTRIBUERT:
+        case IJournalpostStatus.DISTRIBUERT:
             return "Distribuert";
-        case JournalpostStatus.JOURNALFØRT:
+        case IJournalpostStatus.JOURNALFØRT:
             return "Journalført";
-        case JournalpostStatus.KLAR_FOR_DISTRIBUSJON:
+        case IJournalpostStatus.KLAR_FOR_DISTRIBUSJON:
             return "Klar for distribusjon";
-        case JournalpostStatus.UNDER_OPPRETELSE:
+        case IJournalpostStatus.UNDER_OPPRETELSE:
             return "Under opprettelse";
     }
 
     return journalstatus;
 }
 
-export enum JournalpostStatus {
+export enum IJournalpostStatus {
     UNDER_OPPRETELSE = "UO",
     UNDER_PRODUKSJON = "D",
+    RESERVERT = "R",
     JOURNALFØRT = "J",
     DISTRIBUERT = "E",
     KLAR_FOR_DISTRIBUSJON = "KP",

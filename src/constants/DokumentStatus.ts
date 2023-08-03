@@ -1,4 +1,4 @@
-import { JournalpostStatus } from "../types/Journalpost";
+import { IJournalpostStatus } from "../types/Journalpost";
 
 export enum DokumentStatus {
     SLETTET = "SLETTET",
@@ -14,7 +14,7 @@ export const DOKUMENT_KAN_IKKE_ÅPNES_STATUS = [
     DokumentStatus.BESTILLING_FEILET,
     DokumentStatus.IKKE_BESTILT,
     DokumentStatus.UNDER_PRODUKSJON,
-    JournalpostStatus.UNDER_OPPRETELSE,
+    IJournalpostStatus.UNDER_OPPRETELSE,
 ];
 export const DokumentStatusTags = {
     [DokumentStatus.UNDER_PRODUKSJON]: "alt2",

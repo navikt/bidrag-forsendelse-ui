@@ -5,16 +5,16 @@ import React from "react";
 
 import { DOKUMENT_KAN_IKKE_ÅPNES_STATUS, DokumentStatus } from "../../constants/DokumentStatus";
 import { queryClient } from "../../pages/PageWrapper";
-import { JournalpostStatus } from "../../types/Journalpost";
+import { IJournalpostStatus } from "../../types/Journalpost";
 import EditDocumentButton from "./EditDocumentButton";
 
 interface IOpenDokumentButtonProps {
     dokumentreferanse?: string;
     journalpostId?: string;
-    status?: DokumentStatus | string | JournalpostStatus;
+    status?: DokumentStatus | string | IJournalpostStatus;
 }
 export default function OpenDokumentButton({ dokumentreferanse, status, journalpostId }: IOpenDokumentButtonProps) {
-    if (DOKUMENT_KAN_IKKE_ÅPNES_STATUS.includes(status as DokumentStatus | JournalpostStatus)) {
+    if (DOKUMENT_KAN_IKKE_ÅPNES_STATUS.includes(status as DokumentStatus | IJournalpostStatus)) {
         return null;
     }
     if (status == "MÅ_KONTROLLERES" || status == "KONTROLLERT") {
