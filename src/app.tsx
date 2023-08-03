@@ -59,6 +59,7 @@ function OpprettNyNotatPageWrapper() {
                         ? searchParams.get("erFattetBeregnet") == "true"
                         : null
                 }
+                soknadType={searchParams.get("soknadType")}
                 soknadId={searchParams.get("soknadId")}
                 behandlingId={searchParams.get("behandlingId")}
                 vedtakId={searchParams.get("vedtakId")}
@@ -95,6 +96,7 @@ function OpprettNyForsendelsePageWrapper() {
                 }
                 erVedtakIkkeTilbakekreving={searchParams.get("erVedtakIkkeTilbakekreving") == "true"}
                 soknadId={searchParams.get("soknadId")}
+                soknadType={searchParams.get("soknadType")}
                 behandlingId={searchParams.get("behandlingId")}
                 vedtakId={searchParams.get("vedtakId")}
                 soknadFra={searchParams.get("soknadFra") as SoknadFra}

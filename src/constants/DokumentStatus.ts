@@ -24,7 +24,7 @@ export const DokumentStatusTags = {
     [DokumentStatus.FERDIGSTILT]: "success",
     [DokumentStatus.KONTROLLERT]: "success",
     [DokumentStatus.IKKE_BESTILT]: "warning",
-    [DokumentStatus.SLETTET]: "danger",
+    [DokumentStatus.SLETTET]: "error",
 } as const;
 export const DokumentStatusDisplayName = {
     [DokumentStatus.UNDER_PRODUKSJON]: "Under produksjon",

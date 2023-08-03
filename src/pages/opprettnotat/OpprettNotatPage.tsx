@@ -69,7 +69,6 @@ export default function OpprettNotatPage() {
         },
     });
     function onSubmit(data: OpprettForsendelseFormProps) {
-        console.log("onSubmit", data);
         opprettForsendelseFn.mutate(data);
     }
     return (
