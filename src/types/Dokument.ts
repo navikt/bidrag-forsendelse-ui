@@ -19,6 +19,7 @@ export interface IDokument {
     tittel: string;
     dokumentDato?: string;
     status?: DokumentStatus;
+    gammelStatus?: DokumentStatus;
     fraSaksnummer?: string;
     fraRolle?: RolleType;
     lagret: boolean;

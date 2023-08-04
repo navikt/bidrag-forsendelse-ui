@@ -132,7 +132,9 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
         const index = fields.indexOf(deleteDocument);
         update(index, {
             ...deleteDocument,
-            status: DokumentStatus.SLETTET,
+            gammelStatus: deleteDocument.status,
+            status:
+                deleteDocument.status == DokumentStatus.SLETTET ? deleteDocument.gammelStatus : DokumentStatus.SLETTET,
         });
     };
     const updateDocument = (updatedDocument: FormIDokument) => {

@@ -1,4 +1,4 @@
-import { Heading } from "@navikt/ds-react";
+import { ConfirmationPanel, Heading } from "@navikt/ds-react";
 import { Alert } from "@navikt/ds-react";
 import { BodyShort } from "@navikt/ds-react";
 import { Button } from "@navikt/ds-react";
@@ -11,32 +11,29 @@ import { BIDRAG_FORSENDELSE_API } from "../../../api/api";
 import { DistribuerJournalpostRequest } from "../../../api/BidragForsendelseApi";
 import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
 import { RedirectTo } from "../../../utils/RedirectUtils";
-import { queryClient } from "../../PageWrapper";
 
+const CONFIRMATION_MISSING_ERROR = "CONFIRMATION_MISSING_ERROR";
 interface ManuellUtsendingModalProps {
     onCancel: () => void;
 }
 export default function ManuellUtsendingModal({ onCancel }: ManuellUtsendingModalProps) {
-    const [submitState, setSubmitState] = useState<"pending" | "idle" | "succesfull" | "error">("idle");
     const forsendelse = useForsendelseApi().hentForsendelse();
+    const [confirmationState, setConfirmationState] = useState(false);
     const distribuerMutation = useMutation({
         mutationFn: () => {
+            if (!confirmationState) {
+                throw CONFIRMATION_MISSING_ERROR;
+            }
             const request: DistribuerJournalpostRequest = {
                 lokalUtskrift: true,
             };
             return BIDRAG_FORSENDELSE_API.api.distribuerForsendelse(forsendelse.forsendelseId, request);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries("forsendelse");
-            setSubmitState("succesfull");
             RedirectTo.sakshistorikk(forsendelse.saksnummer);
-        },
-        onError: (error, variables, context) => {
-            setSubmitState("error");
         },
     });
     function onSubmit() {
-        setSubmitState("pending");
         distribuerMutation.mutate();
     }
 
@@ -52,30 +49,45 @@ export default function ManuellUtsendingModal({ onCancel }: ManuellUtsendingModa
         <Modal
             onClose={onCancel}
             open
-            closeButton={submitState !== "succesfull"}
-            shouldCloseOnOverlayClick={submitState !== "succesfull"}
+            closeButton={!distribuerMutation.isSuccess}
+            shouldCloseOnOverlayClick={!distribuerMutation.isSuccess}
         >
             <Modal.Content>
                 <div>
-                    <Heading size={"large"}>Har du sendt forsendelsen lokalt?</Heading>
-                    {submitState === "error" && renderErrorMessage()}
+                    <Heading size={"large"}>Sende lokalt</Heading>
+                    {distribuerMutation.isError &&
+                        distribuerMutation.error != CONFIRMATION_MISSING_ERROR &&
+                        renderErrorMessage()}
                     <div className={"min-w-[35rem] relative  w-full max-w-2xl h-full md:h-auto"}>
                         <div className={"py-4"}>
-                            <BodyShort>
-                                Jeg bekrefter at jeg har printet og sendt ut alle dokumenter i forsendelsen
-                            </BodyShort>
                             <BodyShort>
                                 Det vil bli automatisk lagt til <i>(dokumentet er sendt per post med vedlegg)</i> bak
                                 tittel
                             </BodyShort>
                         </div>
+                        <ConfirmationPanel
+                            size="small"
+                            checked={confirmationState}
+                            label="Jeg bekrefter at jeg har printet og sendt ut alle dokumentene i forsendelsen"
+                            error={
+                                distribuerMutation.error == CONFIRMATION_MISSING_ERROR
+                                    ? "Du må bekrefte før du går videre"
+                                    : null
+                            }
+                            onChange={() => setConfirmationState((x) => !x)}
+                        ></ConfirmationPanel>
                     </div>
                 </div>
-                <div className="flex items-center p-2 space-x-2 ">
-                    <Button size="small" variant={"primary"} onClick={onSubmit} loading={submitState === "pending"}>
-                        Bekreft og gå tilbake til sakshistorikk
+                <div className="flex items-center pt-2 space-x-2 ">
+                    <Button size="small" variant={"primary"} onClick={onSubmit} loading={distribuerMutation.isLoading}>
+                        Fullfør og gå tilbake til sakshistorikk
                     </Button>
-                    <Button size="small" variant={"tertiary"} disabled={submitState === "pending"} onClick={onCancel}>
+                    <Button
+                        size="small"
+                        variant={"tertiary"}
+                        disabled={distribuerMutation.isLoading}
+                        onClick={onCancel}
+                    >
                         Avbryt
                     </Button>
                 </div>

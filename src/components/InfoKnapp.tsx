@@ -3,6 +3,7 @@ import { Button, Modal } from "@navikt/ds-react";
 import { PropsWithChildren, useState } from "react";
 type InfoKnappProps = {
     className?: string;
+    title?: string;
 };
 export default function InfoKnapp({ children, className }: PropsWithChildren<InfoKnappProps>) {
     const [modalOpen, setModalOpen] = useState(false);
@@ -13,7 +14,13 @@ export default function InfoKnapp({ children, className }: PropsWithChildren<Inf
     const openModal = () => setModalOpen(true);
     return (
         <>
-            <Button variant="tertiary" size="xsmall" icon={<InformationSquareIcon />} onClick={openModal}></Button>
+            <Button
+                title="Brukerveileding for dokumenttabell"
+                variant="tertiary"
+                size="xsmall"
+                icon={<InformationSquareIcon />}
+                onClick={openModal}
+            ></Button>
             <Modal
                 open={modalOpen}
                 overlayClassName="test"
