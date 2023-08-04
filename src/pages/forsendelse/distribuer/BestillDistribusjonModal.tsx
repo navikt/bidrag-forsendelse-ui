@@ -13,7 +13,6 @@ import { DistribuerJournalpostRequest } from "../../../api/BidragForsendelseApi"
 import { hentPostnummere } from "../../../api/queries";
 import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
 import { RedirectTo } from "../../../utils/RedirectUtils";
-import { queryClient } from "../../PageWrapper";
 import BestillDistribusjonInfo from "./BestillDistribusjonInfo";
 
 interface BestillDistribusjonModalProps {
@@ -67,7 +66,6 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
             return BIDRAG_FORSENDELSE_API.api.distribuerForsendelse(forsendelse.forsendelseId, request);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries("forsendelse");
             setSubmitState("succesfull");
             RedirectTo.sakshistorikk(forsendelse.saksnummer);
         },
