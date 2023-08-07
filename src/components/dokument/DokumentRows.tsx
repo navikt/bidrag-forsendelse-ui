@@ -103,7 +103,7 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
             let styles = { ...style } as CSSProperties;
 
             if (dokument.status == DokumentStatus.SLETTET) {
-                styles = { ...style, border: "solid 2px var(--a-red-500)" };
+                styles = { ...style, border: "solid 2px var(--a-red-200)" };
             } else if (dokument.lagret == false) {
                 styles = { ...style, backgroundColor: "var(--a-green-50)" };
             }
