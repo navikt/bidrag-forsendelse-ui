@@ -101,6 +101,9 @@
     "webpack-manifest-plugin": "5.0.0",
     "webpack-merge": "5.9.0"
   },
+  "resolutions": {
+    "strip-ansi": "^6.0.1"
+  },
   "msw": {
     "workerDirectory": "public"
   }

@@ -251,9 +251,7 @@ function OpprettForsendelsValidationErrorSummary() {
 
     return (
         <ErrorSummary heading={"Følgende må rettes opp før forsendelse kan opprettes"} className="mt-4">
-            {getAllErrors(errors)?.map((err, i) => (
-                <ErrorSummaryItem key={"err" + i}>{err}</ErrorSummaryItem>
-            ))}
+            {getAllErrors(errors)?.map((err, i) => <ErrorSummaryItem key={"err" + i}>{err}</ErrorSummaryItem>)}
         </ErrorSummary>
     );
 }

@@ -25,9 +25,7 @@ export default function ValidationErrorSummary() {
     }
     return (
         <ErrorSummary heading={"Følgende må rettes opp før forsendelse kan distribueres"}>
-            {getAllErrors()?.map((err) => (
-                <ErrorSummaryItem>{err}</ErrorSummaryItem>
-            ))}
+            {getAllErrors()?.map((err) => <ErrorSummaryItem>{err}</ErrorSummaryItem>)}
         </ErrorSummary>
     );
 }
