@@ -14,10 +14,6 @@ export default function ForsendelseDetaljer() {
                 <DetailsGrid
                     rows={[
                         {
-                            label: "Enhet",
-                            value: forsendelse.enhet,
-                        },
-                        {
                             label: "Tema",
                             value: forsendelse.tema == "FAR" ? "Foreldreskap" : "Bidrag",
                         },
