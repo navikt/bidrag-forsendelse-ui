@@ -103,7 +103,7 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
             let styles = { ...style } as CSSProperties;
 
             if (dokument.status == DokumentStatus.SLETTET) {
-                styles = { ...style, backgroundColor: "var(--a-red-50)" };
+                styles = { ...style, border: "solid 2px var(--a-red-500)" };
             } else if (dokument.lagret == false) {
                 styles = { ...style, backgroundColor: "var(--a-green-50)" };
             }
@@ -132,9 +132,7 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
                     <DragVerticalIcon />
                 </Table.DataCell>
                 <Table.DataCell style={{ width: "3px" }}>{index + 1}</Table.DataCell>
-                <Table.DataCell scope="row" style={{ width: "550px" }}>
-                    <EditableDokumentTitle dokument={dokument} index={rowIndex} />
-                </Table.DataCell>
+                <EditableDokumentTitleRow dokument={dokument} index={rowIndex} />
                 <Table.DataCell style={{ width: "100px" }}>
                     {dateToDDMMYYYYString(dokumentDato ? new Date(dokumentDato) : new Date())}
                 </Table.DataCell>
@@ -172,11 +170,11 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
     }
 );
 
-interface IEditableDokumentTitleProps {
+interface IEditableDokumentTitleRowProps {
     dokument: IDokument;
     index: number;
 }
-function EditableDokumentTitle({ dokument, index }: IEditableDokumentTitleProps) {
+function EditableDokumentTitleRow({ dokument, index }: IEditableDokumentTitleRowProps) {
     const [inEditMode, setInEditMode] = useState(false);
     const enableBlurEvent = useRef(false);
     const { updateTitle } = useDokumenterForm();
@@ -204,8 +202,9 @@ function EditableDokumentTitle({ dokument, index }: IEditableDokumentTitleProps)
         }
     }
     return (
-        <div
-            style={{ width: "100%" }}
+        <Table.DataCell
+            scope="row"
+            style={{ width: "550px", height: "100%" }}
             onDoubleClick={(e) => {
                 e.stopPropagation();
                 e.preventDefault();
@@ -229,6 +228,6 @@ function EditableDokumentTitle({ dokument, index }: IEditableDokumentTitleProps)
             ) : (
                 <>{value}</>
             )}
-        </div>
+        </Table.DataCell>
     );
 }
