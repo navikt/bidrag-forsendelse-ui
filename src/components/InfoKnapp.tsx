@@ -1,26 +1,42 @@
-import { InformationSquareIcon } from "@navikt/aksel-icons";
+import "./InfoKnapp.css";
+
+import { QuestionmarkDiamondIcon } from "@navikt/aksel-icons";
 import { Button, Modal } from "@navikt/ds-react";
 import { PropsWithChildren, useState } from "react";
 type InfoKnappProps = {
+    buttonClassName?: string;
     className?: string;
     title?: string;
+    buttonText?: string;
+    roundedIcon?: boolean;
 };
-export default function InfoKnapp({ children, className }: PropsWithChildren<InfoKnappProps>) {
+export default function InfoKnapp({
+    children,
+    className,
+    buttonClassName,
+    buttonText,
+    title,
+}: PropsWithChildren<InfoKnappProps>) {
     const [modalOpen, setModalOpen] = useState(false);
 
     const closeModal = () => {
         setModalOpen(false);
     };
     const openModal = () => setModalOpen(true);
+    const onlyIcon = buttonText == undefined;
     return (
         <>
             <Button
-                title="Brukerveileding for dokumenttabell"
+                title={title}
                 variant="tertiary"
+                className={`${buttonClassName} ${onlyIcon ? "p-0" : ""}`}
                 size="xsmall"
-                icon={<InformationSquareIcon />}
+                icon={<QuestionmarkDiamondIcon />}
                 onClick={openModal}
-            ></Button>
+            >
+                {buttonText}
+            </Button>
+
             <Modal
                 open={modalOpen}
                 overlayClassName="test"
@@ -29,7 +45,7 @@ export default function InfoKnapp({ children, className }: PropsWithChildren<Inf
                 className={`max-w-[900px] ${className}`}
             >
                 <Modal.Content>
-                    <div className="max-h-[800px]">{children}</div>
+                    <div className="max-h-[800px] mdx-content">{children}</div>
                 </Modal.Content>
             </Modal>
         </>

@@ -1,4 +1,4 @@
-<Heading size="small">Forklaring av dokumentstatuser</Heading>
+<Heading size="medium">Forklaring av dokumentstatuser</Heading>
 <div className="">
     <ul>
        <li>
@@ -28,15 +28,18 @@
                 Dokument som er importert fra en annen kilde vil få status "Må kontrolleres". Det betyr at dokumentet må åpnes og skjermes informasjon som mottaker av forsendelsen ikke skal få innsyn på.
             </BodyShort>
               <BodyShort size="small">
-                Etter dokumentet er kontrollert og skjermet ferdig og er ferdigstilt vil dokumentet få status "Kontrollert". Da er dokumentet klar for å distribueres til mottaker.
+                Etter dokumentet er kontrollert og skjermet ferdig vil dokumentet få status "Kontrollert". Da er dokumentet klar for å distribueres til mottaker.
             </BodyShort>
         </li>
            <li> 
            <div className="flex flex-row gap-[5px]">
            <DokumentStatusTag status="UNDER_REDIGERING"/>  <DokumentLinkedTag/>
+           <div className="ml-2"></div>
+           <DokumentStatusTag status="FERDIGSTILT"/>  <DokumentLinkedTag/>
            </div>
               <BodyShort size="small">
-                Kjede ikonet ved siden av "Under redigering" statuset betyr at dokumentet er knyttet to eller flere forsendelser. Det vil si at endringer som gjøres på dokumentet i denne forsendelsen vil også påvirke samme dokument i andre forsendelsene den er knyttet til.
+                Kjede ikonet ved siden av "Under redigering" eller "Ferdigstilt" statuset betyr at dokumentet er knyttet to eller flere forsendelser. Det vil si at endringer som gjøres på dokumentet i denne forsendelsen vil også påvirke samme dokument i andre forsendelsene den er knyttet til.
+                <br/><i>Det er bare innholdet i dokumentet som er lenket sammen. Tittelen på dokumentet vil være unikt for hver forsendelse.</i>
             </BodyShort>
            </li>
     </ul>
