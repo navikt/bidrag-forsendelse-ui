@@ -61,7 +61,7 @@ export const ForsendelseApiHooks = {
                                 fraSaksnummer: forsendelse.saksnummer,
                                 lagret: true,
                                 index,
-                            } as IDokument)
+                            }) as IDokument
                     ),
                 };
             },

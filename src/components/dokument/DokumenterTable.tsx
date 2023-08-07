@@ -7,6 +7,7 @@ import React from "react";
 import { DokumentStatus } from "../../constants/DokumentStatus";
 import { useErrorContext } from "../../context/ErrorProvider";
 import DokumentStatusInfo from "../../docs/DokumentStatusInfo.mdx";
+import DokumentTittelInfo from "../../docs/DokumentTittel.mdx";
 import { useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
 import InfoKnapp from "../InfoKnapp";
 import DokumentRows from "./DokumentRows";
@@ -56,13 +57,18 @@ function DokumenterTableHeader() {
                     Nr.
                 </Table.HeaderCell>
                 <Table.HeaderCell scope="col" style={{ width: "550px" }}>
-                    Tittel
+                    <div className="flex flex-row gap-1 items-center">
+                        Tittel{" "}
+                        <InfoKnapp>
+                            <DokumentTittelInfo />
+                        </InfoKnapp>
+                    </div>
                 </Table.HeaderCell>
                 <Table.HeaderCell scope="col" style={{ width: "100px" }}>
                     Dok. dato
                 </Table.HeaderCell>
                 <Table.HeaderCell scope="col" align={"left"} style={{ width: "200px" }}>
-                    <div className="flex flex-row gap-2">
+                    <div className="flex flex-row gap-1 items-center">
                         Status{" "}
                         <InfoKnapp>
                             <DokumentStatusInfo />
