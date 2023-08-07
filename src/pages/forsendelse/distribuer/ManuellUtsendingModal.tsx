@@ -68,7 +68,7 @@ export default function ManuellUtsendingModal({ onCancel }: ManuellUtsendingModa
                         <ConfirmationPanel
                             size="small"
                             checked={confirmationState}
-                            label="Jeg bekrefter at jeg har printet og sendt ut alle dokumentene i forsendelsen"
+                            label="Jeg har printet og sendt ut alle dokumentene i forsendelsen"
                             error={
                                 distribuerMutation.error == CONFIRMATION_MISSING_ERROR
                                     ? "Du må bekrefte før du går videre"
@@ -80,7 +80,7 @@ export default function ManuellUtsendingModal({ onCancel }: ManuellUtsendingModa
                 </div>
                 <div className="flex items-center pt-2 space-x-2 ">
                     <Button size="small" variant={"primary"} onClick={onSubmit} loading={distribuerMutation.isLoading}>
-                        Fullfør og gå tilbake til sakshistorikk
+                        Bekreft og gå tilbake til sakshistorikk
                     </Button>
                     <Button
                         size="small"

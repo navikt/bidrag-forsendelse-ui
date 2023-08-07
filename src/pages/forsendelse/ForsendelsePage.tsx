@@ -8,7 +8,6 @@ import { PropsWithChildren } from "react";
 import { useIsMutating } from "react-query";
 
 import DokumenterTable from "../../components/dokument/DokumenterTable";
-import ForsendelseDocsButton from "../../components/ForsendelseDocsButton";
 import InfoKnapp from "../../components/InfoKnapp";
 import SaveStatusIndicator from "../../components/SaveStatusIndicator";
 import BidragErrorPanel from "../../context/BidragErrorPanel";
@@ -160,7 +159,7 @@ export default function ForsendelsePage({
                     <React.Suspense fallback={<LoadingIndicator />}>
                         <DokumenterFormProvider forsendelseId={forsendelseId}>
                             <ForsendelseView />
-                            <ForsendelseDocsButton />
+                            {/* <ForsendelseDocsButton /> */}
                         </DokumenterFormProvider>
                     </React.Suspense>
                 </div>
