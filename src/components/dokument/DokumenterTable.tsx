@@ -31,17 +31,19 @@ import LeggTilFraMalKnapp from "./LeggTilFraMalKnapp";
 export default function DokumenterTable() {
     const { dokumenter, forsendelseId } = useDokumenterForm();
     return (
-        <div>
-            <div className={"flex flex-rpw mt-[10px] border-b-[1px] w-[1028px]"}>
+        <div className={"w-max"}>
+            <div className={"flex flex-row mt-[10px] border-b-[1px] w-full flex-wrap max-w-[95vw]"}>
                 <LeggTilDokumentButton />
                 <LeggTilFraMalKnapp />
                 <div style={{ marginLeft: "auto" }}>Antall dokumenter: {dokumenter.length}</div>
             </div>
             <div className={"dokument-table "} style={{ borderColor: "var(--a-border-subtle)" }}>
-                <Table size={"small"} style={{ tableLayout: "auto", display: "block", width: "1028px" }}>
-                    <DokumenterTableHeader />
-                    <DokumentRows />
-                </Table>
+                <div className="w-full max-w-[95vw] overflow-auto">
+                    <Table size={"small"} style={{ tableLayout: "auto", display: "block", width: "1028px" }}>
+                        <DokumenterTableHeader />
+                        <DokumentRows />
+                    </Table>
+                </div>
                 <DokumenterTableBottomButtons />
             </div>
         </div>
@@ -95,7 +97,7 @@ function DokumenterTableBottomButtons() {
         resetError();
     }
     return (
-        <span className={"flex flex-row mt-[10px] w-[1028px]"}>
+        <span className={"flex flex-row mt-[10px] w-full"}>
             {hasChanged && isOneOrMoreDocumentsDeleted && (
                 <>
                     <Button loading={isSavingChanges} onClick={saveChanges} variant={"danger"} size={"small"}>
