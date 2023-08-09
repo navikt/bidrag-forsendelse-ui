@@ -1,3 +1,5 @@
+import "./ForsendelseTittel.css";
+
 import { PencilIcon } from "@navikt/aksel-icons";
 import { XMarkIcon } from "@navikt/aksel-icons";
 import { CloudUpIcon } from "@navikt/aksel-icons";
@@ -27,7 +29,7 @@ export default function ForsendelseTittel() {
     };
     return (
         <div>
-            <div className={"w-max flex flex-row gap-[5px] max-w-[100%]"}>
+            <div className={"w-max flex flex-row gap-[5px] max-w-[100%] forsendelse-tittel"}>
                 {!editMode && (
                     <>
                         <Heading spacing size={"large"}>
