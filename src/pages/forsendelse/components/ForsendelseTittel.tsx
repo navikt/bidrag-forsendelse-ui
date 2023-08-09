@@ -27,7 +27,7 @@ export default function ForsendelseTittel() {
     };
     return (
         <div>
-            <div className={"w-max flex flex-row gap-[5px]"}>
+            <div className={"w-max flex flex-row gap-[5px] max-w-[100%]"}>
                 {!editMode && (
                     <>
                         <Heading spacing size={"large"}>
