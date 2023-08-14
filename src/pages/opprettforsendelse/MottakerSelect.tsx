@@ -1,5 +1,6 @@
 import { MagnifyingGlassIcon, PersonIcon, PersonPencilIcon } from "@navikt/aksel-icons";
 import IdentUtils from "@navikt/bidrag-ui-common/esm/utils/IdentUtils";
+import ObjectUtils from "@navikt/bidrag-ui-common/esm/utils/ObjectUtils";
 import { Alert, Heading, Loader, Panel, Tabs, TextField } from "@navikt/ds-react";
 import React, { useEffect, useRef, useState } from "react";
 import { useWatch } from "react-hook-form";
@@ -41,6 +42,12 @@ export default function MottakerSelect() {
             },
         });
     }, []);
+
+    useEffect(() => {
+        if (selectedTabOption.current == "SAMME_SOM_GJELDER") {
+            setValue("mottaker.ident", gjelderIdent);
+        }
+    }, [gjelderIdent]);
 
     function onTabChange(val: RADIO_OPTIONS) {
         setSelectedRadioOption(val);
@@ -90,7 +97,7 @@ export default function MottakerSelect() {
                     <div className="flex flex-col gap-4 w-max gap-[5px]">
                         <PersonSok
                             defaultValue={watch("mottaker.ident")}
-                            onChange={(ident) => setValue("mottaker.ident", ident)}
+                            onChange={(ident) => setValue("mottaker.ident", ObjectUtils.isEmpty(ident) ? null : ident)}
                         />
                         <MottakerNavnOgAdresse />
                     </div>
@@ -129,6 +136,12 @@ function MottakerNavnOgAdresse() {
     function hentRolle(ident: string) {
         return roller.find((rolle) => rolle.ident == ident)?.rolleType;
     }
+
+    useEffect(() => {
+        if (mottakerIdent == null) {
+            setValue("mottaker", null);
+        }
+    }, [mottakerIdent]);
     useEffect(() => {
         if (data?.adresse) {
             setValue("mottaker.adresse", {
