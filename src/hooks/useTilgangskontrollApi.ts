@@ -14,7 +14,6 @@ export default function useTilgangskontrollApi() {
             },
             useErrorBoundary: false,
             retry: 2,
-
             suspense: true,
         });
     }

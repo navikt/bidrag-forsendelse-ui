@@ -34,13 +34,17 @@ interface MenuEntryProps {
 }
 
 function MenuEntry(props: MenuEntryProps) {
+    function getTitle() {
+        if (typeof props.avvik.title == "function") return props.avvik.title(props.avvik.metadata);
+        return props.avvik.title;
+    }
     return (
         <LinkPanel onClick={() => props.onClick(props.avvik)} href="#" border={true} className="w-[500px]">
             <LinkPanel.Title className="flex flex-row gap-[5px]">
                 <div className="menu-icon">
                     <props.avvik.IconComponent className="w-[30px] h-[30px]" />
                 </div>
-                {props.avvik.title}
+                {getTitle()}
             </LinkPanel.Title>
             {props.avvik.description && <LinkPanel.Description>{props.avvik.description}</LinkPanel.Description>}
         </LinkPanel>

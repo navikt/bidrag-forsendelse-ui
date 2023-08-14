@@ -1,12 +1,12 @@
 import { BodyShort } from "@navikt/ds-react";
 import React, { useState } from "react";
 
-import { AvvikType } from "../../../../../types/AvvikTypes";
+import { Avvik, AvvikType } from "../../../../../types/AvvikTypes";
 import { IForsendelse } from "../../../../../types/Forsendelse";
 import { useAvvikModalContext } from "../../AvvikshandteringButton";
 import AvvikModalButtons from "../AvvikModalButtons";
+import { AvvikStepProps } from "../AvvikshandteringModal";
 import Bekreftelse from "../Bekreftelse";
-import { AvvikTypeCommonProps } from "./AvvikTypes";
 
 const fagomradeOptions = [
     {
@@ -15,7 +15,7 @@ const fagomradeOptions = [
     },
     { value: "FAR", label: "Foreldreskap" },
 ];
-function EndreFagomradeForsendelse(props: AvvikTypeCommonProps) {
+function EndreFagomradeForsendelse(props: AvvikStepProps) {
     const { forsendelse } = useAvvikModalContext();
     const [fagomrade, setFagomrade] = useState("");
 
@@ -34,6 +34,7 @@ function EndreFagomradeForsendelse(props: AvvikTypeCommonProps) {
                 isActive={props.activeStep === 1}
                 onSubmit={handleSubmitFirstStep}
                 forsendelse={forsendelse}
+                kanEndreForsendelseEtterAvvik={props.kanEndreForsendelseEtterAvvik}
             />
             {props.activeStep === 2 && <EndreFagomradeBekreftelse fagomrade={fagomrade} forsendelse={forsendelse} />}
         </>
@@ -44,6 +45,7 @@ interface EndreFagomradeFirstStepProps {
     isActive: boolean;
     forsendelse: IForsendelse;
     onSubmit: (values: EndreFagomradeFirstStepValues) => void;
+    kanEndreForsendelseEtterAvvik?: (avvik: Avvik) => boolean;
 }
 
 interface EndreFagomradeFirstStepValues {
@@ -59,6 +61,10 @@ function EndreFagomradeFirstStep(props: EndreFagomradeFirstStepProps) {
         return null;
     }
 
+    const kanEndreEtterAvvik = props.kanEndreForsendelseEtterAvvik({
+        type: AvvikType.ENDRE_FAGOMRADE,
+        fagomrade: nyFagområde,
+    });
     return (
         <div className={"endrefagomrade_forsendelse"}>
             <BodyShort spacing>
@@ -67,7 +73,9 @@ function EndreFagomradeFirstStep(props: EndreFagomradeFirstStepProps) {
                 har Foreldreskap tilgang kunne se dokumentet i journalen.
             </BodyShort>
             <AvvikModalButtons
-                submitButtonLabel={`Overfør til ${erFagområdeBidrag ? "Foreldreskap" : "Bidrag"}`}
+                submitButtonLabel={`Overfør til ${erFagområdeBidrag ? "Foreldreskap" : "Bidrag"} ${
+                    !kanEndreEtterAvvik ? "og gå tilbake til sakshistorikk" : ""
+                }`}
                 onSubmit={() =>
                     props.onSubmit({
                         fagomrade: nyFagområde,

@@ -1,18 +1,17 @@
 import "./AvvikshandteringModal.css";
 
-import BisysLink from "@navikt/bidrag-ui-common/esm/react_components/bisys/BisysLink";
 import { Left } from "@navikt/ds-icons";
 import { Button, Loader, Modal } from "@navikt/ds-react";
 import { Heading } from "@navikt/ds-react";
 import React, { useContext, useEffect, useMemo, useState } from "react";
-import { useMutation } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../../../../api/api";
 import { Avvikshendelse } from "../../../../api/BidragForsendelseApi";
-import environment from "../../../../environment";
 import useTilgangskontrollApi from "../../../../hooks/useTilgangskontrollApi";
 import { Avvik, AvvikType } from "../../../../types/AvvikTypes";
 import { FAGOMRADE } from "../../../../types/Journalpost";
+import { RedirectTo } from "../../../../utils/RedirectUtils";
 import { useAvvikModalContext } from "../AvvikshandteringButton";
 import { AvvikViewModel, getViewmodelByType } from "../model/AvvikViewModel";
 import MainMenu from "./MainMenu";
@@ -36,13 +35,14 @@ interface AvvikStateContextProps {
 export const useAvvikStateContext = () => useContext(AvvikStateContext);
 const AvvikStateContext = React.createContext<AvvikStateContextProps>({} as AvvikStateContextProps);
 function AvvikshandteringModal(props: AvvikshandteringModalProps) {
-    const { forsendelseId, saksnummer, paloggetEnhet, avvikListe, onCancel } = useAvvikModalContext();
-    const harTilgangTilTemaFar = useTilgangskontrollApi().harTilgangTilTemaFar();
+    const { forsendelseId, saksnummer, paloggetEnhet, avvikListe, onCancel, forsendelse } = useAvvikModalContext();
+    const queryClient = useQueryClient();
+    const { data: harTilgangTilTemaFar } = useTilgangskontrollApi().harTilgangTilTemaFar();
     const [selectedAvvik, setSelectedAvvik] = useState<AvvikViewModel | undefined>();
     const [activeStep, setActiveStep] = useState(props.initialAvvik || props.initialAvvikType ? 1 : 0);
     const avvikStateValue = useMemo(() => hentAvvik(), [avvikListe]);
 
-    const sendAvvikFn = useMutation<KanViderebehandleEtterAvvik, void, Avvik>({
+    const sendAvvikFn = useMutation<void, void, Avvik>({
         mutationKey: AvvikMutationKeys.sendAvvik,
         mutationFn: async (avvik) => {
             const requestBody: Avvikshendelse = mapToAvvikRequest(avvik, saksnummer);
@@ -51,17 +51,24 @@ function AvvikshandteringModal(props: AvvikshandteringModalProps) {
                     "X-enhet": paloggetEnhet,
                 },
             });
-            const harEndretFagomradeTilFarskap =
-                avvik.type == AvvikType.ENDRE_FAGOMRADE && avvik.fagomrade == FAGOMRADE.FAR;
-            return (
-                (harTilgangTilTemaFar && harEndretFagomradeTilFarskap) ||
-                skalKunneViderebehandleJournalpostEtterUtførtAvvik(avvik.type)
-            );
+            if (!skalKunneViderebehandleJournalpostEtterUtførtAvvik(avvik)) {
+                RedirectTo.sakshistorikk(saksnummer);
+            } else {
+                queryClient.invalidateQueries("forsendelse");
+            }
         },
     });
 
     function hentAvvik(): AvvikViewModel[] {
-        return avvikListe.map((avvik) => getViewmodelByType(avvik)).filter((a) => a != undefined);
+        return avvikListe
+            .map(getViewmodelByType)
+            .filter((a) => a != undefined)
+            .map((avvik) => ({
+                ...avvik,
+                metadata: {
+                    tema: forsendelse.tema,
+                },
+            }));
     }
 
     useEffect(() => {
@@ -85,17 +92,12 @@ function AvvikshandteringModal(props: AvvikshandteringModalProps) {
         sendAvvikFn.mutate(avvik);
     };
 
-    const shouldBeAbleToReturnToMainPage = () => {
-        const isSuccess = sendAvvikFn.isSuccess;
-        if (sendAvvikFn.isIdle || !selectedAvvik || !isSuccess) {
-            return true;
+    function skalKunneViderebehandleJournalpostEtterUtførtAvvik(avvik: Avvik) {
+        if (avvik.type == AvvikType.ENDRE_FAGOMRADE) {
+            return (harTilgangTilTemaFar && avvik.fagomrade == FAGOMRADE.FAR) || avvik.fagomrade == FAGOMRADE.BID;
         }
-        return sendAvvikFn.data;
-    };
-
-    function skalKunneViderebehandleJournalpostEtterUtførtAvvik(avvik: string) {
         return ![AvvikType.OVERFOR_TIL_ANNEN_ENHET, AvvikType.SLETT_JOURNALPOST].some(
-            (avvikType) => avvikType === avvik
+            (avvikType) => avvikType === avvik.type
         );
     }
 
@@ -111,16 +113,15 @@ function AvvikshandteringModal(props: AvvikshandteringModalProps) {
 
     function renderAvvik() {
         if (!selectedAvvik) return <MainMenu avvikViewModels={avvikStateValue} onClick={selectAvvik} />;
+        function getTitle() {
+            if (typeof selectedAvvik.title == "function") return selectedAvvik.title(selectedAvvik.metadata);
+            return selectedAvvik.title;
+        }
         return (
             <>
-                <StepIndicator
-                    disableAvvikMeny={!shouldBeAbleToReturnToMainPage()}
-                    activeStep={activeStep}
-                    onChange={changeStep}
-                    selectedAvvik={selectedAvvik}
-                />
+                <StepIndicator activeStep={activeStep} onChange={changeStep} selectedAvvik={selectedAvvik} />
                 <Heading level={"3"} size={"medium"} spacing>
-                    {selectedAvvik.title}
+                    {getTitle()}
                 </Heading>
                 <React.Suspense fallback={<Loader size="small" />}>
                     {activeStep > 0 && sendAvvikFn.isIdle && <PreviousStepButton onPrevious={onPrevious} />}
@@ -129,14 +130,12 @@ function AvvikshandteringModal(props: AvvikshandteringModalProps) {
                         activeStep={activeStep}
                         setActiveStep={setActiveStep}
                         sendAvvik={performSendAvvik}
+                        kanEndreForsendelseEtterAvvik={(avvik: Avvik) =>
+                            skalKunneViderebehandleJournalpostEtterUtførtAvvik(avvik)
+                        }
                         {...props}
                     />
                 </React.Suspense>
-                {!shouldBeAbleToReturnToMainPage() && (
-                    <div className="mt-4">
-                        <BisysLink bisysUrl={environment.url.bisys} page="sakshistorikk" />
-                    </div>
-                )}
             </>
         );
     }
@@ -152,13 +151,7 @@ function AvvikshandteringModal(props: AvvikshandteringModalProps) {
     }, []);
 
     return (
-        <Modal
-            className="min-w-[40rem] max-w-[60rem]"
-            open
-            onClose={onCancel}
-            closeButton={shouldBeAbleToReturnToMainPage()}
-            shouldCloseOnOverlayClick={shouldBeAbleToReturnToMainPage()}
-        >
+        <Modal className="min-w-[40rem] max-w-[60rem]" open onClose={onCancel} shouldCloseOnOverlayClick>
             <Modal.Content>
                 <AvvikStateContext.Provider value={{ sendAvvikStatus: getSendAvvikStatus() }}>
                     <React.Suspense fallback={<Loader size="medium" />}>
@@ -181,11 +174,12 @@ function PreviousStepButton({ onPrevious }: { onPrevious: () => void }) {
     );
 }
 
-interface AvvikStepProps extends AvvikshandteringModalProps {
+export interface AvvikStepProps extends AvvikshandteringModalProps {
     activeStep: number;
     selectedAvvik: AvvikViewModel;
     setActiveStep: (value: number) => void;
     sendAvvik: (avvik: Avvik, ident?: string) => Promise<void>;
+    kanEndreForsendelseEtterAvvik?: (avvik: Avvik) => boolean;
 }
 
 function AvvikStep(props: AvvikStepProps) {
