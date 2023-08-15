@@ -7,7 +7,9 @@ import { useWatch } from "react-hook-form";
 
 import AdresseInfo from "../../components/AdresseInfo";
 import { EditAddress } from "../../components/EditAddress";
+import InfoKnapp from "../../components/InfoKnapp";
 import PersonDetaljer from "../../components/person/PersonDetaljer";
+import MottakerInfo from "../../docs/Mottaker.mdx";
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
 import useSamhandlerPersonApi from "../../hooks/usePersonApi";
 import {
@@ -16,6 +18,7 @@ import {
     useOpprettForsendelseFormContext,
 } from "./OpprettForsendelsePage";
 import PersonSok from "./PersonSok";
+
 type RADIO_OPTIONS = "SAMME_SOM_GJELDER" | "ANNEN_MOTTAKER" | "FRITEKST";
 export default function MottakerSelect() {
     const roller = useForsendelseApi().hentRoller();
@@ -71,7 +74,12 @@ export default function MottakerSelect() {
 
     return (
         <div className="pt-2">
-            <Heading size="small">Mottaker</Heading>
+            <div className="flex flex-row gap-[2px]">
+                <Heading size="small">Mottaker</Heading>
+                <InfoKnapp>
+                    <MottakerInfo />
+                </InfoKnapp>
+            </div>
             <Tabs defaultValue={"SAMME_SOM_GJELDER"} onChange={onTabChange} size="small" className="w-max h-max">
                 <Tabs.List>
                     <Tabs.Tab
