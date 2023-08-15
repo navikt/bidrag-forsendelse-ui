@@ -28,19 +28,30 @@ interface AvvikshandteringModalProps {
 export const AvvikMutationKeys = {
     sendAvvik: "sendAvvik",
 };
-type KanViderebehandleEtterAvvik = boolean;
 interface AvvikStateContextProps {
     sendAvvikStatus: "idle" | "error" | "loading";
 }
 export const useAvvikStateContext = () => useContext(AvvikStateContext);
 const AvvikStateContext = React.createContext<AvvikStateContextProps>({} as AvvikStateContextProps);
 function AvvikshandteringModal(props: AvvikshandteringModalProps) {
-    const { forsendelseId, saksnummer, paloggetEnhet, avvikListe, onCancel, forsendelse } = useAvvikModalContext();
+    const { onCancel } = useAvvikModalContext();
+    return (
+        <Modal className="min-w-[35rem] max-w-[55rem]" open onClose={onCancel} shouldCloseOnOverlayClick>
+            <Modal.Content>
+                <React.Suspense fallback={<Loader size="medium" />}>
+                    <AvvikshandteringModalContent {...props} />
+                </React.Suspense>
+            </Modal.Content>
+        </Modal>
+    );
+}
+function AvvikshandteringModalContent(props: AvvikshandteringModalProps) {
+    const { forsendelseId, saksnummer, paloggetEnhet, avvikListe, forsendelse } = useAvvikModalContext();
     const queryClient = useQueryClient();
     const { data: harTilgangTilTemaFar } = useTilgangskontrollApi().harTilgangTilTemaFar();
     const [selectedAvvik, setSelectedAvvik] = useState<AvvikViewModel | undefined>();
     const [activeStep, setActiveStep] = useState(props.initialAvvik || props.initialAvvikType ? 1 : 0);
-    const avvikStateValue = useMemo(() => hentAvvik(), [avvikListe]);
+    const avvikStateValue = useMemo(() => hentAvvik(), [avvikListe, forsendelse]);
 
     const sendAvvikFn = useMutation<void, void, Avvik>({
         mutationKey: AvvikMutationKeys.sendAvvik,
@@ -151,16 +162,10 @@ function AvvikshandteringModal(props: AvvikshandteringModalProps) {
     }, []);
 
     return (
-        <Modal className="min-w-[40rem] max-w-[60rem]" open onClose={onCancel} shouldCloseOnOverlayClick>
-            <Modal.Content>
-                <AvvikStateContext.Provider value={{ sendAvvikStatus: getSendAvvikStatus() }}>
-                    <React.Suspense fallback={<Loader size="medium" />}>
-                        <Heading size="large">Avvikshåndtering</Heading>
-                        <>{renderAvvik()}</>
-                    </React.Suspense>
-                </AvvikStateContext.Provider>
-            </Modal.Content>
-        </Modal>
+        <React.Suspense fallback={<Loader size="medium" />}>
+            <Heading size="large">Avvikshåndtering</Heading>
+            <>{renderAvvik()}</>
+        </React.Suspense>
     );
 }
 
