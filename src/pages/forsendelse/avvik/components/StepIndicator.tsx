@@ -9,7 +9,6 @@ interface StepIndicatorProps {
     activeStep: number;
     onChange: (step: number) => void;
     selectedAvvik: AvvikViewModel;
-    disableAvvikMeny: boolean;
 }
 
 interface StepIndicatorStepProps {
@@ -18,14 +17,19 @@ interface StepIndicatorStepProps {
 }
 
 function StepIndicator(props: StepIndicatorProps) {
+    const getStepIndicatorLabels = (avvikViewModel: AvvikViewModel) => {
+        return avvikViewModel.stepIndicators.map((label) => {
+            if (typeof label.title == "function") return label.title(avvikViewModel.metadata);
+            return label.title;
+        });
+    };
     const getSteps = (avvikViewModel: AvvikViewModel): StepIndicatorStepProps[] => {
-        const stepLabels = ["Avvik meny", ...avvikViewModel.stepIndicators, "Bekreftelse"];
+        const stepLabels = ["Avvik meny", ...getStepIndicatorLabels(avvikViewModel), "Bekreftelse"];
 
         return stepLabels.map((stepLabel, index) => ({
             index,
             label: stepLabel,
             disabled:
-                props.disableAvvikMeny ||
                 index > props.activeStep ||
                 (props.activeStep === stepLabels.length - 1 && index !== 0 && index !== props.activeStep),
         }));

@@ -3,10 +3,10 @@ import React from "react";
 
 import { AvvikType } from "../../../../../types/AvvikTypes";
 import AvvikModalButtons from "../AvvikModalButtons";
+import { AvvikStepProps } from "../AvvikshandteringModal";
 import Bekreftelse from "../Bekreftelse";
-import { AvvikTypeCommonProps } from "./AvvikTypes";
 
-function SlettForsendelse(props: AvvikTypeCommonProps) {
+function SlettForsendelse(props: AvvikStepProps) {
     const handleSubmit = () => {
         props.sendAvvik({ type: AvvikType.SLETT_JOURNALPOST });
         props.setActiveStep(2);
@@ -17,7 +17,10 @@ function SlettForsendelse(props: AvvikTypeCommonProps) {
             {props.activeStep === 1 && (
                 <>
                     <BodyShort>Slette feilbestilt forsendelse. Forsendelsen vil bli fjernet fra journalen</BodyShort>
-                    <AvvikModalButtons onSubmit={handleSubmit} submitButtonLabel={"Slett"} />
+                    <AvvikModalButtons
+                        onSubmit={handleSubmit}
+                        submitButtonLabel={"Slett og gå tilbake til sakshistorikk"}
+                    />
                 </>
             )}
             {props.activeStep === 2 && (

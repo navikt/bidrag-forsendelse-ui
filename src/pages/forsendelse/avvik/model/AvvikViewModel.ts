@@ -3,12 +3,15 @@ import { FileXMarkIcon } from "@navikt/aksel-icons";
 import { ForwardRefExoticComponent } from "react";
 
 import { AvvikType } from "../../../../types/AvvikTypes";
+
+type TitleSelectorFn = (metadata?: any) => string;
 export interface AvvikViewModel {
     IconComponent: ForwardRefExoticComponent<React.SVGProps<SVGSVGElement>>;
-    title: string;
+    title: string | TitleSelectorFn;
     description?: string;
+    metadata?: any;
     type: AvvikType;
-    stepIndicators: string[];
+    stepIndicators: string[] | TitleSelectorFn[];
 }
 
 export const avvikViewModels: AvvikViewModel[] = [
@@ -19,10 +22,18 @@ export const avvikViewModels: AvvikViewModel[] = [
         stepIndicators: ["Overfør enhet"],
     },
     {
-        title: "Endre fagområde",
+        title: (metadata: any) => {
+            if (!metadata) return "Endre fagområde";
+            return metadata?.tema == "BID" ? "Overfør til fagområde Foreldreskap" : "Overfør til fagområde Bidrag";
+        },
         IconComponent: ArrowRightLeftIcon,
         type: AvvikType.ENDRE_FAGOMRADE,
-        stepIndicators: ["Endre fagområde"],
+        stepIndicators: [
+            (metadata: any) => {
+                if (!metadata) return "Endre fagområde";
+                return metadata?.tema == "BID" ? "Overfør til fagområde Foreldreskap" : "Overfør til fagområde Bidrag";
+            },
+        ],
     },
     {
         title: "Slett forsendelse under produksjon",
