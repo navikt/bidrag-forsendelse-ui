@@ -22,7 +22,11 @@ export default function InfoKnapp({
     const closeModal = () => {
         setModalOpen(false);
     };
-    const openModal = () => setModalOpen(true);
+    const openModal = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        setModalOpen(true);
+    };
     const onlyIcon = buttonText == undefined;
     return (
         <>
