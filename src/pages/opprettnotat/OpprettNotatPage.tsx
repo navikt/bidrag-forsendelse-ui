@@ -34,7 +34,7 @@ export default function OpprettNotatPage() {
             return BIDRAG_FORSENDELSE_API.api.opprettForsendelse({
                 gjelderIdent: data.gjelderIdent,
                 mottaker: {
-                    ident: data.mottakerIdent,
+                    ident: data.gjelderIdent,
                 },
                 saksnummer,
                 opprettTittel: true,
