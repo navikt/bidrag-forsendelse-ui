@@ -29,10 +29,10 @@ export const DokumentStatusTags = {
 export const DokumentStatusDisplayName = {
     [DokumentStatus.UNDER_PRODUKSJON]: "Under produksjon",
     [DokumentStatus.BESTILLING_FEILET]: "Under produksjon",
+    [DokumentStatus.IKKE_BESTILT]: "Under produksjon",
     [DokumentStatus.UNDER_REDIGERING]: "Under redigering",
     [DokumentStatus.MÅ_KONTROLLERES]: "Må kontrolleres",
     [DokumentStatus.FERDIGSTILT]: "Ferdigstilt",
     [DokumentStatus.KONTROLLERT]: "Kontrollert",
-    [DokumentStatus.IKKE_BESTILT]: "Ikke bestilt",
     [DokumentStatus.SLETTET]: "Skal slettes",
 } as const;

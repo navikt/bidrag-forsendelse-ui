@@ -22,7 +22,11 @@ export default function InfoKnapp({
     const closeModal = () => {
         setModalOpen(false);
     };
-    const openModal = () => setModalOpen(true);
+    const openModal = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        setModalOpen(true);
+    };
     const onlyIcon = buttonText == undefined;
     return (
         <>
@@ -41,8 +45,9 @@ export default function InfoKnapp({
                 open={modalOpen}
                 overlayClassName="test"
                 shouldCloseOnEsc
+                shouldCloseOnOverlayClick
                 onClose={closeModal}
-                className={`max-w-[1000px] ${className}`}
+                className={`max-w-[900px] ${className}`}
             >
                 <Modal.Content>
                     <div className="max-h-[800px] mdx-content">{children}</div>

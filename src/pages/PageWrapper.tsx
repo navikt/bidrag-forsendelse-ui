@@ -2,7 +2,7 @@ import "../index.css";
 
 import { MDXProvider } from "@mdx-js/react";
 import { ArrowRightIcon } from "@navikt/aksel-icons";
-import { BodyShort, Heading, Loader } from "@navikt/ds-react";
+import { BodyLong, BodyShort, Heading, Label, Loader } from "@navikt/ds-react";
 import * as dayjs from "dayjs";
 import * as customParseFormat from "dayjs/plugin/customParseFormat";
 import React, { PropsWithChildren } from "react";
@@ -13,7 +13,7 @@ import { initMock } from "../__mocks__/msw";
 import DokumentLinkedTag from "../components/dokument/DokumentLinkedTag";
 import DokumentStatusTag from "../components/dokument/DokumentStatusTag";
 import ErrorProvider from "../context/ErrorProvider";
-const mdxComponents = { Heading, DokumentStatusTag, BodyShort, ArrowRightIcon, DokumentLinkedTag };
+const mdxComponents = { Heading, DokumentStatusTag, BodyShort, ArrowRightIcon, DokumentLinkedTag, BodyLong, Label };
 
 dayjs.extend(customParseFormat);
 initMock();
