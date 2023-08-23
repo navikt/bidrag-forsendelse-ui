@@ -65,7 +65,7 @@ function DokumenterFormProvider({ children, ...props }: PropsWithChildren<IDokum
 function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumenterPropsContext>) {
     const { addError, resetError } = useErrorContext();
     const forsendelse = useForsendelseApi().hentForsendelse();
-    const { reset, handleSubmit, formState, setError } = useFormContext<IForsendelseFormProps>();
+    const { reset, handleSubmit, formState, setError, resetField } = useFormContext<IForsendelseFormProps>();
     const { fields, append, update, swap } = useFieldArray<IForsendelseFormProps>({
         name: "dokumenter",
     });
@@ -169,6 +169,12 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
         submitAndSaveChanges();
     }
 
+    function updateTitle(tittel: string, dokumentreferanse: string) {
+        oppdaterDokumentTittelFn.mutate({ tittel, dokumentreferanse });
+        const index = fields.find((dok) => dok.dokumentreferanse == dokumentreferanse).index;
+        resetField(`dokumenter.${index}.tittel`, { defaultValue: tittel });
+    }
+
     function submitAndSaveChanges() {
         if (formState.isSubmitted || formState.errors) {
             reset(undefined, {
@@ -205,8 +211,7 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
                 saveChanges: handleSubmit(saveChanges),
                 swapDocuments,
                 resetDocumentChanges: resetForm,
-                updateTitle: (tittel, dokumentreferanse) =>
-                    oppdaterDokumentTittelFn.mutate({ tittel, dokumentreferanse }),
+                updateTitle,
             }}
         >
             {children}
