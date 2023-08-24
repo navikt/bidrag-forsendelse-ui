@@ -24,7 +24,7 @@
     "@dnd-kit/sortable": "7.0.2",
     "@mdx-js/react": "^2.3.0",
     "@navikt/aksel-icons": "4.1.7",
-    "@navikt/bidrag-ui-common": "1.8.5",
+    "@navikt/bidrag-ui-common": "1.8.8",
     "@navikt/ds-css": "4.7.2",
     "@navikt/ds-css-internal": "3.4.3",
     "@navikt/ds-icons": "3.4.3",
