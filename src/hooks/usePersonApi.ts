@@ -1,3 +1,4 @@
+import { LoggerService } from "@navikt/bidrag-ui-common";
 import IdentUtils from "@navikt/bidrag-ui-common/esm/utils/IdentUtils";
 import ObjectUtils from "@navikt/bidrag-ui-common/esm/utils/ObjectUtils";
 import { useQuery } from "react-query";
@@ -27,7 +28,8 @@ export default function useSamhandlerPersonApi() {
         return personData.data;
     };
 
-    function hentSamhandlerEllerPersonForIdent(ident: string) {
+    function hentSamhandlerEllerPersonForIdent(_ident: string) {
+        const ident = _ident?.trim();
         return useQuery({
             queryKey: PersonApiQueryKeys.hentAktorForIdent(ident),
             queryFn: async (): Promise<PersonInfo> => {
@@ -35,6 +37,7 @@ export default function useSamhandlerPersonApi() {
                 if (IdentUtils.isSamhandlerId(ident)) {
                     const result = await SAMHANDLER_API.samhandler.hentSamhandler(JSON.stringify(ident));
                     if (result.status != 200) throw Error(`Fant ikke samhandler med ident ${ident}`);
+                    LoggerService.warn("Fant ikke sam");
                     return {
                         ident,
                         navn: result.data.navn,
