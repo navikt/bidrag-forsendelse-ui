@@ -28,8 +28,7 @@ export default function useSamhandlerPersonApi() {
         return personData.data;
     };
 
-    function hentSamhandlerEllerPersonForIdent(_ident: string) {
-        const ident = _ident?.trim();
+    function hentSamhandlerEllerPersonForIdent(ident: string) {
         return useQuery({
             queryKey: PersonApiQueryKeys.hentAktorForIdent(ident),
             queryFn: async (): Promise<PersonInfo> => {

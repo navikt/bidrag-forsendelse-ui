@@ -8,7 +8,7 @@ interface IPersonSokProps {
 }
 export default function PersonSok({ onChange, defaultValue }: IPersonSokProps) {
     function onInputChange(value: string) {
-        onChange(value);
+        onChange(value?.trim());
     }
     return (
         <div className="pt-2 flex flex-row gap-[5px] personsok">
