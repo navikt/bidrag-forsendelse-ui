@@ -195,7 +195,7 @@ function VelgDokumentTabs({ selectDocument, selectedDocuments, unselectDocument 
                             selectDocument={(dokument, toogle) =>
                                 selectDocument({ ...dokument, fraRolle: RolleType.BM }, toogle)
                             }
-                            ident={roller.find((r) => r.rolleType == RolleType.BM).ident}
+                            ident={roller.find((r) => r.rolleType == RolleType.BM)?.ident}
                         />
                     </React.Suspense>
                 </Accordion>
