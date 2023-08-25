@@ -14,6 +14,7 @@ import { ENHET_FARSKAP } from "../../types/EnhetTypes";
 import { mapToBehandlingInfoDto } from "../../types/Forsendelse";
 import { useSession } from "../forsendelse/context/SessionContext";
 import { queryClient } from "../PageWrapper";
+import AvbrytOpprettForsendelseButton from "./AvbrytOpprettForsendelseButton";
 import DokumentValgOpprett from "./DokumentValgOpprett";
 import LanguageAndTemaSelect from "./LanguageAndTemaSelect";
 import MottakerSelect from "./MottakerSelect";
@@ -189,6 +190,8 @@ interface OpprettForsendelsContainerProps {
     tittel?: string;
 }
 function OpprettForsendelsContainer({ onSubmit, tittel }: OpprettForsendelsContainerProps) {
+    const { forsendelseId } = useSession();
+    const forsendelseEksisterer = forsendelseId != null;
     const roller = useForsendelseApi().hentRoller();
     const methods = useFormContext();
     const isLoading = useIsMutating([OPPRETT_FORSENDELSE_MUTATION_KEY]) > 0;
@@ -213,7 +216,11 @@ function OpprettForsendelsContainer({ onSubmit, tittel }: OpprettForsendelsConta
                                     <Button size="small" loading={isLoading}>
                                         Opprett
                                     </Button>
-                                    <SlettForsendelseButton />
+                                    {forsendelseEksisterer ? (
+                                        <SlettForsendelseButton />
+                                    ) : (
+                                        <AvbrytOpprettForsendelseButton disabled={isLoading} />
+                                    )}
                                 </div>
                             </form>
                         </FormProvider>
