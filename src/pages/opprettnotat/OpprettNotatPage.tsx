@@ -86,7 +86,9 @@ export default function OpprettNotatPage() {
                                 <div className="flex flex-row gap-4 pb-4">
                                     <TemaSelect />
                                 </div>
-                                <DokumentValgNotat />
+                                <div className="w-2/3">
+                                    <DokumentValgNotat />
+                                </div>
                                 <div className="flex flex-row gap-2 pt-4">
                                     <Button size="small" loading={opprettForsendelseFn.isLoading}>
                                         Opprett
