@@ -88,6 +88,7 @@ function OpprettNyForsendelsePageWrapper() {
             enhet={searchParams.get("enhet")}
         >
             <Opprettforsendelse
+                barnObjNr={searchParams.getAll("barn_obj_nr") ?? []}
                 vedtakType={searchParams.get("vedtakType") as VedtakType}
                 erFattetBeregnet={
                     searchParams.get("erFattetBeregnet") != undefined

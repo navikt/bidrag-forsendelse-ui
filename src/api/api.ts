@@ -2,6 +2,7 @@ import { useApi } from "@navikt/bidrag-ui-common";
 
 import environment from "../environment";
 import { Api as BidragDokumentApi } from "./BidragDokumentApi";
+import { Api as BidragDokumentArkivApi } from "./BidragDokumentArkivApi";
 import { Api as BidragForsendelseApi } from "./BidragForsendelseApi";
 import { Api as BidragOrganisasjontApi } from "./BidragOrganisasjontApi";
 import { Api as PersonApi } from "./BidragPersonApi";
@@ -36,4 +37,10 @@ export const BIDRAG_TILGANGSKONTROLL_API = useApi(
     new BidragTilgangskontrollApi({ baseURL: environment.url.bidragTilgangskontroll }),
     "bidrag-tilgangskontroll",
     "gcp"
+);
+
+export const BIDRAG_DOKUMENT_ARKIV_API = useApi(
+    new BidragDokumentArkivApi({ baseURL: environment.url.bidragDokumentArkiv }),
+    "bidrag-dokument-arkiv",
+    "fss"
 );

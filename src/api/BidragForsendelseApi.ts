@@ -19,10 +19,13 @@ export interface BehandlingInfoDto {
     /** Brukes bare hvis stonadType og engangsbelopType er null */
     behandlingType?: string;
     vedtakType?: VedtakType;
+    /** Soknadtype er gamle kodeverdier som er erstattet av vedtaktype. */
+    soknadType?: string;
     erFattetBeregnet?: boolean;
     /** Hvis resultatkoden fra BBM er IT så skal denne være sann */
     erVedtakIkkeTilbakekreving?: boolean;
     soknadFra?: SoknadFra;
+    barnIBehandling: string[];
 }
 
 /** Arkivsystem hvor dokument er lagret */
@@ -271,9 +274,9 @@ export interface DokumentDto {
     /** Typen dokument. Dokumentmal sier noe om dokumentets innhold og oppbygning. */
     dokumentmalId?: string;
     /** Dokumentets status. Benyttes hvis journalposten er av typen forsendelse */
-    status?: "IKKE_BESTILT" | "BESTILLING_FEILET" | "UNDER_PRODUKSJON" | "UNDER_REDIGERING" | "FERDIGSTILT" | "AVBRUTT";
+    status?: DokumentDtoStatusEnum;
     /** Arkivsystem hvor dokumentet er produsert og lagret */
-    arkivSystem?: "JOARK" | "MIDLERTIDLIG_BREVLAGER" | "UKJENT" | "BIDRAG" | "FORSENDELSE";
+    arkivSystem?: DokumentDtoArkivSystemEnum;
     /** Metadata om dokumentet */
     metadata: Record<string, string>;
 }
@@ -297,6 +300,7 @@ export interface DistribuerJournalpostResponse {
 }
 
 export interface HentDokumentValgRequest {
+    soknadType?: string;
     vedtakType?: VedtakType;
     behandlingType?: string;
     soknadFra?: SoknadFra;
@@ -309,7 +313,7 @@ export interface HentDokumentValgRequest {
 
 export interface DokumentMalDetaljer {
     beskrivelse: string;
-    type: "UTGÅENDE" | "NOTAT";
+    type: DokumentMalDetaljerTypeEnum;
     kanBestilles: boolean;
 }
 
@@ -323,7 +327,7 @@ export interface OppdaterDokumentForesporsel {
     fjernTilknytning?: boolean;
     /** @format date-time */
     dokumentDato?: string;
-    arkivsystem?: "JOARK" | "MIDLERTIDLIG_BREVLAGER" | "UKJENT" | "BIDRAG" | "FORSENDELSE";
+    arkivsystem?: OppdaterDokumentForesporselArkivsystemEnum;
 }
 
 /** Metadata for oppdatering av forsendelse */
@@ -446,11 +450,11 @@ export interface DokumentMetadata {
     dokumentreferanse?: string;
     tittel?: string;
     /** Hvilken format dokument er på. Dette forteller hvordan dokumentet må åpnes. */
-    format: "PDF" | "MBDOK" | "HTML";
+    format: DokumentMetadataFormatEnum;
     /** Status på dokumentet */
-    status: "IKKE_BESTILT" | "BESTILLING_FEILET" | "UNDER_PRODUKSJON" | "UNDER_REDIGERING" | "FERDIGSTILT" | "AVBRUTT";
+    status: DokumentMetadataStatusEnum;
     /** Hvilken arkivsystem dokumentet er lagret på */
-    arkivsystem: "JOARK" | "MIDLERTIDLIG_BREVLAGER" | "UKJENT" | "BIDRAG" | "FORSENDELSE";
+    arkivsystem: DokumentMetadataArkivsystemEnum;
 }
 
 /** Metadata om behandling */
@@ -459,10 +463,14 @@ export interface BehandlingInfoResponseDto {
     behandlingId?: string;
     soknadId?: string;
     behandlingType?: string;
+    erFattet?: boolean;
+    barnISoknad?: string[];
 }
 
 /** Metadata om forsendelse */
 export interface ForsendelseResponsTo {
+    /** @format int64 */
+    forsendelseId: number;
     /** Ident til brukeren som journalposten gjelder */
     gjelderIdent?: string;
     mottaker?: MottakerTo;
@@ -534,7 +542,7 @@ export interface AvsenderMottakerDto {
     /** Person ident eller organisasjonsnummer */
     ident?: string;
     /** Identtype */
-    type: "FNR" | "SAMHANDLER" | "ORGNR" | "UTENLANDSK_ORGNR" | "UKJENT";
+    type: AvsenderMottakerDtoTypeEnum;
     /** Adresse til mottaker hvis dokumentet sendes som brev */
     adresse?: MottakerAdresseTo;
 }
@@ -592,25 +600,9 @@ export interface JournalpostDto {
      * Journalposten ble mottatt/sendt ut i kanal
      * @deprecated
      */
-    kilde?:
-        | "NAV_NO_BID"
-        | "SKAN_BID"
-        | "NAV_NO"
-        | "SKAN_NETS"
-        | "LOKAL_UTSKRIFT"
-        | "SENTRAL_UTSKRIFT"
-        | "SDP"
-        | "INGEN_DISTRIBUSJON";
+    kilde?: JournalpostDtoKildeEnum;
     /** Journalposten ble mottatt/sendt ut i kanal */
-    kanal?:
-        | "NAV_NO_BID"
-        | "SKAN_BID"
-        | "NAV_NO"
-        | "SKAN_NETS"
-        | "LOKAL_UTSKRIFT"
-        | "SENTRAL_UTSKRIFT"
-        | "SDP"
-        | "INGEN_DISTRIBUSJON";
+    kanal?: JournalpostDtoKanalEnum;
     /**
      * Dato for når dokument er mottat, dvs. dato for journalføring eller skanning
      * @format date
@@ -624,21 +616,7 @@ export interface JournalpostDto {
      */
     journalstatus?: string;
     /** Journalpostens status */
-    status?:
-        | "MOTTATT"
-        | "JOURNALFØRT"
-        | "EKSPEDERT"
-        | "DISTRIBUERT"
-        | "AVBRUTT"
-        | "KLAR_FOR_DISTRIBUSJON"
-        | "RETUR"
-        | "FERDIGSTILT"
-        | "FEILREGISTRERT"
-        | "RESERVERT"
-        | "UTGÅR"
-        | "UNDER_OPPRETTELSE"
-        | "UNDER_PRODUKSJON"
-        | "UKJENT";
+    status?: JournalpostDtoStatusEnum;
     /** Om journalposten er feilført på bidragssak */
     feilfort?: boolean;
     /** Metadata for kode vs dekode i et kodeobjekt */
@@ -740,7 +718,165 @@ export interface ForsendelseIkkeDistribuertResponsTo {
     opprettetDato?: string;
 }
 
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType } from "axios";
+/** Dokumentets status. Benyttes hvis journalposten er av typen forsendelse */
+export enum DokumentDtoStatusEnum {
+    IKKE_BESTILT = "IKKE_BESTILT",
+    BESTILLING_FEILET = "BESTILLING_FEILET",
+    UNDER_PRODUKSJON = "UNDER_PRODUKSJON",
+    UNDER_REDIGERING = "UNDER_REDIGERING",
+    FERDIGSTILT = "FERDIGSTILT",
+    AVBRUTT = "AVBRUTT",
+}
+
+/** Arkivsystem hvor dokumentet er produsert og lagret */
+export enum DokumentDtoArkivSystemEnum {
+    JOARK = "JOARK",
+    MIDLERTIDLIG_BREVLAGER = "MIDLERTIDLIG_BREVLAGER",
+    UKJENT = "UKJENT",
+    BIDRAG = "BIDRAG",
+    FORSENDELSE = "FORSENDELSE",
+}
+
+export enum DokumentMalDetaljerTypeEnum {
+    UTGAENDE = "UTGÅENDE",
+    NOTAT = "NOTAT",
+}
+
+export enum OppdaterDokumentForesporselArkivsystemEnum {
+    JOARK = "JOARK",
+    MIDLERTIDLIG_BREVLAGER = "MIDLERTIDLIG_BREVLAGER",
+    UKJENT = "UKJENT",
+    BIDRAG = "BIDRAG",
+    FORSENDELSE = "FORSENDELSE",
+}
+
+/** Hvilken format dokument er på. Dette forteller hvordan dokumentet må åpnes. */
+export enum DokumentMetadataFormatEnum {
+    PDF = "PDF",
+    MBDOK = "MBDOK",
+    HTML = "HTML",
+}
+
+/** Status på dokumentet */
+export enum DokumentMetadataStatusEnum {
+    IKKE_BESTILT = "IKKE_BESTILT",
+    BESTILLING_FEILET = "BESTILLING_FEILET",
+    UNDER_PRODUKSJON = "UNDER_PRODUKSJON",
+    UNDER_REDIGERING = "UNDER_REDIGERING",
+    FERDIGSTILT = "FERDIGSTILT",
+    AVBRUTT = "AVBRUTT",
+}
+
+/** Hvilken arkivsystem dokumentet er lagret på */
+export enum DokumentMetadataArkivsystemEnum {
+    JOARK = "JOARK",
+    MIDLERTIDLIG_BREVLAGER = "MIDLERTIDLIG_BREVLAGER",
+    UKJENT = "UKJENT",
+    BIDRAG = "BIDRAG",
+    FORSENDELSE = "FORSENDELSE",
+}
+
+/** Identtype */
+export enum AvsenderMottakerDtoTypeEnum {
+    FNR = "FNR",
+    SAMHANDLER = "SAMHANDLER",
+    ORGNR = "ORGNR",
+    UTENLANDSK_ORGNR = "UTENLANDSK_ORGNR",
+    UKJENT = "UKJENT",
+}
+
+/**
+ * Journalposten ble mottatt/sendt ut i kanal
+ * @deprecated
+ */
+export enum JournalpostDtoKildeEnum {
+    NAV_NO_BID = "NAV_NO_BID",
+    SKAN_BID = "SKAN_BID",
+    NAV_NO = "NAV_NO",
+    SKAN_NETS = "SKAN_NETS",
+    LOKAL_UTSKRIFT = "LOKAL_UTSKRIFT",
+    SENTRAL_UTSKRIFT = "SENTRAL_UTSKRIFT",
+    SDP = "SDP",
+    INGEN_DISTRIBUSJON = "INGEN_DISTRIBUSJON",
+}
+
+/** Journalposten ble mottatt/sendt ut i kanal */
+export enum JournalpostDtoKanalEnum {
+    NAV_NO_BID = "NAV_NO_BID",
+    SKAN_BID = "SKAN_BID",
+    NAV_NO = "NAV_NO",
+    SKAN_NETS = "SKAN_NETS",
+    LOKAL_UTSKRIFT = "LOKAL_UTSKRIFT",
+    SENTRAL_UTSKRIFT = "SENTRAL_UTSKRIFT",
+    SDP = "SDP",
+    INGEN_DISTRIBUSJON = "INGEN_DISTRIBUSJON",
+}
+
+/** Journalpostens status */
+export enum JournalpostDtoStatusEnum {
+    MOTTATT = "MOTTATT",
+    JOURNALFORT = "JOURNALFØRT",
+    EKSPEDERT = "EKSPEDERT",
+    DISTRIBUERT = "DISTRIBUERT",
+    AVBRUTT = "AVBRUTT",
+    KLAR_FOR_DISTRIBUSJON = "KLAR_FOR_DISTRIBUSJON",
+    RETUR = "RETUR",
+    FERDIGSTILT = "FERDIGSTILT",
+    FEILREGISTRERT = "FEILREGISTRERT",
+    RESERVERT = "RESERVERT",
+    UTGAR = "UTGÅR",
+    UNDER_OPPRETTELSE = "UNDER_OPPRETTELSE",
+    UNDER_PRODUKSJON = "UNDER_PRODUKSJON",
+    UKJENT = "UKJENT",
+}
+
+export enum HentAvvikEnum {
+    ARKIVERE_JOURNALPOST = "ARKIVERE_JOURNALPOST",
+    BESTILL_ORIGINAL = "BESTILL_ORIGINAL",
+    BESTILL_RESKANNING = "BESTILL_RESKANNING",
+    BESTILL_SPLITTING = "BESTILL_SPLITTING",
+    ENDRE_FAGOMRADE = "ENDRE_FAGOMRADE",
+    SEND_TIL_FAGOMRADE = "SEND_TIL_FAGOMRADE",
+    KOPIER_FRA_ANNEN_FAGOMRADE = "KOPIER_FRA_ANNEN_FAGOMRADE",
+    SEND_KOPI_TIL_FAGOMRADE = "SEND_KOPI_TIL_FAGOMRADE",
+    FEILFORE_SAK = "FEILFORE_SAK",
+    INNG_TIL_UTG_DOKUMENT = "INNG_TIL_UTG_DOKUMENT",
+    OVERFOR_TIL_ANNEN_ENHET = "OVERFOR_TIL_ANNEN_ENHET",
+    SLETT_JOURNALPOST = "SLETT_JOURNALPOST",
+    TREKK_JOURNALPOST = "TREKK_JOURNALPOST",
+    REGISTRER_RETUR = "REGISTRER_RETUR",
+    MANGLER_ADRESSE = "MANGLER_ADRESSE",
+    BESTILL_NY_DISTRIBUSJON = "BESTILL_NY_DISTRIBUSJON",
+    FARSKAP_UTELUKKET = "FARSKAP_UTELUKKET",
+}
+
+export enum HentAvvikEnum1 {
+    ARKIVERE_JOURNALPOST = "ARKIVERE_JOURNALPOST",
+    BESTILL_ORIGINAL = "BESTILL_ORIGINAL",
+    BESTILL_RESKANNING = "BESTILL_RESKANNING",
+    BESTILL_SPLITTING = "BESTILL_SPLITTING",
+    ENDRE_FAGOMRADE = "ENDRE_FAGOMRADE",
+    SEND_TIL_FAGOMRADE = "SEND_TIL_FAGOMRADE",
+    KOPIER_FRA_ANNEN_FAGOMRADE = "KOPIER_FRA_ANNEN_FAGOMRADE",
+    SEND_KOPI_TIL_FAGOMRADE = "SEND_KOPI_TIL_FAGOMRADE",
+    FEILFORE_SAK = "FEILFORE_SAK",
+    INNG_TIL_UTG_DOKUMENT = "INNG_TIL_UTG_DOKUMENT",
+    OVERFOR_TIL_ANNEN_ENHET = "OVERFOR_TIL_ANNEN_ENHET",
+    SLETT_JOURNALPOST = "SLETT_JOURNALPOST",
+    TREKK_JOURNALPOST = "TREKK_JOURNALPOST",
+    REGISTRER_RETUR = "REGISTRER_RETUR",
+    MANGLER_ADRESSE = "MANGLER_ADRESSE",
+    BESTILL_NY_DISTRIBUSJON = "BESTILL_NY_DISTRIBUSJON",
+    FARSKAP_UTELUKKET = "FARSKAP_UTELUKKET",
+}
+
+export enum HentJournalParamsFagomradeEnum {
+    BID = "BID",
+    FAR = "FAR",
+}
+
+import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType } from "axios";
+import axios from "axios";
 
 export type QueryParamsType = Record<string | number, any>;
 
@@ -928,46 +1064,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @secure
          */
         hentAvvik: (forsendelseIdMedPrefix: string, params: RequestParams = {}) =>
-            this.request<
-                (
-                    | "ARKIVERE_JOURNALPOST"
-                    | "BESTILL_ORIGINAL"
-                    | "BESTILL_RESKANNING"
-                    | "BESTILL_SPLITTING"
-                    | "ENDRE_FAGOMRADE"
-                    | "SEND_TIL_FAGOMRADE"
-                    | "KOPIER_FRA_ANNEN_FAGOMRADE"
-                    | "SEND_KOPI_TIL_FAGOMRADE"
-                    | "FEILFORE_SAK"
-                    | "INNG_TIL_UTG_DOKUMENT"
-                    | "OVERFOR_TIL_ANNEN_ENHET"
-                    | "SLETT_JOURNALPOST"
-                    | "TREKK_JOURNALPOST"
-                    | "REGISTRER_RETUR"
-                    | "MANGLER_ADRESSE"
-                    | "BESTILL_NY_DISTRIBUSJON"
-                    | "FARSKAP_UTELUKKET"
-                )[],
-                (
-                    | "ARKIVERE_JOURNALPOST"
-                    | "BESTILL_ORIGINAL"
-                    | "BESTILL_RESKANNING"
-                    | "BESTILL_SPLITTING"
-                    | "ENDRE_FAGOMRADE"
-                    | "SEND_TIL_FAGOMRADE"
-                    | "KOPIER_FRA_ANNEN_FAGOMRADE"
-                    | "SEND_KOPI_TIL_FAGOMRADE"
-                    | "FEILFORE_SAK"
-                    | "INNG_TIL_UTG_DOKUMENT"
-                    | "OVERFOR_TIL_ANNEN_ENHET"
-                    | "SLETT_JOURNALPOST"
-                    | "TREKK_JOURNALPOST"
-                    | "REGISTRER_RETUR"
-                    | "MANGLER_ADRESSE"
-                    | "BESTILL_NY_DISTRIBUSJON"
-                    | "FARSKAP_UTELUKKET"
-                )[]
-            >({
+            this.request<HentAvvikEnum[], HentAvvikEnum1[]>({
                 path: `/api/forsendelse/journal/${forsendelseIdMedPrefix}/avvik`,
                 method: "GET",
                 secure: true,
@@ -1343,7 +1440,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         hentJournal: (
             saksnummer: string,
             query?: {
-                fagomrade?: ("BID" | "FAR")[];
+                fagomrade?: HentJournalParamsFagomradeEnum[];
             },
             params: RequestParams = {}
         ) =>

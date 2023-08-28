@@ -4,6 +4,7 @@ import { PropsWithChildren } from "react";
 import { useContext } from "react";
 
 import { EngangsbelopType, SoknadFra, StonadType, VedtakType } from "../../api/BidragForsendelseApi";
+import { useForsendelseApi } from "../../hooks/useForsendelseApi";
 
 export interface IOpprettForsendelseProviderProps {
     vedtakType: VedtakType;
@@ -18,6 +19,7 @@ export interface IOpprettForsendelseProviderProps {
     vedtakId?: string;
     behandlingId?: string;
     enhet?: string;
+    barnObjNr?: string[];
 }
 
 export interface IOpprettForsendelsePropsContext {
@@ -33,6 +35,7 @@ export interface IOpprettForsendelsePropsContext {
     soknadId?: string;
     vedtakId?: string;
     behandlingId?: string;
+    barn?: string[];
 }
 
 export const OpprettForsendelseContext = createContext<IOpprettForsendelsePropsContext>(
@@ -45,6 +48,7 @@ function OpprettForsendelseProvider({
     ...otherProps
 }: PropsWithChildren<IOpprettForsendelseProviderProps>) {
     const [errors, setErrors] = useState<string[]>([]);
+    const roller = useForsendelseApi().hentRoller();
 
     // useEffect(() => {
     //     const tempErrors = [];
@@ -60,6 +64,17 @@ function OpprettForsendelseProvider({
     //     setErrors(tempErrors);
     // }, []);
 
+    function isSameRole(urlObjNr: string, rolleObjNr: string) {
+        return urlObjNr == rolleObjNr || isEqualByIntIgnoreError(urlObjNr, rolleObjNr);
+    }
+
+    function isEqualByIntIgnoreError(valueA: string, valueB: string) {
+        try {
+            return parseInt(valueA) == parseInt(valueB);
+        } catch (e) {
+            return false;
+        }
+    }
     if (errors.length > 0) {
         return <Alert variant="error">{errors.join(", ")}</Alert>;
     }
@@ -67,6 +82,9 @@ function OpprettForsendelseProvider({
         <OpprettForsendelseContext.Provider
             value={{
                 ...otherProps,
+                barn: otherProps.barnObjNr?.map(
+                    (objNr) => roller.find((rolle) => isSameRole(rolle.objektnummer, objNr))?.ident
+                ),
                 behandlingType: behandlingType ?? otherProps.stonadType ?? otherProps.engangsBelopType,
             }}
         >
