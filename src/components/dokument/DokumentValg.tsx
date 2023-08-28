@@ -19,7 +19,6 @@ export default function DokumentValg({ malDetaljer, showLegend }: DokumentValgPr
     const {
         register,
         setValue,
-        getValues,
         formState: { errors },
     } = useFormContext<{
         dokument: {
@@ -40,11 +39,6 @@ export default function DokumentValg({ malDetaljer, showLegend }: DokumentValgPr
     function updateValues(malId?: string) {
         const dokument = alleBrev.find((d) => d.malId == malId);
         if (dokument) {
-            console.log({
-                malId,
-                tittel: editableTitles.get(malId) ?? dokument.tittel,
-                type: dokument.type,
-            });
             setValue("dokument", {
                 malId,
                 tittel: editableTitles.get(malId) ?? dokument.tittel,
