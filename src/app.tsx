@@ -8,7 +8,6 @@ import { EngangsbelopType, SoknadFra, StonadType, VedtakType } from "./api/Bidra
 import { SessionProvider } from "./pages/forsendelse/context/SessionContext";
 import ForsendelsePage from "./pages/forsendelse/ForsendelsePage";
 import Opprettforsendelse from "./pages/opprettforsendelse";
-import { OpprettForsendelseProvider } from "./pages/opprettforsendelse/OpprettForsendelseContext";
 import Opprettnotat from "./pages/opprettnotat";
 
 // This file is only used for development. The entrypoint is under pages folder
@@ -49,31 +48,27 @@ function OpprettNyNotatPageWrapper() {
     return (
         <SessionProvider
             saksnummer={saksnummer}
-            sessionId={searchParams.get("sessionId")}
+            sessionId={searchParams.get("sessionState")}
             enhet={searchParams.get("enhet")}
         >
-            <OpprettForsendelseProvider
+            <Opprettnotat
+                barnObjNr={searchParams.getAll("barn_obj_nr") ?? []}
                 vedtakType={searchParams.get("vedtakType") as VedtakType}
                 erFattetBeregnet={
                     searchParams.get("erFattetBeregnet") != undefined
                         ? searchParams.get("erFattetBeregnet") == "true"
                         : null
                 }
-                soknadType={searchParams.get("soknadType")}
+                erVedtakIkkeTilbakekreving={searchParams.get("erVedtakIkkeTilbakekreving") == "true"}
                 soknadId={searchParams.get("soknadId")}
+                soknadType={searchParams.get("soknadType")}
                 behandlingId={searchParams.get("behandlingId")}
                 vedtakId={searchParams.get("vedtakId")}
                 soknadFra={searchParams.get("soknadFra") as SoknadFra}
                 behandlingType={searchParams.get("behandlingType")}
                 engangsBelopType={searchParams.get("engangsbelopType") as EngangsbelopType}
                 stonadType={searchParams.get("stonadType") as StonadType}
-            >
-                <Opprettnotat
-                    saksnummer={saksnummer}
-                    sessionId={searchParams.get("sessionState")}
-                    enhet={searchParams.get("enhet")}
-                />
-            </OpprettForsendelseProvider>
+            />
         </SessionProvider>
     );
 }
