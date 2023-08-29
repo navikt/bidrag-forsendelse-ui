@@ -29,6 +29,19 @@ export default function BestillDistribusjonInfo(props: BestillDistribusjonConten
 }
 
 function DistribusjonDetaljer(props: BestillDistribusjonContentProps) {
+    return (
+        <div className="pb-2 pt-2">
+            <Heading size={"small"} className={"pb-1"}>
+                Distribusjonskanal
+            </Heading>
+            <React.Suspense fallback={<Loader size="small" />}>
+                <DistribusjonsKanal {...props} />
+            </React.Suspense>
+        </div>
+    );
+}
+
+function DistribusjonsKanal(props: BestillDistribusjonContentProps) {
     const distribusjonKanal = useDokumentApi().distribusjonKanal();
     const forsendelse = useForsendelseApi().hentForsendelse();
 
@@ -49,22 +62,17 @@ function DistribusjonDetaljer(props: BestillDistribusjonContentProps) {
         return distribusjonKanal.regelBegrunnelse;
     }
     return (
-        <div className="pb-2 pt-2">
-            <Heading size={"small"} className={"pb-1"}>
-                Distribusjonskanal
-            </Heading>
-            <div>
+        <div>
+            <BodyShort spacing>
+                <div>{mapToDistribusjonKanalBeskrivelse()}</div>
+            </BodyShort>
+            {distribusjonKanal.distribusjonskanal == "PRINT" && (
                 <BodyShort spacing>
-                    <div>{mapToDistribusjonKanalBeskrivelse()}</div>
+                    <Heading size="xsmall">Begrunnelse</Heading>
+                    <div>{mapToBegrunnelseBeskrivelse()}</div>
                 </BodyShort>
-                {distribusjonKanal.distribusjonskanal == "PRINT" && (
-                    <BodyShort spacing>
-                        <Heading size="xsmall">Begrunnelse</Heading>
-                        <div>{mapToBegrunnelseBeskrivelse()}</div>
-                    </BodyShort>
-                )}
-                {distribusjonKanal.distribusjonskanal == "PRINT" && <Adresse {...props} />}
-            </div>
+            )}
+            {distribusjonKanal.distribusjonskanal == "PRINT" && <Adresse {...props} />}
         </div>
     );
 }
