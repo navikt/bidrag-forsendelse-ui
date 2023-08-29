@@ -19,6 +19,7 @@ export default function DokumentValg({ malDetaljer, showLegend }: DokumentValgPr
     const {
         register,
         setValue,
+        getValues,
         formState: { errors },
     } = useFormContext<{
         dokument: {
@@ -49,6 +50,9 @@ export default function DokumentValg({ malDetaljer, showLegend }: DokumentValgPr
 
     function onTitleChange(malId: string, title: string) {
         setEditableTitles((prevValue) => prevValue.set(malId, title));
+        if (getValues("dokument.malId") == malId) {
+            setValue("dokument.tittel", title);
+        }
     }
     const methods = register("dokument", { validate: (dok) => (dok?.malId == null ? "Dokument må velges" : true) });
     return (
