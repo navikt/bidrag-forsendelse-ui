@@ -10,7 +10,6 @@ import AdresseInfo from "../../../components/AdresseInfo";
 import { EditAddressForm } from "../../../components/EditAddress";
 import useDokumentApi from "../../../hooks/useDokumentApi";
 import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
-import { IMottakerAdresse } from "../../../types/Adresse";
 import Mottaker from "../components/Mottaker";
 
 interface BestillDistribusjonContentProps {
@@ -29,26 +28,10 @@ export default function BestillDistribusjonInfo(props: BestillDistribusjonConten
 }
 
 function DistribusjonDetaljer(props: BestillDistribusjonContentProps) {
-    return (
-        <div className="pb-2 pt-2">
-            <Heading size={"small"} className={"pb-1"}>
-                Distribusjonskanal
-            </Heading>
-            <React.Suspense fallback={<Loader size="small" />}>
-                <DistribusjonsKanal {...props} />
-            </React.Suspense>
-        </div>
-    );
-}
-
-function DistribusjonsKanal(props: BestillDistribusjonContentProps) {
     const distribusjonKanal = useDokumentApi().distribusjonKanal();
     const forsendelse = useForsendelseApi().hentForsendelse();
 
     function mapToDistribusjonKanalBeskrivelse() {
-        if (!distribusjonKanal) {
-            return "Ukjent (Kunne ikke hente distribusjonskanal)";
-        }
         switch (distribusjonKanal.distribusjonskanal) {
             case "PRINT":
                 return "Fysisk (Sentral print)";
@@ -60,23 +43,27 @@ function DistribusjonsKanal(props: BestillDistribusjonContentProps) {
     }
 
     function mapToBegrunnelseBeskrivelse() {
-        if (!distribusjonKanal) return;
         if (forsendelse.mottaker?.ident != forsendelse.gjelderIdent) return "Mottaker er ulik gjelder";
         if (IdentUtils.isSamhandlerId(forsendelse.mottaker?.ident)) return "Mottaker er samhandler";
         return distribusjonKanal.regelBegrunnelse;
     }
     return (
-        <div>
-            <BodyShort spacing>
-                <div>{mapToDistribusjonKanalBeskrivelse()}</div>
-            </BodyShort>
-            {distribusjonKanal?.distribusjonskanal == "PRINT" && (
+        <div className="pb-2 pt-2">
+            <Heading size={"small"} className={"pb-1"}>
+                Distribusjonskanal
+            </Heading>
+            <div>
                 <BodyShort spacing>
-                    <Heading size="xsmall">Begrunnelse</Heading>
-                    <div>{mapToBegrunnelseBeskrivelse()}</div>
+                    <div>{mapToDistribusjonKanalBeskrivelse()}</div>
                 </BodyShort>
-            )}
-            {(distribusjonKanal?.distribusjonskanal == "PRINT" || !distribusjonKanal) && <Adresse {...props} />}
+                {distribusjonKanal.distribusjonskanal == "PRINT" && (
+                    <BodyShort spacing>
+                        <Heading size="xsmall">Begrunnelse</Heading>
+                        <div>{mapToBegrunnelseBeskrivelse()}</div>
+                    </BodyShort>
+                )}
+                {distribusjonKanal.distribusjonskanal == "PRINT" && <Adresse {...props} />}
+            </div>
         </div>
     );
 }

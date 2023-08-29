@@ -88,7 +88,7 @@ export default function useDokumentApi() {
         });
     }
 
-    function distribusjonKanal(): BestemKanalResponse | undefined {
+    function distribusjonKanal(): BestemKanalResponse {
         const forsendelse = useForsendelseApi().hentForsendelse();
         const gjelderId = forsendelse.gjelderIdent;
         const mottakerId = forsendelse.mottaker?.ident;
@@ -99,12 +99,8 @@ export default function useDokumentApi() {
                 return data.data;
             },
             enabled: gjelderId == mottakerId,
-            useErrorBoundary: false,
         });
 
-        if (result.isError) {
-            return undefined;
-        }
         return (
             result.data ?? {
                 distribusjonskanal: BestemKanalResponseDistribusjonskanalEnum.PRINT,
