@@ -4,7 +4,7 @@ import { EyeIcon } from "@navikt/aksel-icons";
 import { DragVerticalIcon } from "@navikt/aksel-icons";
 import { dateToDDMMYYYYString, OpenDocumentUtils } from "@navikt/bidrag-ui-common";
 import { Delete } from "@navikt/ds-icons";
-import { Table } from "@navikt/ds-react";
+import { BodyShort, Checkbox, Heading, Modal, Table } from "@navikt/ds-react";
 import { Button } from "@navikt/ds-react";
 import { Textarea } from "@navikt/ds-react";
 import React, { useRef } from "react";
@@ -18,6 +18,7 @@ import { DokumentStatus } from "../../constants/DokumentStatus";
 import { FormIDokument, useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IForsendelseFormProps } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IDokument } from "../../types/Dokument";
+import { cleanupAfterClosedModal } from "../../utils/ModalUtils";
 import TableDraggableBody from "../table/TableDraggableBody";
 import DokumentLinkedTag from "./DokumentLinkedTag";
 import DokumentStatusTag from "./DokumentStatusTag";
@@ -56,7 +57,6 @@ export default function DokumentRows() {
                         listeners={listeners}
                         attributes={attributes}
                         style={style}
-                        deleteDocument={() => deleteDocument(dokument)}
                     />
                 )}
             </TableDraggableBody>
@@ -67,27 +67,14 @@ export default function DokumentRows() {
 interface IDokumentRowProps {
     id: string;
     index: number;
-    dokument: IDokument;
+    dokument: FormIDokument;
     forsendelseId: string;
-    deleteDocument: () => void;
     attributes: DraggableAttributes;
     listeners: SyntheticListenerMap;
     style: CSSProperties;
 }
 const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
-    (
-        {
-            id,
-            dokument,
-            forsendelseId,
-            index: rowIndex,
-            deleteDocument,
-            listeners,
-            attributes,
-            style,
-        }: IDokumentRowProps,
-        ref
-    ) => {
+    ({ id, dokument, forsendelseId, index: rowIndex, listeners, attributes, style }: IDokumentRowProps, ref) => {
         const { tittel, index: dokindex, status, journalpostId, dokumentreferanse, dokumentDato } = dokument;
         const {
             register,
@@ -162,7 +149,7 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
                             journalpostId={"BIF-" + forsendelseIdNumeric}
                             status={dokument.status}
                         />
-                        <Button size={"small"} variant={"tertiary"} icon={<Delete />} onClick={deleteDocument} />
+                        <DeleteDocumentButton dokument={dokument} />
                     </div>
                 </Table.DataCell>
             </Table.Row>
@@ -170,6 +157,71 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
     }
 );
 
+function DeleteDocumentButton({ dokument }: { dokument: FormIDokument }) {
+    const { deleteDocument, saveChanges, deleteMode } = useDokumenterForm();
+    const [modalOpen, setModalOpen] = useState(false);
+    const closeModal = () => {
+        setModalOpen(false);
+        cleanupAfterClosedModal();
+    };
+    const openModal = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        setModalOpen(true);
+    };
+
+    function deleteDocumentFromForsendelse() {
+        deleteDocument(dokument);
+        saveChanges();
+    }
+
+    if (deleteMode) {
+        const isChecked = dokument.status == DokumentStatus.SLETTET;
+        return (
+            <Checkbox
+                checked={isChecked}
+                onChange={() => {
+                    deleteDocument(dokument);
+                }}
+            >
+                <div></div>
+            </Checkbox>
+        );
+    }
+    return (
+        <>
+            <Button size={"small"} variant={"tertiary"} icon={<Delete />} onClick={openModal} />
+            <Modal
+                open={modalOpen}
+                shouldCloseOnEsc
+                shouldCloseOnOverlayClick
+                onClose={closeModal}
+                className={`max-w-[900px]`}
+            >
+                <Modal.Content>
+                    <Heading spacing size={"medium"}>
+                        Ønsker du å slette dokument?
+                    </Heading>
+                    <BodyShort>
+                        Du er i ferd med å slette dokument med tittel {dokument.tittel} fra forsendelsen
+                        <br />
+                        Det vil ikke være mulig å angre handling
+                    </BodyShort>
+                    <div>
+                        <div className={"ml-2 flex flex-row gap-2 items-end bottom-2"}>
+                            <Button size="small" variant="danger" onClick={deleteDocumentFromForsendelse}>
+                                Slett
+                            </Button>
+                            <Button size="small" variant={"tertiary"} onClick={closeModal}>
+                                Avbryt
+                            </Button>
+                        </div>
+                    </div>
+                </Modal.Content>
+            </Modal>
+        </>
+    );
+}
 interface IEditableDokumentTitleRowProps {
     dokument: IDokument;
     index: number;

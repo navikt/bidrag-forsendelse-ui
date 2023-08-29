@@ -1,7 +1,7 @@
 import "./DokumenterTable.css";
 
 import { OpenDocumentUtils } from "@navikt/bidrag-ui-common";
-import { Button, Table } from "@navikt/ds-react";
+import { Button, Switch, Table } from "@navikt/ds-react";
 import React from "react";
 
 import { DokumentStatus } from "../../constants/DokumentStatus";
@@ -29,13 +29,28 @@ import LeggTilFraMalKnapp from "./LeggTilFraMalKnapp";
 // }
 
 export default function DokumenterTable() {
-    const { dokumenter, forsendelseId } = useDokumenterForm();
+    const { dokumenter, toggleDeleteMode, deleteMode } = useDokumenterForm();
     return (
         <div className={"w-max"}>
             <div className={"flex flex-row mt-[10px] border-b-[1px] w-full flex-wrap max-w-[95vw]"}>
                 <LeggTilDokumentButton />
                 <LeggTilFraMalKnapp />
-                <div style={{ marginLeft: "auto" }}>Antall dokumenter: {dokumenter.length}</div>
+            </div>
+
+            <div className={"flex flex-row mt-[10px] border-b-[1px] w-full flex-wrap max-w-[95vw]"}>
+                <div>Antall dokumenter: {dokumenter.length}</div>
+                <div style={{ marginLeft: "auto" }}>
+                    <Switch
+                        value={deleteMode}
+                        size="small"
+                        onChange={(e) => {
+                            console.log(e);
+                            toggleDeleteMode();
+                        }}
+                    >
+                        Slett flere
+                    </Switch>
+                </div>
             </div>
             <div className={"dokument-table "} style={{ borderColor: "var(--a-border-subtle)" }}>
                 <div className="w-full max-w-[95vw] overflow-auto">
