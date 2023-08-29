@@ -2,7 +2,10 @@ import { Loader } from "@navikt/ds-react";
 import React from "react";
 
 import ForsendelseSakHeader from "../forsendelse/components/ForsendelseSakHeader";
-import { SessionProvider } from "../forsendelse/context/SessionContext";
+import {
+    IOpprettForsendelseProviderProps,
+    OpprettForsendelseProvider,
+} from "../opprettforsendelse/OpprettForsendelseContext";
 import PageWrapper from "../PageWrapper";
 import OpprettNotatPage from "./OpprettNotatPage";
 
@@ -11,17 +14,17 @@ interface OpprettNotatProps {
     sessionId: string;
     enhet: string;
 }
-export default function ({ saksnummer, sessionId, enhet }: OpprettNotatProps) {
+export default function ({ ...otherProps }: IOpprettForsendelseProviderProps) {
     return (
         <PageWrapper name={"opprett-forsendelse-page"}>
-            <SessionProvider saksnummer={saksnummer} sessionId={sessionId} enhet={enhet}>
+            <OpprettForsendelseProvider {...otherProps}>
                 <div>
                     <ForsendelseSakHeader />
                     <React.Suspense fallback={<LoadingIndicator />}>
                         <OpprettNotatPage />
                     </React.Suspense>
                 </div>
-            </SessionProvider>
+            </OpprettForsendelseProvider>
         </PageWrapper>
     );
 }

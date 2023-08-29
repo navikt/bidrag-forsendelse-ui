@@ -11,6 +11,7 @@ import DokumentValgNotat from "../../components/dokument/DokumentValgNotat";
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
 import { mapToBehandlingInfoDto } from "../../types/Forsendelse";
 import { useSession } from "../forsendelse/context/SessionContext";
+import AvbrytOpprettForsendelseButton from "../opprettforsendelse/AvbrytOpprettForsendelseButton";
 import { useOpprettForsendelse } from "../opprettforsendelse/OpprettForsendelseContext";
 
 export type OpprettForsendelseFormProps = {
@@ -85,19 +86,14 @@ export default function OpprettNotatPage() {
                                 <div className="flex flex-row gap-4 pb-4">
                                     <TemaSelect />
                                 </div>
-                                <DokumentValgNotat />
+                                <div className="w-2/3">
+                                    <DokumentValgNotat />
+                                </div>
                                 <div className="flex flex-row gap-2 pt-4">
                                     <Button size="small" loading={opprettForsendelseFn.isLoading}>
                                         Opprett
                                     </Button>
-                                    <Button
-                                        size="small"
-                                        variant="tertiary"
-                                        type="button"
-                                        disabled={opprettForsendelseFn.isLoading}
-                                    >
-                                        Avbryt
-                                    </Button>
+                                    <AvbrytOpprettForsendelseButton disabled={opprettForsendelseFn.isLoading} />
                                 </div>
                             </form>
                         </FormProvider>

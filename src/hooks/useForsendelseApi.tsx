@@ -104,6 +104,7 @@ export function useForsendelseApi(): UseForsendelseDataProps {
         return sak.roller.map((rolle) => ({
             rolleType: RolleType[rolle.rolleType],
             ident: rolle.fodselsnummer ?? rolle.samhandlerIdent,
+            objektnummer: rolle.objektnummer,
             navn: useSamhandlerPersonApi().hentPerson(rolle.fodselsnummer)?.navn,
         }));
     };

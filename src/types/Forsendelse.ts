@@ -45,6 +45,7 @@ export function mapToBehandlingInfoDto(options: IOpprettForsendelsePropsContext)
         engangsBelopType: options.engangsBelopType,
         erFattetBeregnet: options.erFattetBeregnet,
         erVedtakIkkeTilbakekreving: options.erVedtakIkkeTilbakekreving,
+        barnIBehandling: options.barn,
     };
     const isBehandlingInfoEmpty = ObjectUtils.isEmpty(behandlingInfo) || hasOnlyNullValues(behandlingInfo);
     return isBehandlingInfoEmpty ? null : behandlingInfo;
