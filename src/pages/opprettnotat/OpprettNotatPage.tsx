@@ -1,4 +1,4 @@
-import { RolleType } from "@navikt/bidrag-ui-common";
+import { dateToDDMMYYYYString, RolleType } from "@navikt/bidrag-ui-common";
 import { Button, Cell, ContentContainer, Grid, Heading } from "@navikt/ds-react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useMutation } from "react-query";
@@ -13,10 +13,12 @@ import { mapToBehandlingInfoDto } from "../../types/Forsendelse";
 import { useSession } from "../forsendelse/context/SessionContext";
 import AvbrytOpprettForsendelseButton from "../opprettforsendelse/AvbrytOpprettForsendelseButton";
 import { useOpprettForsendelse } from "../opprettforsendelse/OpprettForsendelseContext";
+import Dokumentdato from "./Dokumentdato";
 
 export type OpprettForsendelseFormProps = {
     gjelderIdent: string;
     mottakerIdent: string;
+    dokumentdato: string;
     dokument: {
         malId: string;
         tittel: string;
@@ -49,6 +51,7 @@ export default function OpprettNotatPage() {
                         tittel: data.dokument.tittel,
                         språk: data.språk,
                         bestillDokument: true,
+                        dokumentDato: data.dokumentdato ? `${data.dokumentdato}-00-00-00` : null,
                     },
                 ],
             });
@@ -65,6 +68,7 @@ export default function OpprettNotatPage() {
         defaultValues: {
             gjelderIdent: defaultGjelder,
             mottakerIdent: defaultGjelder,
+            dokumentdato: dateToDDMMYYYYString(new Date()),
             tema: "BID",
             språk: "NB",
         },
@@ -85,6 +89,7 @@ export default function OpprettNotatPage() {
                                 <GjelderSelect roller={roller} />
                                 <div className="flex flex-row gap-4 pb-4">
                                     <TemaSelect />
+                                    <Dokumentdato />
                                 </div>
                                 <div className="w-2/3">
                                     <DokumentValgNotat />
