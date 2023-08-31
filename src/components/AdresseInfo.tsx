@@ -1,12 +1,11 @@
 import { BodyShort } from "@navikt/ds-react";
 import React from "react";
 
-import { DistribuerTilAdresse } from "../api/BidragDokumentApi";
-import { MottakerAdresseTo } from "../api/BidragForsendelseApi";
+import { IMottakerAdresse } from "../types/Adresse";
 import { countryCodeToName } from "../utils/AdresseUtils";
 
 interface AdresseInfoProps {
-    adresse?: MottakerAdresseTo & DistribuerTilAdresse;
+    adresse?: IMottakerAdresse;
 }
 
 function renderDetailWhenExists(...values: string[]) {

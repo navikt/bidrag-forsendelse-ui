@@ -12,6 +12,7 @@ import { useErrorContext } from "../../context/ErrorProvider";
 import { useForsendelseApi, UseForsendelseApiKeys } from "../../hooks/useForsendelseApi";
 import { ENHET_FARSKAP } from "../../types/EnhetTypes";
 import { mapToBehandlingInfoDto } from "../../types/Forsendelse";
+import { countryCodeIso2ToIso3 } from "../../utils/AdresseUtils";
 import { useSession } from "../forsendelse/context/SessionContext";
 import { queryClient } from "../PageWrapper";
 import AvbrytOpprettForsendelseButton from "./AvbrytOpprettForsendelseButton";
@@ -54,6 +55,7 @@ export type OpprettForsendelseFormProps = {
 function mapToOpprettEllerOppdaterForsendelseRequest(
     data: OpprettForsendelseFormProps
 ): OppdaterForsendelseForesporsel {
+    const landkode = data.mottaker?.adresse?.landkode ?? data.mottaker?.adresse?.land;
     return {
         gjelderIdent: data.gjelderIdent,
         mottaker: {
@@ -62,7 +64,8 @@ function mapToOpprettEllerOppdaterForsendelseRequest(
             adresse: data.mottaker?.adresse
                 ? {
                       ...data.mottaker?.adresse,
-                      landkode: data.mottaker?.adresse?.landkode ?? data.mottaker?.adresse?.land,
+                      landkode,
+                      landkode3: data.mottaker?.adresse?.landkode3 ?? countryCodeIso2ToIso3(landkode),
                   }
                 : undefined,
         },

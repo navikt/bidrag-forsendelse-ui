@@ -21,6 +21,17 @@ export function countryCodeIso3ToIso2(countryCode: string) {
     return countryCode;
 }
 
+export function countryCodeIso2ToIso3(countryCode: string) {
+    if (countryCode.length == 2) {
+        console.log(
+            countryCode,
+            Object.keys(countryISOMapping).find((val) => countryISOMapping[val] == countryCode)
+        );
+        return Object.keys(countryISOMapping).find((val) => countryISOMapping[val] == countryCode);
+    }
+    return countryCode;
+}
+
 const countryISOMapping = {
     AFG: "AF",
     ALA: "AX",

@@ -5,16 +5,16 @@ import { Button } from "@navikt/ds-react";
 import React from "react";
 import { useState } from "react";
 
-import { DistribuerTilAdresse } from "../../../api/BidragDokumentApi";
 import AdresseInfo from "../../../components/AdresseInfo";
 import { EditAddressForm } from "../../../components/EditAddress";
+import { IMottakerAdresse } from "../../../types/Adresse";
 import Mottaker from "../components/Mottaker";
 
 interface BestillDistribusjonContentProps {
     editable?: boolean;
-    adresse: DistribuerTilAdresse;
+    adresse: IMottakerAdresse;
     onEditModeChanged?: (inEditMode: boolean) => void;
-    onAdresseChanged: (adresse: DistribuerTilAdresse) => void;
+    onAdresseChanged: (adresse: IMottakerAdresse) => void;
 }
 export default function BestillDistribusjonInfo({
     editable = true,
