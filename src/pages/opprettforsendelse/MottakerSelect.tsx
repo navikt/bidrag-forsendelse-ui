@@ -154,7 +154,6 @@ function MottakerNavnOgAdresse() {
         if (data?.adresse) {
             setValue("mottaker.adresse", {
                 ...data.adresse,
-                land: data.adresse.landkode,
             });
         }
         if (data?.navn) {

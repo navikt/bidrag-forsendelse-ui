@@ -28,11 +28,13 @@ export type MottakerFormProps = {
 };
 
 export interface MottakerAdresseFormTo {
-    adresselinje1?: string;
+    adresselinje1: string;
     adresselinje2?: string;
     adresselinje3?: string;
     bruksenhetsnummer?: string;
     land?: string;
+    landkode?: string;
+    landkode3?: string;
     postnummer?: string;
     poststed?: string;
 }
@@ -58,7 +60,10 @@ function mapToOpprettEllerOppdaterForsendelseRequest(
             ident: data.mottaker.ident,
             navn: data.mottaker.navn,
             adresse: data.mottaker?.adresse
-                ? { ...data.mottaker?.adresse, landkode: data.mottaker?.adresse?.land }
+                ? {
+                      ...data.mottaker?.adresse,
+                      landkode: data.mottaker?.adresse?.landkode ?? data.mottaker?.adresse?.land,
+                  }
                 : undefined,
         },
         tema: data.tema as JournalTema,
