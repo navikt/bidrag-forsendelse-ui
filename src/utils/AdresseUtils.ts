@@ -23,10 +23,6 @@ export function countryCodeIso3ToIso2(countryCode: string) {
 
 export function countryCodeIso2ToIso3(countryCode: string) {
     if (countryCode.length == 2) {
-        console.log(
-            countryCode,
-            Object.keys(countryISOMapping).find((val) => countryISOMapping[val] == countryCode)
-        );
         return Object.keys(countryISOMapping).find((val) => countryISOMapping[val] == countryCode);
     }
     return countryCode;
