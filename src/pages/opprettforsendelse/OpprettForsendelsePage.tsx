@@ -12,6 +12,7 @@ import { useErrorContext } from "../../context/ErrorProvider";
 import { useForsendelseApi, UseForsendelseApiKeys } from "../../hooks/useForsendelseApi";
 import { ENHET_FARSKAP } from "../../types/EnhetTypes";
 import { mapToBehandlingInfoDto } from "../../types/Forsendelse";
+import { countryCodeIso2ToIso3 } from "../../utils/AdresseUtils";
 import { useSession } from "../forsendelse/context/SessionContext";
 import { queryClient } from "../PageWrapper";
 import AvbrytOpprettForsendelseButton from "./AvbrytOpprettForsendelseButton";
@@ -28,11 +29,13 @@ export type MottakerFormProps = {
 };
 
 export interface MottakerAdresseFormTo {
-    adresselinje1?: string;
+    adresselinje1: string;
     adresselinje2?: string;
     adresselinje3?: string;
     bruksenhetsnummer?: string;
     land?: string;
+    landkode?: string;
+    landkode3?: string;
     postnummer?: string;
     poststed?: string;
 }
@@ -52,13 +55,18 @@ export type OpprettForsendelseFormProps = {
 function mapToOpprettEllerOppdaterForsendelseRequest(
     data: OpprettForsendelseFormProps
 ): OppdaterForsendelseForesporsel {
+    const landkode = data.mottaker?.adresse?.landkode ?? data.mottaker?.adresse?.land;
     return {
         gjelderIdent: data.gjelderIdent,
         mottaker: {
             ident: data.mottaker.ident,
             navn: data.mottaker.navn,
             adresse: data.mottaker?.adresse
-                ? { ...data.mottaker?.adresse, landkode: data.mottaker?.adresse?.land }
+                ? {
+                      ...data.mottaker?.adresse,
+                      landkode,
+                      landkode3: data.mottaker?.adresse?.landkode3 ?? countryCodeIso2ToIso3(landkode),
+                  }
                 : undefined,
         },
         tema: data.tema as JournalTema,

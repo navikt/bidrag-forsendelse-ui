@@ -13,11 +13,12 @@ import { useWatch } from "react-hook-form";
 import { DistribuerTilAdresse } from "../api/BidragDokumentApi";
 import { hentPostnummere } from "../api/queries";
 import { hentLandkoder } from "../api/queries";
-import { isCountryCodeNorway } from "../utils/AdresseUtils";
+import { IMottakerAdresse } from "../types/Adresse";
+import { countryCodeIso2ToIso3, isCountryCodeNorway } from "../utils/AdresseUtils";
 
 interface EditAddressFormProps {
-    address?: DistribuerTilAdresse;
-    onSubmit: (adress: DistribuerTilAdresse) => void;
+    address?: IMottakerAdresse;
+    onSubmit: (adress: IMottakerAdresse) => void;
     onCancel: () => void;
 }
 
@@ -40,13 +41,21 @@ export function EditAddress(props: EditAddressProps) {
 }
 
 export function EditAddressForm({ address, onSubmit, onCancel }: EditAddressFormProps) {
-    const methods = useForm<DistribuerTilAdresse>({
+    const methods = useForm<IMottakerAdresse>({
         defaultValues: {
             ...address,
         },
         reValidateMode: "onSubmit",
         mode: "onSubmit",
     });
+
+    function onFormSubmit(submitAdresse: IMottakerAdresse) {
+        onSubmit({
+            ...submitAdresse,
+            landkode: submitAdresse.land,
+            landkode3: countryCodeIso2ToIso3(submitAdresse.land),
+        });
+    }
 
     return (
         <FormProvider {...methods}>
@@ -57,7 +66,7 @@ export function EditAddressForm({ address, onSubmit, onCancel }: EditAddressForm
                         id={"lagre_adresse_knapp"}
                         variant="tertiary"
                         size="small"
-                        onClick={methods.handleSubmit(onSubmit)}
+                        onClick={methods.handleSubmit(onFormSubmit)}
                         icon={<Locked fr="true" />}
                     >
                         Lagre
@@ -104,7 +113,7 @@ function EditPostcodeAndState(props: EditAddressProps) {
     const poststedFormKey = `${formPrefix}poststed`;
     const postnummerFormKey = `${formPrefix}postnummer`;
     return (
-        <div className={`flex gap-x-4 pb-2 pt-2 w-auto ${isNorway ? "" : "flex-col"}`}>
+        <div className={`flex gap-x-4 pb-2 pt-2 w-auto ${isNorway ? "self-start" : "flex-col"}`}>
             {isNorway ? (
                 <>
                     <Controller
@@ -199,7 +208,6 @@ function EditAddressLines(props: EditAddressProps) {
         }
         return error?.adresselinje1?.message;
     };
-    console.log(getError());
 
     return (
         <div className={"flex flex-col gap-y-4"}>

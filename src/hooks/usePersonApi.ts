@@ -59,6 +59,8 @@ export default function useSamhandlerPersonApi() {
                         adresse: {
                             adresselinje1: "",
                             ...postAdresseResult.data,
+                            landkode: postAdresseResult.data.land,
+                            landkode3: postAdresseResult.data.land3,
                         },
                     };
                 }

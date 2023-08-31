@@ -145,7 +145,6 @@ function EditableTitle({
     }
     return (
         <Textarea
-            autoFocus
             maxRows={2}
             minRows={1}
             label="Tittel"
