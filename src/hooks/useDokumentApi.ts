@@ -1,17 +1,25 @@
 import { AxiosError } from "axios";
 import { useQuery, UseQueryResult } from "react-query";
 
-import { BIDRAG_DOKUMENT_API, BIDRAG_FORSENDELSE_API } from "../api/api";
+import { BIDRAG_DOKUMENT_API, BIDRAG_DOKUMENT_ARKIV_API, BIDRAG_FORSENDELSE_API } from "../api/api";
 import { DokumentDto, JournalpostDto } from "../api/BidragDokumentApi";
+import { BestemKanalResponse, BestemKanalResponseDistribusjonskanalEnum } from "../api/BidragDokumentArkivApi";
 import { HentDokumentValgRequest } from "../api/BidragForsendelseApi";
 import { useSession } from "../pages/forsendelse/context/SessionContext";
 import { AvvikType } from "../types/AvvikTypes";
 import { IDokumentJournalDto, IJournalpost } from "../types/Journalpost";
+import { useForsendelseApi } from "./useForsendelseApi";
 const DokumentQueryKeys = {
     dokument: "dokument",
     hentJournalpost: (jpId: string) => [DokumentQueryKeys.dokument, "hentJournalpost", jpId],
     hentAvvikListe: (jpId: string) => [DokumentQueryKeys.dokument, "hentAvvikListe", jpId],
     hentAvvik: (jpId: string) => [DokumentQueryKeys.dokument, "hentAvvik", jpId],
+    hentDistribusjonKanal: (mottakerId: string, gjelderId: string) => [
+        DokumentQueryKeys.dokument,
+        "hentDistribusjonKanal",
+        gjelderId,
+        mottakerId,
+    ],
 };
 export default function useDokumentApi() {
     const { forsendelseId, saksnummer, enhet } = useSession();
@@ -80,7 +88,33 @@ export default function useDokumentApi() {
         });
     }
 
+    function distribusjonKanal(): BestemKanalResponse | undefined {
+        const forsendelse = useForsendelseApi().hentForsendelse();
+        const gjelderId = forsendelse.gjelderIdent;
+        const mottakerId = forsendelse.mottaker?.ident;
+        const result = useQuery({
+            queryKey: DokumentQueryKeys.hentDistribusjonKanal(mottakerId, mottakerId),
+            queryFn: () => BIDRAG_DOKUMENT_ARKIV_API.journal.hentDistribusjonKanal({ mottakerId, gjelderId }),
+            select: (data) => {
+                return data.data;
+            },
+            enabled: gjelderId == mottakerId,
+            useErrorBoundary: false,
+        });
+
+        if (result.isError) {
+            return undefined;
+        }
+        return (
+            result.data ?? {
+                distribusjonskanal: BestemKanalResponseDistribusjonskanalEnum.PRINT,
+                regelBegrunnelse: "Gjelder er ulik mottaker",
+                regel: "",
+            }
+        );
+    }
     return {
+        distribusjonKanal,
         hentNotatMalDetaljer,
         dokumentMalDetaljerForsendelse,
         dokumentMalDetaljer,
@@ -88,6 +122,11 @@ export default function useDokumentApi() {
         hentAvvikListe,
     };
 }
+
+export enum DistribusjonKanalUkjentEnum {
+    UKJENT,
+}
+export type DistribusjonKanalEnum = BestemKanalResponseDistribusjonskanalEnum & DistribusjonKanalUkjentEnum;
 
 export function journalpostMapper(journalpost: JournalpostDto, sakstilknytninger?: string[]): IJournalpost {
     const isForsendelse = () => journalpost.journalpostId?.startsWith("BIF");

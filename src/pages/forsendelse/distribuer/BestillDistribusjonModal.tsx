@@ -111,7 +111,7 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
                         onAdresseChanged={setAdresse}
                     />
                 </React.Suspense>
-                <div className="flex items-center p-2 space-x-2">
+                <div className="flex items-center space-x-2">
                     <Button
                         variant={"primary"}
                         onClick={onSubmit}
