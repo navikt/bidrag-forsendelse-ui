@@ -1,6 +1,7 @@
-import { RolleType } from "@navikt/bidrag-ui-common";
-import { Button, Cell, ContentContainer, Grid, Heading } from "@navikt/ds-react";
-import { FormProvider, useForm } from "react-hook-form";
+import { dateToDDMMYYYYString, RolleType } from "@navikt/bidrag-ui-common";
+import { Button, Cell, ContentContainer, ErrorSummary, Grid, Heading } from "@navikt/ds-react";
+import ErrorSummaryItem from "@navikt/ds-react/esm/form/error-summary/ErrorSummaryItem";
+import { FieldErrors, FormProvider, useForm, useFormContext } from "react-hook-form";
 import { useMutation } from "react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../../api/api";
@@ -8,15 +9,18 @@ import { JournalTema } from "../../api/BidragForsendelseApi";
 import GjelderSelect from "../../components/detaljer/GjelderSelect";
 import TemaSelect from "../../components/detaljer/TemaSelect";
 import DokumentValgNotat from "../../components/dokument/DokumentValgNotat";
+import BidragErrorPanel from "../../context/BidragErrorPanel";
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
 import { mapToBehandlingInfoDto } from "../../types/Forsendelse";
 import { useSession } from "../forsendelse/context/SessionContext";
 import AvbrytOpprettForsendelseButton from "../opprettforsendelse/AvbrytOpprettForsendelseButton";
 import { useOpprettForsendelse } from "../opprettforsendelse/OpprettForsendelseContext";
+import Dokumentdato from "./Dokumentdato";
 
 export type OpprettForsendelseFormProps = {
     gjelderIdent: string;
     mottakerIdent: string;
+    dokumentdato: string;
     dokument: {
         malId: string;
         tittel: string;
@@ -49,6 +53,7 @@ export default function OpprettNotatPage() {
                         tittel: data.dokument.tittel,
                         språk: data.språk,
                         bestillDokument: true,
+                        dokumentDato: data.dokumentdato ? `${data.dokumentdato}-00-00-00` : null,
                     },
                 ],
             });
@@ -65,6 +70,7 @@ export default function OpprettNotatPage() {
         defaultValues: {
             gjelderIdent: defaultGjelder,
             mottakerIdent: defaultGjelder,
+            dokumentdato: dateToDDMMYYYYString(new Date()),
             tema: "BID",
             språk: "NB",
         },
@@ -85,10 +91,13 @@ export default function OpprettNotatPage() {
                                 <GjelderSelect roller={roller} />
                                 <div className="flex flex-row gap-4 pb-4">
                                     <TemaSelect />
+                                    <Dokumentdato />
                                 </div>
                                 <div className="w-2/3">
                                     <DokumentValgNotat />
                                 </div>
+                                <BidragErrorPanel />
+                                <OpprettNotatValidationErrorSummary />
                                 <div className="flex flex-row gap-2 pt-4">
                                     <Button size="small" loading={opprettForsendelseFn.isLoading}>
                                         Opprett
@@ -101,5 +110,37 @@ export default function OpprettNotatPage() {
                 </Cell>
             </Grid>
         </ContentContainer>
+    );
+}
+
+function OpprettNotatValidationErrorSummary() {
+    const {
+        formState: { errors },
+    } = useFormContext<OpprettForsendelseFormProps>();
+
+    function getAllErrors(errors: FieldErrors<OpprettForsendelseFormProps>): string[] {
+        const allErrors = [];
+        Object.keys(errors).forEach((key) => {
+            const errorsValue = errors[key];
+            if (errorsValue && !errorsValue.ref) {
+                const errorMessages = getAllErrors(errorsValue);
+                errorMessages.forEach((d) => allErrors.push(d));
+            } else {
+                const message = errors[key].message;
+                if (message) {
+                    allErrors.push(message);
+                }
+            }
+        });
+        return allErrors.filter((error) => error && error.trim().length > 0);
+    }
+    if (getAllErrors(errors).length == 0) {
+        return null;
+    }
+
+    return (
+        <ErrorSummary heading={"Følgende må rettes opp før notat kan opprettes"} className="mt-4">
+            {getAllErrors(errors)?.map((err, i) => <ErrorSummaryItem key={"err" + i}>{err}</ErrorSummaryItem>)}
+        </ErrorSummary>
     );
 }
