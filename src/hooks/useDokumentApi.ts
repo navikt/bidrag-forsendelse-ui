@@ -88,7 +88,7 @@ export default function useDokumentApi() {
         });
     }
 
-    function distribusjonKanal(): BestemKanalResponse {
+    function distribusjonKanal(): BestemKanalResponse | undefined {
         const forsendelse = useForsendelseApi().hentForsendelse();
         const gjelderId = forsendelse.gjelderIdent;
         const mottakerId = forsendelse.mottaker?.ident;
@@ -99,8 +99,12 @@ export default function useDokumentApi() {
                 return data.data;
             },
             enabled: gjelderId == mottakerId,
+            useErrorBoundary: false,
         });
 
+        if (result.isError) {
+            return undefined;
+        }
         return (
             result.data ?? {
                 distribusjonskanal: BestemKanalResponseDistribusjonskanalEnum.PRINT,
@@ -118,6 +122,11 @@ export default function useDokumentApi() {
         hentAvvikListe,
     };
 }
+
+export enum DistribusjonKanalUkjentEnum {
+    UKJENT,
+}
+export type DistribusjonKanalEnum = BestemKanalResponseDistribusjonskanalEnum & DistribusjonKanalUkjentEnum;
 
 export function journalpostMapper(journalpost: JournalpostDto, sakstilknytninger?: string[]): IJournalpost {
     const isForsendelse = () => journalpost.journalpostId?.startsWith("BIF");

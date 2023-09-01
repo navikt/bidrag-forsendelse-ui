@@ -46,6 +46,9 @@ function DistribusjonsKanal(props: BestillDistribusjonContentProps) {
     const forsendelse = useForsendelseApi().hentForsendelse();
 
     function mapToDistribusjonKanalBeskrivelse() {
+        if (!distribusjonKanal) {
+            return "Ukjent (Kunne ikke hente distribusjonskanal)";
+        }
         switch (distribusjonKanal.distribusjonskanal) {
             case "PRINT":
                 return "Fysisk (Sentral print)";
@@ -57,6 +60,7 @@ function DistribusjonsKanal(props: BestillDistribusjonContentProps) {
     }
 
     function mapToBegrunnelseBeskrivelse() {
+        if (!distribusjonKanal) return;
         if (forsendelse.mottaker?.ident != forsendelse.gjelderIdent) return "Mottaker er ulik gjelder";
         if (IdentUtils.isSamhandlerId(forsendelse.mottaker?.ident)) return "Mottaker er samhandler";
         return distribusjonKanal.regelBegrunnelse;
@@ -66,13 +70,13 @@ function DistribusjonsKanal(props: BestillDistribusjonContentProps) {
             <BodyShort spacing>
                 <div>{mapToDistribusjonKanalBeskrivelse()}</div>
             </BodyShort>
-            {distribusjonKanal.distribusjonskanal == "PRINT" && (
+            {distribusjonKanal?.distribusjonskanal == "PRINT" && (
                 <BodyShort spacing>
                     <Heading size="xsmall">Begrunnelse</Heading>
                     <div>{mapToBegrunnelseBeskrivelse()}</div>
                 </BodyShort>
             )}
-            {distribusjonKanal.distribusjonskanal == "PRINT" && <Adresse {...props} />}
+            {(distribusjonKanal?.distribusjonskanal == "PRINT" || !distribusjonKanal) && <Adresse {...props} />}
         </div>
     );
 }
