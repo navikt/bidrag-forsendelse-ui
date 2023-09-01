@@ -3,8 +3,15 @@ import { DatePicker, useDatepicker } from "@navikt/ds-react";
 import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 
+import { toDateObject } from "../../utils/DateUtils";
+import { OpprettForsendelseFormProps } from "./OpprettNotatPage";
+
 export default function Dokumentdato() {
-    const { register, setValue } = useFormContext();
+    const {
+        register,
+        setValue,
+        formState: { errors },
+    } = useFormContext<OpprettForsendelseFormProps>();
     const { inputProps, datepickerProps } = useDatepicker({
         defaultSelected: new Date(),
         onDateChange: (val: Date) => {
@@ -14,12 +21,21 @@ export default function Dokumentdato() {
     });
 
     useEffect(() => {
-        register("dokumentdato");
+        register("dokumentdato", {
+            validate: (value) =>
+                toDateObject(value) > new Date() ? "Dokumentdato kan ikke være senere enn dagens dato" : true,
+        });
     }, []);
 
     return (
         <DatePicker {...datepickerProps} disabled={[(date) => date > new Date()]}>
-            <DatePicker.Input size="small" label="Dokumentdato" {...inputProps} name="dokumentdato" />
+            <DatePicker.Input
+                error={errors?.dokumentdato?.message}
+                size="small"
+                label="Dokumentdato"
+                {...inputProps}
+                name="dokumentdato"
+            />
         </DatePicker>
     );
 }
