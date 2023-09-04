@@ -40,7 +40,7 @@ interface PageWrapperProps {
 }
 const theme: Theme = {
     config: {
-        useRootStyles: true,
+        useRootStyles: false,
     },
     fonts: {
         body: 'var(--a-font-family,"Source Sans Pro",Arial,sans-serif)',
@@ -75,19 +75,6 @@ const theme: Theme = {
         },
         h5: {
             fontSize: "var(--a-font-size-heading-xsmall)",
-        },
-        figure: {
-            border: "thin #c0c0c0 solid",
-            display: "flex",
-            flexFlow: "column",
-            padding: "5px",
-        },
-
-        figcaption: {
-            backgroundColor: "var(--a-gray-200)",
-            font: "italic smaller sans-serif",
-            padding: "3px",
-            textAlign: "center",
         },
     },
 };
