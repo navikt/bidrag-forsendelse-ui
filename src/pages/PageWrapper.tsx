@@ -93,10 +93,10 @@ const theme: Theme = {
 };
 
 export default function PageWrapper({ children, name }: PropsWithChildren<PageWrapperProps>) {
-    const componentsWithStyles = useThemedStylesWithMdx(useMDXComponents(mdxComponents));
+    const componentsWithStyles = useThemedStylesWithMdx(useMDXComponents());
     return (
         <ThemeUIProvider theme={theme}>
-            <MDXProvider components={componentsWithStyles}>
+            <MDXProvider components={{ ...mdxComponents, ...componentsWithStyles }}>
                 <ErrorProvider>
                     <QueryClientProvider client={queryClient}>
                         <React.Suspense fallback={<Loader size={"3xlarge"} title={"Laster..."} />}>
