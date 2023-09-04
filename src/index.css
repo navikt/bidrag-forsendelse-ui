@@ -10,6 +10,7 @@ figure {
     display: flex;
     flex-flow: column;
     padding: 5px;
+    max-width: 50rem;
   }
   
   

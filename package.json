@@ -41,7 +41,10 @@
     "react-error-boundary": "^4.0.10",
     "react-hook-form": "7.45.0",
     "react-query": "3.39.3",
-    "react-router-dom": "6.13.0"
+    "react-router-dom": "6.13.0",
+    "@theme-ui/mdx":"0.16.1",
+    "theme-ui":"0.16.1",
+    "@emotion/react":"11.11.1"
   },
   "devDependencies": {
     "@mdx-js/loader": "^2.3.0",

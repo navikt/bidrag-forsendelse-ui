@@ -39,7 +39,7 @@ function BrukerveiledningPageWrapper() {
         <PageWrapper name="Forsendelse brukerveiledning">
             <ContentContainer>
                 <Grid>
-                    <Cell xs={12} md={12} lg={10}>
+                    <Cell xs={12} md={12} lg={12}>
                         <Brukerveiledning saksbehandlerNavn={""} />
                     </Cell>
                 </Grid>
