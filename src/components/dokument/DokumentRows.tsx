@@ -90,7 +90,7 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
             let styles = { ...style } as CSSProperties;
 
             if (dokument.status == DokumentStatus.SLETTET) {
-                styles = { ...style, border: "solid 2px var(--a-red-200)" };
+                styles = { ...style };
             } else if (dokument.lagret == false) {
                 styles = { ...style, backgroundColor: "var(--a-green-50)" };
             }
@@ -196,19 +196,20 @@ function DeleteDocumentButton({ dokument }: { dokument: FormIDokument }) {
                 shouldCloseOnEsc
                 shouldCloseOnOverlayClick
                 onClose={closeModal}
-                className={`max-w-[900px]`}
+                className={`max-w-[700px]`}
             >
                 <Modal.Content>
                     <Heading spacing size={"medium"}>
-                        Ønsker du å slette dokument?
+                        Ønsker du å slette dokumentet?
                     </Heading>
                     <BodyShort>
-                        Du er i ferd med å slette dokument med tittel {dokument.tittel} fra forsendelsen
+                        Du er i ferd med å slette dokument med tittel <strong>{dokument.tittel}</strong> fra
+                        forsendelsen
                         <br />
-                        Det vil ikke være mulig å angre handling
+                        Det vil ikke være mulig å angre handlingen
                     </BodyShort>
                     <div>
-                        <div className={"ml-2 flex flex-row gap-2 items-end bottom-2"}>
+                        <div className={"mt-2 flex flex-row gap-2 items-end bottom-2"}>
                             <Button size="small" variant="danger" onClick={deleteDocumentFromForsendelse}>
                                 Slett
                             </Button>

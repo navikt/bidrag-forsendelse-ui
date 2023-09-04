@@ -41,10 +41,9 @@ export default function DokumenterTable() {
                 <div>Antall dokumenter: {dokumenter.length}</div>
                 <div style={{ marginLeft: "auto" }}>
                     <Switch
-                        value={deleteMode}
+                        checked={deleteMode}
                         size="small"
                         onChange={(e) => {
-                            console.log(e);
                             toggleDeleteMode();
                         }}
                     >
@@ -53,7 +52,7 @@ export default function DokumenterTable() {
                 </div>
             </div>
             <div className={"dokument-table "} style={{ borderColor: "var(--a-border-subtle)" }}>
-                <div className="w-full max-w-[95vw] overflow-auto">
+                <div className="w-full max-w-[95vw] overflow-x-auto overflow-y-hidden	">
                     <Table size={"small"} style={{ tableLayout: "auto", display: "block", width: "1028px" }}>
                         <DokumenterTableHeader />
                         <DokumentRows />
@@ -99,8 +98,16 @@ function DokumenterTableHeader() {
 }
 
 function DokumenterTableBottomButtons() {
-    const { isSavingChanges, hasChanged, saveChanges, resetDocumentChanges, dokumenter, forsendelseId } =
-        useDokumenterForm();
+    const {
+        isSavingChanges,
+        hasChanged,
+        saveChanges,
+        resetDocumentChanges,
+        dokumenter,
+        forsendelseId,
+        deleteMode,
+        toggleDeleteMode,
+    } = useDokumenterForm();
     const { errorSource, resetError } = useErrorContext();
     const isOneOrMoreDocumentsDeleted = dokumenter.some((d) => d.status == DokumentStatus.SLETTET);
     const isAllDocumentsFinished = dokumenter.every(
@@ -113,35 +120,43 @@ function DokumenterTableBottomButtons() {
     }
     return (
         <span className={"flex flex-row mt-[10px] w-full"}>
-            {hasChanged && isOneOrMoreDocumentsDeleted && (
-                <>
-                    <Button loading={isSavingChanges} onClick={saveChanges} variant={"danger"} size={"small"}>
-                        Bekreft sletting
-                    </Button>
-                    <Button onClick={resetDocumentChanges} variant={"tertiary"} size={"small"}>
-                        Angre
-                    </Button>
-                </>
-            )}
             {errorSource == "dokumenter" && (
                 <Button onClick={resetErrorAndChanges} variant={"tertiary"} size={"small"}>
                     Angre siste endringer
                 </Button>
             )}
-            <Button
-                size="small"
-                variant="tertiary"
-                className="ml-auto justify-end"
-                onClick={() => {
-                    if (!isAllDocumentsFinished) {
-                        addWarning("Alle dokumenter må kontrolleres/ferdigstilles før de kan åpnes samtidig");
-                    } else {
-                        OpenDocumentUtils.åpneDokument("BIF-" + forsendelseId, null, false);
-                    }
-                }}
-            >
-                Åpne alle
-            </Button>
+            <div className="ml-auto justify-end flex flex-row gap-[5px]">
+                <Button
+                    size="small"
+                    variant="tertiary"
+                    onClick={() => {
+                        if (!isAllDocumentsFinished) {
+                            addWarning("Alle dokumenter må kontrolleres/ferdigstilles før de kan åpnes samtidig");
+                        } else {
+                            OpenDocumentUtils.åpneDokument("BIF-" + forsendelseId, null, false);
+                        }
+                    }}
+                >
+                    Åpne alle
+                </Button>
+                {deleteMode && (
+                    <>
+                        <Button
+                            loading={isSavingChanges}
+                            onClick={() => {
+                                saveChanges();
+                                toggleDeleteMode();
+                            }}
+                            variant={"tertiary"}
+                            disabled={!(hasChanged && isOneOrMoreDocumentsDeleted)}
+                            size={"small"}
+                            className="ml-auto justify-end"
+                        >
+                            Bekreft sletting
+                        </Button>
+                    </>
+                )}
+            </div>
         </span>
     );
 }
