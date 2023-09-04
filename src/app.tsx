@@ -1,14 +1,17 @@
 import "./index.css";
 
+import { Cell, ContentContainer, Grid, Heading } from "@navikt/ds-react";
 import React from "react";
 import { BrowserRouter, Route, Routes, useParams, useSearchParams } from "react-router-dom";
 
 import { initMock } from "./__mocks__/msw";
 import { EngangsbelopType, SoknadFra, StonadType, VedtakType } from "./api/BidragForsendelseApi";
+import ForsendelseInfo from "./docs/ForsendelseInfo.mdx";
 import { SessionProvider } from "./pages/forsendelse/context/SessionContext";
 import ForsendelsePage from "./pages/forsendelse/ForsendelsePage";
 import Opprettforsendelse from "./pages/opprettforsendelse";
 import Opprettnotat from "./pages/opprettnotat";
+import PageWrapper from "./pages/PageWrapper";
 
 // This file is only used for development. The entrypoint is under pages folder
 initMock();
@@ -17,6 +20,7 @@ export default function App() {
         <React.StrictMode>
             <BrowserRouter>
                 <Routes>
+                    <Route path="/forsendelse/brukerveiledning" element={<BrukerveiledningPageWrapper />} />
                     <Route path="/:forsendelseId" element={<ForsendelsePageWrapper />} />
                     <Route path="/forsendelse/:forsendelseId" element={<ForsendelsePageWrapper />} />
                     <Route path="sak/:saksnummer/">
@@ -30,6 +34,20 @@ export default function App() {
     );
 }
 
+function BrukerveiledningPageWrapper() {
+    return (
+        <PageWrapper name="Forsendelse brukerveiledning">
+            <ContentContainer>
+                <Grid>
+                    <Cell xs={12} md={12} lg={10}>
+                        <Heading size="large">Brukerveiledning forsendelse</Heading>
+                        <ForsendelseInfo saksbehandlerNavn={""} />
+                    </Cell>
+                </Grid>
+            </ContentContainer>
+        </PageWrapper>
+    );
+}
 function ForsendelsePageWrapper() {
     const { forsendelseId, saksnummer } = useParams();
     const [searchParams, _] = useSearchParams();
