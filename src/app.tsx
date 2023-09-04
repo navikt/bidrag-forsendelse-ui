@@ -1,12 +1,12 @@
 import "./index.css";
 
-import { Cell, ContentContainer, Grid, Heading } from "@navikt/ds-react";
+import { Cell, ContentContainer, Grid } from "@navikt/ds-react";
 import React from "react";
 import { BrowserRouter, Route, Routes, useParams, useSearchParams } from "react-router-dom";
 
 import { initMock } from "./__mocks__/msw";
 import { EngangsbelopType, SoknadFra, StonadType, VedtakType } from "./api/BidragForsendelseApi";
-import ForsendelseInfo from "./docs/ForsendelseInfo.mdx";
+import Brukerveiledning from "./docs/Brukerveiledning.mdx";
 import { SessionProvider } from "./pages/forsendelse/context/SessionContext";
 import ForsendelsePage from "./pages/forsendelse/ForsendelsePage";
 import Opprettforsendelse from "./pages/opprettforsendelse";
@@ -40,8 +40,7 @@ function BrukerveiledningPageWrapper() {
             <ContentContainer>
                 <Grid>
                     <Cell xs={12} md={12} lg={10}>
-                        <Heading size="large">Brukerveiledning forsendelse</Heading>
-                        <ForsendelseInfo saksbehandlerNavn={""} />
+                        <Brukerveiledning saksbehandlerNavn={""} />
                     </Cell>
                 </Grid>
             </ContentContainer>

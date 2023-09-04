@@ -4,3 +4,19 @@
 @import "@navikt/bidrag-ui-common/styles/index.css";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
+
+figure {
+    border: thin #c0c0c0 solid;
+    display: flex;
+    flex-flow: column;
+    padding: 5px;
+  }
+  
+  
+  figcaption {
+    background-color: var(--a-gray-200);
+    font: italic smaller sans-serif;
+    padding: 3px;
+    text-align: center;
+  }
+  
