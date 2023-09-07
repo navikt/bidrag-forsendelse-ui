@@ -10,6 +10,7 @@ import AdresseInfo from "../../../components/AdresseInfo";
 import { EditAddressForm } from "../../../components/EditAddress";
 import useDokumentApi from "../../../hooks/useDokumentApi";
 import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
+import { IMottakerAdresse } from "../../../types/Adresse";
 import Mottaker from "../components/Mottaker";
 
 interface BestillDistribusjonContentProps {
@@ -70,11 +71,11 @@ function DistribusjonDetaljer(props: BestillDistribusjonContentProps) {
 
 function Adresse({ editable = true, adresse, onAdresseChanged, onEditModeChanged }: BestillDistribusjonContentProps) {
     const [adressEditable, setAdressEditable] = useState<boolean>(false);
-
     function changeAdressEditable(value: boolean) {
         onEditModeChanged(value);
         setAdressEditable(value);
     }
+
     return (
         <div>
             <Heading size="xsmall">{adressEditable ? "Endre adresse" : "Til følgende adresse"}</Heading>

@@ -1,11 +1,10 @@
 import "./ForsendelseTittel.css";
 
-import { PencilIcon } from "@navikt/aksel-icons";
 import { XMarkIcon } from "@navikt/aksel-icons";
 import { CloudUpIcon } from "@navikt/aksel-icons";
 import { Alert, Button, Heading, TextField } from "@navikt/ds-react";
 import { AxiosError } from "axios";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useMutation, useQueryClient } from "react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../../../api/api";
@@ -14,45 +13,51 @@ import { useErrorContext } from "../../../context/ErrorProvider";
 import { useForsendelseApi, UseForsendelseApiKeys } from "../../../hooks/useForsendelseApi";
 export default function ForsendelseTittel() {
     const forsendelse = useForsendelseApi().hentForsendelse();
-    const [editMode, setEditMode] = useState(false);
-    const [forsendelseTittel, setForsendelseTittel] = useState(forsendelse.tittel);
+    // const [editMode, setEditMode] = useState(false);
+    // const [forsendelseTittel, setForsendelseTittel] = useState(forsendelse.tittel);
 
-    useEffect(() => {
-        setForsendelseTittel(forsendelse.tittel);
-    }, [forsendelse.tittel]);
+    // useEffect(() => {
+    //     setForsendelseTittel(forsendelse.tittel);
+    // }, [forsendelse.tittel]);
 
-    const enableEditMode = () => setEditMode(true);
-    const disableEditMode = () => setEditMode(false);
-    const onSubmit = (updatedTitle: string) => {
-        setForsendelseTittel(updatedTitle);
-        disableEditMode();
-    };
+    // const enableEditMode = () => setEditMode(true);
+    // const disableEditMode = () => setEditMode(false);
+    // const onSubmit = (updatedTitle: string) => {
+    //     setForsendelseTittel(updatedTitle);
+    //     disableEditMode();
+    // };
+
     return (
-        <div>
-            <div className={"w-max flex flex-row gap-[5px] max-w-[100%] forsendelse-tittel"}>
-                {!editMode && (
-                    <>
-                        <Heading spacing size={"large"}>
-                            {forsendelseTittel}{" "}
-                        </Heading>
-
-                        <Button
-                            className="w-max h-max mt-1"
-                            size="small"
-                            variant="tertiary"
-                            icon={<PencilIcon />}
-                            onClick={enableEditMode}
-                        >
-                            Endre tittel
-                        </Button>
-                    </>
-                )}
-            </div>
-            {editMode && (
-                <EditForsendelseTitle onSubmit={onSubmit} onCancel={disableEditMode} defaultValue={forsendelseTittel} />
-            )}
-        </div>
+        <Heading spacing size={"large"}>
+            {forsendelse.tittel}
+        </Heading>
     );
+    // return (
+    //     <div>
+    //         <div className={"w-max flex flex-row gap-[5px] max-w-[100%] forsendelse-tittel"}>
+    //             {!editMode && (
+    //                 <>
+    //                     <Heading spacing size={"large"}>
+    //                         {forsendelseTittel}{" "}
+    //                     </Heading>
+
+    //                     <Button
+    //                         className="w-max h-max mt-1"
+    //                         size="small"
+    //                         variant="tertiary"
+    //                         icon={<PencilIcon />}
+    //                         onClick={enableEditMode}
+    //                     >
+    //                         Endre tittel
+    //                     </Button>
+    //                 </>
+    //             )}
+    //         </div>
+    //         {editMode && (
+    //             <EditForsendelseTitle onSubmit={onSubmit} onCancel={disableEditMode} defaultValue={forsendelseTittel} />
+    //         )}
+    //     </div>
+    // );
 }
 
 interface EditForsendelseTitleProps {

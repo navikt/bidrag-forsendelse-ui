@@ -1,14 +1,15 @@
 import "./DokumenterTable.css";
 
 import { OpenDocumentUtils } from "@navikt/bidrag-ui-common";
-import { Button, Switch, Table } from "@navikt/ds-react";
-import React from "react";
+import { BodyShort, Button, Heading, Modal, Switch, Table } from "@navikt/ds-react";
+import React, { useState } from "react";
 
 import { DokumentStatus } from "../../constants/DokumentStatus";
 import { useErrorContext } from "../../context/ErrorProvider";
 import DokumentStatusInfo from "../../docs/DokumentStatusInfo.mdx";
 import DokumentTittelInfo from "../../docs/DokumentTittel.mdx";
 import { useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
+import { cleanupAfterClosedModal } from "../../utils/ModalUtils";
 import InfoKnapp from "../InfoKnapp";
 import DokumentRows from "./DokumentRows";
 import LeggTilDokumentButton from "./LeggTilDokumentKnapp";
@@ -98,18 +99,8 @@ function DokumenterTableHeader() {
 }
 
 function DokumenterTableBottomButtons() {
-    const {
-        isSavingChanges,
-        hasChanged,
-        saveChanges,
-        resetDocumentChanges,
-        dokumenter,
-        forsendelseId,
-        deleteMode,
-        toggleDeleteMode,
-    } = useDokumenterForm();
+    const { resetDocumentChanges, dokumenter, forsendelseId, deleteMode } = useDokumenterForm();
     const { errorSource, resetError } = useErrorContext();
-    const isOneOrMoreDocumentsDeleted = dokumenter.some((d) => d.status == DokumentStatus.SLETTET);
     const isAllDocumentsFinished = dokumenter.every(
         (d) => d.status == DokumentStatus.FERDIGSTILT || d.status == DokumentStatus.KONTROLLERT
     );
@@ -139,24 +130,66 @@ function DokumenterTableBottomButtons() {
                 >
                     Åpne alle
                 </Button>
-                {deleteMode && (
-                    <>
-                        <Button
-                            loading={isSavingChanges}
-                            onClick={() => {
-                                saveChanges();
-                                toggleDeleteMode();
-                            }}
-                            variant={"tertiary"}
-                            disabled={!(hasChanged && isOneOrMoreDocumentsDeleted)}
-                            size={"small"}
-                            className="ml-auto justify-end"
-                        >
-                            Bekreft sletting
-                        </Button>
-                    </>
-                )}
+                {deleteMode && <BekreftSlettingButton />}
             </div>
         </span>
+    );
+}
+
+function BekreftSlettingButton() {
+    const { isSavingChanges, hasChanged, saveChanges, dokumenter, toggleDeleteMode } = useDokumenterForm();
+    const isOneOrMoreDocumentsDeleted = dokumenter.some((d) => d.status == DokumentStatus.SLETTET);
+    const [modalOpen, setModalOpen] = useState(false);
+    const closeModal = () => {
+        setModalOpen(false);
+        cleanupAfterClosedModal();
+    };
+    const openModal = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        setModalOpen(true);
+    };
+
+    function deleteDocuments() {
+        saveChanges();
+        toggleDeleteMode();
+    }
+    return (
+        <>
+            <Button
+                loading={isSavingChanges}
+                onClick={openModal}
+                variant={"tertiary"}
+                disabled={!(hasChanged && isOneOrMoreDocumentsDeleted)}
+                size={"small"}
+                className="ml-auto justify-end"
+            >
+                Bekreft sletting
+            </Button>
+            {modalOpen && (
+                <Modal open shouldCloseOnEsc shouldCloseOnOverlayClick onClose={closeModal} className={`max-w-[700px]`}>
+                    <Modal.Content>
+                        <Heading spacing size={"medium"}>
+                            Ønsker du å slette valgte dokumenter?
+                        </Heading>
+                        <BodyShort>
+                            Du er i ferd med å slette flere dokumenter fra forsendelsen
+                            <br />
+                            Det vil ikke være mulig å angre handlingen
+                        </BodyShort>
+                        <div>
+                            <div className={"mt-2 flex flex-row gap-2 items-end bottom-2"}>
+                                <Button size="small" variant="danger" onClick={deleteDocuments}>
+                                    Slett
+                                </Button>
+                                <Button size="small" variant={"tertiary"} onClick={closeModal}>
+                                    Avbryt
+                                </Button>
+                            </div>
+                        </div>
+                    </Modal.Content>
+                </Modal>
+            )}
+        </>
     );
 }

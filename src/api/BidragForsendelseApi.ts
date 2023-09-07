@@ -348,8 +348,6 @@ export interface OppdaterForsendelseForesporsel {
     tema?: JournalTema;
     /** Språk forsendelsen skal være på */
     språk?: string;
-    /** Tittelen på forsendelse. Dette er tittel som vil vises i journalen i Bisys og i forsendelse skjermbildet */
-    tittel?: string;
 }
 
 /** Metadata til en respons etter journalpost ble oppdatert */
@@ -464,7 +462,7 @@ export interface BehandlingInfoResponseDto {
     soknadId?: string;
     behandlingType?: string;
     erFattet?: boolean;
-    barnISoknad?: string[];
+    barnIBehandling?: string[];
 }
 
 /** Metadata om forsendelse */
@@ -1343,6 +1341,40 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             }),
 
         /**
+         * No description
+         *
+         * @tags dokument-kontroller
+         * @name HentDokumentForReferanse
+         * @summary Hent fysisk dokument som byte
+         * @request GET:/api/forsendelse/dokumentreferanse/{dokumentreferanse}
+         * @secure
+         */
+        hentDokumentForReferanse: (dokumentreferanse: string, params: RequestParams = {}) =>
+            this.request<string, any>({
+                path: `/api/forsendelse/dokumentreferanse/${dokumentreferanse}`,
+                method: "GET",
+                secure: true,
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags dokument-kontroller
+         * @name HentDokumentMetadataForReferanse
+         * @summary Hent metadata om dokument
+         * @request OPTIONS:/api/forsendelse/dokumentreferanse/{dokumentreferanse}
+         * @secure
+         */
+        hentDokumentMetadataForReferanse: (dokumentreferanse: string, params: RequestParams = {}) =>
+            this.request<DokumentMetadata[], any>({
+                path: `/api/forsendelse/dokumentreferanse/${dokumentreferanse}`,
+                method: "OPTIONS",
+                secure: true,
+                ...params,
+            }),
+
+        /**
          * @description Henter dokumentmaler som er støttet av applikasjonen
          *
          * @tags forsendelse-innsyn-kontroller
@@ -1488,13 +1520,30 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * No description
          *
          * @tags distribusjon-kontroller
+         * @name HenStorrelsePaDokumenter
+         * @summary Hent størrelse på dokumentene i forsendelsen
+         * @request GET:/api/forsendelse/journal/distribuer/{forsendelseIdMedPrefix}/size
+         * @secure
+         */
+        henStorrelsePaDokumenter: (forsendelseIdMedPrefix: string, params: RequestParams = {}) =>
+            this.request<number, any>({
+                path: `/api/forsendelse/journal/distribuer/${forsendelseIdMedPrefix}/size`,
+                method: "GET",
+                secure: true,
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags distribusjon-kontroller
          * @name KanDistribuere
          * @summary Sjekk om forsendelse kan distribueres
          * @request GET:/api/forsendelse/journal/distribuer/{forsendelseIdMedPrefix}/enabled
          * @secure
          */
         kanDistribuere: (forsendelseIdMedPrefix: string, params: RequestParams = {}) =>
-            this.request<void, void>({
+            this.request<string, string>({
                 path: `/api/forsendelse/journal/distribuer/${forsendelseIdMedPrefix}/enabled`,
                 method: "GET",
                 secure: true,

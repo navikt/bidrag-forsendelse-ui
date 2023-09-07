@@ -37,6 +37,7 @@ export const UseForsendelseApiKeys = {
 interface UseForsendelseDataProps {
     kanEndre: () => boolean;
     hentForsendelse: () => IForsendelse;
+    hentStørrelseIMb: () => number;
     hentGjelder: () => IRolleDetaljer;
     hentMottaker: () => IRolleDetaljer;
     hentRoller: () => IRolleDetaljer[];
@@ -214,6 +215,14 @@ export function useForsendelseApi(): UseForsendelseDataProps {
         return forsendelse.status == "UNDER_PRODUKSJON";
     }
 
+    function hentStørrelseIMb(): number {
+        const result = useQuery({
+            queryKey: "forsendelse_størrelse",
+            queryFn: () => BIDRAG_FORSENDELSE_API.api.henStorrelsePaDokumenter(forsendelseId),
+            select: (data) => data.data,
+        });
+        return result.data;
+    }
     return {
         hentForsendelse: hentForsendelseQuery,
         hentMottaker,
@@ -222,5 +231,6 @@ export function useForsendelseApi(): UseForsendelseDataProps {
         hentJournalposterForPerson,
         hentJournalposterForSak,
         kanEndre,
+        hentStørrelseIMb,
     };
 }
