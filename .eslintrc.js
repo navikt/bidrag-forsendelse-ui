@@ -17,7 +17,17 @@ module.exports = {
         // if you want to override the default language mapper inside, you can provide your own
         "mdx/language-mapper": {},
     },
-    plugins: ["@typescript-eslint", "prettier", "json-format", "simple-import-sort", "unused-imports"],
+    plugins: [
+        "@typescript-eslint",
+        "prettier",
+        "json-format",
+        "simple-import-sort",
+        "unused-imports",
+        "preset-lint-consistent",
+        "preset-lint-recommended",
+        "preset-lint-markdown-style-guide",
+        "preset-prettier"
+    ],
     extends: [
         "eslint:recommended",
         "plugin:@typescript-eslint/eslint-recommended",

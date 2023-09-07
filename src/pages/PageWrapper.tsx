@@ -66,6 +66,7 @@ const theme: Theme = {
         },
         h2: {
             fontSize: "var(--a-font-size-heading-large)",
+            marginTop: 0
         },
         h3: {
             fontSize: "var(--a-font-size-heading-medium)",

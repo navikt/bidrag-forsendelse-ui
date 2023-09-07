@@ -1,47 +1,36 @@
-<Heading size="medium">Forklaring av dokumentstatuser</Heading>
-<div className="">
-    <ul>
-       <li>
-       <div className="flex flex-row gap-[5px]">
-          <DokumentStatusTag status="UNDER_PRODUKSJON"/> 
-           <ArrowRightIcon className="self-center"/>
-           <DokumentStatusTag status="UNDER_REDIGERING"/>  
-           <ArrowRightIcon className="self-center"/>
-           <DokumentStatusTag status="FERDIGSTILT"/>
-            </div>  
-             <BodyLong >
-                Når det bestilles ett nytt dokument fra mal så vil dokumentet ha status "Under produksjon" i en kort periode. 
-                Det betyr at dokumentet er i ferd med å produseres og er ikke klar for å åpnes og redigeres enda.
-            </BodyLong>
-            <BodyLong >
-                Etter dokumentet er ferdigprodusert vil den få status "Under redigering". Det vil si at dokumentet er klar for å åpnes (feks i WORD) og redigeres.
-            </BodyLong>
-            <BodyLong >
-                Etter dokumentet er redigert ferdig og ferdigstilt så vil dokumentet få status "Ferdigstilt". Da er dokumentet låst for redigering er klar for å distribueres.
-            </BodyLong>
-        </li> 
-       <li>
-      <div className="flex flex-row gap-[5px]">
-            <DokumentStatusTag status="MÅ_KONTROLLERES"/>  <ArrowRightIcon className="self-center"/><DokumentStatusTag status="KONTROLLERT"/>
-            </div>          
-            <BodyLong >
-                Dokument som er importert fra en annen kilde vil få status "Må kontrolleres". Det betyr at dokumentet må åpnes og skjermes informasjon som mottaker av forsendelsen ikke skal få innsyn på.
-            </BodyLong>
-              <BodyLong >
-                Etter dokumentet er kontrollert og skjermet ferdig vil dokumentet få status "Kontrollert". Da er dokumentet klar for å distribueres til mottaker.
-            </BodyLong>
-        </li>
-           <li> 
-           <div className="flex flex-row gap-[5px]">
-           <DokumentStatusTag status="UNDER_REDIGERING"/>  <DokumentLinkedTag/>
-           <div className="ml-2"></div>
-           <DokumentStatusTag status="FERDIGSTILT"/>  <DokumentLinkedTag/>
-           </div>
-              <BodyLong >
-                Kjede ikonet ved siden av "Under redigering" eller "Ferdigstilt" statuset betyr at dokumentet er knyttet to eller flere forsendelser. Det vil si at endringer som gjøres på dokumentet i denne forsendelsen vil også påvirke samme dokument i andre forsendelsene den er knyttet til.
-                <br/><i>Det er bare innholdet i dokumentet som er lenket sammen. Tittelen på dokumentet vil være unikt for hver forsendelse.</i>
-            </BodyLong>
-           </li>
-    </ul>
+## Forklaring av dokumentstatuser
 
-</div>
+-   <div className="flex flex-row gap-[5px]">
+        <DokumentStatusTag status="UNDER_PRODUKSJON" />
+        <ArrowRightIcon className="self-center" />
+        <DokumentStatusTag status="UNDER_REDIGERING" />
+        <ArrowRightIcon className="self-center" />
+        <DokumentStatusTag status="FERDIGSTILT" />
+    </div>
+    Når det bestilles ett nytt dokument fra mal så vil dokumentet ha status "Under produksjon" i en kort periode. Det betyr
+    at dokumentet er i ferd med å produseres og er ikke klar for å åpnes og redigeres enda.
+
+    Etter dokumentet er ferdigprodusert vil den få status "Under redigering". Det vil si at dokumentet er klar for å åpnes (feks i WORD) og redigeres.
+
+    Etter dokumentet er redigert ferdig og ferdigstilt så vil dokumentet få status "Ferdigstilt". Da er dokumentet låst for redigering er klar for å distribueres.
+
+-   <div className="flex flex-row gap-[5px]">
+        <DokumentStatusTag status="MÅ_KONTROLLERES" /> <ArrowRightIcon className="self-center" />
+        <DokumentStatusTag status="KONTROLLERT" />
+    </div>
+    Dokument som er importert fra en annen kilde vil få status "Må kontrolleres". Det betyr at dokumentet må åpnes og skjermes
+    informasjon som mottaker av forsendelsen ikke skal få innsyn på. Etter dokumentet er kontrollert og skjermet ferdig vil
+    dokumentet få status "Kontrollert". Da er dokumentet klar for å distribueres til mottaker.
+-   <div className="flex flex-row gap-[5px]">
+        <DokumentStatusTag status="UNDER_REDIGERING" /> <DokumentLinkedTag />
+        <div className="ml-2"></div>
+        <DokumentStatusTag status="FERDIGSTILT" /> <DokumentLinkedTag />
+    </div>
+    Kjede ikonet ved siden av "Under redigering" eller "Ferdigstilt" statuset betyr at dokumentet er knyttet to eller flere
+    forsendelser. Det vil si at endringer som gjøres på dokumentet i denne forsendelsen vil også påvirke samme dokument i
+    andre forsendelsene den er knyttet til.
+    <br />
+    <i>
+        Det er bare innholdet i dokumentet som er lenket sammen. Tittelen på dokumentet vil være unikt for hver
+        forsendelse.
+    </i>
