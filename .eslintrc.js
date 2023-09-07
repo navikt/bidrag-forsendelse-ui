@@ -23,10 +23,6 @@ module.exports = {
         "json-format",
         "simple-import-sort",
         "unused-imports",
-        "preset-lint-consistent",
-        "preset-lint-recommended",
-        "preset-lint-markdown-style-guide",
-        "preset-prettier"
     ],
     extends: [
         "eslint:recommended",
