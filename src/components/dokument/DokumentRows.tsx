@@ -196,17 +196,18 @@ function DeleteDocumentButton({ dokument }: { dokument: FormIDokument }) {
                 shouldCloseOnEsc
                 shouldCloseOnOverlayClick
                 onClose={closeModal}
-                className={`max-w-[700px]`}
+                className={`min-w-[430px] max-w-[700px]`}
             >
                 <Modal.Content>
                     <Heading spacing size={"medium"}>
                         Ønsker du å slette dokumentet?
                     </Heading>
                     <BodyShort>
-                        Du er i ferd med å slette dokument med tittel <strong>{dokument.tittel}</strong> fra
-                        forsendelsen
-                        <br />
-                        Det vil ikke være mulig å angre handlingen
+                        Du er i ferd med å slette dokument med tittel
+                        <ul>
+                            <li>{dokument.tittel}</li>
+                        </ul>
+                        Det vil ikke være mulig å angre slettingen
                     </BodyShort>
                     <div>
                         <div className={"mt-2 flex flex-row gap-2 items-end bottom-2"}>

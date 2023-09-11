@@ -33,7 +33,7 @@ export default function DokumenterTable() {
     const { dokumenter, toggleDeleteMode, deleteMode } = useDokumenterForm();
     return (
         <div className={"w-max"}>
-            <div className={"flex flex-row mt-[10px] border-b-[1px] w-full flex-wrap max-w-[95vw]"}>
+            <div className={"flex flex-row mt-[10px] border-b-[1px] w-full flex-wrap max-w-[95vw] gap-[20px]"}>
                 <LeggTilDokumentButton />
                 <LeggTilFraMalKnapp />
             </div>
@@ -154,6 +154,7 @@ function BekreftSlettingButton() {
         saveChanges();
         toggleDeleteMode();
     }
+    const deletedDocuments = dokumenter.filter((d) => d.status == DokumentStatus.SLETTET);
     return (
         <>
             <Button
@@ -167,15 +168,26 @@ function BekreftSlettingButton() {
                 Bekreft sletting
             </Button>
             {modalOpen && (
-                <Modal open shouldCloseOnEsc shouldCloseOnOverlayClick onClose={closeModal} className={`max-w-[700px]`}>
+                <Modal
+                    open
+                    shouldCloseOnEsc
+                    shouldCloseOnOverlayClick
+                    onClose={closeModal}
+                    className={`min-w-[450px] max-w-[900px]`}
+                >
                     <Modal.Content>
                         <Heading spacing size={"medium"}>
-                            Ønsker du å slette valgte dokumenter?
+                            Ønsker du å slette {deletedDocuments.length > 1 ? " valgte dokumenter" : "valgt dokument"}
                         </Heading>
                         <BodyShort>
-                            Du er i ferd med å slette flere dokumenter fra forsendelsen
-                            <br />
-                            Det vil ikke være mulig å angre handlingen
+                            Du er i ferd med å slette følgende {deletedDocuments.length > 1 ? "dokumenter" : "dokument"}
+                            :
+                            <ul>
+                                {deletedDocuments.map((d) => (
+                                    <li>{d.tittel}</li>
+                                ))}
+                            </ul>
+                            Det vil ikke være mulig å angre slettingen
                         </BodyShort>
                         <div>
                             <div className={"mt-2 flex flex-row gap-2 items-end bottom-2"}>

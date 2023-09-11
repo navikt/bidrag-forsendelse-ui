@@ -76,6 +76,8 @@ const theme: Theme = {
         },
         h5: {
             fontSize: "var(--a-font-size-heading-xsmall)",
+            marginTop: "5px",
+            marginBottom: "5px",
         },
     },
 };
