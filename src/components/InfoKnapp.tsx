@@ -3,6 +3,8 @@ import "./InfoKnapp.css";
 import { QuestionmarkIcon } from "@navikt/aksel-icons";
 import { Button, Modal } from "@navikt/ds-react";
 import { PropsWithChildren, useState } from "react";
+
+import { cleanupAfterClosedModal } from "../utils/ModalUtils";
 type InfoKnappProps = {
     buttonClassName?: string;
     className?: string;
@@ -21,6 +23,7 @@ export default function InfoKnapp({
 
     const closeModal = () => {
         setModalOpen(false);
+        cleanupAfterClosedModal();
     };
     const openModal = (e) => {
         e.stopPropagation();

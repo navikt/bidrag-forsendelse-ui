@@ -66,6 +66,7 @@ const theme: Theme = {
         },
         h2: {
             fontSize: "var(--a-font-size-heading-large)",
+            marginTop: 0,
         },
         h3: {
             fontSize: "var(--a-font-size-heading-medium)",
@@ -75,6 +76,8 @@ const theme: Theme = {
         },
         h5: {
             fontSize: "var(--a-font-size-heading-xsmall)",
+            marginTop: "5px",
+            marginBottom: "5px",
         },
     },
 };

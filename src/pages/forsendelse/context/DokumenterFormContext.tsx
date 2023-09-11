@@ -1,6 +1,6 @@
 import { AxiosError } from "axios";
 import dayjs from "dayjs";
-import { createContext } from "react";
+import { createContext, useState } from "react";
 import { PropsWithChildren } from "react";
 import { useContext } from "react";
 import { useEffect } from "react";
@@ -24,6 +24,8 @@ export type FormIDokument = FieldArrayWithId<IForsendelseFormProps, "dokumenter"
 interface IDokumenterContext {
     isSavingChanges: boolean;
     hasChanged: boolean;
+    deleteMode: boolean;
+    toggleDeleteMode: () => void;
     saveChanges: () => void;
     validateCanSendForsendelse: () => boolean;
     forsendelseId: string;
@@ -65,6 +67,7 @@ function DokumenterFormProvider({ children, ...props }: PropsWithChildren<IDokum
 function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumenterPropsContext>) {
     const { addError, resetError } = useErrorContext();
     const forsendelse = useForsendelseApi().hentForsendelse();
+    const [deleteMode, setDeleteMode] = useState(false);
     const { reset, handleSubmit, formState, setError, resetField } = useFormContext<IForsendelseFormProps>();
     const { fields, append, update, swap } = useFieldArray<IForsendelseFormProps>({
         name: "dokumenter",
@@ -192,6 +195,12 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
             submitAndSaveChanges();
         }
     }
+    function toggleDeleteMode() {
+        if (deleteMode) {
+            resetForm();
+        }
+        setDeleteMode((prev) => !prev);
+    }
     const hasChanged =
         isDirty &&
         dirtyFields.dokumenter?.filter((dok) => {
@@ -212,6 +221,8 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
                 swapDocuments,
                 resetDocumentChanges: resetForm,
                 updateTitle,
+                deleteMode,
+                toggleDeleteMode,
             }}
         >
             {children}

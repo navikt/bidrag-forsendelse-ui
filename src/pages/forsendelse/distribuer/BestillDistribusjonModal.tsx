@@ -9,8 +9,10 @@ import { useQuery } from "react-query";
 import { BIDRAG_FORSENDELSE_API } from "../../../api/api";
 import { PERSON_API } from "../../../api/api";
 import { DistribuerTilAdresse } from "../../../api/BidragDokumentApi";
+import { BestemKanalResponseDistribusjonskanalEnum } from "../../../api/BidragDokumentArkivApi";
 import { DistribuerJournalpostRequest } from "../../../api/BidragForsendelseApi";
 import { hentPostnummere } from "../../../api/queries";
+import useDokumentApi from "../../../hooks/useDokumentApi";
 import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
 import { RedirectTo } from "../../../utils/RedirectUtils";
 import BestillDistribusjonInfo from "./BestillDistribusjonInfo";
@@ -111,20 +113,15 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
                         onAdresseChanged={setAdresse}
                     />
                 </React.Suspense>
-                <div className="flex items-center space-x-2">
-                    <Button
-                        variant={"primary"}
-                        onClick={onSubmit}
-                        size="small"
+                <React.Suspense fallback={<div />}>
+                    <DistribusjonKnapper
+                        onSubmit={onSubmit}
+                        onCancel={onCancel}
                         loading={submitState === "pending"}
-                        disabled={submitButtonDisabled}
-                    >
-                        Bekreft og gå tilbake til sakshistorikk
-                    </Button>
-                    <Button size="small" variant={"secondary"} disabled={cancelButtonDisabled} onClick={onCancel}>
-                        Avbryt
-                    </Button>
-                </div>
+                        submitButtonDisabled={submitButtonDisabled}
+                        cancelButtonDisabled={cancelButtonDisabled}
+                    />
+                </React.Suspense>
             </>
         );
     }
@@ -159,5 +156,60 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
                 </div>
             </Modal.Content>
         </Modal>
+    );
+}
+
+interface DistribusjonKnapperProps {
+    onSubmit: () => void;
+    onCancel: () => void;
+    submitButtonDisabled: boolean;
+    cancelButtonDisabled: boolean;
+    loading: boolean;
+}
+function DistribusjonKnapper({
+    onSubmit,
+    onCancel,
+    cancelButtonDisabled,
+    loading,
+    submitButtonDisabled,
+}: DistribusjonKnapperProps) {
+    const distribusjonKanal = useDokumentApi().distribusjonKanal();
+    const størrelseIMb = useForsendelseApi().hentStørrelseIMb();
+    function kanDistribuere(): { result: boolean; reason?: string } {
+        const distribusjonViaSDP =
+            distribusjonKanal.distribusjonskanal == BestemKanalResponseDistribusjonskanalEnum.SDP;
+        if (distribusjonViaSDP && størrelseIMb >= 29.5) {
+            return {
+                result: false,
+                reason: "Kan ikke distribuere store forsendelser via digital postkasse akkurat nå. Det jobbes med en løsning og vil være klar om dager.",
+            };
+        }
+        return {
+            result: true,
+        };
+    }
+    const kanDistribuereResult = kanDistribuere();
+    if (!kanDistribuereResult.result) {
+        return (
+            <Alert size="small" variant="warning">
+                {kanDistribuereResult.reason}
+            </Alert>
+        );
+    }
+    return (
+        <div className="flex items-center space-x-2">
+            <Button
+                variant={"primary"}
+                onClick={onSubmit}
+                size="small"
+                loading={loading}
+                disabled={submitButtonDisabled}
+            >
+                Bekreft og gå tilbake til sakshistorikk
+            </Button>
+            <Button size="small" variant={"secondary"} disabled={cancelButtonDisabled} onClick={onCancel}>
+                Avbryt
+            </Button>
+        </div>
     );
 }
