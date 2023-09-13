@@ -6,6 +6,8 @@ import { useState } from "react";
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 
+import environment from "../../../environment";
+
 interface ISessionContext {
     forsendelseId: string;
     forsendelseIdMedPrefix: string;
@@ -50,7 +52,7 @@ function SessionProvider({ children, ...props }: PropsWithChildren<ISessionProps
         params.append("enhet", enhet);
         params.append("sessionState", sessionId);
         if (type == "NOTAT") {
-            RedirectTo.sakshistorikk(saksnummer, sessionId);
+            RedirectTo.sakshistorikk(saksnummer, environment.url.bisys);
         } else {
             navigate(`/sak/${saksnummer}/forsendelse/${forsendelseId}?${params.toString()}`);
         }
