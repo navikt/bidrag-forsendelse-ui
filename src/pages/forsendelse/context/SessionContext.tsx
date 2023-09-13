@@ -1,4 +1,4 @@
-import { CustomError } from "@navikt/bidrag-ui-common";
+import { CustomError, RedirectTo } from "@navikt/bidrag-ui-common";
 import ObjectUtils from "@navikt/bidrag-ui-common/esm/utils/ObjectUtils";
 import { createContext, useEffect } from "react";
 import { PropsWithChildren } from "react";
@@ -50,7 +50,7 @@ function SessionProvider({ children, ...props }: PropsWithChildren<ISessionProps
         params.append("enhet", enhet);
         params.append("sessionState", sessionId);
         if (type == "NOTAT") {
-            window.open(`/sak/${saksnummer}/journal/BIF-${forsendelseId}?${params.toString()}`, "_self");
+            RedirectTo.sakshistorikk(saksnummer, sessionId);
         } else {
             navigate(`/sak/${saksnummer}/forsendelse/${forsendelseId}?${params.toString()}`);
         }
