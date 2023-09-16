@@ -1,5 +1,5 @@
 import useDokumentApi from "../../hooks/useDokumentApi";
-import DokumentValg from "./DokumentValg";
+import DokumentValgMulti from "./DokumentValgMulti";
 
 export default function DokumentValgNotat() {
     const { data: dokumentDetaljer, isFetching } = useDokumentApi().hentNotatMalDetaljer();
@@ -8,5 +8,5 @@ export default function DokumentValgNotat() {
         return null;
     }
 
-    return <DokumentValg malDetaljer={dokumentDetaljer} />;
+    return <DokumentValgMulti malDetaljer={dokumentDetaljer} />;
 }

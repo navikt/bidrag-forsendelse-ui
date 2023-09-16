@@ -10,6 +10,12 @@ interface TableRowData {
     type: "UTGÅENDE" | "NOTAT";
 }
 
+export interface DokumentFormProps {
+    malId: string;
+    tittel: string;
+    type: "UTGÅENDE" | "NOTAT";
+}
+
 interface DokumentValgProps {
     malDetaljer: Record<string, DokumentMalDetaljer>;
     showLegend?: boolean;
@@ -22,11 +28,7 @@ export default function DokumentValg({ malDetaljer, showLegend }: DokumentValgPr
         getValues,
         formState: { errors },
     } = useFormContext<{
-        dokument: {
-            malId: string;
-            tittel: string;
-            type: "UTGÅENDE" | "NOTAT";
-        };
+        dokument: DokumentFormProps;
     }>();
 
     const dokument = useWatch({ name: "dokument" });

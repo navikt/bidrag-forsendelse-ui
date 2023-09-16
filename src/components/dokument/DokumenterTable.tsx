@@ -14,6 +14,7 @@ import InfoKnapp from "../InfoKnapp";
 import DokumentRows from "./DokumentRows";
 import LeggTilDokumentButton from "./LeggTilDokumentKnapp";
 import LeggTilFraMalKnapp from "./LeggTilFraMalKnapp";
+import SlettForsendelseModal from "./SlettForsendelseModal";
 // interface DokumenterTableProps {
 //     forsendelseId: string;
 //     dokumenter: IDokument[];
@@ -155,6 +156,7 @@ function BekreftSlettingButton() {
         toggleDeleteMode();
     }
     const deletedDocuments = dokumenter.filter((d) => d.status == DokumentStatus.SLETTET);
+    const slettAlleDokumenter = deletedDocuments.length == dokumenter.length;
     return (
         <>
             <Button
@@ -167,7 +169,7 @@ function BekreftSlettingButton() {
             >
                 Bekreft sletting
             </Button>
-            {modalOpen && (
+            {modalOpen && !slettAlleDokumenter && (
                 <Modal
                     open
                     shouldCloseOnEsc
@@ -177,7 +179,7 @@ function BekreftSlettingButton() {
                 >
                     <Modal.Content>
                         <Heading spacing size={"medium"}>
-                            Ønsker du å slette {deletedDocuments.length > 1 ? " valgte dokumenter" : "valgt dokument"}
+                            Ønsker du å slette {deletedDocuments.length > 1 ? " valgte dokumenter" : "valgt dokument"}?
                         </Heading>
                         <BodyShort>
                             Du er i ferd med å slette følgende {deletedDocuments.length > 1 ? "dokumenter" : "dokument"}
@@ -202,6 +204,7 @@ function BekreftSlettingButton() {
                     </Modal.Content>
                 </Modal>
             )}
+            {modalOpen && slettAlleDokumenter && <SlettForsendelseModal closeModal={closeModal} />}
         </>
     );
 }

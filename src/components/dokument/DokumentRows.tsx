@@ -23,6 +23,7 @@ import TableDraggableBody from "../table/TableDraggableBody";
 import DokumentLinkedTag from "./DokumentLinkedTag";
 import DokumentStatusTag from "./DokumentStatusTag";
 import OpenDokumentButton from "./OpenDokumentButton";
+import SlettForsendelseModal from "./SlettForsendelseModal";
 export default function DokumentRows() {
     const { dokumenter, forsendelseId, deleteDocument, swapDocuments } = useDokumenterForm();
 
@@ -158,7 +159,7 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
 );
 
 function DeleteDocumentButton({ dokument }: { dokument: FormIDokument }) {
-    const { deleteDocument, saveChanges, deleteMode } = useDokumenterForm();
+    const { deleteDocument, saveChanges, deleteMode, dokumenter } = useDokumenterForm();
     const [modalOpen, setModalOpen] = useState(false);
     const closeModal = () => {
         setModalOpen(false);
@@ -188,39 +189,43 @@ function DeleteDocumentButton({ dokument }: { dokument: FormIDokument }) {
             </Checkbox>
         );
     }
+    const hasOnlyOneDocument = dokumenter.length == 1;
     return (
         <>
             <Button size={"small"} variant={"tertiary"} icon={<Delete />} onClick={openModal} />
-            <Modal
-                open={modalOpen}
-                shouldCloseOnEsc
-                shouldCloseOnOverlayClick
-                onClose={closeModal}
-                className={`min-w-[430px] max-w-[700px]`}
-            >
-                <Modal.Content>
-                    <Heading spacing size={"medium"}>
-                        Ønsker du å slette dokumentet?
-                    </Heading>
-                    <BodyShort>
-                        Du er i ferd med å slette dokument med tittel
-                        <ul>
-                            <li>{dokument.tittel}</li>
-                        </ul>
-                        Det vil ikke være mulig å angre slettingen
-                    </BodyShort>
-                    <div>
-                        <div className={"mt-2 flex flex-row gap-2 items-end bottom-2"}>
-                            <Button size="small" variant="danger" onClick={deleteDocumentFromForsendelse}>
-                                Slett
-                            </Button>
-                            <Button size="small" variant={"tertiary"} onClick={closeModal}>
-                                Avbryt
-                            </Button>
+            {modalOpen && !hasOnlyOneDocument && (
+                <Modal
+                    open={modalOpen}
+                    shouldCloseOnEsc
+                    shouldCloseOnOverlayClick
+                    onClose={closeModal}
+                    className={`min-w-[430px] max-w-[700px]`}
+                >
+                    <Modal.Content>
+                        <Heading spacing size={"medium"}>
+                            Ønsker du å slette dokumentet?
+                        </Heading>
+                        <BodyShort>
+                            Du er i ferd med å slette dokument med tittel
+                            <ul>
+                                <li>{dokument.tittel}</li>
+                            </ul>
+                            Det vil ikke være mulig å angre slettingen
+                        </BodyShort>
+                        <div>
+                            <div className={"mt-2 flex flex-row gap-2 items-end bottom-2"}>
+                                <Button size="small" variant="danger" onClick={deleteDocumentFromForsendelse}>
+                                    Slett
+                                </Button>
+                                <Button size="small" variant={"tertiary"} onClick={closeModal}>
+                                    Avbryt
+                                </Button>
+                            </div>
                         </div>
-                    </div>
-                </Modal.Content>
-            </Modal>
+                    </Modal.Content>
+                </Modal>
+            )}
+            {modalOpen && hasOnlyOneDocument && <SlettForsendelseModal closeModal={closeModal} />}
         </>
     );
 }
