@@ -1,13 +1,14 @@
-import { dateToDDMMYYYYString, RolleTypeAbbreviation } from "@navikt/bidrag-ui-common";
+import { dateToDDMMYYYYString, LoggerService, RolleTypeAbbreviation } from "@navikt/bidrag-ui-common";
 import { Button, Cell, ContentContainer, ErrorSummary, Grid, Heading } from "@navikt/ds-react";
 import ErrorSummaryItem from "@navikt/ds-react/esm/form/error-summary/ErrorSummaryItem";
 import { FieldErrors, FormProvider, useForm, useFormContext } from "react-hook-form";
 import { useMutation } from "react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../../api/api";
-import { JournalTema } from "../../api/BidragForsendelseApi";
+import { ForsendelseTypeTo, JournalTema } from "../../api/BidragForsendelseApi";
 import GjelderSelect from "../../components/detaljer/GjelderSelect";
 import TemaSelect from "../../components/detaljer/TemaSelect";
+import { DokumentFormProps } from "../../components/dokument/DokumentValg";
 import DokumentValgNotat from "../../components/dokument/DokumentValgNotat";
 import BidragErrorPanel from "../../context/BidragErrorPanel";
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
@@ -21,11 +22,7 @@ export type OpprettForsendelseFormProps = {
     gjelderIdent: string;
     mottakerIdent: string;
     dokumentdato: string;
-    dokument: {
-        malId: string;
-        tittel: string;
-        type: "UTGÅENDE" | "NOTAT";
-    };
+    dokumenter: DokumentFormProps[];
     språk: string;
     tema: "BID" | "FAR";
     enhet: string;
@@ -34,40 +31,47 @@ export type OpprettForsendelseFormProps = {
 export default function OpprettNotatPage() {
     const { saksnummer, enhet, navigateToForsendelse } = useSession();
     const options = useOpprettForsendelse();
-    const opprettForsendelseFn = useMutation({
-        mutationFn: (data: OpprettForsendelseFormProps) => {
-            return BIDRAG_FORSENDELSE_API.api.opprettForsendelse({
-                gjelderIdent: data.gjelderIdent,
-                mottaker: {
-                    ident: data.gjelderIdent,
+    async function opprettNotat(data: OpprettForsendelseFormProps, dokument: DokumentFormProps) {
+        const result = await BIDRAG_FORSENDELSE_API.api.opprettForsendelse({
+            gjelderIdent: data.gjelderIdent,
+            mottaker: {
+                ident: data.gjelderIdent,
+            },
+            saksnummer,
+            opprettTittel: true,
+            enhet: enhet,
+            tema: data.tema as JournalTema,
+            språk: data.språk,
+            behandlingInfo: mapToBehandlingInfoDto(options),
+            dokumenter: [
+                {
+                    dokumentmalId: dokument.malId,
+                    tittel: dokument.tittel,
+                    språk: data.språk,
+                    bestillDokument: true,
+                    dokumentDato: data.dokumentdato ? `${data.dokumentdato}-00-00-00` : null,
                 },
-                saksnummer,
-                opprettTittel: true,
-                enhet: enhet,
-                tema: data.tema as JournalTema,
-                språk: data.språk,
-                behandlingInfo: mapToBehandlingInfoDto(options),
-                dokumenter: [
-                    {
-                        dokumentmalId: data.dokument.malId,
-                        tittel: data.dokument.tittel,
-                        språk: data.språk,
-                        bestillDokument: true,
-                        dokumentDato: data.dokumentdato ? `${data.dokumentdato}-00-00-00` : null,
-                    },
-                ],
-            });
+            ],
+        });
+
+        LoggerService.info("Opprettet notat med forsendelseId " + result.data.forsendelseId);
+    }
+    const opprettForsendelseFn = useMutation({
+        mutationFn: async (data: OpprettForsendelseFormProps) => {
+            for (const dokument of data.dokumenter.filter((dokument) => dokument != undefined)) {
+                await opprettNotat(data, dokument);
+            }
+            return null;
         },
-        onSuccess: (data) => {
-            const forsendelseId = data.data.forsendelseId;
-            navigateToForsendelse(forsendelseId?.toString(), data.data.forsendelseType);
+        onSuccess: () => {
+            navigateToForsendelse(null, ForsendelseTypeTo.NOTAT);
         },
     });
 
     const roller = useForsendelseApi().hentRoller();
-    const defaultGjelder = roller.find((rolle) =>
-        [RolleTypeAbbreviation.BM, RolleTypeAbbreviation.BP].includes(rolle.rolleType)
-    )?.ident;
+    const defaultGjelder = roller
+        .sort((_, rolleB) => (rolleB.rolleType == RolleTypeAbbreviation.BP ? 1 : -1))
+        .find((rolle) => [RolleTypeAbbreviation.BM, RolleTypeAbbreviation.BP].includes(rolle.rolleType))?.ident;
     const methods = useForm<OpprettForsendelseFormProps>({
         defaultValues: {
             gjelderIdent: defaultGjelder,

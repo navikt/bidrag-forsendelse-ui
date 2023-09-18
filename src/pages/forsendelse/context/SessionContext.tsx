@@ -47,7 +47,7 @@ function SessionProvider({ children, ...props }: PropsWithChildren<ISessionProps
         }
     }, []);
 
-    const navigateToForsendelse = (forsendelseId: string, type: "UTGÅENDE" | "NOTAT" = "UTGÅENDE") => {
+    const navigateToForsendelse = (forsendelseId?: string, type: "UTGÅENDE" | "NOTAT" = "UTGÅENDE") => {
         const params = new URLSearchParams();
         params.append("enhet", enhet);
         params.append("sessionState", sessionId);
