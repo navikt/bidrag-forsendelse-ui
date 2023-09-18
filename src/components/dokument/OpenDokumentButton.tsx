@@ -27,12 +27,32 @@ export default function OpenDokumentButton({ dokumentreferanse, status, journalp
         );
     }
 
+    const id = `doklink_${journalpostId}_${dokumentreferanse}`;
     return (
-        <Button
-            size={"small"}
-            variant={"tertiary"}
-            icon={<ExternalLink />}
-            onClick={() => OpenDocumentUtils.åpneDokument(journalpostId, dokumentreferanse)}
-        />
+        <>
+            <Button
+                size={"small"}
+                variant={"tertiary"}
+                icon={<ExternalLink />}
+                onClick={() => document.getElementById(id).click()}
+            />
+            <OpenDokumentIframe
+                id={id}
+                path={OpenDocumentUtils.getÅpneDokumentLenke(journalpostId, dokumentreferanse, false, true)}
+            />
+        </>
+    );
+}
+
+interface OpenDokumentIframeProps {
+    id: string;
+    path: string;
+}
+function OpenDokumentIframe({ path, id }: OpenDokumentIframeProps) {
+    return (
+        <>
+            <iframe name="bidragui" style={{ display: "none" }}></iframe>
+            <a id={id} style={{ display: "none" }} href={path} target="bidragui"></a>
+        </>
     );
 }
