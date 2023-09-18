@@ -1,6 +1,6 @@
 import { Checkbox, CheckboxGroup, Heading, Table, Textarea } from "@navikt/ds-react";
 import { useState } from "react";
-import { useFormContext } from "react-hook-form";
+import { useFormContext, useWatch } from "react-hook-form";
 
 import { DokumentMalDetaljer } from "../../api/BidragForsendelseApi";
 import { DokumentFormProps } from "./DokumentValg";
@@ -124,18 +124,20 @@ function DokumentRow({ row, index }: DokumentRowProps) {
             </Table.DataCell>
             <Table.DataCell width="1%">{row.malId}</Table.DataCell>
             <Table.DataCell width="100%">
-                <EditableTitle malId={row.malId} tittel={row.tittel} onTitleChange={onTitleChange} />
+                <EditableTitle index={index} malId={row.malId} tittel={row.tittel} onTitleChange={onTitleChange} />
             </Table.DataCell>
         </Table.Row>
     );
 }
 
 interface EditableTitleProps {
+    index: number;
     malId: string;
     tittel: string;
     onTitleChange: (tittel: string) => void;
 }
-function EditableTitle({ malId, tittel, onTitleChange }: EditableTitleProps) {
+function EditableTitle({ malId, tittel, onTitleChange, index }: EditableTitleProps) {
+    const isChecked = useWatch({ name: `dokumenter.${index}` });
     function shouldBeEditable() {
         const MALID_TITTLE_REDIGERBAR = ["BI01X02", "BI01X01", "BI01P11", "BI01S02"];
         return MALID_TITTLE_REDIGERBAR.includes(malId);
@@ -144,6 +146,7 @@ function EditableTitle({ malId, tittel, onTitleChange }: EditableTitleProps) {
     if (!shouldBeEditable()) {
         return tittel;
     }
+
     return (
         <Textarea
             maxRows={2}
@@ -151,6 +154,7 @@ function EditableTitle({ malId, tittel, onTitleChange }: EditableTitleProps) {
             label="Tittel"
             defaultValue={tittel}
             size="small"
+            disabled={!isChecked}
             hideLabel
             onChange={(e) => onTitleChange(e.target.value)}
         />
