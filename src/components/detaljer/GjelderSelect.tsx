@@ -8,9 +8,7 @@ interface GjelderSelectProps {
 export default function GjelderSelect({ roller }: GjelderSelectProps) {
     const { register, getValues } = useFormContext();
     const rollerFiltrert = roller.filter((rolle) =>
-        [RolleTypeAbbreviation.BA, RolleTypeAbbreviation.BM, RolRolleTypeAbbreviationleType.BP].includes(
-            rolle.rolleType
-        )
+        [RolleTypeAbbreviation.BA, RolleTypeAbbreviation.BM, RolleTypeAbbreviation.BP].includes(rolle.rolleType)
     );
     const rollerIkkeBarn = rollerFiltrert.filter((rolle) => rolle.rolleType !== RolleTypeAbbreviation.BA);
 
