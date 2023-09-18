@@ -52,7 +52,7 @@ function OpenDokumentIframe({ path, id }: OpenDokumentIframeProps) {
     return (
         <>
             <iframe name="bidragui" style={{ display: "none" }}></iframe>
-            <a id={id} style={{ display: "none" }} href={path} target="bidragui"></a>
+            <a id={id} style={{ display: "none" }} href={`${window.location.origin}${path}`} target="bidragui"></a>
         </>
     );
 }
