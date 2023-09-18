@@ -1,4 +1,4 @@
-import { IRolleDetaljer, RolleType } from "@navikt/bidrag-ui-common";
+import { IRolleDetaljer, RolleType, RolleTypeAbbreviation, RolleTypeFullName } from "@navikt/bidrag-ui-common";
 import { useQuery } from "react-query";
 
 import { DokumentStatus } from "../constants/DokumentStatus";
@@ -166,7 +166,7 @@ export const hentRoller = (): IRolleDetaljer[] => {
     const sak = hentSak();
 
     return sak.roller.map((rolle) => ({
-        rolleType: RolleType[rolle.rolleType],
+        rolleType: RolleTypeAbbreviation[rolle.rolleType] ?? RolleTypeFullName[rolle.rolleType],
         ident: rolle.fodselsnummer ?? rolle.samhandlerIdent,
         navn: hentPerson(rolle.fodselsnummer)?.navn,
     }));
@@ -174,7 +174,10 @@ export const hentRoller = (): IRolleDetaljer[] => {
 
 const rolleISak = (ident: string): RolleType | null => {
     const sak = hentSak();
-    return RolleType[sak.roller?.find((r) => r.fodselsnummer == ident)?.rolleType];
+    return (
+        RolleTypeAbbreviation[sak.roller?.find((r) => r.fodselsnummer == ident)?.rolleType] ??
+        RolleTypeFullName[sak.roller?.find((r) => r.fodselsnummer == ident)?.rolleType]
+    );
 };
 
 const hentPerson = (ident?: string): PersonDto => {
