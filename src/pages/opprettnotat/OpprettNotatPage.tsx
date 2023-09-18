@@ -69,9 +69,9 @@ export default function OpprettNotatPage() {
     });
 
     const roller = useForsendelseApi().hentRoller();
-    const defaultGjelder = roller.find((rolle) =>
-        [RolleTypeAbbreviation.BM, RolleTypeAbbreviation.BP].includes(rolle.rolleType)
-    )?.ident;
+    const defaultGjelder = roller
+        .sort((_, rolleB) => (rolleB.rolleType == RolleTypeAbbreviation.BP ? 1 : -1))
+        .find((rolle) => [RolleTypeAbbreviation.BM, RolleTypeAbbreviation.BP].includes(rolle.rolleType))?.ident;
     const methods = useForm<OpprettForsendelseFormProps>({
         defaultValues: {
             gjelderIdent: defaultGjelder,
