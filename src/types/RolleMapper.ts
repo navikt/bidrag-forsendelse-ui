@@ -1,14 +1,14 @@
-import { RolleType } from "@navikt/bidrag-ui-common";
+import { RolleType, RolleTypeAbbreviation } from "@navikt/bidrag-ui-common";
 
 export function mapRolleToDisplayValue(rolleType: RolleType): string {
     switch (rolleType) {
-        case RolleType.BA:
+        case RolleTypeAbbreviation.BA:
             return "Barn";
-        case RolleType.BM:
+        case RolleTypeAbbreviation.BM:
             return "Bidragsmottaker";
-        case RolleType.BP:
+        case RolleTypeAbbreviation.BP:
             return "Bidragspliktig";
-        case RolleType.RM:
+        case RolleTypeAbbreviation.RM:
             return "Reel mottaker";
     }
     return rolleType;

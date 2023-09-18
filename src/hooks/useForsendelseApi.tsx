@@ -1,4 +1,4 @@
-import { IRolleDetaljer, RolleType } from "@navikt/bidrag-ui-common";
+import { IRolleDetaljer, RolleType, RolleTypeAbbreviation, RolleTypeFullName } from "@navikt/bidrag-ui-common";
 import IdentUtils from "@navikt/bidrag-ui-common/esm/utils/IdentUtils";
 import { AxiosError, AxiosResponse, HttpStatusCode } from "axios";
 import React from "react";
@@ -103,7 +103,7 @@ export function useForsendelseApi(): UseForsendelseDataProps {
         const sak = hentSak();
 
         return sak.roller.map((rolle) => ({
-            rolleType: RolleType[rolle.rolleType],
+            rolleType: RolleTypeAbbreviation[rolle.rolleType] ?? RolleTypeFullName[rolle.rolleType],
             ident: rolle.fodselsnummer ?? rolle.samhandlerIdent,
             objektnummer: rolle.objektnummer,
             navn: useSamhandlerPersonApi().hentPerson(rolle.fodselsnummer)?.navn,
@@ -112,7 +112,10 @@ export function useForsendelseApi(): UseForsendelseDataProps {
 
     const rolleISak = (ident: string): RolleType | null => {
         const sak = hentSak();
-        return RolleType[sak.roller?.find((r) => r.fodselsnummer == ident)?.rolleType];
+        return (
+            RolleTypeAbbreviation[sak.roller?.find((r) => r.fodselsnummer == ident)?.rolleType] ||
+            RolleTypeFullName[sak.roller?.find((r) => r.fodselsnummer == ident)?.rolleType]
+        );
     };
 
     const hentGjelder = (): IRolleDetaljer => {

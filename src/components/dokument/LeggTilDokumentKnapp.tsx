@@ -1,6 +1,6 @@
 import "./LeggTilDokumentButton.css";
 
-import { dateToDDMMYYYYString, RolleType } from "@navikt/bidrag-ui-common";
+import { dateToDDMMYYYYString, RolleType, RolleTypeAbbreviation } from "@navikt/bidrag-ui-common";
 import { Add } from "@navikt/ds-icons";
 import { Collapse } from "@navikt/ds-icons";
 import { Expand } from "@navikt/ds-icons";
@@ -87,9 +87,9 @@ function LeggTilDokumentFraSakModal({ onClose, open }: LeggTilDokumentFraSakModa
         const hentFraRolleSakStartIndex = (rolletype: RolleType) =>
             tittel.indexOf(`(fra ${mapRolleToDisplayValue(rolletype)?.toLowerCase()}`);
         const fraRolleSakStartIndex = Math.max(
-            hentFraRolleSakStartIndex(RolleType.BA),
-            hentFraRolleSakStartIndex(RolleType.BM),
-            hentFraRolleSakStartIndex(RolleType.BP)
+            hentFraRolleSakStartIndex(RolleTypeAbbreviation.BA),
+            hentFraRolleSakStartIndex(RolleTypeAbbreviation.BM),
+            hentFraRolleSakStartIndex(RolleTypeAbbreviation.BP)
         );
         if (fraRolleSakStartIndex > 0) {
             const fraRolleSakSluttIndex = tittel.indexOf(")", fraRolleSakStartIndex);
@@ -172,8 +172,8 @@ function VelgDokumentTabs({ selectDocument, selectedDocuments, unselectDocument 
         <Tabs value={tabState} onChange={setTabState}>
             <Tabs.List>
                 <Tabs.Tab value="fra_samme_sak" label={renderLabel("Fra samme sak", forsendelse.saksnummer)} />
-                <Tabs.Tab value="bm" label={renderLabel("Fra BM saker", null, RolleType.BM)} />
-                <Tabs.Tab value="bp" label={renderLabel("Fra BP saker", null, RolleType.BP)} />
+                <Tabs.Tab value="bm" label={renderLabel("Fra BM saker", null, RolleTypeAbbreviation.BM)} />
+                <Tabs.Tab value="bp" label={renderLabel("Fra BP saker", null, RolleTypeAbbreviation.BP)} />
             </Tabs.List>
             <Tabs.Panel value="fra_samme_sak" className="">
                 <React.Suspense fallback={<Loader size={"small"} />}>
@@ -189,13 +189,13 @@ function VelgDokumentTabs({ selectDocument, selectedDocuments, unselectDocument 
                 <Accordion style={{ width: "100%", height: "100%" }} size="small" headingSize="xsmall">
                     <React.Suspense fallback={<Loader size={"small"} />}>
                         <DokumenterForPerson
-                            rolle={RolleType.BM}
+                            rolle={RolleTypeAbbreviation.BM}
                             selectedDocuments={selectedDocuments}
                             unselectDocument={unselectDocument}
                             selectDocument={(dokument, toogle) =>
-                                selectDocument({ ...dokument, fraRolle: RolleType.BM }, toogle)
+                                selectDocument({ ...dokument, fraRolle: RolleTypeAbbreviation.BM }, toogle)
                             }
-                            ident={roller.find((r) => r.rolleType == RolleType.BM)?.ident}
+                            ident={roller.find((r) => r.rolleType == RolleTypeAbbreviation.BM)?.ident}
                         />
                     </React.Suspense>
                 </Accordion>
@@ -204,13 +204,13 @@ function VelgDokumentTabs({ selectDocument, selectedDocuments, unselectDocument 
                 <Accordion style={{ width: "100%" }} size="small" headingSize="xsmall">
                     <React.Suspense fallback={<Loader size={"small"} />}>
                         <DokumenterForPerson
-                            rolle={RolleType.BP}
+                            rolle={RolleTypeAbbreviation.BP}
                             selectedDocuments={selectedDocuments}
                             unselectDocument={unselectDocument}
                             selectDocument={(dokument, toogle) =>
-                                selectDocument({ ...dokument, fraRolle: RolleType.BP }, toogle)
+                                selectDocument({ ...dokument, fraRolle: RolleTypeAbbreviation.BP }, toogle)
                             }
-                            ident={roller.find((r) => r.rolleType == RolleType.BP)?.ident}
+                            ident={roller.find((r) => r.rolleType == RolleTypeAbbreviation.BP)?.ident}
                         />
                     </React.Suspense>
                 </Accordion>

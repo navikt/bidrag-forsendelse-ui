@@ -1,4 +1,4 @@
-import { IRolleDetaljer, RolleType } from "@navikt/bidrag-ui-common";
+import { IRolleDetaljer, RolleTypeAbbreviation } from "@navikt/bidrag-ui-common";
 import { Heading, Select } from "@navikt/ds-react";
 import { useFormContext } from "react-hook-form";
 
@@ -8,12 +8,14 @@ interface GjelderSelectProps {
 export default function GjelderSelect({ roller }: GjelderSelectProps) {
     const { register, getValues } = useFormContext();
     const rollerFiltrert = roller.filter((rolle) =>
-        [RolleType.BA, RolleType.BM, RolleType.BP].includes(rolle.rolleType)
+        [RolleTypeAbbreviation.BA, RolleTypeAbbreviation.BM, RolRolleTypeAbbreviationleType.BP].includes(
+            rolle.rolleType
+        )
     );
-    const rollerIkkeBarn = rollerFiltrert.filter((rolle) => rolle.rolleType !== RolleType.BA);
+    const rollerIkkeBarn = rollerFiltrert.filter((rolle) => rolle.rolleType !== RolleTypeAbbreviation.BA);
 
     function renderBarnOptions() {
-        const barn = rollerFiltrert.filter((rolle) => rolle.rolleType == RolleType.BA);
+        const barn = rollerFiltrert.filter((rolle) => rolle.rolleType == RolleTypeAbbreviation.BA);
         if (barn.length == 0) return null;
         return (
             <optgroup label="Barn">

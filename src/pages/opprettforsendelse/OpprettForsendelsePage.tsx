@@ -1,4 +1,4 @@
-import { RolleType } from "@navikt/bidrag-ui-common";
+import { RolleTypeAbbreviation } from "@navikt/bidrag-ui-common";
 import { Button, Cell, ContentContainer, ErrorSummary, Grid, Heading } from "@navikt/ds-react";
 import ErrorSummaryItem from "@navikt/ds-react/esm/form/error-summary/ErrorSummaryItem";
 import { FieldErrors, FormProvider, useForm, useFormContext } from "react-hook-form";
@@ -172,7 +172,9 @@ function OpprettForsendelseNy() {
     });
 
     const roller = useForsendelseApi().hentRoller();
-    const defaultGjelder = roller.find((rolle) => [RolleType.BM, RolleType.BP].includes(rolle.rolleType))?.ident;
+    const defaultGjelder = roller.find((rolle) =>
+        [RolleTypeAbbreviation.BM, RolleTypeAbbreviation.BP].includes(rolle.rolleType)
+    )?.ident;
     const methods = useForm<OpprettForsendelseFormProps>({
         defaultValues: {
             gjelderIdent: defaultGjelder,
