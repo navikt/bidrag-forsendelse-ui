@@ -315,6 +315,7 @@ export interface DokumentMalDetaljer {
     beskrivelse: string;
     type: DokumentMalDetaljerTypeEnum;
     kanBestilles: boolean;
+    alternativeTitler: string[];
 }
 
 /** Metadata for dokument som skal knyttes til forsendelsen. Første dokument i listen blir automatisk satt som hoveddokument i forsendelsen */

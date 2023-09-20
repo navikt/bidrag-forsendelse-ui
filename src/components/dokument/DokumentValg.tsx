@@ -1,3 +1,4 @@
+import { AutoSuggest } from "@navikt/bidrag-ui-common";
 import { Heading, Radio, RadioGroup, Table, Textarea } from "@navikt/ds-react";
 import { useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
@@ -7,9 +8,11 @@ import { DokumentMalDetaljer } from "../../api/BidragForsendelseApi";
 interface TableRowData {
     malId: string;
     tittel: string;
+    alternativeTitler: string[];
     type: "UTGÅENDE" | "NOTAT";
 }
 
+const harAlternativeTitler = (row: TableRowData) => row.alternativeTitler && row.alternativeTitler.length > 0;
 export interface DokumentFormProps {
     malId: string;
     tittel: string;
@@ -36,6 +39,7 @@ export default function DokumentValg({ malDetaljer, showLegend }: DokumentValgPr
     const alleBrev: TableRowData[] = Object.keys(malDetaljer).map((key) => ({
         malId: key,
         tittel: malDetaljer[key].beskrivelse,
+        alternativeTitler: malDetaljer[key].alternativeTitler,
         type: malDetaljer[key].type,
     }));
 
@@ -44,7 +48,7 @@ export default function DokumentValg({ malDetaljer, showLegend }: DokumentValgPr
         if (dokument) {
             setValue("dokument", {
                 malId,
-                tittel: editableTitles.get(malId) ?? dokument.tittel,
+                tittel: editableTitles.get(malId) ?? harAlternativeTitler(dokument) ? null : dokument.tittel,
                 type: dokument.type,
             });
         }
@@ -56,7 +60,13 @@ export default function DokumentValg({ malDetaljer, showLegend }: DokumentValgPr
             setValue("dokument.tittel", title);
         }
     }
-    const methods = register("dokument", { validate: (dok) => (dok?.malId == null ? "Dokument må velges" : true) });
+    const methods = register("dokument", {
+        validate: (dok) => {
+            if (dok?.malId == null) return "Dokument må velges";
+            if (dok?.tittel == null || dok.tittel.trim().length == 0) return "Tittel må settes";
+            return true;
+        },
+    });
     return (
         <div className="w-100">
             <RadioGroup
@@ -116,27 +126,19 @@ function DokumentValgTableRows({ rows, onTitleChange }: DokumentValgTableProps) 
                     </Table.DataCell>
                     <Table.DataCell width="1%">{row.malId}</Table.DataCell>
                     <Table.DataCell width="100%">
-                        <EditableTitle
-                            malId={row.malId}
-                            tittel={row.tittel}
-                            onTitleChange={(value) => onTitleChange(row.malId, value)}
-                        />
+                        <EditableTitle row={row} onTitleChange={(value) => onTitleChange(row.malId, value)} />
                     </Table.DataCell>
                 </Table.Row>
             ))}
         </Table.Body>
     );
 }
-
-function EditableTitle({
-    malId,
-    tittel,
-    onTitleChange,
-}: {
-    malId: string;
-    tittel: string;
-    onTitleChange: (value: string) => void;
-}) {
+interface EditableTitleProps {
+    row: TableRowData;
+    onTitleChange: (tittel: string) => void;
+}
+function EditableTitle({ row, onTitleChange }: EditableTitleProps) {
+    const { malId, tittel } = row;
     function shouldBeEditable() {
         const MALID_TITTLE_REDIGERBAR = ["BI01X02", "BI01X01", "BI01P11", "BI01S02"];
         return MALID_TITTLE_REDIGERBAR.includes(malId);
@@ -144,6 +146,10 @@ function EditableTitle({
 
     if (!shouldBeEditable()) {
         return tittel;
+    }
+
+    if (harAlternativeTitler(row)) {
+        return <EditableAndSelectableTitle row={row} onTitleChange={onTitleChange} />;
     }
     return (
         <Textarea
@@ -156,4 +162,11 @@ function EditableTitle({
             onChange={(e) => onTitleChange(e.target.value)}
         />
     );
+}
+interface EditableAndSelectableTitleProps {
+    row: TableRowData;
+    onTitleChange: (tittel: string) => void;
+}
+function EditableAndSelectableTitle({ onTitleChange, row }: EditableAndSelectableTitleProps) {
+    return <AutoSuggest options={row.alternativeTitler} placeholder={row.tittel} label={""} onChange={onTitleChange} />;
 }

@@ -186,7 +186,8 @@ function OpprettForsendelseNy() {
         },
     });
     function onSubmit(data: OpprettForsendelseFormProps) {
-        opprettForsendelseFn.mutate(data);
+        console.log(data);
+        //opprettForsendelseFn.mutate(data);
     }
     return (
         <FormProvider {...methods}>
