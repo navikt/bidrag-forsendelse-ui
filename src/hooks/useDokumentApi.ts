@@ -51,10 +51,10 @@ export default function useDokumentApi() {
         });
     }
 
-    function hentNotatMalDetaljer() {
+    function hentNotatMalDetaljer(request: HentDokumentValgRequest) {
         return useQuery({
-            queryKey: "notatDetaljer",
-            queryFn: ({ signal }) => BIDRAG_FORSENDELSE_API.api.hentDokumentValgNotater(),
+            queryKey: ["notatDetaljer", request?.vedtakType],
+            queryFn: ({ signal }) => BIDRAG_FORSENDELSE_API.api.hentDokumentValgNotater({ ...request, enhet }),
             select: (data) => data.data,
             optimisticResults: false,
         });
@@ -94,7 +94,12 @@ export default function useDokumentApi() {
         const mottakerId = forsendelse.mottaker?.ident;
         const result = useQuery({
             queryKey: DokumentQueryKeys.hentDistribusjonKanal(mottakerId, mottakerId),
-            queryFn: () => BIDRAG_DOKUMENT_ARKIV_API.journal.hentDistribusjonKanal({ mottakerId, gjelderId }),
+            queryFn: () =>
+                BIDRAG_DOKUMENT_ARKIV_API.journal.hentDistribusjonKanal({
+                    mottakerId,
+                    gjelderId,
+                    tema: forsendelse.tema,
+                }),
             select: (data) => {
                 return data.data;
             },

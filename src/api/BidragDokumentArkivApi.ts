@@ -267,6 +267,7 @@ export interface DistribuerJournalpostResponse {
 export interface BestemDistribusjonKanalRequest {
     mottakerId?: string;
     gjelderId: string;
+    tema: string;
 }
 
 export interface BestemKanalResponse {

@@ -1133,6 +1133,24 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             }),
 
         /**
+         * @description Henter dokumentmaler som er støttet av applikasjonen
+         *
+         * @tags forsendelse-innsyn-kontroller
+         * @name HentDokumentValgNotater
+         * @request POST:/api/forsendelse/dokumentvalg/notat
+         * @secure
+         */
+        hentDokumentValgNotater: (data: HentDokumentValgRequest, params: RequestParams = {}) =>
+            this.request<Record<string, DokumentMalDetaljer>, any>({
+                path: `/api/forsendelse/dokumentvalg/notat`,
+                method: "POST",
+                body: data,
+                secure: true,
+                type: ContentType.Json,
+                ...params,
+            }),
+
+        /**
          * @description Hent forsendelse med forsendelseid
          *
          * @tags forsendelse-innsyn-kontroller
@@ -1545,22 +1563,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         kanDistribuere: (forsendelseIdMedPrefix: string, params: RequestParams = {}) =>
             this.request<string, string>({
                 path: `/api/forsendelse/journal/distribuer/${forsendelseIdMedPrefix}/enabled`,
-                method: "GET",
-                secure: true,
-                ...params,
-            }),
-
-        /**
-         * @description Henter dokumentmaler som er støttet av applikasjonen
-         *
-         * @tags forsendelse-innsyn-kontroller
-         * @name HentDokumentValgNotater
-         * @request GET:/api/forsendelse/dokumentvalg/notat
-         * @secure
-         */
-        hentDokumentValgNotater: (params: RequestParams = {}) =>
-            this.request<Record<string, DokumentMalDetaljer>, any>({
-                path: `/api/forsendelse/dokumentvalg/notat`,
                 method: "GET",
                 secure: true,
                 ...params,
