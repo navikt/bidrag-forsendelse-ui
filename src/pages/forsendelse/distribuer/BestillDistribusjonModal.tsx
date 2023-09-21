@@ -55,7 +55,6 @@ function ModalContent({ onCancel }: BestillDistribusjonModalProps) {
     const personAdresseQuery = useQuery({
         queryKey: `person_adresse_${ident}`,
         queryFn: async () => {
-            await countMetricDistribusjon();
             if (mottaker.adresse) {
                 const adresse = { ...mottaker.adresse, land: mottaker.adresse.landkode };
                 const manglerPoststed = adresse.landkode == "NO" && adresse.postnummer && !adresse.poststed;
