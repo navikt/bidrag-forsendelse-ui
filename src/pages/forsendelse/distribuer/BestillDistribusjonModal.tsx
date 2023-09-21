@@ -108,30 +108,32 @@ function ModalContent({ onCancel }: BestillDistribusjonModalProps) {
             vedtak: forsendelse.behandlingInfo?.erFattet ? "true" : "false",
         };
         try {
-            await MetricService.countMetric({
-                name: "forsendelseDistribuert_kanal",
-                description: "Kanal forsendelse ble distribuert gjennom",
-                labels: {
-                    kanal: distribusjonKanal.distribusjonskanal,
-                    ...initialMetricRequest,
-                },
-            });
-            await MetricService.gaugeMetric({
-                name: "forsendelseDistribuert_storrelse_mb",
-                description: "Størrelsen på forsendelsen som ble distribuert i MB",
-                labels: {
-                    ...initialMetricRequest,
-                },
-                value: storrelseIMb,
-            });
-            await MetricService.gaugeMetric({
-                name: "forsendelseDistribuert_antallDokumenter",
-                description: "Antall dokumenter som ble distribuert",
-                labels: {
-                    ...initialMetricRequest,
-                },
-                value: forsendelse.dokumenter.length,
-            });
+            await Promise.all([
+                MetricService.countMetric({
+                    name: "forsendelseDistribuert_kanal",
+                    description: "Kanal forsendelse ble distribuert gjennom",
+                    labels: {
+                        kanal: distribusjonKanal.distribusjonskanal,
+                        ...initialMetricRequest,
+                    },
+                }),
+                MetricService.gaugeMetric({
+                    name: "forsendelseDistribuert_storrelse_mb",
+                    description: "Størrelsen på forsendelsen som ble distribuert i MB",
+                    labels: {
+                        ...initialMetricRequest,
+                    },
+                    value: storrelseIMb,
+                }),
+                MetricService.gaugeMetric({
+                    name: "forsendelseDistribuert_antallDokumenter",
+                    description: "Antall dokumenter som ble distribuert",
+                    labels: {
+                        ...initialMetricRequest,
+                    },
+                    value: forsendelse.dokumenter.length,
+                }),
+            ]);
         } catch (e) {
             LoggerService.warn("Det skjedde en feil ved lagring av metrikker");
         }
