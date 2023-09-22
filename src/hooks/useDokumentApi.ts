@@ -90,6 +90,7 @@ export default function useDokumentApi() {
 
     function distribusjonKanal(): BestemKanalResponse {
         const forsendelse = useForsendelseApi().hentForsendelse();
+        const størrelseIMb = useForsendelseApi().hentStørrelseIMb();
         const gjelderId = forsendelse.gjelderIdent;
         const mottakerId = forsendelse.mottaker?.ident;
         const result = useQuery({
@@ -99,6 +100,7 @@ export default function useDokumentApi() {
                     mottakerId,
                     gjelderId,
                     tema: forsendelse.tema,
+                    forsendelseStoerrelse: størrelseIMb,
                 }),
             select: (data) => {
                 return data.data;

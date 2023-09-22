@@ -268,6 +268,8 @@ export interface BestemDistribusjonKanalRequest {
     mottakerId?: string;
     gjelderId: string;
     tema: string;
+    /** @format int32 */
+    forsendelseStoerrelse?: number;
 }
 
 export interface BestemKanalResponse {
