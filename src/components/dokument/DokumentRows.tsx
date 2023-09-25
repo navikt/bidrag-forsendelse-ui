@@ -2,7 +2,7 @@ import { DragEndEvent, DraggableAttributes } from "@dnd-kit/core";
 import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import { EyeIcon } from "@navikt/aksel-icons";
 import { DragVerticalIcon } from "@navikt/aksel-icons";
-import { dateToDDMMYYYYString, OpenDocumentUtils } from "@navikt/bidrag-ui-common";
+import { dateToDDMMYYYYString, OpenDocumentUtils, removeNonPrintableCharachters } from "@navikt/bidrag-ui-common";
 import { Delete } from "@navikt/ds-icons";
 import { BodyShort, Checkbox, Heading, Modal, Table } from "@navikt/ds-react";
 import { Button } from "@navikt/ds-react";
@@ -19,7 +19,6 @@ import { FormIDokument, useDokumenterForm } from "../../pages/forsendelse/contex
 import { IForsendelseFormProps } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IDokument } from "../../types/Dokument";
 import { cleanupAfterClosedModal } from "../../utils/ModalUtils";
-import { removeNonprintableCharacters } from "../../utils/ObjectUtils";
 import TableDraggableBody from "../table/TableDraggableBody";
 import DokumentLinkedTag from "./DokumentLinkedTag";
 import DokumentStatusTag from "./DokumentStatusTag";
@@ -248,7 +247,7 @@ function EditableDokumentTitleRow({ dokument, index }: IEditableDokumentTitleRow
 
     function _updateTitle() {
         setInEditMode(false);
-        updateTitle(removeNonprintableCharacters(value), dokument.dokumentreferanse);
+        updateTitle(removeNonPrintableCharachters(value), dokument.dokumentreferanse);
     }
 
     function onKeyDown(e: React.KeyboardEvent) {

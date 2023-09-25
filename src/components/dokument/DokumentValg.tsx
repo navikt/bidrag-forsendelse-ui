@@ -63,7 +63,8 @@ export default function DokumentValg({ malDetaljer, showLegend }: DokumentValgPr
     const methods = register("dokument", {
         validate: (dok) => {
             if (dok?.malId == null) return "Dokument må velges";
-            if (dok?.tittel == null || dok.tittel.trim().length == 0) return "Tittel må settes";
+            if (dok?.tittel == null || dok.tittel.trim().length == 0)
+                return "Kan ikke opprette dokument med tom tittel";
             return true;
         },
     });
@@ -144,11 +145,15 @@ function EditableTitle({ row, onTitleChange }: EditableTitleProps) {
         return MALID_TITTLE_REDIGERBAR.includes(malId);
     }
 
+    function erFritekstbrev() {
+        return row.malId == "BI01S02";
+    }
+
     if (!shouldBeEditable()) {
         return tittel;
     }
 
-    if (harAlternativeTitler(row)) {
+    if (harAlternativeTitler(row) || erFritekstbrev()) {
         return <EditableAndSelectableTitle row={row} onTitleChange={onTitleChange} />;
     }
     return (
@@ -168,5 +173,12 @@ interface EditableAndSelectableTitleProps {
     onTitleChange: (tittel: string) => void;
 }
 function EditableAndSelectableTitle({ onTitleChange, row }: EditableAndSelectableTitleProps) {
-    return <AutoSuggest options={row.alternativeTitler} placeholder={row.tittel} label={""} onChange={onTitleChange} />;
+    return (
+        <AutoSuggest
+            options={row.alternativeTitler ?? []}
+            placeholder={row.tittel}
+            label={""}
+            onChange={onTitleChange}
+        />
+    );
 }
