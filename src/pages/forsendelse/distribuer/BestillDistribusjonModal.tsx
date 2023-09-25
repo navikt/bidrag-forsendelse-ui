@@ -9,10 +9,8 @@ import { useQuery } from "react-query";
 import { BIDRAG_FORSENDELSE_API } from "../../../api/api";
 import { PERSON_API } from "../../../api/api";
 import { DistribuerTilAdresse } from "../../../api/BidragDokumentApi";
-import { BestemKanalResponseDistribusjonskanalEnum } from "../../../api/BidragDokumentArkivApi";
 import { DistribuerJournalpostRequest } from "../../../api/BidragForsendelseApi";
 import { hentPostnummere } from "../../../api/queries";
-import useDokumentApi from "../../../hooks/useDokumentApi";
 import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
 import { RedirectTo } from "../../../utils/RedirectUtils";
 import BestillDistribusjonInfo from "./BestillDistribusjonInfo";
@@ -173,29 +171,6 @@ function DistribusjonKnapper({
     loading,
     submitButtonDisabled,
 }: DistribusjonKnapperProps) {
-    const distribusjonKanal = useDokumentApi().distribusjonKanal();
-    const størrelseIMb = useForsendelseApi().hentStørrelseIMb();
-    function kanDistribuere(): { result: boolean; reason?: string } {
-        const distribusjonViaSDP =
-            distribusjonKanal.distribusjonskanal == BestemKanalResponseDistribusjonskanalEnum.SDP;
-        if (distribusjonViaSDP && størrelseIMb >= 29.5) {
-            return {
-                result: false,
-                reason: "Kan ikke distribuere store forsendelser via digital postkasse akkurat nå. Det jobbes med en løsning og vil være klar om dager.",
-            };
-        }
-        return {
-            result: true,
-        };
-    }
-    const kanDistribuereResult = kanDistribuere();
-    if (!kanDistribuereResult.result) {
-        return (
-            <Alert size="small" variant="warning">
-                {kanDistribuereResult.reason}
-            </Alert>
-        );
-    }
     return (
         <div className="flex items-center space-x-2">
             <Button

@@ -19,6 +19,7 @@ import { FormIDokument, useDokumenterForm } from "../../pages/forsendelse/contex
 import { IForsendelseFormProps } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IDokument } from "../../types/Dokument";
 import { cleanupAfterClosedModal } from "../../utils/ModalUtils";
+import { removeNonprintableCharacters } from "../../utils/ObjectUtils";
 import TableDraggableBody from "../table/TableDraggableBody";
 import DokumentLinkedTag from "./DokumentLinkedTag";
 import DokumentStatusTag from "./DokumentStatusTag";
@@ -247,7 +248,7 @@ function EditableDokumentTitleRow({ dokument, index }: IEditableDokumentTitleRow
 
     function _updateTitle() {
         setInEditMode(false);
-        updateTitle(value, dokument.dokumentreferanse);
+        updateTitle(removeNonprintableCharacters(value), dokument.dokumentreferanse);
     }
 
     function onKeyDown(e: React.KeyboardEvent) {
