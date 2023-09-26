@@ -140,6 +140,7 @@ export function journalpostMapper(journalpost: JournalpostDto, sakstilknytninger
         erForsendelse: isForsendelse(),
         sakstilknytninger: journalpost.sakstilknytninger ?? sakstilknytninger,
         journalpostIdNoPrefix: journalpostIdNoPrefix(),
+        dokumentDato: journalpost.dokumentDato ?? journalpost.journalfortDato,
         dokumenter: journalpost.dokumenter.map((dokument, i) => dokumentMapper(journalpost, dokument, i)),
     };
 }
