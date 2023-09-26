@@ -5,6 +5,11 @@ const system = {
     isProduction: process.env.NODE_ENV === "production",
 };
 
+const feature = {
+    visDokumentmalKode:
+        process.env.VIS_DOKUMENTMAL_KODE === "true" || localStorage.getItem("VIS_DOKUMENTMAL_KODE") == "true",
+};
+
 const url = {
     bidragDokumentForsendelse: process.env.BIDRAG_DOKUMENT_FORSENDELSE_URL,
     bidragTilgangskontroll: process.env.BIDRAG_TILGANGSKONTROLL_URL,
@@ -17,4 +22,4 @@ const url = {
     bisys: process.env.BISYS_URL,
 };
 
-export default { url, system };
+export default { url, system, feature };

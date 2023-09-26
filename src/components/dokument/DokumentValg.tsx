@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
 import { DokumentMalDetaljer } from "../../api/BidragForsendelseApi";
+import environment from "../../environment";
 
 interface TableRowData {
     malId: string;
@@ -102,15 +103,21 @@ interface IDokumentValgTableProps {
 function DokumentValgTable({ rows, onTitleChange }: IDokumentValgTableProps) {
     return (
         <Table size="small">
-            <Table.Header>
-                <Table.Row>
-                    <Table.HeaderCell></Table.HeaderCell>
-                    <Table.HeaderCell>Mal</Table.HeaderCell>
-                    <Table.HeaderCell>Tittel</Table.HeaderCell>
-                </Table.Row>
-            </Table.Header>
+            <DokumentValgTableHeader />
             <DokumentValgTableRows rows={rows} onTitleChange={onTitleChange} />
         </Table>
+    );
+}
+
+export function DokumentValgTableHeader() {
+    return (
+        <Table.Header>
+            <Table.Row>
+                <Table.HeaderCell></Table.HeaderCell>
+                {environment.feature.visDokumentmalKode && <Table.HeaderCell>Mal</Table.HeaderCell>}
+                <Table.HeaderCell>Tittel</Table.HeaderCell>
+            </Table.Row>
+        </Table.Header>
     );
 }
 
@@ -128,7 +135,7 @@ function DokumentValgTableRows({ rows, onTitleChange }: DokumentValgTableProps) 
                             {""}
                         </Radio>
                     </Table.DataCell>
-                    <Table.DataCell width="1%">{row.malId}</Table.DataCell>
+                    {environment.feature.visDokumentmalKode && <Table.DataCell width="1%">{row.malId}</Table.DataCell>}
                     <Table.DataCell width="100%">
                         <EditableTitle row={row} onTitleChange={(value) => onTitleChange(row.malId, value)} />
                     </Table.DataCell>

@@ -3,7 +3,8 @@ import { useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
 import { DokumentMalDetaljer } from "../../api/BidragForsendelseApi";
-import { DokumentFormProps } from "./DokumentValg";
+import environment from "../../environment";
+import { DokumentFormProps, DokumentValgTableHeader } from "./DokumentValg";
 
 interface TableRowData {
     malId: string;
@@ -52,13 +53,7 @@ interface IDokumentValgTableProps {
 function DokumentValgTable({ rows }: IDokumentValgTableProps) {
     return (
         <Table size="small">
-            <Table.Header>
-                <Table.Row>
-                    <Table.HeaderCell></Table.HeaderCell>
-                    <Table.HeaderCell>Mal</Table.HeaderCell>
-                    <Table.HeaderCell>Tittel</Table.HeaderCell>
-                </Table.Row>
-            </Table.Header>
+            <DokumentValgTableHeader />
             <DokumentValgTableRows rows={rows} />
         </Table>
     );
@@ -122,7 +117,7 @@ function DokumentRow({ row, index }: DokumentRowProps) {
                     {""}
                 </Checkbox>
             </Table.DataCell>
-            <Table.DataCell width="1%">{row.malId}</Table.DataCell>
+            {environment.feature.visDokumentmalKode && <Table.DataCell width="1%">{row.malId}</Table.DataCell>}
             <Table.DataCell width="100%">
                 <EditableTitle index={index} malId={row.malId} tittel={row.tittel} onTitleChange={onTitleChange} />
             </Table.DataCell>
