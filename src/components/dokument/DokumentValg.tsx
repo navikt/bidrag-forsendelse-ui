@@ -13,6 +13,7 @@ interface TableRowData {
 }
 
 const harAlternativeTitler = (row: TableRowData) => row.alternativeTitler && row.alternativeTitler.length > 0;
+const erFritekstbrev = (row: TableRowData) => row.malId == "BI01S02";
 export interface DokumentFormProps {
     malId: string;
     tittel: string;
@@ -46,9 +47,11 @@ export default function DokumentValg({ malDetaljer, showLegend }: DokumentValgPr
     function updateValues(malId?: string) {
         const dokument = alleBrev.find((d) => d.malId == malId);
         if (dokument) {
+            const defaultTittel = harAlternativeTitler(dokument) || erFritekstbrev(dokument) ? null : dokument.tittel;
+            const tittel = editableTitles.get(malId) ?? defaultTittel;
             setValue("dokument", {
                 malId,
-                tittel: editableTitles.get(malId) ?? harAlternativeTitler(dokument) ? null : dokument.tittel,
+                tittel,
                 type: dokument.type,
             });
         }
@@ -176,7 +179,7 @@ function EditableAndSelectableTitle({ onTitleChange, row }: EditableAndSelectabl
     return (
         <AutoSuggest
             options={row.alternativeTitler ?? []}
-            placeholder={row.tittel}
+            placeholder={row.tittel + " (skriv inn tittel)"}
             label={""}
             onChange={onTitleChange}
         />

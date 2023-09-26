@@ -1,4 +1,3 @@
-import { RolleTypeAbbreviation } from "@navikt/bidrag-ui-common";
 import { Button, Cell, ContentContainer, ErrorSummary, Grid, Heading } from "@navikt/ds-react";
 import ErrorSummaryItem from "@navikt/ds-react/esm/form/error-summary/ErrorSummaryItem";
 import { FieldErrors, FormProvider, useForm, useFormContext } from "react-hook-form";
@@ -171,23 +170,14 @@ function OpprettForsendelseNy() {
         },
     });
 
-    const roller = useForsendelseApi().hentRoller();
-    const defaultGjelder = roller
-        .sort((_, rolleB) => (rolleB.rolleType == RolleTypeAbbreviation.BP ? 1 : -1))
-        .find((rolle) => [RolleTypeAbbreviation.BM, RolleTypeAbbreviation.BP].includes(rolle.rolleType))?.ident;
     const methods = useForm<OpprettForsendelseFormProps>({
         defaultValues: {
-            gjelderIdent: defaultGjelder,
-            mottaker: {
-                ident: defaultGjelder,
-            },
             tema: enhet == ENHET_FARSKAP ? "FAR" : "BID",
             språk: "NB",
         },
     });
     function onSubmit(data: OpprettForsendelseFormProps) {
-        console.log(data);
-        //opprettForsendelseFn.mutate(data);
+        opprettForsendelseFn.mutate(data);
     }
     return (
         <FormProvider {...methods}>
