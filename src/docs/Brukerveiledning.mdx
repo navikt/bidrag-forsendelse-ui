@@ -4,6 +4,10 @@ import forsendelse_bildet from "./files/forsendelse_bildet_vedtak.png";
 import forsendelse_dokumentliste_full from "./files/forsendelse_dokumentliste_full.png";
 import modia_dokumentliste from "./files/modia_dokumentliste.png";
 import navno_dokumentliste from "./files/navno_dokumentliste.png";
+import brevmaler_foreldreskap from "./files/brevmaler_foreldreskap.png";
+import brevmaler_alle from "./files/brevmaler_alle.png";
+import åpne_dokument_brevmal from "./files/åpne_dokument_brevmal.png";
+import brevmal_lastned from "./files/brevmal_lastned.png";
 
 # Brukerveiledning forsendelse
 
@@ -123,3 +127,28 @@ Bruker kan ikke se
 
 -   dokumenter som bruker selv har sendt inn via post, eller
 -   brev/dokumenter til eller fra andre parter.
+
+
+## Lenker til brevmalene på Navet
+Nederst til høyre på skjermbildet finner du lenker til brevmaler for varsel og vedtak på <strong>Navet</strong>:
+<div className="flex flex-row">
+    <figure className="w-[35rem] flex flex-col justify-between">
+        <img src={brevmaler_foreldreskap} />
+        <figcaption>Brevmaler</figcaption>
+    </figure>
+    <figure className="w-[35rem]">
+        <img src={brevmaler_alle} />
+        <figcaption>Brevmaler når tema er foreldreskap</figcaption>
+    </figure>
+</div>
+
+Hvis du åpner dokument for et brevmal via skjermbildet vil ikke knappen "Åpne i skrivebordsprogram" fungere. Da må du istedenfor gjøre følgende for å åpne dokumentet:
+* Trykk på tre dottene i høyre hjørnet på dokumentene
+ <figure className="w-[35rem]">
+        <img src={åpne_dokument_brevmal} />
+</figure>
+* Trykk på "last ned" knappen på menyen som dukker opp
+ <figure className="w-[35rem]">
+        <img src={brevmal_lastned} />
+</figure>
+* Åpne dokumentet som blir lastet ned

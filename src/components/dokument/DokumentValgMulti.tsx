@@ -1,3 +1,4 @@
+import { removeNonPrintableCharachters } from "@navikt/bidrag-ui-common";
 import { Checkbox, CheckboxGroup, Heading, Table, Textarea } from "@navikt/ds-react";
 import { useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
@@ -31,8 +32,16 @@ export default function DokumentValgMulti({ malDetaljer, showLegend }: DokumentV
     }));
 
     register("dokumenter", {
-        validate: (value: DokumentFormProps[]) =>
-            value.filter((v) => v != undefined).length == 0 ? "Minst et dokument må velges" : true,
+        validate: (value: DokumentFormProps[]) => {
+            const valgteDokumenter = value.filter((v) => v != undefined);
+            const harValgtDokument = valgteDokumenter.length > 0;
+            if (!harValgtDokument) return "Minst et dokument må velges";
+            const harAlleDokumenterTittel = valgteDokumenter.every(
+                (dok) => dok.tittel != null && dok.tittel.trim().length > 0
+            );
+            if (!harAlleDokumenterTittel) return "Tittel på notat kan ikke være tom";
+            return true;
+        },
     });
 
     return (
@@ -94,8 +103,9 @@ function DokumentRow({ row, index }: DokumentRowProps) {
         }
     }
     function onTitleChange(title: string) {
-        setTitle(title);
-        setValue(`dokumenter.${index}.tittel`, title);
+        const titlePrintable = removeNonPrintableCharachters(title);
+        setTitle(titlePrintable);
+        setValue(`dokumenter.${index}.tittel`, titlePrintable);
     }
     return (
         <Table.Row key={row.malId}>

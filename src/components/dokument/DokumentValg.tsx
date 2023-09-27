@@ -1,4 +1,4 @@
-import { AutoSuggest } from "@navikt/bidrag-ui-common";
+import { AutoSuggest, removeNonPrintableCharachters } from "@navikt/bidrag-ui-common";
 import { Heading, Radio, RadioGroup, Table, Textarea } from "@navikt/ds-react";
 import { useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
@@ -59,16 +59,16 @@ export default function DokumentValg({ malDetaljer, showLegend }: DokumentValgPr
     }
 
     function onTitleChange(malId: string, title: string) {
-        setEditableTitles((prevValue) => prevValue.set(malId, title));
+        const titleNoPrintable = removeNonPrintableCharachters(title);
+        setEditableTitles((prevValue) => prevValue.set(malId, titleNoPrintable));
         if (getValues("dokument.malId") == malId) {
-            setValue("dokument.tittel", title);
+            setValue("dokument.tittel", titleNoPrintable);
         }
     }
     const methods = register("dokument", {
         validate: (dok) => {
             if (dok?.malId == null) return "Dokument må velges";
-            if (dok?.tittel == null || dok.tittel.trim().length == 0)
-                return "Kan ikke opprette dokument med tom tittel";
+            if (dok?.tittel == null || dok.tittel.trim().length == 0) return "Tittel på dokumentet kan ikke være tom";
             return true;
         },
     });

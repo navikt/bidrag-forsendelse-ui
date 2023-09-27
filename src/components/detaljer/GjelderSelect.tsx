@@ -38,7 +38,7 @@ export default function GjelderSelect({ roller }: GjelderSelectProps) {
                 className="pb-2 pt-2"
                 size="small"
                 label={<Heading size="small">Gjelder</Heading>}
-                {...register("gjelderIdent", { required: "Gjelder må settes" })}
+                {...register("gjelderIdent", { required: "Gjelder må velges" })}
                 defaultValue={getValues("gjelderIdent")}
                 error={errors?.gjelderIdent?.message}
             >
