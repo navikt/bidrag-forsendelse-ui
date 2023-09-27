@@ -1,4 +1,4 @@
-import { dateToDDMMYYYYString, LoggerService, RolleTypeAbbreviation } from "@navikt/bidrag-ui-common";
+import { dateToDDMMYYYYString, LoggerService } from "@navikt/bidrag-ui-common";
 import { Button, Cell, ContentContainer, ErrorSummary, Grid, Heading } from "@navikt/ds-react";
 import ErrorSummaryItem from "@navikt/ds-react/esm/form/error-summary/ErrorSummaryItem";
 import { FieldErrors, FormProvider, useForm, useFormContext } from "react-hook-form";
@@ -69,13 +69,8 @@ export default function OpprettNotatPage() {
     });
 
     const roller = useForsendelseApi().hentRoller();
-    const defaultGjelder = roller
-        .sort((_, rolleB) => (rolleB.rolleType == RolleTypeAbbreviation.BP ? 1 : -1))
-        .find((rolle) => [RolleTypeAbbreviation.BM, RolleTypeAbbreviation.BP].includes(rolle.rolleType))?.ident;
     const methods = useForm<OpprettForsendelseFormProps>({
         defaultValues: {
-            gjelderIdent: defaultGjelder,
-            mottakerIdent: defaultGjelder,
             dokumentdato: dateToDDMMYYYYString(new Date()),
             tema: "BID",
             språk: "NB",

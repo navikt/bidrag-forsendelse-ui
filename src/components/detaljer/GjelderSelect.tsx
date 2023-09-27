@@ -6,7 +6,11 @@ interface GjelderSelectProps {
     roller: IRolleDetaljer[];
 }
 export default function GjelderSelect({ roller }: GjelderSelectProps) {
-    const { register, getValues } = useFormContext();
+    const {
+        register,
+        getValues,
+        formState: { errors },
+    } = useFormContext<{ gjelderIdent: string }>();
     const rollerFiltrert = roller
         .sort((_, rolleB) => (rolleB.rolleType == RolleTypeAbbreviation.BP ? 1 : -1))
         .filter((rolle) =>
@@ -34,9 +38,13 @@ export default function GjelderSelect({ roller }: GjelderSelectProps) {
                 className="pb-2 pt-2"
                 size="small"
                 label={<Heading size="small">Gjelder</Heading>}
-                {...register("gjelderIdent", { required: "Gjelder må settes" })}
+                {...register("gjelderIdent", { required: "Gjelder må velges" })}
                 defaultValue={getValues("gjelderIdent")}
+                error={errors?.gjelderIdent?.message}
             >
+                <option key={"empty"} value="">
+                    Velg gjelder
+                </option>
                 {rollerIkkeBarn.map((rolle) => (
                     <option key={rolle.ident} value={rolle.ident}>
                         {rolle.navn} / {rolle.ident}

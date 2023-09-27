@@ -11,7 +11,3 @@ export function hasOnlyNullValues(o?: Object): boolean {
             .filter((value) => typeof value == "string" || (typeof value == "boolean" && value == true)).length == 0
     );
 }
-
-export function removeNonprintableCharacters(value?: string): string | undefined {
-    return value.replace(/\p{C}/gu, "");
-}

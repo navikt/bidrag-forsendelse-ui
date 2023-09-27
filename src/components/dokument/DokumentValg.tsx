@@ -1,15 +1,20 @@
+import { AutoSuggest, removeNonPrintableCharachters } from "@navikt/bidrag-ui-common";
 import { Heading, Radio, RadioGroup, Table, Textarea } from "@navikt/ds-react";
 import { useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
 import { DokumentMalDetaljer } from "../../api/BidragForsendelseApi";
+import environment from "../../environment";
 
 interface TableRowData {
     malId: string;
     tittel: string;
+    alternativeTitler: string[];
     type: "UTGÅENDE" | "NOTAT";
 }
 
+const harAlternativeTitler = (row: TableRowData) => row.alternativeTitler && row.alternativeTitler.length > 0;
+const erFritekstbrev = (row: TableRowData) => row.malId == "BI01S02";
 export interface DokumentFormProps {
     malId: string;
     tittel: string;
@@ -36,27 +41,37 @@ export default function DokumentValg({ malDetaljer, showLegend }: DokumentValgPr
     const alleBrev: TableRowData[] = Object.keys(malDetaljer).map((key) => ({
         malId: key,
         tittel: malDetaljer[key].beskrivelse,
+        alternativeTitler: malDetaljer[key].alternativeTitler,
         type: malDetaljer[key].type,
     }));
 
     function updateValues(malId?: string) {
         const dokument = alleBrev.find((d) => d.malId == malId);
         if (dokument) {
+            const defaultTittel = harAlternativeTitler(dokument) || erFritekstbrev(dokument) ? null : dokument.tittel;
+            const tittel = editableTitles.get(malId) ?? defaultTittel;
             setValue("dokument", {
                 malId,
-                tittel: editableTitles.get(malId) ?? dokument.tittel,
+                tittel,
                 type: dokument.type,
             });
         }
     }
 
     function onTitleChange(malId: string, title: string) {
-        setEditableTitles((prevValue) => prevValue.set(malId, title));
+        const titleNoPrintable = removeNonPrintableCharachters(title);
+        setEditableTitles((prevValue) => prevValue.set(malId, titleNoPrintable));
         if (getValues("dokument.malId") == malId) {
-            setValue("dokument.tittel", title);
+            setValue("dokument.tittel", titleNoPrintable);
         }
     }
-    const methods = register("dokument", { validate: (dok) => (dok?.malId == null ? "Dokument må velges" : true) });
+    const methods = register("dokument", {
+        validate: (dok) => {
+            if (dok?.malId == null) return "Dokument må velges";
+            if (dok?.tittel == null || dok.tittel.trim().length == 0) return "Tittel på dokumentet kan ikke være tom";
+            return true;
+        },
+    });
     return (
         <div className="w-100">
             <RadioGroup
@@ -88,15 +103,21 @@ interface IDokumentValgTableProps {
 function DokumentValgTable({ rows, onTitleChange }: IDokumentValgTableProps) {
     return (
         <Table size="small">
-            <Table.Header>
-                <Table.Row>
-                    <Table.HeaderCell></Table.HeaderCell>
-                    <Table.HeaderCell>Mal</Table.HeaderCell>
-                    <Table.HeaderCell>Tittel</Table.HeaderCell>
-                </Table.Row>
-            </Table.Header>
+            <DokumentValgTableHeader />
             <DokumentValgTableRows rows={rows} onTitleChange={onTitleChange} />
         </Table>
+    );
+}
+
+export function DokumentValgTableHeader() {
+    return (
+        <Table.Header>
+            <Table.Row>
+                <Table.HeaderCell></Table.HeaderCell>
+                {environment.feature.visDokumentmalKode && <Table.HeaderCell>Mal</Table.HeaderCell>}
+                <Table.HeaderCell>Tittel</Table.HeaderCell>
+            </Table.Row>
+        </Table.Header>
     );
 }
 
@@ -114,36 +135,36 @@ function DokumentValgTableRows({ rows, onTitleChange }: DokumentValgTableProps) 
                             {""}
                         </Radio>
                     </Table.DataCell>
-                    <Table.DataCell width="1%">{row.malId}</Table.DataCell>
+                    {environment.feature.visDokumentmalKode && <Table.DataCell width="1%">{row.malId}</Table.DataCell>}
                     <Table.DataCell width="100%">
-                        <EditableTitle
-                            malId={row.malId}
-                            tittel={row.tittel}
-                            onTitleChange={(value) => onTitleChange(row.malId, value)}
-                        />
+                        <EditableTitle row={row} onTitleChange={(value) => onTitleChange(row.malId, value)} />
                     </Table.DataCell>
                 </Table.Row>
             ))}
         </Table.Body>
     );
 }
-
-function EditableTitle({
-    malId,
-    tittel,
-    onTitleChange,
-}: {
-    malId: string;
-    tittel: string;
-    onTitleChange: (value: string) => void;
-}) {
+interface EditableTitleProps {
+    row: TableRowData;
+    onTitleChange: (tittel: string) => void;
+}
+function EditableTitle({ row, onTitleChange }: EditableTitleProps) {
+    const { malId, tittel } = row;
     function shouldBeEditable() {
         const MALID_TITTLE_REDIGERBAR = ["BI01X02", "BI01X01", "BI01P11", "BI01S02"];
         return MALID_TITTLE_REDIGERBAR.includes(malId);
     }
 
+    function erFritekstbrev() {
+        return row.malId == "BI01S02";
+    }
+
     if (!shouldBeEditable()) {
         return tittel;
+    }
+
+    if (harAlternativeTitler(row) || erFritekstbrev()) {
+        return <EditableAndSelectableTitle row={row} onTitleChange={onTitleChange} />;
     }
     return (
         <Textarea
@@ -154,6 +175,20 @@ function EditableTitle({
             size="small"
             hideLabel
             onChange={(e) => onTitleChange(e.target.value)}
+        />
+    );
+}
+interface EditableAndSelectableTitleProps {
+    row: TableRowData;
+    onTitleChange: (tittel: string) => void;
+}
+function EditableAndSelectableTitle({ onTitleChange, row }: EditableAndSelectableTitleProps) {
+    return (
+        <AutoSuggest
+            options={row.alternativeTitler ?? []}
+            placeholder={row.tittel + " (skriv inn tittel)"}
+            label={""}
+            onChange={onTitleChange}
         />
     );
 }

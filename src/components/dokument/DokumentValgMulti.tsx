@@ -1,9 +1,11 @@
+import { removeNonPrintableCharachters } from "@navikt/bidrag-ui-common";
 import { Checkbox, CheckboxGroup, Heading, Table, Textarea } from "@navikt/ds-react";
 import { useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
 import { DokumentMalDetaljer } from "../../api/BidragForsendelseApi";
-import { DokumentFormProps } from "./DokumentValg";
+import environment from "../../environment";
+import { DokumentFormProps, DokumentValgTableHeader } from "./DokumentValg";
 
 interface TableRowData {
     malId: string;
@@ -30,8 +32,16 @@ export default function DokumentValgMulti({ malDetaljer, showLegend }: DokumentV
     }));
 
     register("dokumenter", {
-        validate: (value: DokumentFormProps[]) =>
-            value.filter((v) => v != undefined).length == 0 ? "Minst et dokument må velges" : true,
+        validate: (value: DokumentFormProps[]) => {
+            const valgteDokumenter = value.filter((v) => v != undefined);
+            const harValgtDokument = valgteDokumenter.length > 0;
+            if (!harValgtDokument) return "Minst et dokument må velges";
+            const harAlleDokumenterTittel = valgteDokumenter.every(
+                (dok) => dok.tittel != null && dok.tittel.trim().length > 0
+            );
+            if (!harAlleDokumenterTittel) return "Tittel på notat kan ikke være tom";
+            return true;
+        },
     });
 
     return (
@@ -52,13 +62,7 @@ interface IDokumentValgTableProps {
 function DokumentValgTable({ rows }: IDokumentValgTableProps) {
     return (
         <Table size="small">
-            <Table.Header>
-                <Table.Row>
-                    <Table.HeaderCell></Table.HeaderCell>
-                    <Table.HeaderCell>Mal</Table.HeaderCell>
-                    <Table.HeaderCell>Tittel</Table.HeaderCell>
-                </Table.Row>
-            </Table.Header>
+            <DokumentValgTableHeader />
             <DokumentValgTableRows rows={rows} />
         </Table>
     );
@@ -99,8 +103,9 @@ function DokumentRow({ row, index }: DokumentRowProps) {
         }
     }
     function onTitleChange(title: string) {
-        setTitle(title);
-        setValue(`dokumenter.${index}.tittel`, title);
+        const titlePrintable = removeNonPrintableCharachters(title);
+        setTitle(titlePrintable);
+        setValue(`dokumenter.${index}.tittel`, titlePrintable);
     }
     return (
         <Table.Row key={row.malId}>
@@ -122,7 +127,7 @@ function DokumentRow({ row, index }: DokumentRowProps) {
                     {""}
                 </Checkbox>
             </Table.DataCell>
-            <Table.DataCell width="1%">{row.malId}</Table.DataCell>
+            {environment.feature.visDokumentmalKode && <Table.DataCell width="1%">{row.malId}</Table.DataCell>}
             <Table.DataCell width="100%">
                 <EditableTitle index={index} malId={row.malId} tittel={row.tittel} onTitleChange={onTitleChange} />
             </Table.DataCell>
