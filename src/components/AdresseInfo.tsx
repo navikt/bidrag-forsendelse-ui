@@ -16,6 +16,7 @@ function renderDetailWhenExists(...values: string[]) {
 }
 
 export default function AdresseInfo({ adresse }: AdresseInfoProps) {
+    if (!adresse) return null;
     return (
         <>
             {renderDetailWhenExists(adresse?.adresselinje1)}

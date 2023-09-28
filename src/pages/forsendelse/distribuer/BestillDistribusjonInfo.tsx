@@ -15,7 +15,7 @@ import Mottaker from "../components/Mottaker";
 
 interface BestillDistribusjonContentProps {
     editable?: boolean;
-    adresse: IMottakerAdresse;
+    adresse?: IMottakerAdresse;
     onEditModeChanged?: (inEditMode: boolean) => void;
     onAdresseChanged: (adresse: IMottakerAdresse) => void;
 }

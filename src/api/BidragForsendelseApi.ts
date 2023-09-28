@@ -309,6 +309,8 @@ export interface HentDokumentValgRequest {
     vedtakId?: string;
     behandlingId?: string;
     enhet?: string;
+    stonadType?: StonadType;
+    engangsBelopType?: EngangsbelopType;
 }
 
 export interface DokumentMalDetaljer {
@@ -1102,6 +1104,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             data: DistribuerJournalpostRequest,
             query?: {
                 batchId?: string;
+                ingenDistribusjon?: boolean;
             },
             params: RequestParams = {}
         ) =>
@@ -1130,6 +1133,23 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 body: data,
                 secure: true,
                 type: ContentType.Json,
+                ...params,
+            }),
+
+        /**
+         * @description Henter dokumentmaler som er støttet av applikasjonen
+         *
+         * @tags forsendelse-innsyn-kontroller
+         * @name HentDokumentValgNotaterGet
+         * @request GET:/api/forsendelse/dokumentvalg/notat
+         * @deprecated
+         * @secure
+         */
+        hentDokumentValgNotaterGet: (params: RequestParams = {}) =>
+            this.request<Record<string, DokumentMalDetaljer>, any>({
+                path: `/api/forsendelse/dokumentvalg/notat`,
+                method: "GET",
+                secure: true,
                 ...params,
             }),
 

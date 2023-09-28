@@ -8,6 +8,9 @@ export function hasOnlyNullValues(o?: Object): boolean {
     return (
         Object.values(o)
             .filter((value) => value != null)
-            .filter((value) => typeof value == "string" || (typeof value == "boolean" && value == true)).length == 0
+            .filter(
+                (value) =>
+                    (typeof value == "string" && value.length > 0) || (typeof value == "boolean" && value == true)
+            ).length == 0
     );
 }
