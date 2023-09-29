@@ -188,6 +188,9 @@ function DistribusjonKnapper({
 }: DistribusjonKnapperProps) {
     const [ingenDistribusjon, setIngenDistribusjon] = useState(false);
     const distribusjonKanal = useDokumentApi().distribusjonKanal();
+    useEffect(() => {
+        if (harAdresse) setIngenDistribusjon(false);
+    }, [harAdresse]);
     function renderIngenDistribusjonChoice() {
         if (harAdresse) return null;
         if (distribusjonKanal.distribusjonskanal != BestemKanalResponseDistribusjonskanalEnum.PRINT) return null;
