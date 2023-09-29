@@ -1,4 +1,5 @@
-import { Alert, BodyShort, Button, Heading, Loader } from "@navikt/ds-react";
+import ObjectUtils from "@navikt/bidrag-ui-common/esm/utils/ObjectUtils";
+import { Alert, BodyShort, Button, ConfirmationPanel, Heading, Loader } from "@navikt/ds-react";
 import { Modal } from "@navikt/ds-react";
 import React from "react";
 import { useState } from "react";
@@ -9,9 +10,12 @@ import { useQuery } from "react-query";
 import { BIDRAG_FORSENDELSE_API } from "../../../api/api";
 import { PERSON_API } from "../../../api/api";
 import { DistribuerTilAdresse } from "../../../api/BidragDokumentApi";
+import { BestemKanalResponseDistribusjonskanalEnum } from "../../../api/BidragDokumentArkivApi";
 import { DistribuerJournalpostRequest } from "../../../api/BidragForsendelseApi";
 import { hentPostnummere } from "../../../api/queries";
+import useDokumentApi from "../../../hooks/useDokumentApi";
 import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
+import { hasOnlyNullValues } from "../../../utils/ObjectUtils";
 import { RedirectTo } from "../../../utils/RedirectUtils";
 import BestillDistribusjonInfo from "./BestillDistribusjonInfo";
 
@@ -19,16 +23,18 @@ interface BestillDistribusjonModalProps {
     onCancel: () => void;
 }
 export default function BestillDistribusjonModal({ onCancel }: BestillDistribusjonModalProps) {
-    const [submitState, setSubmitState] = useState<"pending" | "idle" | "succesfull" | "error">("idle");
+    const [submitState, setSubmitState] = useState<
+        "pending" | "idle" | "succesfull" | "succesfull_no_distribution" | "error"
+    >("idle");
     const [onEditMode, setOnEditMode] = useState<boolean>(false);
     const [loadingData, setLoadingData] = useState<boolean>(true);
     const [error, setError] = useState<string>();
-    const [adresse, setAdresse] = useState<DistribuerTilAdresse>();
+    const [adresse, setAdresse] = useState<DistribuerTilAdresse | undefined>();
     const forsendelse = useForsendelseApi().hentForsendelse();
     const postnummere = hentPostnummere();
     const ident = forsendelse.mottaker.ident;
     const mottaker = forsendelse.mottaker;
-
+    const harAdresse = adresse != undefined && adresse != null;
     const personAdresseQuery = useQuery({
         queryKey: `person_adresse_${ident}`,
         queryFn: async () => {
@@ -40,8 +46,13 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
                 }
                 return adresse;
             } else {
-                return (await PERSON_API.adresse.hentPersonPostadresse({ personident: "" }, { ident }))?.data;
+                const response = await PERSON_API.adresse.hentPersonPostadresse({ personident: "" }, { ident });
+                return response?.status == 204 ? null : response?.data;
             }
+        },
+        onSuccess: (adresse) => {
+            const erTomAdresse = ObjectUtils.isEmpty(adresse) || hasOnlyNullValues(adresse);
+            return erTomAdresse ? null : adresse;
         },
         suspense: false,
     });
@@ -50,23 +61,24 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
         if (personAdresseQuery.status == "success") {
             const adresseResponse = personAdresseQuery.data;
             setLoadingData(false);
-            setAdresse({
-                ...adresseResponse,
-                adresselinje1: adresseResponse.adresselinje1 ?? "",
-            });
+            // @ts-ignore
+            setAdresse(adresseResponse);
         }
     }, [personAdresseQuery.status]);
 
     const distribuerMutation = useMutation({
-        mutationFn: () => {
+        mutationFn: async ({ ingenDistribusjon }: { ingenDistribusjon?: boolean }) => {
             const request: DistribuerJournalpostRequest = {
                 lokalUtskrift: false,
                 adresse: adresse,
             };
-            return BIDRAG_FORSENDELSE_API.api.distribuerForsendelse(forsendelse.forsendelseId, request);
+            await BIDRAG_FORSENDELSE_API.api.distribuerForsendelse(forsendelse.forsendelseId, request, {
+                ingenDistribusjon,
+            });
+            return ingenDistribusjon ? false : true;
         },
-        onSuccess: () => {
-            setSubmitState("succesfull");
+        onSuccess: (distribuert: boolean) => {
+            setSubmitState(distribuert ? "succesfull" : "succesfull_no_distribution");
             RedirectTo.sakshistorikk(forsendelse.saksnummer);
         },
         onError: () => {
@@ -82,8 +94,8 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
         return postnummerValue ? postnummerValue[postnummer] : undefined;
     }
 
-    function onSubmit() {
-        if (!adresse) {
+    function onSubmit(trengerAdresseForDistribusjon: boolean, ingenDistribusjon?: boolean) {
+        if (trengerAdresseForDistribusjon && !adresse && !ingenDistribusjon) {
             setError("Adresse må settes før distribusjon");
             setSubmitState("error");
             return;
@@ -91,7 +103,7 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
 
         setError(null);
         setSubmitState("pending");
-        distribuerMutation.mutate();
+        distribuerMutation.mutate({ ingenDistribusjon });
     }
 
     function renderModalBody() {
@@ -106,7 +118,7 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
                 <React.Suspense fallback={<Loader variant="neutral" size="small" />}>
                     <BestillDistribusjonInfo
                         adresse={adresse}
-                        editable={submitState === "idle"}
+                        editable={submitState === "idle" || submitState == "error"}
                         onEditModeChanged={setOnEditMode}
                         onAdresseChanged={setAdresse}
                     />
@@ -115,6 +127,7 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
                     <DistribusjonKnapper
                         onSubmit={onSubmit}
                         onCancel={onCancel}
+                        harAdresse={harAdresse}
                         loading={submitState === "pending"}
                         submitButtonDisabled={submitButtonDisabled}
                         cancelButtonDisabled={cancelButtonDisabled}
@@ -139,14 +152,14 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
                         <BodyShort>{error}</BodyShort>
                     </Alert>
                 )}
-                {!adresse && !loadingData && (
-                    <Alert variant="warning" className={"mt-2"}>
-                        <BodyShort>Fant ingen adresse for mottaker {mottaker.ident}</BodyShort>
-                    </Alert>
-                )}
                 {submitState === "succesfull" && (
                     <Alert variant="success" className={"mt-2"}>
                         <BodyShort>Distribusjon bestilt. Åpner sakshistorikk</BodyShort>
+                    </Alert>
+                )}
+                {submitState === "succesfull_no_distribution" && (
+                    <Alert variant="success" className={"mt-2"}>
+                        <BodyShort>Forsendelse markert som ikke distribuert. Åpner sakshistorikk</BodyShort>
                     </Alert>
                 )}
                 <div className={"min-w-[35rem] relative px-2 w-full max-w-3xl h-full md:h-auto"}>
@@ -158,8 +171,9 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
 }
 
 interface DistribusjonKnapperProps {
-    onSubmit: () => void;
+    onSubmit: (trengerAdresseForDistribusjon: boolean, ingenDistribusjon?: boolean) => void;
     onCancel: () => void;
+    harAdresse: boolean;
     submitButtonDisabled: boolean;
     cancelButtonDisabled: boolean;
     loading: boolean;
@@ -167,24 +181,53 @@ interface DistribusjonKnapperProps {
 function DistribusjonKnapper({
     onSubmit,
     onCancel,
+    harAdresse,
     cancelButtonDisabled,
     loading,
     submitButtonDisabled,
 }: DistribusjonKnapperProps) {
-    return (
-        <div className="flex items-center space-x-2">
-            <Button
-                variant={"primary"}
-                onClick={onSubmit}
+    const [ingenDistribusjon, setIngenDistribusjon] = useState(false);
+    const distribusjonKanal = useDokumentApi().distribusjonKanal();
+    const trengerAdresseForDistribusjon =
+        distribusjonKanal.distribusjonskanal == BestemKanalResponseDistribusjonskanalEnum.PRINT;
+    useEffect(() => {
+        if (harAdresse) setIngenDistribusjon(false);
+    }, [harAdresse]);
+    function renderIngenDistribusjonChoice() {
+        if (harAdresse) return null;
+        if (!trengerAdresseForDistribusjon) return null;
+        return (
+            <ConfirmationPanel
                 size="small"
-                loading={loading}
-                disabled={submitButtonDisabled}
+                className="mb-2"
+                checked={ingenDistribusjon}
+                label="Mottaker mangler adresse. Ferdigstill forsendelsen uten distribusjon."
+                onChange={() => setIngenDistribusjon((x) => !x)}
             >
-                Bekreft og gå tilbake til sakshistorikk
-            </Button>
-            <Button size="small" variant={"secondary"} disabled={cancelButtonDisabled} onClick={onCancel}>
-                Avbryt
-            </Button>
+                Fant ingen postadresse til mottaker. Når adressen ikke er tilgjengelig, kan du ferdigstille forsendelsen
+                uten å distribuere den til mottaker.
+            </ConfirmationPanel>
+        );
+    }
+    return (
+        <div className="flex flex-col">
+            {renderIngenDistribusjonChoice()}
+            <div className="flex items-center space-x-2">
+                <Button
+                    variant={"primary"}
+                    onClick={() => onSubmit(trengerAdresseForDistribusjon, ingenDistribusjon)}
+                    size="small"
+                    loading={loading}
+                    disabled={submitButtonDisabled}
+                >
+                    {ingenDistribusjon
+                        ? "Bekreft uten distribusjon og gå tilbake til sakshistorikk"
+                        : "Bekreft og gå tilbake til sakshistorikk"}
+                </Button>
+                <Button size="small" variant={"secondary"} disabled={cancelButtonDisabled} onClick={onCancel}>
+                    Avbryt
+                </Button>
+            </div>
         </div>
     );
 }

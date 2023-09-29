@@ -1,3 +1,4 @@
+import ObjectUtils from "@navikt/bidrag-ui-common/esm/utils/ObjectUtils";
 import { Button, Cell, ContentContainer, ErrorSummary, Grid, Heading } from "@navikt/ds-react";
 import ErrorSummaryItem from "@navikt/ds-react/esm/form/error-summary/ErrorSummaryItem";
 import { FieldErrors, FormProvider, useForm, useFormContext } from "react-hook-form";
@@ -12,6 +13,7 @@ import { useForsendelseApi, UseForsendelseApiKeys } from "../../hooks/useForsend
 import { ENHET_FARSKAP } from "../../types/EnhetTypes";
 import { mapToBehandlingInfoDto } from "../../types/Forsendelse";
 import { countryCodeIso2ToIso3 } from "../../utils/AdresseUtils";
+import { hasOnlyNullValues } from "../../utils/ObjectUtils";
 import { useSession } from "../forsendelse/context/SessionContext";
 import { queryClient } from "../PageWrapper";
 import AvbrytOpprettForsendelseButton from "./AvbrytOpprettForsendelseButton";
@@ -55,12 +57,13 @@ function mapToOpprettEllerOppdaterForsendelseRequest(
     data: OpprettForsendelseFormProps
 ): OppdaterForsendelseForesporsel {
     const landkode = data.mottaker?.adresse?.landkode ?? data.mottaker?.adresse?.land;
+    const hasAdresse = !ObjectUtils.isEmpty(data.mottaker?.adresse) && !hasOnlyNullValues(data.mottaker?.adresse);
     return {
         gjelderIdent: data.gjelderIdent,
         mottaker: {
             ident: data.mottaker.ident,
             navn: data.mottaker.navn,
-            adresse: data.mottaker?.adresse
+            adresse: hasAdresse
                 ? {
                       ...data.mottaker?.adresse,
                       landkode,
