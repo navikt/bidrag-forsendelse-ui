@@ -94,8 +94,8 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
         return postnummerValue ? postnummerValue[postnummer] : undefined;
     }
 
-    function onSubmit(ingenDistribusjon?: boolean) {
-        if (!adresse && !ingenDistribusjon) {
+    function onSubmit(trengerAdresseForDistribusjon: boolean, ingenDistribusjon?: boolean) {
+        if (trengerAdresseForDistribusjon && !adresse && !ingenDistribusjon) {
             setError("Adresse må settes før distribusjon");
             setSubmitState("error");
             return;
@@ -171,7 +171,7 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
 }
 
 interface DistribusjonKnapperProps {
-    onSubmit: (ingenDistribusjon?: boolean) => void;
+    onSubmit: (trengerAdresseForDistribusjon: boolean, ingenDistribusjon?: boolean) => void;
     onCancel: () => void;
     harAdresse: boolean;
     submitButtonDisabled: boolean;
@@ -188,12 +188,14 @@ function DistribusjonKnapper({
 }: DistribusjonKnapperProps) {
     const [ingenDistribusjon, setIngenDistribusjon] = useState(false);
     const distribusjonKanal = useDokumentApi().distribusjonKanal();
+    const trengerAdresseForDistribusjon =
+        distribusjonKanal.distribusjonskanal == BestemKanalResponseDistribusjonskanalEnum.PRINT;
     useEffect(() => {
         if (harAdresse) setIngenDistribusjon(false);
     }, [harAdresse]);
     function renderIngenDistribusjonChoice() {
         if (harAdresse) return null;
-        if (distribusjonKanal.distribusjonskanal != BestemKanalResponseDistribusjonskanalEnum.PRINT) return null;
+        if (!trengerAdresseForDistribusjon) return null;
         return (
             <ConfirmationPanel
                 size="small"
@@ -213,7 +215,7 @@ function DistribusjonKnapper({
             <div className="flex items-center space-x-2">
                 <Button
                     variant={"primary"}
-                    onClick={() => onSubmit(ingenDistribusjon)}
+                    onClick={() => onSubmit(trengerAdresseForDistribusjon, ingenDistribusjon)}
                     size="small"
                     loading={loading}
                     disabled={submitButtonDisabled}
