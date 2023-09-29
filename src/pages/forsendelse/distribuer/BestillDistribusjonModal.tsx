@@ -196,11 +196,11 @@ function DistribusjonKnapper({
                 size="small"
                 className="mb-2"
                 checked={ingenDistribusjon}
-                label="Marker forsendelse som ikke distribuert"
+                label="Mottaker mangler adresse. Ferdigstill forsendelsen uten distribusjon."
                 onChange={() => setIngenDistribusjon((x) => !x)}
             >
-                Fant ingen postadresse til mottaker. Hvis adressen til mottaker ikke er tilgjengelig kan du markere
-                forsendelsen som <i>ikke distribuert</i>.
+                Fant ingen postadresse til mottaker. Hvis adressen til mottaker ikke er tilgjengelig kan du ferdigstille
+                forsendelsen uten å distribuere til mottaker.
             </ConfirmationPanel>
         );
     }
@@ -215,7 +215,9 @@ function DistribusjonKnapper({
                     loading={loading}
                     disabled={submitButtonDisabled}
                 >
-                    Bekreft og gå tilbake til sakshistorikk
+                    {ingenDistribusjon
+                        ? "Bekreft uten distribusjon og gå tilbake til sakshistorikk"
+                        : "Bekreft og gå tilbake til sakshistorikk"}
                 </Button>
                 <Button size="small" variant={"secondary"} disabled={cancelButtonDisabled} onClick={onCancel}>
                     Avbryt
