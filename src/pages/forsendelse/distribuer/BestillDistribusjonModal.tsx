@@ -202,8 +202,8 @@ function DistribusjonKnapper({
                 label="Mottaker mangler adresse. Ferdigstill forsendelsen uten distribusjon."
                 onChange={() => setIngenDistribusjon((x) => !x)}
             >
-                Fant ingen postadresse til mottaker. Hvis adressen til mottaker ikke er tilgjengelig kan du ferdigstille
-                forsendelsen uten å distribuere til mottaker.
+                Fant ingen postadresse til mottaker. Når adressen ikke er tilgjengelig, kan du ferdigstille forsendelsen
+                uten å distribuere den til mottaker.
             </ConfirmationPanel>
         );
     }
