@@ -2,13 +2,13 @@ import { IRolleDetaljer, RolleType, RolleTypeAbbreviation, RolleTypeFullName } f
 import IdentUtils from "@navikt/bidrag-ui-common/esm/utils/IdentUtils";
 import { AxiosError, AxiosResponse, HttpStatusCode } from "axios";
 import React from "react";
-import { useQuery } from "react-query";
+import { useQuery, UseQueryResult } from "react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../api/api";
 import { SAK_API } from "../api/api";
 import { BIDRAG_DOKUMENT_API } from "../api/api";
 import { JournalpostDto } from "../api/BidragDokumentApi";
-import { ForsendelseResponsTo } from "../api/BidragForsendelseApi";
+import { DokumentMalDetaljer, ForsendelseResponsTo } from "../api/BidragForsendelseApi";
 import { BidragSakDto } from "../api/BidragSakApi";
 import { DokumentStatus } from "../constants/DokumentStatus";
 import { SAKSNUMMER } from "../constants/fellestyper";
@@ -20,6 +20,7 @@ import { parseErrorMessageFromAxiosError } from "../utils/ErrorUtils";
 import { journalpostMapper } from "./useDokumentApi";
 import useSamhandlerPersonApi from "./usePersonApi";
 
+export type VedleggListe = { malId: string; detaljer: DokumentMalDetaljer }[];
 export const UseForsendelseApiKeys = {
     forsendelse: "forsendelse",
     sak: "sak",
@@ -43,6 +44,7 @@ interface UseForsendelseDataProps {
     hentRoller: () => IRolleDetaljer[];
     hentJournalposterForPerson: (ident?: string) => Map<SAKSNUMMER, IJournalpost[]>;
     hentJournalposterForSak: (saksnummer: string) => IJournalpost[];
+    vedleggListe: () => UseQueryResult<VedleggListe>;
 }
 export function useForsendelseApi(): UseForsendelseDataProps {
     const { forsendelseId, saksnummer: saksnummerFromSession } = useSession();
@@ -213,6 +215,27 @@ export function useForsendelseApi(): UseForsendelseDataProps {
         };
     }
 
+    function vedleggListe() {
+        const { enhet } = useSession();
+        return useQuery({
+            queryKey: `vedlegg_liste`,
+            queryFn: ({ signal }) => BIDRAG_FORSENDELSE_API.api.stottedeDokumentmalDetaljer(),
+            select: React.useCallback((response: AxiosResponse): VedleggListe => {
+                const dokumentmaler = response.data as Record<string, DokumentMalDetaljer>;
+                return Object.entries(dokumentmaler)
+                    .filter(
+                        ([key, value]) =>
+                            value.statiskInnhold &&
+                            (value.tilhorerEnheter.length == 0 || value.tilhorerEnheter.includes(enhet))
+                    )
+                    .map(([key, value]) => ({
+                        malId: key,
+                        detaljer: value,
+                    }));
+            }, []),
+        });
+    }
+
     function kanEndre() {
         const forsendelse = hentForsendelseQuery();
         return forsendelse.status == "UNDER_PRODUKSJON";
@@ -235,5 +258,6 @@ export function useForsendelseApi(): UseForsendelseDataProps {
         hentJournalposterForSak,
         kanEndre,
         hentStørrelseIMb,
+        vedleggListe,
     };
 }
