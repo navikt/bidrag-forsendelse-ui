@@ -12,7 +12,7 @@ import { IDokument } from "../../types/Dokument";
 import { cleanupAfterClosedModal } from "../../utils/ModalUtils";
 
 export default function LeggTilVedleggKnapp() {
-    const { addDocuments, saveChanges } = useDokumenterForm();
+    const { addDocuments } = useDokumenterForm();
     const [modalOpen, setModalOpen] = useState(false);
     const { data: vedleggListe } = useForsendelseApi().vedleggListe();
 
@@ -120,8 +120,8 @@ function DokumentValgVedlegg() {
     const {
         register,
         setValue,
-        getValues,
         formState: { errors },
+        resetField,
     } = useFormContext<{
         dokument: DokumentFormProps;
     }>();
@@ -155,6 +155,8 @@ function DokumentValgVedlegg() {
                 malId,
                 tittel,
             });
+        } else {
+            resetField("dokument");
         }
     }
     register("dokument", {
@@ -165,6 +167,21 @@ function DokumentValgVedlegg() {
         },
     });
 
+    function innholdTypeTilVisningsnavn(innholdType: DokumentMalDetaljerInnholdTypeEnum): string {
+        switch (innholdType) {
+            case DokumentMalDetaljerInnholdTypeEnum.SKJEMA:
+                return "Skjema";
+            case DokumentMalDetaljerInnholdTypeEnum.VARSEL:
+                return "Varsel";
+            case DokumentMalDetaljerInnholdTypeEnum.VEDLEGG_VARSEL:
+                return "Vedlegg til varselbrev";
+            case DokumentMalDetaljerInnholdTypeEnum.VEDLEGG_VEDTAK:
+                return "Vedlegg til vedtakbrev";
+            case DokumentMalDetaljerInnholdTypeEnum.VEDTAK:
+                return "Vedtak";
+        }
+        return innholdType;
+    }
     const rows = getAllRows();
     return (
         <div className="w-100">
@@ -178,7 +195,7 @@ function DokumentValgVedlegg() {
                 {Object.keys(rows).map((innholdType) => {
                     const dokumentListe = rows[innholdType];
                     return (
-                        <optgroup label={innholdType}>
+                        <optgroup label={innholdTypeTilVisningsnavn(innholdType as DokumentMalDetaljerInnholdTypeEnum)}>
                             {dokumentListe.map((dokument) => (
                                 <option value={dokument.malId}>{dokument.beskrivelse}</option>
                             ))}
