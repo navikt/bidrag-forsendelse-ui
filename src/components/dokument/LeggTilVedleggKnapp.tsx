@@ -103,10 +103,11 @@ function LeggTilVedlegglModal({ onClose, open }: LeggTilDokumentFraSakModalProps
     );
 }
 
-interface SelectDocumentData {
+interface SelectOptionData {
     malId: string;
     tittel: string;
     beskrivelse: string;
+    språk: string;
     innholdType: DokumentMalDetaljerInnholdTypeEnum;
 }
 
@@ -126,15 +127,16 @@ function DokumentValgVedlegg() {
         dokument: DokumentFormProps;
     }>();
 
-    function getAllRows() {
+    function getAllOptions(): Record<string, SelectOptionData[]> {
         const tableData = vedleggListe.map((vedlegg) => ({
             malId: vedlegg.malId,
             beskrivelse: vedlegg.detaljer.beskrivelse,
             tittel: vedlegg.detaljer.beskrivelse,
             innholdType: vedlegg.detaljer.innholdType,
+            språk: vedlegg.detaljer.språk.length > 0 ? vedlegg.detaljer.språk[0] : "NB",
         }));
 
-        const rowData: Record<string, SelectDocumentData[]> = {};
+        const rowData: Record<string, SelectOptionData[]> = {};
 
         tableData.forEach((data) => {
             if (!rowData[data.innholdType]) {
@@ -150,7 +152,9 @@ function DokumentValgVedlegg() {
     function onSelectionChange(malId: string) {
         const dokument = vedleggListe.find((d) => d.malId == malId);
         if (dokument) {
-            const tittel = dokument.detaljer.tittel;
+            const beskrivelse = dokument.detaljer.beskrivelse;
+            const erNorsk = dokument.detaljer.språk.length == 0 || dokument.detaljer.språk.includes("NB");
+            const tittel = erNorsk ? dokument.detaljer.tittel : `${dokument.detaljer.tittel} (${beskrivelse})`;
             setValue("dokument", {
                 malId,
                 tittel,
@@ -182,7 +186,12 @@ function DokumentValgVedlegg() {
         }
         return innholdType;
     }
-    const rows = getAllRows();
+    const options = getAllOptions();
+
+    function mapToBeskrivelse(option: SelectOptionData) {
+        if (option.språk == "NB") return option.beskrivelse;
+        return `${option.beskrivelse} (${option.språk})`;
+    }
     return (
         <div className="w-100">
             <Select
@@ -192,13 +201,19 @@ function DokumentValgVedlegg() {
                 error={errors.dokument?.message}
             >
                 <option value="">Velg dokument</option>
-                {Object.keys(rows).map((innholdType) => {
-                    const dokumentListe = rows[innholdType];
+                {Object.keys(options).map((innholdType) => {
+                    const dokumentListe = options[innholdType];
                     return (
                         <optgroup label={innholdTypeTilVisningsnavn(innholdType as DokumentMalDetaljerInnholdTypeEnum)}>
-                            {dokumentListe.map((dokument) => (
-                                <option value={dokument.malId}>{dokument.beskrivelse}</option>
-                            ))}
+                            {dokumentListe
+                                .map((opt) => ({
+                                    ...opt,
+                                    beskrivelse: mapToBeskrivelse(opt),
+                                }))
+                                .sort((a, b) => (b.språk == "NB" ? 1 : a.beskrivelse.localeCompare(b.beskrivelse)))
+                                .map((dokument) => (
+                                    <option value={dokument.malId}>{dokument.beskrivelse}</option>
+                                ))}
                         </optgroup>
                     );
                 })}

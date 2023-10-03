@@ -330,6 +330,7 @@ export interface DokumentMalDetaljer {
     beskrivelse: string;
     statiskInnhold: boolean;
     innholdType?: DokumentMalDetaljerInnholdTypeEnum;
+    språk: string[];
     tilhorerEnheter: string[];
     alternativeTitler: string[];
 }
@@ -1118,24 +1119,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         hentDokumentValg: (data: HentDokumentValgRequest, params: RequestParams = {}) =>
             this.request<Record<string, DokumentMalDetaljer>, any>({
                 path: `/api/forsendelse/dokumentvalg`,
-                method: "POST",
-                body: data,
-                secure: true,
-                type: ContentType.Json,
-                ...params,
-            }),
-
-        /**
-         * @description Henter dokumentmaler for statiske vedlegg
-         *
-         * @tags forsendelse-innsyn-kontroller
-         * @name HentDokumentValgVedlegg
-         * @request POST:/api/forsendelse/dokumentvalg/vedlegg
-         * @secure
-         */
-        hentDokumentValgVedlegg: (data: HentDokumentValgRequest, params: RequestParams = {}) =>
-            this.request<Record<string, DokumentMalDetaljer>, any>({
-                path: `/api/forsendelse/dokumentvalg/vedlegg`,
                 method: "POST",
                 body: data,
                 secure: true,
