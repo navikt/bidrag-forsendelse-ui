@@ -4,7 +4,7 @@ import { useQuery } from "react-query";
 
 import { PERSON_API, SAMHANDLER_API } from "../api/api";
 import { MottakerAdresseTo } from "../api/BidragForsendelseApi";
-import { PersonDto } from "../api/BidragPersonApi";
+import { PersonAdresseDto, PersonDto } from "../api/BidragPersonApi";
 import { countryCodeIso3ToIso2 } from "../utils/AdresseUtils";
 
 type PersonInfo = { ident: string; navn?: string; valid?: boolean; adresse?: MottakerAdresseTo };
@@ -48,20 +48,20 @@ export default function useSamhandlerPersonApi() {
                     };
                 } else if (IdentUtils.isFnr(ident)) {
                     const result = await PERSON_API.informasjon.hentPersonPost({ ident });
-                    const postAdresseResult = await PERSON_API.adresse.hentPersonPostadresse(null, {
-                        ident,
-                    });
+                    const postAdresseResult = await hentPersonAdresse(ident);
                     if (result.status != 200) throw Error(`Fant ikke person med ident ${ident}`);
                     return {
                         ident,
                         navn: result.data.navn,
                         valid: true,
-                        adresse: {
-                            adresselinje1: "",
-                            ...postAdresseResult.data,
-                            landkode: postAdresseResult.data.land,
-                            landkode3: postAdresseResult.data.land3,
-                        },
+                        adresse: postAdresseResult
+                            ? {
+                                  adresselinje1: "",
+                                  ...postAdresseResult,
+                                  landkode: postAdresseResult.land,
+                                  landkode3: postAdresseResult.land3,
+                              }
+                            : null,
                     };
                 }
                 return { ident, valid: false };
@@ -72,6 +72,13 @@ export default function useSamhandlerPersonApi() {
         });
     }
 
+    async function hentPersonAdresse(ident: string): Promise<PersonAdresseDto | null> {
+        const postAdresseResult = await PERSON_API.adresse.hentPersonPostadresse(null, {
+            ident,
+        });
+        if (postAdresseResult.status == 201) return null;
+        return postAdresseResult.data;
+    }
     return {
         hentSamhandlerEllerPersonForIdent,
         hentPerson,

@@ -1,10 +1,12 @@
 import { MagnifyingGlassIcon, PersonIcon, PersonPencilIcon } from "@navikt/aksel-icons";
 import IdentUtils from "@navikt/bidrag-ui-common/esm/utils/IdentUtils";
 import ObjectUtils from "@navikt/bidrag-ui-common/esm/utils/ObjectUtils";
-import { Alert, Heading, Loader, Panel, Tabs, TextField } from "@navikt/ds-react";
+import { Edit } from "@navikt/ds-icons";
+import { Alert, Button, Heading, Loader, Panel, Tabs, TextField } from "@navikt/ds-react";
 import React, { useEffect, useRef, useState } from "react";
 import { useWatch } from "react-hook-form";
 
+import { MottakerAdresseTo } from "../../api/BidragForsendelseApi";
 import AdresseInfo from "../../components/AdresseInfo";
 import { EditAddress } from "../../components/EditAddress";
 import InfoKnapp from "../../components/InfoKnapp";
@@ -12,6 +14,7 @@ import PersonDetaljer from "../../components/person/PersonDetaljer";
 import MottakerInfo from "../../docs/Mottaker.mdx";
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
 import useSamhandlerPersonApi from "../../hooks/usePersonApi";
+import { hasOnlyNullValues } from "../../utils/ObjectUtils";
 import {
     MottakerFormProps,
     OpprettForsendelseFormProps,
@@ -137,7 +140,7 @@ function MottakerFritekst() {
 }
 
 function MottakerNavnOgAdresse() {
-    const { setValue } = useOpprettForsendelseFormContext();
+    const { setValue, watch } = useOpprettForsendelseFormContext();
     const mottakerIdent: string = useWatch<OpprettForsendelseFormProps>({ name: "mottaker.ident" }) as string;
     const { data, isFetching, isError } = useSamhandlerPersonApi().hentSamhandlerEllerPersonForIdent(mottakerIdent);
     const roller = useForsendelseApi().hentRoller();
@@ -171,6 +174,7 @@ function MottakerNavnOgAdresse() {
             </Alert>
         );
     }
+
     if (!data?.valid) return null;
 
     return (
@@ -182,10 +186,66 @@ function MottakerNavnOgAdresse() {
                 // ident={data.ident}
                 rolle={hentRolle(data.ident)}
             />
+
             <div className="pt-3">
-                <Heading size="xsmall">Adresse:</Heading>
-                <AdresseInfo adresse={data.adresse} />
+                <MottakerAdresse adresse={data.adresse} />
             </div>
         </Panel>
+    );
+}
+
+type MottakerAdresseProps = {
+    adresse?: MottakerAdresseTo;
+};
+
+function MottakerAdresse({ adresse: mottakerAdresse }: MottakerAdresseProps) {
+    const [inEditMode, setInEditMode] = useState(false);
+    const { watch } = useOpprettForsendelseFormContext();
+    const manglerAdresse = mottakerAdresse == null;
+    const adresse = mottakerAdresse ?? watch("mottaker.adresse");
+
+    const hasAdresse = !ObjectUtils.isEmpty(adresse) && !hasOnlyNullValues(adresse);
+    const editAdresse = inEditMode || hasAdresse;
+
+    function onInitEditMode() {
+        setInEditMode(true);
+    }
+
+    function renderAdresse() {
+        if (!manglerAdresse) {
+            return <AdresseInfo adresse={adresse} />;
+        }
+
+        if (!editAdresse) {
+            return (
+                <div>
+                    <Alert size="small" variant="warning" className="mb-2">
+                        Fant ingen adresse til mottaker
+                    </Alert>
+                    <Button
+                        id={"endre_adresse_knapp"}
+                        variant="tertiary"
+                        size="xsmall"
+                        onClick={onInitEditMode}
+                        icon={<Edit fr="true" />}
+                    >
+                        Legg til
+                    </Button>
+                </div>
+            );
+        }
+
+        return (
+            <React.Suspense fallback={<Loader />}>
+                <EditAddress formPrefix="mottaker.adresse" />
+            </React.Suspense>
+        );
+    }
+
+    return (
+        <>
+            {!editAdresse && <Heading size="xsmall">Adresse:</Heading>}
+            {renderAdresse()}
+        </>
     );
 }
