@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import React from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 
-import { DokumentMalDetaljerInnholdTypeEnum } from "../../api/BidragForsendelseApi";
+import { DokumentMalDetaljer, DokumentMalDetaljerInnholdTypeEnum } from "../../api/BidragForsendelseApi";
 import { DokumentStatus } from "../../constants/DokumentStatus";
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
 import { useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
@@ -45,21 +45,18 @@ interface LeggTilDokumentFraSakModalProps {
     open: boolean;
 }
 
-interface OpprettDokumentFraMalFormProps {
-    dokument: {
-        malId: string;
-        tittel: string;
-        type: "UTGÅENDE" | "NOTAT";
-    };
+export interface DokumentFormProps {
+    dokument: { malId: string; tittel: string; språk: string };
 }
 function LeggTilVedlegglModal({ onClose, open }: LeggTilDokumentFraSakModalProps) {
-    const methods = useForm<OpprettDokumentFraMalFormProps>();
+    const methods = useForm<DokumentFormProps>();
 
-    function onSubmit(data: OpprettDokumentFraMalFormProps) {
+    function onSubmit(data: DokumentFormProps) {
         if (data.dokument) {
             onClose({
                 dokumentmalId: data.dokument.malId,
                 tittel: data.dokument.tittel,
+                språk: data.dokument.språk,
                 status: DokumentStatus.IKKE_BESTILT,
                 index: -1,
                 lagret: false,
@@ -111,11 +108,6 @@ interface SelectOptionData {
     innholdType: DokumentMalDetaljerInnholdTypeEnum;
 }
 
-export interface DokumentFormProps {
-    malId: string;
-    tittel: string;
-}
-
 function DokumentValgVedlegg() {
     const { data: vedleggListe } = useForsendelseApi().vedleggListe();
     const {
@@ -123,17 +115,18 @@ function DokumentValgVedlegg() {
         setValue,
         formState: { errors },
         resetField,
-    } = useFormContext<{
-        dokument: DokumentFormProps;
-    }>();
+    } = useFormContext<DokumentFormProps>();
 
+    function hentSpråk(dokument: DokumentMalDetaljer): string {
+        return dokument.språk.length > 0 ? dokument.språk[0] : "NB";
+    }
     function getAllOptions(): Record<string, SelectOptionData[]> {
         const tableData = vedleggListe.map((vedlegg) => ({
             malId: vedlegg.malId,
             beskrivelse: vedlegg.detaljer.beskrivelse,
             tittel: vedlegg.detaljer.beskrivelse,
             innholdType: vedlegg.detaljer.innholdType,
-            språk: vedlegg.detaljer.språk.length > 0 ? vedlegg.detaljer.språk[0] : "NB",
+            språk: hentSpråk(vedlegg.detaljer),
         }));
 
         const rowData: Record<string, SelectOptionData[]> = {};
@@ -158,6 +151,7 @@ function DokumentValgVedlegg() {
             setValue("dokument", {
                 malId,
                 tittel,
+                språk: hentSpråk(dokument.detaljer),
             });
         } else {
             resetField("dokument");

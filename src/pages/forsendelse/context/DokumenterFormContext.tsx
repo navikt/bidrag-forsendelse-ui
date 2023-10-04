@@ -100,6 +100,7 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
                 dokumenter: dokumenter.map((dokument) => ({
                     dokumentreferanse: dokument.dokumentreferanse,
                     dokumentmalId: dokument.dokumentmalId,
+                    språk: dokument.språk,
                     dokumentDato: dayjs(dokument.dokumentDato).format("YYYY-MM-DDTHH:mm:ss"),
                     fjernTilknytning: dokument.status == DokumentStatus.SLETTET,
                     tittel: dokument.tittel,

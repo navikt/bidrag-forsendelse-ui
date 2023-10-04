@@ -341,6 +341,8 @@ export interface OppdaterDokumentForesporsel {
     journalpostId?: string;
     dokumentmalId?: string;
     dokumentreferanse?: string;
+    /** Språk dokumentet er skrevet på */
+    språk?: string;
     tittel?: string;
     fjernTilknytning?: boolean;
     /** @format date-time */
