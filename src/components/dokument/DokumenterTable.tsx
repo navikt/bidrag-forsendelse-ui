@@ -14,6 +14,7 @@ import InfoKnapp from "../InfoKnapp";
 import DokumentRows from "./DokumentRows";
 import LeggTilDokumentButton from "./LeggTilDokumentKnapp";
 import LeggTilFraMalKnapp from "./LeggTilFraMalKnapp";
+import LeggTilVedleggKnapp from "./LeggTilVedleggKnapp";
 import SlettForsendelseModal from "./SlettForsendelseModal";
 // interface DokumenterTableProps {
 //     forsendelseId: string;
@@ -37,6 +38,7 @@ export default function DokumenterTable() {
             <div className={"flex flex-row mt-[10px] border-b-[1px] w-full flex-wrap max-w-[95vw] gap-[20px]"}>
                 <LeggTilDokumentButton />
                 <LeggTilFraMalKnapp />
+                <LeggTilVedleggKnapp />
             </div>
 
             <div className={"flex flex-row mt-[10px] border-b-[1px] w-full flex-wrap max-w-[95vw]"}>

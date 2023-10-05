@@ -274,11 +274,21 @@ export interface DokumentDto {
     /** Typen dokument. Dokumentmal sier noe om dokumentets innhold og oppbygning. */
     dokumentmalId?: string;
     /** Dokumentets status. Benyttes hvis journalposten er av typen forsendelse */
-    status?: DokumentDtoStatusEnum;
-    /** Arkivsystem hvor dokumentet er produsert og lagret */
-    arkivSystem?: DokumentDtoArkivSystemEnum;
+    status?: DokumentStatusDto;
+    /** Arkivsystem hvor dokument er lagret */
+    arkivSystem?: DokumentArkivSystemDto;
     /** Metadata om dokumentet */
     metadata: Record<string, string>;
+}
+
+/** Dokumentets status. Benyttes hvis journalposten er av typen forsendelse */
+export enum DokumentStatusDto {
+    IKKE_BESTILT = "IKKE_BESTILT",
+    BESTILLING_FEILET = "BESTILLING_FEILET",
+    UNDER_PRODUKSJON = "UNDER_PRODUKSJON",
+    UNDER_REDIGERING = "UNDER_REDIGERING",
+    FERDIGSTILT = "FERDIGSTILT",
+    AVBRUTT = "AVBRUTT",
 }
 
 /** Bestill distribusjon av journalpost */
@@ -314,9 +324,14 @@ export interface HentDokumentValgRequest {
 }
 
 export interface DokumentMalDetaljer {
-    beskrivelse: string;
+    tittel: string;
     type: DokumentMalDetaljerTypeEnum;
     kanBestilles: boolean;
+    beskrivelse: string;
+    statiskInnhold: boolean;
+    innholdType?: DokumentMalDetaljerInnholdTypeEnum;
+    språk: string[];
+    tilhorerEnheter: string[];
     alternativeTitler: string[];
 }
 
@@ -326,6 +341,8 @@ export interface OppdaterDokumentForesporsel {
     journalpostId?: string;
     dokumentmalId?: string;
     dokumentreferanse?: string;
+    /** Språk dokumentet er skrevet på */
+    språk?: string;
     tittel?: string;
     fjernTilknytning?: boolean;
     /** @format date-time */
@@ -543,9 +560,18 @@ export interface AvsenderMottakerDto {
     /** Person ident eller organisasjonsnummer */
     ident?: string;
     /** Identtype */
-    type: AvsenderMottakerDtoTypeEnum;
+    type: AvsenderMottakerDtoIdType;
     /** Adresse til mottaker hvis dokumentet sendes som brev */
     adresse?: MottakerAdresseTo;
+}
+
+/** Identtype */
+export enum AvsenderMottakerDtoIdType {
+    FNR = "FNR",
+    SAMHANDLER = "SAMHANDLER",
+    ORGNR = "ORGNR",
+    UTENLANDSK_ORGNR = "UTENLANDSK_ORGNR",
+    UKJENT = "UKJENT",
 }
 
 /** Metadata til en journalpost */
@@ -597,13 +623,10 @@ export interface JournalpostDto {
     journalfortDato?: string;
     /** Identifikator av journalpost i midlertidig brevlager eller fra joark på formatet [BID|JOARK]-<journalpostId> */
     journalpostId?: string;
-    /**
-     * Journalposten ble mottatt/sendt ut i kanal
-     * @deprecated
-     */
-    kilde?: JournalpostDtoKildeEnum;
     /** Journalposten ble mottatt/sendt ut i kanal */
-    kanal?: JournalpostDtoKanalEnum;
+    kilde?: Kanal;
+    /** Journalposten ble mottatt/sendt ut i kanal */
+    kanal?: Kanal;
     /**
      * Dato for når dokument er mottat, dvs. dato for journalføring eller skanning
      * @format date
@@ -617,7 +640,7 @@ export interface JournalpostDto {
      */
     journalstatus?: string;
     /** Journalpostens status */
-    status?: JournalpostDtoStatusEnum;
+    status?: JournalpostStatus;
     /** Om journalposten er feilført på bidragssak */
     feilfort?: boolean;
     /** Metadata for kode vs dekode i et kodeobjekt */
@@ -636,6 +659,40 @@ export interface JournalpostDto {
     opprettetAvIdent?: string;
     /** Referanse til originale kilden til journalposten. Kan være referanse til forsendelse eller bidrag journalpost med prefiks. Feks BID_12323 eller BIF_123213 */
     eksternReferanseId?: string;
+}
+
+/** Journalpostens status */
+export enum JournalpostStatus {
+    MOTTATT = "MOTTATT",
+    JOURNALFORT = "JOURNALFØRT",
+    EKSPEDERT = "EKSPEDERT",
+    DISTRIBUERT = "DISTRIBUERT",
+    AVBRUTT = "AVBRUTT",
+    KLAR_FOR_DISTRIBUSJON = "KLAR_FOR_DISTRIBUSJON",
+    RETUR = "RETUR",
+    FERDIGSTILT = "FERDIGSTILT",
+    FEILREGISTRERT = "FEILREGISTRERT",
+    RESERVERT = "RESERVERT",
+    UTGAR = "UTGÅR",
+    UNDER_OPPRETTELSE = "UNDER_OPPRETTELSE",
+    UNDER_PRODUKSJON = "UNDER_PRODUKSJON",
+    UKJENT = "UKJENT",
+}
+
+/** Journalposten ble mottatt/sendt ut i kanal */
+export enum Kanal {
+    NAV_NO = "NAV_NO",
+    NAV_NO_BID = "NAV_NO_BID",
+    SKAN_BID = "SKAN_BID",
+    SKAN_IM = "SKAN_IM",
+    SKAN_NETS = "SKAN_NETS",
+    LOKAL_UTSKRIFT = "LOKAL_UTSKRIFT",
+    SENTRAL_UTSKRIFT = "SENTRAL_UTSKRIFT",
+    SDP = "SDP",
+    INGEN_DISTRIBUSJON = "INGEN_DISTRIBUSJON",
+    INNSENDT_NAV_ANSATT = "INNSENDT_NAV_ANSATT",
+    NAV_NO_UINNLOGGET = "NAV_NO_UINNLOGGET",
+    NAV_NO_CHAT = "NAV_NO_CHAT",
 }
 
 /** Metadata for kode vs dekode i et kodeobjekt */
@@ -719,28 +776,17 @@ export interface ForsendelseIkkeDistribuertResponsTo {
     opprettetDato?: string;
 }
 
-/** Dokumentets status. Benyttes hvis journalposten er av typen forsendelse */
-export enum DokumentDtoStatusEnum {
-    IKKE_BESTILT = "IKKE_BESTILT",
-    BESTILLING_FEILET = "BESTILLING_FEILET",
-    UNDER_PRODUKSJON = "UNDER_PRODUKSJON",
-    UNDER_REDIGERING = "UNDER_REDIGERING",
-    FERDIGSTILT = "FERDIGSTILT",
-    AVBRUTT = "AVBRUTT",
-}
-
-/** Arkivsystem hvor dokumentet er produsert og lagret */
-export enum DokumentDtoArkivSystemEnum {
-    JOARK = "JOARK",
-    MIDLERTIDLIG_BREVLAGER = "MIDLERTIDLIG_BREVLAGER",
-    UKJENT = "UKJENT",
-    BIDRAG = "BIDRAG",
-    FORSENDELSE = "FORSENDELSE",
-}
-
 export enum DokumentMalDetaljerTypeEnum {
     UTGAENDE = "UTGÅENDE",
     NOTAT = "NOTAT",
+}
+
+export enum DokumentMalDetaljerInnholdTypeEnum {
+    VARSEL = "VARSEL",
+    VEDTAK = "VEDTAK",
+    VEDLEGG_VEDTAK = "VEDLEGG_VEDTAK",
+    VEDLEGG_VARSEL = "VEDLEGG_VARSEL",
+    SKJEMA = "SKJEMA",
 }
 
 export enum OppdaterDokumentForesporselArkivsystemEnum {
@@ -775,60 +821,6 @@ export enum DokumentMetadataArkivsystemEnum {
     UKJENT = "UKJENT",
     BIDRAG = "BIDRAG",
     FORSENDELSE = "FORSENDELSE",
-}
-
-/** Identtype */
-export enum AvsenderMottakerDtoTypeEnum {
-    FNR = "FNR",
-    SAMHANDLER = "SAMHANDLER",
-    ORGNR = "ORGNR",
-    UTENLANDSK_ORGNR = "UTENLANDSK_ORGNR",
-    UKJENT = "UKJENT",
-}
-
-/**
- * Journalposten ble mottatt/sendt ut i kanal
- * @deprecated
- */
-export enum JournalpostDtoKildeEnum {
-    NAV_NO_BID = "NAV_NO_BID",
-    SKAN_BID = "SKAN_BID",
-    NAV_NO = "NAV_NO",
-    SKAN_NETS = "SKAN_NETS",
-    LOKAL_UTSKRIFT = "LOKAL_UTSKRIFT",
-    SENTRAL_UTSKRIFT = "SENTRAL_UTSKRIFT",
-    SDP = "SDP",
-    INGEN_DISTRIBUSJON = "INGEN_DISTRIBUSJON",
-}
-
-/** Journalposten ble mottatt/sendt ut i kanal */
-export enum JournalpostDtoKanalEnum {
-    NAV_NO_BID = "NAV_NO_BID",
-    SKAN_BID = "SKAN_BID",
-    NAV_NO = "NAV_NO",
-    SKAN_NETS = "SKAN_NETS",
-    LOKAL_UTSKRIFT = "LOKAL_UTSKRIFT",
-    SENTRAL_UTSKRIFT = "SENTRAL_UTSKRIFT",
-    SDP = "SDP",
-    INGEN_DISTRIBUSJON = "INGEN_DISTRIBUSJON",
-}
-
-/** Journalpostens status */
-export enum JournalpostDtoStatusEnum {
-    MOTTATT = "MOTTATT",
-    JOURNALFORT = "JOURNALFØRT",
-    EKSPEDERT = "EKSPEDERT",
-    DISTRIBUERT = "DISTRIBUERT",
-    AVBRUTT = "AVBRUTT",
-    KLAR_FOR_DISTRIBUSJON = "KLAR_FOR_DISTRIBUSJON",
-    RETUR = "RETUR",
-    FERDIGSTILT = "FERDIGSTILT",
-    FEILREGISTRERT = "FEILREGISTRERT",
-    RESERVERT = "RESERVERT",
-    UTGAR = "UTGÅR",
-    UNDER_OPPRETTELSE = "UNDER_OPPRETTELSE",
-    UNDER_PRODUKSJON = "UNDER_PRODUKSJON",
-    UKJENT = "UKJENT",
 }
 
 export enum HentAvvikEnum {

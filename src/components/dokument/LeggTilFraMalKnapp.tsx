@@ -78,7 +78,7 @@ function LeggTilDokumentFraMalModal({ onClose, open }: LeggTilDokumentFraSakModa
                 <form onSubmit={methods.handleSubmit(onSubmit)}>
                     <Modal.Content
                         style={{
-                            minWidth: "max-content",
+                            minWidth: "30rem",
                             minHeight: "max-content",
                             padding: "3rem 2rem 1rem 2rem",
                             overflowY: "auto",
