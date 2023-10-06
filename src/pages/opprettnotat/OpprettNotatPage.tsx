@@ -12,6 +12,7 @@ import { DokumentFormProps } from "../../components/dokument/DokumentValg";
 import DokumentValgNotat from "../../components/dokument/DokumentValgNotat";
 import BidragErrorPanel from "../../context/BidragErrorPanel";
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
+import { ENHET_FARSKAP } from "../../types/EnhetTypes";
 import { mapToBehandlingInfoDto } from "../../types/Forsendelse";
 import { useSession } from "../forsendelse/context/SessionContext";
 import AvbrytOpprettForsendelseButton from "../opprettforsendelse/AvbrytOpprettForsendelseButton";
@@ -72,7 +73,7 @@ export default function OpprettNotatPage() {
     const methods = useForm<OpprettForsendelseFormProps>({
         defaultValues: {
             dokumentdato: dateToDDMMYYYYString(new Date()),
-            tema: "BID",
+            tema: enhet == ENHET_FARSKAP ? "FAR" : "BID",
             språk: "NB",
         },
     });
