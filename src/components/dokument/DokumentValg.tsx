@@ -4,7 +4,9 @@ import { useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
 import { DokumentMalDetaljer } from "../../api/BidragForsendelseApi";
+import DokumentvalgTittel from "../../docs/DokumentvalgTittel.mdx";
 import environment from "../../environment";
+import InfoKnapp from "../InfoKnapp";
 
 interface TableRowData {
     malId: string;
@@ -117,7 +119,14 @@ export function DokumentValgTableHeader() {
             <Table.Row>
                 <Table.HeaderCell></Table.HeaderCell>
                 {environment.feature.visDokumentmalKode && <Table.HeaderCell>Mal</Table.HeaderCell>}
-                <Table.HeaderCell>Tittel</Table.HeaderCell>
+                <Table.HeaderCell>
+                    <div className="flex flex-row gap-1 items-center">
+                        <div>Tittel</div>
+                        <InfoKnapp>
+                            <DokumentvalgTittel />
+                        </InfoKnapp>
+                    </div>
+                </Table.HeaderCell>
             </Table.Row>
         </Table.Header>
     );
