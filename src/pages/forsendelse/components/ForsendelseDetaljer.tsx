@@ -7,7 +7,7 @@ import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
 export default function ForsendelseDetaljer() {
     const forsendelse = useForsendelseApi().hentForsendelse();
     return (
-        <div>
+        <div className="mt-[-15px]">
             {/* <Heading size="small">Andre detaljer</Heading> */}
             <div className="h-px w-full bg-border-divider" />
             <div className="flex flex-row static_data">
