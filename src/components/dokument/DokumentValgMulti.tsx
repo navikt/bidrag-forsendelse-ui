@@ -27,7 +27,7 @@ export default function DokumentValgMulti({ malDetaljer, showLegend }: DokumentV
 
     const alleBrev: TableRowData[] = Object.keys(malDetaljer).map((key) => ({
         malId: key,
-        tittel: malDetaljer[key].beskrivelse,
+        tittel: malDetaljer[key].tittel,
         type: malDetaljer[key].type,
     }));
 

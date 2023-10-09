@@ -1,5 +1,5 @@
 import { AutoSuggest, removeNonPrintableCharachters } from "@navikt/bidrag-ui-common";
-import { Heading, Radio, RadioGroup, Table, Textarea } from "@navikt/ds-react";
+import { Detail, Heading, Radio, RadioGroup, Table, Textarea } from "@navikt/ds-react";
 import { useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
@@ -9,6 +9,7 @@ import environment from "../../environment";
 interface TableRowData {
     malId: string;
     tittel: string;
+    beskrivelse: string;
     alternativeTitler: string[];
     type: "UTGÅENDE" | "NOTAT";
 }
@@ -40,7 +41,8 @@ export default function DokumentValg({ malDetaljer, showLegend }: DokumentValgPr
 
     const alleBrev: TableRowData[] = Object.keys(malDetaljer).map((key) => ({
         malId: key,
-        tittel: malDetaljer[key].beskrivelse,
+        tittel: malDetaljer[key].tittel,
+        beskrivelse: malDetaljer[key].beskrivelse,
         alternativeTitler: malDetaljer[key].alternativeTitler,
         type: malDetaljer[key].type,
     }));
@@ -149,7 +151,8 @@ interface EditableTitleProps {
     onTitleChange: (tittel: string) => void;
 }
 function EditableTitle({ row, onTitleChange }: EditableTitleProps) {
-    const { malId, tittel } = row;
+    const { malId, tittel, beskrivelse } = row;
+    const harAnnenTittel = tittel != beskrivelse;
     function shouldBeEditable() {
         const MALID_TITTLE_REDIGERBAR = ["BI01X02", "BI01X01", "BI01P11", "BI01S02"];
         return MALID_TITTLE_REDIGERBAR.includes(malId);
@@ -160,7 +163,12 @@ function EditableTitle({ row, onTitleChange }: EditableTitleProps) {
     }
 
     if (!shouldBeEditable()) {
-        return tittel;
+        return (
+            <div>
+                {beskrivelse}
+                {harAnnenTittel && <Detail>{tittel}</Detail>}
+            </div>
+        );
     }
 
     if (harAlternativeTitler(row) || erFritekstbrev()) {

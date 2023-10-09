@@ -80,6 +80,10 @@ function LeggTilVedlegglModal({ onClose, open }: LeggTilDokumentFraSakModalProps
                         <Heading spacing level="1" size="large" id="modal-heading">
                             Legg til vedlegg
                         </Heading>
+                        {/* <Detail>
+                            Her kan du legge til et dokument med standard innhold som feks skjema, vedlegg til
+                            varsel/vedtak
+                        </Detail> */}
                         <React.Suspense fallback={<Loader size={"medium"} />}>
                             <DokumentValgVedlegg />
                         </React.Suspense>

@@ -4,7 +4,7 @@ import { dateToDDMMYYYYString, RolleType, RolleTypeAbbreviation } from "@navikt/
 import { Add } from "@navikt/ds-icons";
 import { Collapse } from "@navikt/ds-icons";
 import { Expand } from "@navikt/ds-icons";
-import { Button, Detail, Table, Tabs } from "@navikt/ds-react";
+import { Button, Table, Tabs } from "@navikt/ds-react";
 import { Modal } from "@navikt/ds-react";
 import { Loader } from "@navikt/ds-react";
 import { Heading } from "@navikt/ds-react";
@@ -525,14 +525,7 @@ function JournalpostDokumenterRowMultiDoc({
                         {" "}
                     </Checkbox>
                 </Table.DataCell>
-                {harBareEttDokument ? (
-                    <Table.DataCell>
-                        <div>{tittelDebug}</div>
-                        <Detail>{journalpost.dokumenter[0].tittel}</Detail>
-                    </Table.DataCell>
-                ) : (
-                    <Table.DataCell>{tittelDebug}</Table.DataCell>
-                )}
+                <Table.DataCell>{tittelDebug}</Table.DataCell>
                 <Table.DataCell>
                     {jpForsendelseRelasjoner.erNoenDokumenterValgt() && (
                         <Tag variant="info" size="small" className="w-max">
