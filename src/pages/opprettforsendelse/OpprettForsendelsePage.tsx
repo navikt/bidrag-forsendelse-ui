@@ -1,6 +1,7 @@
 import ObjectUtils from "@navikt/bidrag-ui-common/esm/utils/ObjectUtils";
 import { Button, Cell, ContentContainer, ErrorSummary, Grid, Heading } from "@navikt/ds-react";
 import ErrorSummaryItem from "@navikt/ds-react/esm/form/error-summary/ErrorSummaryItem";
+import { AxiosError } from "axios";
 import { FieldErrors, FormProvider, useForm, useFormContext } from "react-hook-form";
 import { useIsMutating, useMutation } from "react-query";
 
@@ -13,6 +14,7 @@ import { useForsendelseApi, UseForsendelseApiKeys } from "../../hooks/useForsend
 import { ENHET_FARSKAP } from "../../types/EnhetTypes";
 import { mapToBehandlingInfoDto } from "../../types/Forsendelse";
 import { countryCodeIso2ToIso3 } from "../../utils/AdresseUtils";
+import { parseErrorMessageFromAxiosError } from "../../utils/ErrorUtils";
 import { hasOnlyNullValues } from "../../utils/ObjectUtils";
 import { useSession } from "../forsendelse/context/SessionContext";
 import { queryClient } from "../PageWrapper";
@@ -106,9 +108,10 @@ function OpprettForsendelseUnderOpprettelse() {
             navigateToForsendelse(forsendelseId, "UTGÅENDE");
             queryClient.refetchQueries(UseForsendelseApiKeys.forsendelse);
         },
-        onError: () => {
+        onError: (error: AxiosError) => {
+            const errorMessage = parseErrorMessageFromAxiosError(error);
             addError({
-                message: "Kunne ikke opprette forsendelse. Vennligst prøv på nytt",
+                message: `Kunne ikke opprette forsendelse: ${errorMessage}`,
                 source: "opprettforsendelse",
             });
         },
@@ -161,9 +164,10 @@ function OpprettForsendelseNy() {
                 ],
             });
         },
-        onError: () => {
+        onError: (error: AxiosError) => {
+            const errorMessage = parseErrorMessageFromAxiosError(error);
             addError({
-                message: "Kunne ikke opprette forsendelse. Vennligst prøv på nytt",
+                message: `Kunne ikke opprette forsendelse: ${errorMessage}`,
                 source: "opprettforsendelse",
             });
         },
