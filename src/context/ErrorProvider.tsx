@@ -11,7 +11,7 @@ type ErrorContextProps = {
     addWarning: (warningMessage: string) => void;
 };
 
-type ErrorSource = "dokumenter" | "opprettforsendelse" | "hentforsendelse";
+type ErrorSource = "dokumenter" | "opprettforsendelse" | "opprettnotat" | "hentforsendelse";
 interface IForsendelseApiError {
     message: string;
     source?: ErrorSource;

@@ -1,14 +1,17 @@
 import { AutoSuggest, removeNonPrintableCharachters } from "@navikt/bidrag-ui-common";
-import { Heading, Radio, RadioGroup, Table, Textarea } from "@navikt/ds-react";
+import { Detail, Heading, Radio, RadioGroup, Table, Textarea } from "@navikt/ds-react";
 import { useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
 import { DokumentMalDetaljer } from "../../api/BidragForsendelseApi";
+import DokumentvalgTittel from "../../docs/DokumentvalgTittel.mdx";
 import environment from "../../environment";
+import InfoKnapp from "../InfoKnapp";
 
 interface TableRowData {
     malId: string;
     tittel: string;
+    beskrivelse: string;
     alternativeTitler: string[];
     type: "UTGÅENDE" | "NOTAT";
 }
@@ -40,7 +43,8 @@ export default function DokumentValg({ malDetaljer, showLegend }: DokumentValgPr
 
     const alleBrev: TableRowData[] = Object.keys(malDetaljer).map((key) => ({
         malId: key,
-        tittel: malDetaljer[key].beskrivelse,
+        tittel: malDetaljer[key].tittel,
+        beskrivelse: malDetaljer[key].beskrivelse,
         alternativeTitler: malDetaljer[key].alternativeTitler,
         type: malDetaljer[key].type,
     }));
@@ -115,7 +119,14 @@ export function DokumentValgTableHeader() {
             <Table.Row>
                 <Table.HeaderCell></Table.HeaderCell>
                 {environment.feature.visDokumentmalKode && <Table.HeaderCell>Mal</Table.HeaderCell>}
-                <Table.HeaderCell>Tittel</Table.HeaderCell>
+                <Table.HeaderCell>
+                    <div className="flex flex-row gap-1 items-center">
+                        <div>Tittel</div>
+                        <InfoKnapp>
+                            <DokumentvalgTittel />
+                        </InfoKnapp>
+                    </div>
+                </Table.HeaderCell>
             </Table.Row>
         </Table.Header>
     );
@@ -149,7 +160,8 @@ interface EditableTitleProps {
     onTitleChange: (tittel: string) => void;
 }
 function EditableTitle({ row, onTitleChange }: EditableTitleProps) {
-    const { malId, tittel } = row;
+    const { malId, tittel, beskrivelse } = row;
+    const harAnnenTittel = tittel != beskrivelse;
     function shouldBeEditable() {
         const MALID_TITTLE_REDIGERBAR = ["BI01X02", "BI01X01", "BI01P11", "BI01S02"];
         return MALID_TITTLE_REDIGERBAR.includes(malId);
@@ -160,7 +172,12 @@ function EditableTitle({ row, onTitleChange }: EditableTitleProps) {
     }
 
     if (!shouldBeEditable()) {
-        return tittel;
+        return (
+            <div>
+                {beskrivelse}
+                {harAnnenTittel && <Detail>{tittel}</Detail>}
+            </div>
+        );
     }
 
     if (harAlternativeTitler(row) || erFritekstbrev()) {

@@ -1,3 +1,4 @@
+import { StringUtils } from "@navikt/bidrag-ui-common";
 import { Locked } from "@navikt/ds-icons";
 import { Cancel } from "@navikt/ds-icons";
 import { Loader, TextField } from "@navikt/ds-react";
@@ -114,7 +115,7 @@ function EditPostcodeAndState(props: EditAddressProps) {
     const postnummerFormKey = `${formPrefix}postnummer`;
     return (
         <div className={`flex gap-x-4 pb-2 pt-2 w-auto ${isNorway ? "self-start" : "flex-col"}`}>
-            {isNorway ? (
+            {isNorway && (
                 <>
                     <Controller
                         control={control}
@@ -139,17 +140,17 @@ function EditPostcodeAndState(props: EditAddressProps) {
                             </React.Suspense>
                         )}
                     />
-                    <TextField
-                        {...register(poststedFormKey as "poststed", { required: "Skriv inn gyldig postnummer" })}
-                        size="small"
-                        className="w-full"
-                        label={"Poststed (fylles automatisk)"}
-                        disabled={true}
-                    />
                 </>
-            ) : (
-                <TextField {...register(poststedFormKey as "poststed")} size="small" label={"Poststed"} />
             )}
+            <TextField
+                {...register(poststedFormKey as "poststed", {
+                    validate: (val) => (isNorway && StringUtils.isEmpty(val) ? "Skriv inn gyldig postnummer" : true),
+                })}
+                size="small"
+                className="w-full"
+                label={isNorway ? "Poststed (fylles automatisk)" : "Poststed"}
+                disabled={isNorway}
+            />
         </div>
     );
 }

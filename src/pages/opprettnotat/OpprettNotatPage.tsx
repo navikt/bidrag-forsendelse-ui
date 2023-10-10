@@ -1,6 +1,7 @@
 import { dateToDDMMYYYYString, LoggerService } from "@navikt/bidrag-ui-common";
 import { Button, Cell, ContentContainer, ErrorSummary, Grid, Heading } from "@navikt/ds-react";
 import ErrorSummaryItem from "@navikt/ds-react/esm/form/error-summary/ErrorSummaryItem";
+import { AxiosError } from "axios";
 import { FieldErrors, FormProvider, useForm, useFormContext } from "react-hook-form";
 import { useMutation } from "react-query";
 
@@ -11,9 +12,11 @@ import TemaSelect from "../../components/detaljer/TemaSelect";
 import { DokumentFormProps } from "../../components/dokument/DokumentValg";
 import DokumentValgNotat from "../../components/dokument/DokumentValgNotat";
 import BidragErrorPanel from "../../context/BidragErrorPanel";
+import { useErrorContext } from "../../context/ErrorProvider";
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
 import { ENHET_FARSKAP } from "../../types/EnhetTypes";
 import { mapToBehandlingInfoDto } from "../../types/Forsendelse";
+import { parseErrorMessageFromAxiosError } from "../../utils/ErrorUtils";
 import { useSession } from "../forsendelse/context/SessionContext";
 import AvbrytOpprettForsendelseButton from "../opprettforsendelse/AvbrytOpprettForsendelseButton";
 import { useOpprettForsendelse } from "../opprettforsendelse/OpprettForsendelseContext";
@@ -31,6 +34,7 @@ export type OpprettForsendelseFormProps = {
 
 export default function OpprettNotatPage() {
     const { saksnummer, enhet, navigateToForsendelse } = useSession();
+    const { addError } = useErrorContext();
     const options = useOpprettForsendelse();
     async function opprettNotat(data: OpprettForsendelseFormProps, dokument: DokumentFormProps) {
         const result = await BIDRAG_FORSENDELSE_API.api.opprettForsendelse({
@@ -67,6 +71,10 @@ export default function OpprettNotatPage() {
         onSuccess: () => {
             navigateToForsendelse(null, ForsendelseTypeTo.NOTAT);
         },
+        onError: (error: AxiosError) => {
+            const errorMessage = parseErrorMessageFromAxiosError(error);
+            addError({ message: `Kunne ikke opprettet notat: ${errorMessage}`, source: "opprettnotat" });
+        },
     });
 
     const roller = useForsendelseApi().hentRoller();
@@ -80,6 +88,7 @@ export default function OpprettNotatPage() {
     function onSubmit(data: OpprettForsendelseFormProps) {
         opprettForsendelseFn.mutate(data);
     }
+    const isLoading = opprettForsendelseFn.isLoading || opprettForsendelseFn.isSuccess;
     return (
         <ContentContainer>
             <Grid>
@@ -101,10 +110,10 @@ export default function OpprettNotatPage() {
                                 <BidragErrorPanel />
                                 <OpprettNotatValidationErrorSummary />
                                 <div className="flex flex-row gap-2 pt-4">
-                                    <Button size="small" loading={opprettForsendelseFn.isLoading}>
+                                    <Button size="small" loading={isLoading}>
                                         Opprett
                                     </Button>
-                                    <AvbrytOpprettForsendelseButton disabled={opprettForsendelseFn.isLoading} />
+                                    <AvbrytOpprettForsendelseButton disabled={isLoading} />
                                 </div>
                             </form>
                         </FormProvider>
