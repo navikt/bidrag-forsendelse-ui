@@ -34,7 +34,7 @@ export default function OpenDokumentButton({ dokumentreferanse, status, journalp
         document.getElementById(id).click();
         setTimeout(() => {
             setIsOpeningIframe(false);
-        }, 2000);
+        }, 4000);
     }
     return (
         <>
