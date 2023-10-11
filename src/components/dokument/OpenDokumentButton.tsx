@@ -1,7 +1,7 @@
 import { OpenDocumentUtils } from "@navikt/bidrag-ui-common";
 import { ExternalLink } from "@navikt/ds-icons";
 import { Button } from "@navikt/ds-react";
-import React from "react";
+import React, { useState } from "react";
 
 import { DOKUMENT_KAN_IKKE_ÅPNES_STATUS, DokumentStatus } from "../../constants/DokumentStatus";
 import { queryClient } from "../../pages/PageWrapper";
@@ -14,6 +14,7 @@ interface IOpenDokumentButtonProps {
     status?: DokumentStatus | string | IJournalpostStatus;
 }
 export default function OpenDokumentButton({ dokumentreferanse, status, journalpostId }: IOpenDokumentButtonProps) {
+    const [isOpeningIframe, setIsOpeningIframe] = useState(false);
     if (DOKUMENT_KAN_IKKE_ÅPNES_STATUS.includes(status as DokumentStatus | IJournalpostStatus)) {
         return null;
     }
@@ -28,13 +29,23 @@ export default function OpenDokumentButton({ dokumentreferanse, status, journalp
     }
 
     const id = `doklink_${journalpostId}_${dokumentreferanse}`;
+    function openDocumentIframe() {
+        setIsOpeningIframe(true);
+        document.getElementById(id).click();
+        setTimeout(() => {
+            setIsOpeningIframe(false);
+        }, 2000);
+    }
     return (
         <>
             <Button
                 size={"small"}
                 variant={"tertiary"}
                 icon={<ExternalLink />}
-                onClick={() => document.getElementById(id).click()}
+                loading={isOpeningIframe}
+                disabled={isOpeningIframe}
+                title={isOpeningIframe ? "Åpner dokument" : "Åpne dokument"}
+                onClick={openDocumentIframe}
             />
             <OpenDokumentIframe
                 id={id}
