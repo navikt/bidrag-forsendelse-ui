@@ -109,6 +109,7 @@ interface SelectOptionData {
     tittel: string;
     beskrivelse: string;
     språk: string;
+    gruppeVisningsnavn?: string;
     innholdType: DokumentMalDetaljerInnholdTypeEnum;
 }
 
@@ -130,17 +131,18 @@ function DokumentValgVedlegg() {
             beskrivelse: vedlegg.detaljer.beskrivelse,
             tittel: vedlegg.detaljer.beskrivelse,
             innholdType: vedlegg.detaljer.innholdType,
+            gruppeVisningsnavn: vedlegg.detaljer.gruppeVisningsnavn,
             språk: hentSpråk(vedlegg.detaljer),
         }));
 
         const rowData: Record<string, SelectOptionData[]> = {};
 
         tableData.forEach((data) => {
-            if (!rowData[data.innholdType]) {
-                rowData[data.innholdType] = [];
+            if (!rowData[data.gruppeVisningsnavn]) {
+                rowData[data.gruppeVisningsnavn] = [];
             }
 
-            rowData[data.innholdType].push(data);
+            rowData[data.gruppeVisningsnavn].push(data);
         });
 
         return rowData;
@@ -169,21 +171,6 @@ function DokumentValgVedlegg() {
         },
     });
 
-    function innholdTypeTilVisningsnavn(innholdType: DokumentMalDetaljerInnholdTypeEnum): string {
-        switch (innholdType) {
-            case DokumentMalDetaljerInnholdTypeEnum.SKJEMA:
-                return "Skjema";
-            case DokumentMalDetaljerInnholdTypeEnum.VARSEL:
-                return "Varsel";
-            case DokumentMalDetaljerInnholdTypeEnum.VEDLEGG_VARSEL:
-                return "Vedlegg til varselbrev";
-            case DokumentMalDetaljerInnholdTypeEnum.VEDLEGG_VEDTAK:
-                return "Vedlegg til vedtakbrev";
-            case DokumentMalDetaljerInnholdTypeEnum.VEDTAK:
-                return "Vedtak";
-        }
-        return innholdType;
-    }
     const options = getAllOptions();
 
     function mapToBeskrivelse(option: SelectOptionData) {
@@ -199,10 +186,10 @@ function DokumentValgVedlegg() {
                 error={errors.dokument?.message}
             >
                 <option value="">Velg dokument</option>
-                {Object.keys(options).map((innholdType) => {
-                    const dokumentListe = options[innholdType];
+                {Object.keys(options).map((gruppeVisningsnavn) => {
+                    const dokumentListe = options[gruppeVisningsnavn];
                     return (
-                        <optgroup label={innholdTypeTilVisningsnavn(innholdType as DokumentMalDetaljerInnholdTypeEnum)}>
+                        <optgroup label={gruppeVisningsnavn}>
                             {dokumentListe
                                 .map((opt) => ({
                                     ...opt,
