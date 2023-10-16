@@ -330,6 +330,7 @@ export interface DokumentMalDetaljer {
     beskrivelse: string;
     statiskInnhold: boolean;
     innholdType?: DokumentMalDetaljerInnholdTypeEnum;
+    gruppeVisningsnavn?: string;
     språk: string[];
     tilhorerEnheter: string[];
     alternativeTitler: string[];
@@ -341,7 +342,7 @@ export interface OppdaterDokumentForesporsel {
     journalpostId?: string;
     dokumentmalId?: string;
     dokumentreferanse?: string;
-    /** Språk dokumentet er skrevet på */
+    /** Språket på innholdet i dokumentet */
     språk?: string;
     tittel?: string;
     fjernTilknytning?: boolean;

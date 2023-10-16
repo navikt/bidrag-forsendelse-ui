@@ -219,7 +219,7 @@ export function useForsendelseApi(): UseForsendelseDataProps {
         const { enhet } = useSession();
         return useQuery({
             queryKey: `vedlegg_liste`,
-            queryFn: ({ signal }) => BIDRAG_FORSENDELSE_API.api.stottedeDokumentmalDetaljer(),
+            queryFn: () => BIDRAG_FORSENDELSE_API.api.stottedeDokumentmalDetaljer(),
             select: React.useCallback((response: AxiosResponse): VedleggListe => {
                 const dokumentmaler = response.data as Record<string, DokumentMalDetaljer>;
                 return Object.entries(dokumentmaler)
