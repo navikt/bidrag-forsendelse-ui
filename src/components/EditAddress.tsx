@@ -154,7 +154,8 @@ function EditPostcodeAndState(props: EditAddressProps) {
                         if (isNorway) {
                             return StringUtils.isEmpty(value) ? "Skriv inn gyldig postnummer" : true;
                         }
-                        return !value || value.trim().length == 0 ? "Poststed må fylles ut" : true;
+                        return true;
+                        // return !value || value.trim().length == 0 ? "Poststed må fylles ut" : true;
                     },
                 })}
                 error={!isNorway ? getPostnummerErrorMessage() : undefined}
