@@ -7,7 +7,7 @@ import { Button } from "@navikt/ds-react";
 import { ChangeEvent } from "react";
 import React from "react";
 import { useState } from "react";
-import { Controller, FormProvider, useForm } from "react-hook-form";
+import { Controller, FieldErrors, FormProvider, useForm } from "react-hook-form";
 import { useFormContext } from "react-hook-form";
 import { useWatch } from "react-hook-form";
 
@@ -17,6 +17,20 @@ import { hentLandkoder } from "../api/queries";
 import { IMottakerAdresse } from "../types/Adresse";
 import { countryCodeIso2ToIso3, isCountryCodeNorway } from "../utils/AdresseUtils";
 
+export const validerMaks128Tegn = (errorMessage: string) => (value: string) => {
+    return value && value.length > 128 ? errorMessage : true;
+};
+
+export function getErrorForPrefix<T>(errors: FieldErrors<T>, formPrefix?: string): FieldErrors<T> {
+    if (formPrefix) {
+        formPrefix.split(".").forEach((splitKey) => {
+            if (splitKey.length > 0 && errors) {
+                errors = errors[splitKey];
+            }
+        });
+    }
+    return errors;
+}
 interface EditAddressFormProps {
     address?: IMottakerAdresse;
     onSubmit: (adress: IMottakerAdresse) => void;
@@ -99,16 +113,8 @@ function EditPostcodeAndState(props: EditAddressProps) {
     const country = useWatch({ name: `${formPrefix}land` });
     const isNorway = isCountryCodeNorway(country);
 
-    const getErrorMessage = () => {
-        let error = errors;
-        if (formPrefix) {
-            formPrefix.split(".").forEach((splitKey) => {
-                if (splitKey.length > 0 && error) {
-                    error = error[splitKey];
-                }
-            });
-        }
-        return error?.poststed?.message;
+    const getPostnummerErrorMessage = () => {
+        return getErrorForPrefix<DistribuerTilAdresse>(errors, formPrefix)?.poststed?.message;
     };
 
     const poststedFormKey = `${formPrefix}poststed`;
@@ -129,7 +135,7 @@ function EditPostcodeAndState(props: EditAddressProps) {
                                 <PostnummerInput
                                     defaultValue={value}
                                     inputRef={ref}
-                                    error={error?.message ?? getErrorMessage()}
+                                    error={error?.message ?? getPostnummerErrorMessage()}
                                     name={name}
                                     onChange={(postnummer, poststed) => {
                                         onChange(postnummer);
@@ -144,8 +150,14 @@ function EditPostcodeAndState(props: EditAddressProps) {
             )}
             <TextField
                 {...register(poststedFormKey as "poststed", {
-                    validate: (val) => (isNorway && StringUtils.isEmpty(val) ? "Skriv inn gyldig postnummer" : true),
+                    validate: (value?: string) => {
+                        if (isNorway) {
+                            return StringUtils.isEmpty(value) ? "Skriv inn gyldig postnummer" : true;
+                        }
+                        return !value || value.trim().length == 0 ? "Poststed må fylles ut" : true;
+                    },
                 })}
+                error={!isNorway ? getPostnummerErrorMessage() : undefined}
                 size="small"
                 className="w-full"
                 label={isNorway ? "Poststed (fylles automatisk)" : "Poststed"}
@@ -198,38 +210,33 @@ function EditAddressLines(props: EditAddressProps) {
 
     const country = useWatch({ name: `${formPrefix}land` });
     const isNorway = isCountryCodeNorway(country);
-    const getError = () => {
-        let error = errors;
-        if (formPrefix) {
-            formPrefix.split(".").forEach((splitKey) => {
-                if (splitKey.length > 0 && error) {
-                    error = error[splitKey];
-                }
-            });
-        }
-        return error?.adresselinje1?.message;
-    };
-
     return (
         <div className={"flex flex-col gap-y-4"}>
             <TextField
                 size="small"
-                error={getError()}
+                error={getErrorForPrefix(errors, formPrefix)?.adresselinje1?.message}
                 {...register(`${formPrefix}adresselinje1` as "adresselinje1", {
                     required: isNorway ? false : "Adresselinje1 er påkrevd",
+                    validate: validerMaks128Tegn("Adresselinje kan ikke være lengre enn 128 tegn"),
                 })}
                 label={"Adresse"}
             />
             <TextField
                 size="small"
                 hideLabel
-                {...register(`${formPrefix}adresselinje2` as "adresselinje2")}
+                error={getErrorForPrefix(errors, formPrefix)?.adresselinje2?.message}
+                {...register(`${formPrefix}adresselinje2` as "adresselinje2", {
+                    validate: validerMaks128Tegn("Adresselinje kan ikke være lengre enn 128 tegn"),
+                })}
                 label={"Adresselinje2"}
             />
             <TextField
                 size="small"
                 hideLabel
-                {...register(`${formPrefix}adresselinje3` as "adresselinje3")}
+                error={getErrorForPrefix(errors, formPrefix)?.adresselinje3?.message}
+                {...register(`${formPrefix}adresselinje3` as "adresselinje3", {
+                    validate: validerMaks128Tegn("Adresselinje kan ikke være lengre enn 128 tegn"),
+                })}
                 label={"Adresselinje3"}
             />
         </div>

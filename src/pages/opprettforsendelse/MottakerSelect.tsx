@@ -8,7 +8,7 @@ import { useWatch } from "react-hook-form";
 
 import { MottakerAdresseTo } from "../../api/BidragForsendelseApi";
 import AdresseInfo from "../../components/AdresseInfo";
-import { EditAddress } from "../../components/EditAddress";
+import { EditAddress, validerMaks128Tegn } from "../../components/EditAddress";
 import InfoKnapp from "../../components/InfoKnapp";
 import PersonDetaljer from "../../components/person/PersonDetaljer";
 import MottakerInfo from "../../docs/Mottaker.mdx";
@@ -127,11 +127,24 @@ export default function MottakerSelect() {
 }
 
 function MottakerFritekst() {
-    const { register } = useOpprettForsendelseFormContext();
+    const {
+        register,
+        formState: { errors },
+    } = useOpprettForsendelseFormContext();
 
     return (
         <div className="w-[400px] h-max">
-            <TextField className="mb-2" size="small" label="Navn" {...register("mottaker.navn")} />
+            <TextField
+                className="mb-2"
+                size="small"
+                label="Navn"
+                {...register("mottaker.navn", {
+                    validate: validerMaks128Tegn(
+                        "Navn kan ikke være lengre enn 128 tegn. Vennligst benytt adressefeltet for å skrive resten av adressen."
+                    ),
+                })}
+                error={errors?.mottaker?.navn?.message}
+            />
             <React.Suspense fallback={<Loader />}>
                 <EditAddress formPrefix="mottaker.adresse" />
             </React.Suspense>
