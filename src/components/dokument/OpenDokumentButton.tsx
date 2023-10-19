@@ -12,8 +12,14 @@ interface IOpenDokumentButtonProps {
     dokumentreferanse?: string;
     journalpostId?: string;
     status?: DokumentStatus | string | IJournalpostStatus;
+    erSkjema?: boolean;
 }
-export default function OpenDokumentButton({ dokumentreferanse, status, journalpostId }: IOpenDokumentButtonProps) {
+export default function OpenDokumentButton({
+    dokumentreferanse,
+    status,
+    journalpostId,
+    erSkjema,
+}: IOpenDokumentButtonProps) {
     const [isOpeningIframe, setIsOpeningIframe] = useState(false);
     if (DOKUMENT_KAN_IKKE_ÅPNES_STATUS.includes(status as DokumentStatus | IJournalpostStatus)) {
         return null;
@@ -23,6 +29,7 @@ export default function OpenDokumentButton({ dokumentreferanse, status, journalp
             <EditDocumentButton
                 journalpostId={journalpostId}
                 dokumentreferanse={dokumentreferanse}
+                erSkjema={erSkjema}
                 onEditFinished={() => queryClient.invalidateQueries("forsendelse")}
             />
         );

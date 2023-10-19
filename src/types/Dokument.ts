@@ -6,6 +6,7 @@ import { DokumentStatus } from "../constants/DokumentStatus";
 export interface IDokument {
     index: number;
     journalpostId?: string;
+    erSkjema: boolean;
     dokumentreferanse?: string;
     arkivsystem?: DokumentArkivSystemDto;
     lenkeTilDokumentreferanse?: string;
