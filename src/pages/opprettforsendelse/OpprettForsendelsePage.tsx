@@ -79,6 +79,7 @@ function mapToOpprettEllerOppdaterForsendelseRequest(
             {
                 dokumentmalId: data.dokument.malId,
                 tittel: data.dokument.tittel,
+                språk: data.språk,
             },
         ],
     };
