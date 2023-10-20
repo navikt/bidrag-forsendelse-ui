@@ -41,10 +41,11 @@ export enum EngangsbelopType {
     DIREKTE_OPPGJOR = "DIREKTE_OPPGJOR",
     ETTERGIVELSE = "ETTERGIVELSE",
     ETTERGIVELSE_TILBAKEKREVING = "ETTERGIVELSE_TILBAKEKREVING",
-    TILBAKEKREVING = "TILBAKEKREVING",
-    SAERTILSKUDD = "SAERTILSKUDD",
     GEBYR_MOTTAKER = "GEBYR_MOTTAKER",
     GEBYR_SKYLDNER = "GEBYR_SKYLDNER",
+    INNKREVING_GJELD = "INNKREVING_GJELD",
+    SAERTILSKUDD = "SAERTILSKUDD",
+    TILBAKEKREVING = "TILBAKEKREVING",
 }
 
 /** Tema forsendelsen skal opprettes med */
@@ -187,6 +188,7 @@ export interface DokumentRespons {
     journalpostId?: string;
     dokumentmalId?: string;
     redigeringMetadata?: string;
+    erSkjema: boolean;
     /** Dette skal være UNDER_PRODUKSJON for redigerbare dokumenter som ikke er ferdigprodusert. Ellers settes det til FERDIGSTILT */
     status?: DokumentStatusTo;
     /** Arkivsystem hvor dokument er lagret */
@@ -327,6 +329,7 @@ export interface DokumentMalDetaljer {
     tittel: string;
     type: DokumentMalDetaljerTypeEnum;
     kanBestilles: boolean;
+    redigerbar: boolean;
     beskrivelse: string;
     statiskInnhold: boolean;
     innholdType?: DokumentMalDetaljerInnholdTypeEnum;
@@ -437,14 +440,14 @@ export interface EndreJournalpostCommand {
     behandlingstema?: string;
     /** Endre fagområde */
     fagomrade?: string;
-    /** Type ident for gjelder: FNR, ORGNR, AKTOERID */
-    gjelderType?: string;
+    /** Identtypene til en aktør */
+    gjelderType?: IdentType;
     /** Tittel på journalposten */
     tittel?: string;
     /** Skal journalposten journalføres aka. registreres */
     skalJournalfores: boolean;
     /** Liste med retur detaljer som skal endres */
-    endreReturDetaljer?: EndreReturDetaljer[];
+    endreReturDetaljer: EndreReturDetaljer[];
 }
 
 /** Metadata for endring av et retur detalj */
@@ -463,17 +466,31 @@ export interface EndreReturDetaljer {
     beskrivelse: string;
 }
 
+/** Identtypene til en aktør */
+export enum IdentType {
+    AKTOERID = "AKTOERID",
+    FNR = "FNR",
+    ORGNR = "ORGNR",
+}
+
+/** Hvilken format dokument er på. Dette forteller hvordan dokumentet må åpnes. */
+export enum DokumentFormatDto {
+    PDF = "PDF",
+    MBDOK = "MBDOK",
+    HTML = "HTML",
+}
+
 export interface DokumentMetadata {
     /** Journalpostid med arkiv prefiks som skal benyttes når dokumentet hentes */
     journalpostId?: string;
     dokumentreferanse?: string;
     tittel?: string;
     /** Hvilken format dokument er på. Dette forteller hvordan dokumentet må åpnes. */
-    format: DokumentMetadataFormatEnum;
-    /** Status på dokumentet */
-    status: DokumentMetadataStatusEnum;
-    /** Hvilken arkivsystem dokumentet er lagret på */
-    arkivsystem: DokumentMetadataArkivsystemEnum;
+    format: DokumentFormatDto;
+    /** Dokumentets status. Benyttes hvis journalposten er av typen forsendelse */
+    status: DokumentStatusDto;
+    /** Arkivsystem hvor dokument er lagret */
+    arkivsystem: DokumentArkivSystemDto;
 }
 
 /** Metadata om behandling */
@@ -546,8 +563,8 @@ export enum ForsendelseStatusTo {
 export interface AktorDto {
     /** Identifaktor til aktøren */
     ident: string;
-    /** Hvilken identtype som skal brukes */
-    type?: string;
+    /** Identtypene til en aktør */
+    type?: IdentType;
 }
 
 /**
@@ -664,9 +681,15 @@ export interface JournalpostDto {
 
 /** Journalpostens status */
 export enum JournalpostStatus {
+    AVVIK_ENDRE_FAGOMRADE = "AVVIK_ENDRE_FAGOMRADE",
+    AVVIK_BESTILL_RESKANNING = "AVVIK_BESTILL_RESKANNING",
+    AVVIK_BESTILL_SPLITTING = "AVVIK_BESTILL_SPLITTING",
     MOTTATT = "MOTTATT",
     JOURNALFORT = "JOURNALFØRT",
     EKSPEDERT = "EKSPEDERT",
+    EKSPEDERT_JOARK = "EKSPEDERT_JOARK",
+    MOTTAKSREGISTRERT = "MOTTAKSREGISTRERT",
+    UKJENT = "UKJENT",
     DISTRIBUERT = "DISTRIBUERT",
     AVBRUTT = "AVBRUTT",
     KLAR_FOR_DISTRIBUSJON = "KLAR_FOR_DISTRIBUSJON",
@@ -675,9 +698,11 @@ export enum JournalpostStatus {
     FEILREGISTRERT = "FEILREGISTRERT",
     RESERVERT = "RESERVERT",
     UTGAR = "UTGÅR",
+    SLETTET = "SLETTET",
     UNDER_OPPRETTELSE = "UNDER_OPPRETTELSE",
+    TIL_LAGRING = "TIL_LAGRING",
+    OPPRETTET = "OPPRETTET",
     UNDER_PRODUKSJON = "UNDER_PRODUKSJON",
-    UKJENT = "UKJENT",
 }
 
 /** Journalposten ble mottatt/sendt ut i kanal */
@@ -685,8 +710,8 @@ export enum Kanal {
     NAV_NO = "NAV_NO",
     NAV_NO_BID = "NAV_NO_BID",
     SKAN_BID = "SKAN_BID",
-    SKAN_IM = "SKAN_IM",
     SKAN_NETS = "SKAN_NETS",
+    SKAN_IM = "SKAN_IM",
     LOKAL_UTSKRIFT = "LOKAL_UTSKRIFT",
     SENTRAL_UTSKRIFT = "SENTRAL_UTSKRIFT",
     SDP = "SDP",
@@ -719,7 +744,7 @@ export interface ReturDetaljer {
      */
     antall?: number;
     /** Liste med logg av alle registrerte returer */
-    logg?: ReturDetaljerLog[];
+    logg: ReturDetaljerLog[];
 }
 
 /** Metadata for retur detaljer log */
@@ -785,38 +810,11 @@ export enum DokumentMalDetaljerTypeEnum {
 export enum DokumentMalDetaljerInnholdTypeEnum {
     VARSEL = "VARSEL",
     VEDTAK = "VEDTAK",
-    VEDLEGG_VEDTAK = "VEDLEGG_VEDTAK",
-    VEDLEGG_VARSEL = "VEDLEGG_VARSEL",
+    VEDLEGG = "VEDLEGG",
     SKJEMA = "SKJEMA",
 }
 
 export enum OppdaterDokumentForesporselArkivsystemEnum {
-    JOARK = "JOARK",
-    MIDLERTIDLIG_BREVLAGER = "MIDLERTIDLIG_BREVLAGER",
-    UKJENT = "UKJENT",
-    BIDRAG = "BIDRAG",
-    FORSENDELSE = "FORSENDELSE",
-}
-
-/** Hvilken format dokument er på. Dette forteller hvordan dokumentet må åpnes. */
-export enum DokumentMetadataFormatEnum {
-    PDF = "PDF",
-    MBDOK = "MBDOK",
-    HTML = "HTML",
-}
-
-/** Status på dokumentet */
-export enum DokumentMetadataStatusEnum {
-    IKKE_BESTILT = "IKKE_BESTILT",
-    BESTILLING_FEILET = "BESTILLING_FEILET",
-    UNDER_PRODUKSJON = "UNDER_PRODUKSJON",
-    UNDER_REDIGERING = "UNDER_REDIGERING",
-    FERDIGSTILT = "FERDIGSTILT",
-    AVBRUTT = "AVBRUTT",
-}
-
-/** Hvilken arkivsystem dokumentet er lagret på */
-export enum DokumentMetadataArkivsystemEnum {
     JOARK = "JOARK",
     MIDLERTIDLIG_BREVLAGER = "MIDLERTIDLIG_BREVLAGER",
     UKJENT = "UKJENT",

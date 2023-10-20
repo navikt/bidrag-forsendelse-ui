@@ -149,6 +149,7 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
                             dokumentreferanse={originalDokumentreferanse}
                             journalpostId={"BIF-" + forsendelseIdNumeric}
                             status={dokument.status}
+                            erSkjema={dokument.erSkjema}
                         />
                         <DeleteDocumentButton dokument={dokument} />
                     </div>
