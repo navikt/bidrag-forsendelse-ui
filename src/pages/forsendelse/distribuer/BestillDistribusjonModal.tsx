@@ -1,11 +1,11 @@
 import ObjectUtils from "@navikt/bidrag-ui-common/esm/utils/ObjectUtils";
 import { Alert, BodyShort, Button, ConfirmationPanel, Heading, Loader } from "@navikt/ds-react";
 import { Modal } from "@navikt/ds-react";
+import { useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { useState } from "react";
 import { useEffect } from "react";
-import { useMutation } from "react-query";
-import { useQuery } from "react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../../../api/api";
 import { PERSON_API } from "../../../api/api";

@@ -1,12 +1,12 @@
 import { SecuritySessionUtils } from "@navikt/bidrag-ui-common";
-import { useQuery, UseQueryResult } from "react-query";
+import { useSuspenseQuery, UseSuspenseQueryResult } from "@tanstack/react-query";
 
 import { BIDRAG_ORGANISASJON_API } from "../api/api";
 import { EnhetDto, JournalforendeEnhetDto } from "../api/BidragOrganisasjontApi";
 
 type UseOrganisasjonApiProps = {
-    hentJournalforendeEnheter: () => UseQueryResult<JournalforendeEnhetDto[]>;
-    hentSaksbehandlerEnhetListe: () => UseQueryResult<EnhetDto[]>;
+    hentJournalforendeEnheter: () => UseSuspenseQueryResult<JournalforendeEnhetDto[]>;
+    hentSaksbehandlerEnhetListe: () => UseSuspenseQueryResult<EnhetDto[]>;
 };
 
 const OrganisasjonQueryKeys = {
@@ -15,14 +15,14 @@ const OrganisasjonQueryKeys = {
     hentSaksbehandlerEnhetliste: () => [OrganisasjonQueryKeys.organisasjon, "hentSaksbehandlerEnhetliste"],
 };
 export default function useOrganisasjonApi(): UseOrganisasjonApiProps {
-    function hentJournalforendeEnheter(): UseQueryResult<JournalforendeEnhetDto[]> {
-        return useQuery({
+    function hentJournalforendeEnheter(): UseSuspenseQueryResult<JournalforendeEnhetDto[]> {
+        return useSuspenseQuery({
             queryKey: OrganisasjonQueryKeys.hentJournalforendeEnheter(),
             queryFn: () => BIDRAG_ORGANISASJON_API.arbeidsfordeling.hentArbeidsfordelingJournalforendeEnheter(),
         });
     }
-    function hentSaksbehandlerEnhetListe(): UseQueryResult<EnhetDto[]> {
-        return useQuery({
+    function hentSaksbehandlerEnhetListe(): UseSuspenseQueryResult<EnhetDto[]> {
+        return useSuspenseQuery({
             queryKey: OrganisasjonQueryKeys.hentSaksbehandlerEnhetliste(),
             queryFn: async () => {
                 const saksbehandlerId = await SecuritySessionUtils.hentSaksbehandlerId();

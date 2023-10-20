@@ -3,9 +3,9 @@ import { Alert } from "@navikt/ds-react";
 import { BodyShort } from "@navikt/ds-react";
 import { Button } from "@navikt/ds-react";
 import { Modal } from "@navikt/ds-react";
+import { useMutation } from "@tanstack/react-query";
 import React from "react";
 import { useState } from "react";
-import { useMutation } from "react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../../../api/api";
 import { DistribuerJournalpostRequest } from "../../../api/BidragForsendelseApi";

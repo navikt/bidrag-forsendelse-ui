@@ -1,5 +1,5 @@
+import { useQuery, UseQueryResult } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import { useQuery, UseQueryResult } from "react-query";
 
 import { BIDRAG_DOKUMENT_API, BIDRAG_DOKUMENT_ARKIV_API, BIDRAG_FORSENDELSE_API } from "../api/api";
 import { DokumentDto, JournalpostDto } from "../api/BidragDokumentApi";
@@ -28,7 +28,6 @@ export default function useDokumentApi() {
             queryKey: ["dokumentMalDetaljer", forsendelseId],
             queryFn: ({ signal }) => BIDRAG_FORSENDELSE_API.api.hentDokumentValgForForsendelse(forsendelseId),
             select: (data) => data.data,
-            optimisticResults: false,
         });
     }
     function dokumentMalDetaljer(request: HentDokumentValgRequest) {
@@ -47,7 +46,6 @@ export default function useDokumentApi() {
                 if (error.response.status == 400) return false;
                 return failureCount < 3;
             },
-            optimisticResults: false,
         });
     }
 
@@ -56,7 +54,6 @@ export default function useDokumentApi() {
             queryKey: ["notatDetaljer", request?.vedtakType],
             queryFn: ({ signal }) => BIDRAG_FORSENDELSE_API.api.hentDokumentValgNotater({ ...request, enhet }),
             select: (data) => data.data,
-            optimisticResults: false,
         });
     }
 

@@ -1,6 +1,6 @@
 import IdentUtils from "@navikt/bidrag-ui-common/esm/utils/IdentUtils";
 import ObjectUtils from "@navikt/bidrag-ui-common/esm/utils/ObjectUtils";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 
 import { PERSON_API, SAMHANDLER_API } from "../api/api";
 import { MottakerAdresseTo } from "../api/BidragForsendelseApi";
@@ -66,9 +66,8 @@ export default function useSamhandlerPersonApi() {
                 }
                 return { ident, valid: false };
             },
-            useErrorBoundary: false,
+            throwOnError: false,
             retry: 2,
-            suspense: false,
         });
     }
 

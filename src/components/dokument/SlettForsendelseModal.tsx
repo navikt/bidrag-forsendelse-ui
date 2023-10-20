@@ -1,6 +1,6 @@
 import { RedirectTo } from "@navikt/bidrag-ui-common";
 import { BodyShort, Button, Heading, Modal } from "@navikt/ds-react";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../../api/api";
 import environment from "../../environment";

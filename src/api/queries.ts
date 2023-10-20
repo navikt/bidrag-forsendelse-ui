@@ -1,5 +1,5 @@
 import { IRolleDetaljer, RolleType, RolleTypeAbbreviation, RolleTypeFullName } from "@navikt/bidrag-ui-common";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 
 import { DokumentStatus } from "../constants/DokumentStatus";
 import { SAKSNUMMER } from "../constants/fellestyper";

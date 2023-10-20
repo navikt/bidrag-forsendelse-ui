@@ -3,8 +3,8 @@ import "./AvvikshandteringModal.css";
 import { Left } from "@navikt/ds-icons";
 import { Button, Loader, Modal } from "@navikt/ds-react";
 import { Heading } from "@navikt/ds-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React, { useContext, useEffect, useMemo, useState } from "react";
-import { useMutation, useQueryClient } from "react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../../../../api/api";
 import { Avvikshendelse } from "../../../../api/BidragForsendelseApi";

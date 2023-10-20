@@ -1,4 +1,4 @@
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 
 import { BIDRAG_TILGANGSKONTROLL_API } from "../api/api";
 import { ContentType } from "../api/BidragTilgangskontrollApi";

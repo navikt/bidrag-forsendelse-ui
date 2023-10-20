@@ -1,6 +1,6 @@
 import { Alert, BodyShort, Button, Heading, Modal } from "@navikt/ds-react";
+import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { useMutation } from "react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../../api/api";
 import { Avvikshendelse } from "../../api/BidragForsendelseApi";

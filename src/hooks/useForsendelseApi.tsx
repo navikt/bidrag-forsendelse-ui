@@ -1,8 +1,8 @@
 import { IRolleDetaljer, RolleType, RolleTypeAbbreviation, RolleTypeFullName } from "@navikt/bidrag-ui-common";
 import IdentUtils from "@navikt/bidrag-ui-common/esm/utils/IdentUtils";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse, HttpStatusCode } from "axios";
 import React from "react";
-import { useQuery, UseQueryResult } from "react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../api/api";
 import { SAK_API } from "../api/api";
@@ -22,10 +22,10 @@ import useSamhandlerPersonApi from "./usePersonApi";
 
 export type VedleggListe = { malId: string; detaljer: DokumentMalDetaljer }[];
 export const UseForsendelseApiKeys = {
-    forsendelse: "forsendelse",
-    sak: "sak",
-    hentForsendelse: () => [UseForsendelseApiKeys.forsendelse],
-    sakerPerson: (personId: string) => [UseForsendelseApiKeys.sak, personId],
+    forsendelse: ["forsendelse"],
+    sak: ["sak"],
+    hentForsendelse: () => [...UseForsendelseApiKeys.forsendelse],
+    sakerPerson: (personId: string) => [...UseForsendelseApiKeys.sak, personId],
     dokumentValg: (behandlingType: string, soknadFra: string, soknadType: string) => [
         UseForsendelseApiKeys.forsendelse,
         "dokumentValg",
@@ -44,7 +44,7 @@ interface UseForsendelseDataProps {
     hentRoller: () => IRolleDetaljer[];
     hentJournalposterForPerson: (ident?: string) => Map<SAKSNUMMER, IJournalpost[]>;
     hentJournalposterForSak: (saksnummer: string) => IJournalpost[];
-    vedleggListe: () => UseQueryResult<VedleggListe>;
+    vedleggListe: () => UseSuspenseQueryResult<VedleggListe>;
 }
 export function useForsendelseApi(): UseForsendelseDataProps {
     const { forsendelseId, saksnummer: saksnummerFromSession } = useSession();
@@ -52,7 +52,7 @@ export function useForsendelseApi(): UseForsendelseDataProps {
     const saksnummer = saksnummerFromSession ?? hentForsendelseQuery().saksnummer;
     const hentSak = (): BidragSakDto => {
         const { data: sak, refetch } = useQuery({
-            queryKey: `sak_${saksnummer}`,
+            queryKey: [`sak_${saksnummer}`],
             queryFn: ({ signal }) => SAK_API.bidragSak.findMetadataForSak(saksnummer),
         });
 
@@ -72,7 +72,7 @@ export function useForsendelseApi(): UseForsendelseDataProps {
     const hentJournalposterForSak = (saksnummer: string): IJournalpost[] => {
         // console.log("Henter journalposter for sak", saksnummer);
         const { data: journalposter } = useQuery({
-            queryKey: `journal_sak_${saksnummer}`,
+            queryKey: [`journal_sak_${saksnummer}`],
             queryFn: ({ signal }) =>
                 BIDRAG_DOKUMENT_API.sak.hentJournal(
                     saksnummer,
@@ -154,12 +154,21 @@ export function useForsendelseApi(): UseForsendelseDataProps {
         };
     };
     function hentForsendelseQuery(): IForsendelse {
-        const { data: forsendelse, isRefetching } = useQuery({
+        const { data: forsendelse, isRefetching } = useSuspenseQuery({
             queryKey: UseForsendelseApiKeys.hentForsendelse(),
-            queryFn: () =>
-                BIDRAG_FORSENDELSE_API.api.hentForsendelse(forsendelseId, { saksnummer: saksnummerFromSession }),
-            enabled: forsendelseId != undefined,
-            optimisticResults: false,
+            queryFn: () => {
+                try {
+                    return BIDRAG_FORSENDELSE_API.api.hentForsendelse(forsendelseId, {
+                        saksnummer: saksnummerFromSession,
+                    });
+                } catch (error) {
+                    const errorMessage = parseErrorMessageFromAxiosError(error);
+                    addError({
+                        message: `Kunne ikke hente forsendelse: ${errorMessage}`,
+                        source: "hentforsendelse",
+                    });
+                }
+            },
             retry: (retryCount, error: AxiosError) => {
                 return error?.response?.status == HttpStatusCode.NotFound ? retryCount < 1 : retryCount < 3;
             },
@@ -198,15 +207,6 @@ export function useForsendelseApi(): UseForsendelseDataProps {
                     }),
                 };
             }, []),
-            onError: (error: AxiosError) => {
-                const errorMessage = parseErrorMessageFromAxiosError(error);
-                addError({
-                    message: `Kunne ikke hente forsendelse: ${errorMessage}`,
-                    source: "hentforsendelse",
-                });
-            },
-            suspense: true,
-            useErrorBoundary: (error: AxiosError) => error?.response?.status != HttpStatusCode.NotFound,
         });
 
         return {
@@ -217,8 +217,8 @@ export function useForsendelseApi(): UseForsendelseDataProps {
 
     function vedleggListe() {
         const { enhet } = useSession();
-        return useQuery({
-            queryKey: `vedlegg_liste`,
+        return useSuspenseQuery({
+            queryKey: [`vedlegg_liste`],
             queryFn: () => BIDRAG_FORSENDELSE_API.api.stottedeDokumentmalDetaljer(),
             select: React.useCallback((response: AxiosResponse): VedleggListe => {
                 const dokumentmaler = response.data as Record<string, DokumentMalDetaljer>;
@@ -242,8 +242,8 @@ export function useForsendelseApi(): UseForsendelseDataProps {
     }
 
     function hentStørrelseIMb(): number {
-        const result = useQuery({
-            queryKey: "forsendelse_størrelse",
+        const result = useSuspenseQuery({
+            queryKey: ["forsendelse_størrelse"],
             queryFn: () => BIDRAG_FORSENDELSE_API.api.henStorrelsePaDokumenter(forsendelseId),
             select: (data) => data.data,
         });

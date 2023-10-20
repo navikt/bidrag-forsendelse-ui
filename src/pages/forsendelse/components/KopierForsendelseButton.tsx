@@ -1,7 +1,7 @@
 import { BodyShort, Button, Checkbox, Heading, Loader, Modal, Table } from "@navikt/ds-react";
+import { useMutation } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { FormProvider, useFieldArray, useForm, useFormContext } from "react-hook-form";
-import { useMutation } from "react-query";
 import { useNavigate } from "react-router-dom";
 
 import { BIDRAG_FORSENDELSE_API } from "../../../api/api";

@@ -3,9 +3,9 @@ import "./ForsendelseTittel.css";
 import { XMarkIcon } from "@navikt/aksel-icons";
 import { CloudUpIcon } from "@navikt/aksel-icons";
 import { Alert, Button, Heading, TextField } from "@navikt/ds-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useRef, useState } from "react";
-import { useMutation, useQueryClient } from "react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../../../api/api";
 import { OppdaterForsendelseResponse } from "../../../api/BidragForsendelseApi";
