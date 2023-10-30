@@ -69,7 +69,7 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
     const forsendelse = useForsendelseApi().hentForsendelse();
     const [deleteMode, setDeleteMode] = useState(false);
     const { reset, handleSubmit, formState, setError, resetField } = useFormContext<IForsendelseFormProps>();
-    const { fields, append, update, swap } = useFieldArray<IForsendelseFormProps>({
+    const { fields, append, update, move } = useFieldArray<IForsendelseFormProps>({
         name: "dokumenter",
     });
 
@@ -169,7 +169,7 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
     }
 
     function swapDocuments(indexA: number, indexB: number) {
-        swap(indexA, indexB);
+        move(indexA, indexB);
         submitAndSaveChanges();
     }
 

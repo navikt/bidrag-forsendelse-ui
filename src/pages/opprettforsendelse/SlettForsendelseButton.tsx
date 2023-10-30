@@ -14,7 +14,7 @@ export default function SlettForsendelseButton() {
     const closeModal = () => setModalOpen(false);
 
     const slettForsendelseFn = useMutation({
-        mutationKey: "slett_forsendelse",
+        mutationKey: ["slett_forsendelse"],
         mutationFn: async () => {
             const requestBody: Avvikshendelse = {
                 avvikType: "SLETT_JOURNALPOST",
@@ -49,14 +49,14 @@ export default function SlettForsendelseButton() {
                             <Button
                                 size="small"
                                 onClick={() => slettForsendelseFn.mutate()}
-                                loading={slettForsendelseFn.isLoading}
+                                loading={slettForsendelseFn.isPending}
                             >
                                 Slett og gå tilbake til sakshistorikk
                             </Button>
                             <Button
                                 size="small"
                                 onClick={closeModal}
-                                disabled={slettForsendelseFn.isLoading}
+                                disabled={slettForsendelseFn.isPending}
                                 variant="tertiary"
                             >
                                 Avbryt

@@ -77,7 +77,7 @@ function KopierForsendelseModal({ onClose, open }: KopierForsendelseModalProps) 
     });
 
     const opprettForsendelseFn = useMutation({
-        mutationKey: OPPRETT_FORSENDELSE_MUTATION_KEY,
+        mutationKey: [OPPRETT_FORSENDELSE_MUTATION_KEY],
         mutationFn: (data: KopierForsendelseFormProps) =>
             BIDRAG_FORSENDELSE_API.api.opprettForsendelse({
                 gjelderIdent: data.gjelderIdent,
@@ -155,7 +155,7 @@ function KopierForsendelseModal({ onClose, open }: KopierForsendelseModalProps) 
                     </Modal.Content>
                     <Modal.Content>
                         <div className={"ml-2 flex flex-row gap-2 items-end bottom-2"}>
-                            <Button size="small" type="submit" loading={opprettForsendelseFn.isLoading}>
+                            <Button size="small" type="submit" loading={opprettForsendelseFn.isPending}>
                                 Opprett
                             </Button>
                             <Button size="small" variant={"tertiary"} onClick={() => onClose()}>

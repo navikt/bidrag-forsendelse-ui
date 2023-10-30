@@ -36,7 +36,7 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
     const mottaker = forsendelse.mottaker;
     const harAdresse = adresse != undefined && adresse != null;
     const personAdresseQuery = useQuery({
-        queryKey: `person_adresse_${ident}`,
+        queryKey: [`person_adresse_${ident}`],
         queryFn: async () => {
             if (mottaker.adresse) {
                 const adresse = { ...mottaker.adresse, land: mottaker.adresse.landkode };
@@ -50,11 +50,10 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
                 return response?.status == 204 ? null : response?.data;
             }
         },
-        onSuccess: (adresse) => {
+        select: (adresse) => {
             const erTomAdresse = ObjectUtils.isEmpty(adresse) || hasOnlyNullValues(adresse);
             return erTomAdresse ? null : adresse;
         },
-        suspense: false,
     });
 
     useEffect(() => {
