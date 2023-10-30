@@ -21,10 +21,10 @@ figure {
     text-align: center;
   }
   
-  .bidrag-forsendelse-ui .navds-table__data-cell .navds-checkbox--small .navds-checkbox__icon {
+  .bidrag-forsendelse-ui .navds-checkbox--small .navds-checkbox__icon {
     top: 13px;
   }
 
-  .bidrag-forsendelse-ui .navds-table__data-cell .navds-checkbox--medium .navds-checkbox__icon {
+  .bidrag-forsendelse-ui .navds-checkbox--medium .navds-checkbox__icon {
     top: 6px;
   }
