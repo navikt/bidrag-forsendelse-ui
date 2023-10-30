@@ -21,7 +21,6 @@ import { useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFor
 import { IDokument } from "../../types/Dokument";
 import { IDokumentJournalDto, IJournalpost, IJournalpostStatus } from "../../types/Journalpost";
 import { mapRolleToDisplayValue } from "../../types/RolleMapper";
-import { cleanupAfterClosedModal } from "../../utils/ModalUtils";
 import JournalpostStatusTag from "../journalpost/JournalpostStatusTag";
 import DokumentStatusTag from "./DokumentStatusTag";
 import { isSameDocument, JournalpostForsendelseRelasjoner } from "./JournalpostStatusMapper";
@@ -33,7 +32,6 @@ export default function LeggTilDokumentKnapp() {
 
     const closeModal = () => {
         setModalOpen(false);
-        cleanupAfterClosedModal();
     };
 
     return (

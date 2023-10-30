@@ -3,7 +3,6 @@ import "./PersonSok.css";
 import { PersonSokButton } from "@navikt/bidrag-ui-common";
 import { Search } from "@navikt/ds-react";
 
-import { cleanupAfterClosedModal } from "../../utils/ModalUtils";
 interface IPersonSokProps {
     onChange: (ident: string) => void;
     defaultValue?: string;
@@ -25,7 +24,6 @@ export default function PersonSok({ onChange, defaultValue }: IPersonSokProps) {
             <PersonSokButton
                 onResult={(data) => {
                     onChange(data.ident);
-                    cleanupAfterClosedModal();
                 }}
             />
         </div>

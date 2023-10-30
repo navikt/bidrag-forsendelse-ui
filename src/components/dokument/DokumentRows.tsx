@@ -18,7 +18,6 @@ import { DokumentStatus } from "../../constants/DokumentStatus";
 import { FormIDokument, useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IForsendelseFormProps } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IDokument } from "../../types/Dokument";
-import { cleanupAfterClosedModal } from "../../utils/ModalUtils";
 import TableDraggableBody from "../table/TableDraggableBody";
 import DokumentLinkedTag from "./DokumentLinkedTag";
 import DokumentStatusTag from "./DokumentStatusTag";
@@ -164,7 +163,6 @@ function DeleteDocumentButton({ dokument }: { dokument: FormIDokument }) {
     const [modalOpen, setModalOpen] = useState(false);
     const closeModal = () => {
         setModalOpen(false);
-        cleanupAfterClosedModal();
     };
     const openModal = (e) => {
         e.stopPropagation();

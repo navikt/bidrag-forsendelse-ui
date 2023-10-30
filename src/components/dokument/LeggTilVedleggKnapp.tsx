@@ -9,7 +9,6 @@ import { DokumentStatus } from "../../constants/DokumentStatus";
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
 import { useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IDokument } from "../../types/Dokument";
-import { cleanupAfterClosedModal } from "../../utils/ModalUtils";
 
 export default function LeggTilVedleggKnapp() {
     const { addDocuments } = useDokumenterForm();
@@ -18,7 +17,6 @@ export default function LeggTilVedleggKnapp() {
 
     const closeModal = () => {
         setModalOpen(false);
-        cleanupAfterClosedModal();
     };
     if (vedleggListe.length == 0) {
         return null;

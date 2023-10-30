@@ -5,7 +5,6 @@ import useDokumentApi from "../../../hooks/useDokumentApi";
 import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
 import { AvvikType } from "../../../types/AvvikTypes";
 import { IForsendelse } from "../../../types/Forsendelse";
-import { cleanupAfterClosedModal } from "../../../utils/ModalUtils";
 import { useSession } from "../context/SessionContext";
 import AvvikshandteringModal from "./components/AvvikshandteringModal";
 
@@ -33,7 +32,6 @@ function AvvikshandteringButton() {
 
     const closeModal = () => {
         setIsModalOpen(false);
-        cleanupAfterClosedModal();
     };
 
     if (avvikListe.length === 0) {

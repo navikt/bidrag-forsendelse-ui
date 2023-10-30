@@ -11,7 +11,6 @@ import { FormProvider, useForm } from "react-hook-form";
 import { DokumentStatus } from "../../constants/DokumentStatus";
 import { useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IDokument } from "../../types/Dokument";
-import { cleanupAfterClosedModal } from "../../utils/ModalUtils";
 import DokumentValgForsendelse from "./DokumentValgForsendelse";
 
 export default function LeggTilFraMalKnapp() {
@@ -20,7 +19,6 @@ export default function LeggTilFraMalKnapp() {
 
     const closeModal = () => {
         setModalOpen(false);
-        cleanupAfterClosedModal();
     };
     return (
         <div>

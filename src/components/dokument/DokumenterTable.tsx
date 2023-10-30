@@ -9,7 +9,6 @@ import { useErrorContext } from "../../context/ErrorProvider";
 import DokumentStatusInfo from "../../docs/DokumentStatusInfo.mdx";
 import DokumentTittelInfo from "../../docs/DokumentTittel.mdx";
 import { useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
-import { cleanupAfterClosedModal } from "../../utils/ModalUtils";
 import InfoKnapp from "../InfoKnapp";
 import DokumentRows from "./DokumentRows";
 import LeggTilDokumentButton from "./LeggTilDokumentKnapp";
@@ -145,7 +144,6 @@ function BekreftSlettingButton() {
     const [modalOpen, setModalOpen] = useState(false);
     const closeModal = () => {
         setModalOpen(false);
-        cleanupAfterClosedModal();
     };
     const openModal = (e) => {
         e.stopPropagation();
