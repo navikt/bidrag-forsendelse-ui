@@ -215,7 +215,7 @@ function DistribusjonKnapper({
     return (
         <div className="flex flex-col">
             {renderIngenDistribusjonChoice()}
-            <div className="flex items-center space-x-2">
+            <div className="flex gap-2 flex-row flex-wrap flex-row-reverse ">
                 <Button
                     variant={"primary"}
                     onClick={() => onSubmit(trengerAdresseForDistribusjon, ingenDistribusjon)}
