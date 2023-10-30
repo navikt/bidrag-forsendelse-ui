@@ -116,6 +116,7 @@ function LeggTilDokumentFraSakModal({ onClose, open }: LeggTilDokumentFraSakModa
             header={{
                 heading: "Legg til dokumenter",
             }}
+            className="max-w-none"
         >
             <Modal.Body className="legg_til_dokument_modal">
                 <React.Suspense fallback={<Loader size={"medium"} />}>

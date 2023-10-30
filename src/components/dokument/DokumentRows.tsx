@@ -196,12 +196,12 @@ function DeleteDocumentButton({ dokument }: { dokument: FormIDokument }) {
             <Button size={"small"} variant={"tertiary"} icon={<Delete />} onClick={openModal} />
             {modalOpen && !hasOnlyOneDocument && (
                 <Modal
-                    open={modalOpen}
                     header={{
                         heading: "Ønsker du å slette dokumentet?",
                     }}
                     onClose={closeModal}
-                    className={`min-w-[430px] max-w-[700px]`}
+                    open={true}
+                    closeOnBackdropClick
                 >
                     <Modal.Body>
                         <BodyShort>
@@ -211,17 +211,15 @@ function DeleteDocumentButton({ dokument }: { dokument: FormIDokument }) {
                             </ul>
                             Det vil ikke være mulig å angre slettingen
                         </BodyShort>
-                        <div>
-                            <div className={"mt-2 flex flex-row gap-2 items-end bottom-2"}>
-                                <Button size="small" variant="danger" onClick={deleteDocumentFromForsendelse}>
-                                    Slett
-                                </Button>
-                                <Button size="small" variant={"tertiary"} onClick={closeModal}>
-                                    Avbryt
-                                </Button>
-                            </div>
-                        </div>
                     </Modal.Body>
+                    <Modal.Footer>
+                        <Button size="small" variant="danger" onClick={deleteDocumentFromForsendelse}>
+                            Slett
+                        </Button>
+                        <Button size="small" variant={"tertiary"} onClick={closeModal}>
+                            Avbryt
+                        </Button>
+                    </Modal.Footer>
                 </Modal>
             )}
             {modalOpen && hasOnlyOneDocument && <SlettForsendelseModal closeModal={closeModal} />}

@@ -81,7 +81,7 @@ function LeggTilDokumentFraMalModal({ onClose, open }: LeggTilDokumentFraSakModa
                         style={{
                             minWidth: "30rem",
                             minHeight: "max-content",
-                            padding: "3rem 2rem 1rem 2rem",
+                            padding: "0.5rem 2rem 1rem 2rem",
                             overflowY: "auto",
                         }}
                     >
@@ -90,14 +90,12 @@ function LeggTilDokumentFraMalModal({ onClose, open }: LeggTilDokumentFraSakModa
                         </React.Suspense>
                     </Modal.Body>
                     <Modal.Footer>
-                        <div className={"ml-2 flex flex-row gap-2 items-end bottom-2"}>
-                            <Button size="small" type="submit">
-                                Legg til
-                            </Button>
-                            <Button size="small" variant={"tertiary"} onClick={() => onClose()}>
-                                Avbryt
-                            </Button>
-                        </div>
+                        <Button size="small" type="submit">
+                            Legg til
+                        </Button>
+                        <Button size="small" variant={"tertiary"} onClick={() => onClose()}>
+                            Avbryt
+                        </Button>
                     </Modal.Footer>
                 </form>
             </Modal>

@@ -45,15 +45,12 @@ export default function InfoKnapp({
 
             <Modal
                 ref={ref}
+                closeOnBackdropClick
                 onClose={closeModal}
                 className={`max-w-[900px] ${className} m-auto `}
                 portal
-                open={false}
-                header={{
-                    heading: "",
-                    closeButton: true,
-                }}
             >
+                <Modal.Header className="h-[10px]" closeButton></Modal.Header>
                 <Modal.Body>
                     <div className="max-h-[800px] mdx-content">{children}</div>
                 </Modal.Body>

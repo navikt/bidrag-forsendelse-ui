@@ -71,12 +71,12 @@ function LeggTilVedlegglModal({ onClose, open }: LeggTilDokumentFraSakModalProps
                 header={{
                     heading: " Legg til vedlegg",
                 }}
+                className="max-w-max"
             >
                 <form onSubmit={methods.handleSubmit(onSubmit)} className="mb-0">
                     <Modal.Body
                         style={{
                             minWidth: "max-content",
-                            minHeight: "max-content",
                         }}
                     >
                         <React.Suspense fallback={<Loader size={"medium"} />}>
