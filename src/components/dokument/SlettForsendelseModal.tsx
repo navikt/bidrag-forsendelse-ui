@@ -1,5 +1,5 @@
 import { RedirectTo } from "@navikt/bidrag-ui-common";
-import { BodyShort, Button, Heading, Modal } from "@navikt/ds-react";
+import { BodyShort, Button, Modal } from "@navikt/ds-react";
 import { useMutation } from "react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../../api/api";
@@ -27,35 +27,31 @@ export default function SlettForsendelseModal({ closeModal }: { closeModal: () =
     return (
         <Modal
             open
-            shouldCloseOnEsc
-            shouldCloseOnOverlayClick
             onClose={closeModal}
             className={`min-w-[450px] max-w-[900px]`}
+            header={{
+                heading: "Ønsker du å slette forsendelsen?",
+            }}
         >
-            <Modal.Content>
-                <Heading spacing size={"medium"}>
-                    Ønsker du å slette forsendelsen?
-                </Heading>
+            <Modal.Body>
                 <BodyShort spacing>
                     Du er i ferd med å slette alle dokumenter i forsendelse. En forsendelse må minst ha ett dokument.
                     <br /> Ønsker du å slette hele forsendelsen istedenfor?
                 </BodyShort>
-                <div>
-                    <div className={"mt-2 flex flex-row gap-2 items-end bottom-2"}>
-                        <Button
-                            size="small"
-                            variant="danger"
-                            onClick={deleteDocuments}
-                            loading={deleteForsendelseFnf.isLoading}
-                        >
-                            Slett forsendelse og gå tilbake til sakshistorikk
-                        </Button>
-                        <Button size="small" variant={"tertiary"} onClick={closeModal}>
-                            Avbryt
-                        </Button>
-                    </div>
-                </div>
-            </Modal.Content>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button
+                    size="small"
+                    variant="danger"
+                    onClick={deleteDocuments}
+                    loading={deleteForsendelseFnf.isLoading}
+                >
+                    Slett forsendelse og gå tilbake til sakshistorikk
+                </Button>
+                <Button size="small" variant={"tertiary"} onClick={closeModal}>
+                    Avbryt
+                </Button>
+            </Modal.Footer>
         </Modal>
     );
 }

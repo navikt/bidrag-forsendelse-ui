@@ -7,11 +7,10 @@ import { Expand } from "@navikt/ds-icons";
 import { Button, Table, Tabs } from "@navikt/ds-react";
 import { Modal } from "@navikt/ds-react";
 import { Loader } from "@navikt/ds-react";
-import { Heading } from "@navikt/ds-react";
 import { Accordion } from "@navikt/ds-react";
 import { Tag } from "@navikt/ds-react";
 import { Checkbox } from "@navikt/ds-react";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import React from "react";
 import { useEffect } from "react";
 
@@ -22,7 +21,6 @@ import { useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFor
 import { IDokument } from "../../types/Dokument";
 import { IDokumentJournalDto, IJournalpost, IJournalpostStatus } from "../../types/Journalpost";
 import { mapRolleToDisplayValue } from "../../types/RolleMapper";
-import { cleanupAfterClosedModal } from "../../utils/ModalUtils";
 import JournalpostStatusTag from "../journalpost/JournalpostStatusTag";
 import DokumentStatusTag from "./DokumentStatusTag";
 import { isSameDocument, JournalpostForsendelseRelasjoner } from "./JournalpostStatusMapper";
@@ -34,7 +32,6 @@ export default function LeggTilDokumentKnapp() {
 
     const closeModal = () => {
         setModalOpen(false);
-        cleanupAfterClosedModal();
     };
 
     return (
@@ -60,6 +57,9 @@ interface LeggTilDokumentFraSakModalProps {
 function LeggTilDokumentFraSakModal({ onClose, open }: LeggTilDokumentFraSakModalProps) {
     const [selectedDocuments, setSelectedDocuments] = useState<IDokument[]>([]);
     const { hentForsendelse } = useForsendelseApi();
+    const [hasOpened, setHasOpened] = useState(false);
+    const ref = useRef<HTMLDialogElement>(null);
+
     const saksnummer = hentForsendelse().saksnummer;
     function selectDocument(document: IDokument, toggle = true) {
         const isSelected = (d: IDokument) => {
@@ -108,36 +108,40 @@ function LeggTilDokumentFraSakModal({ onClose, open }: LeggTilDokumentFraSakModa
 
     useEffect(() => {
         setSelectedDocuments([]);
+        if (open) {
+            ref.current?.showModal();
+            setHasOpened(true);
+        } else ref.current?.close();
     }, [open]);
 
-    useEffect(() => {
-        Modal.setAppElement("#forsendelse-page");
-    }, []);
-
     return (
-        <Modal open={open} onClose={() => onClose([])}>
-            <Modal.Content className="legg_til_dokument_modal">
-                <Heading spacing level="1" size="large" id="modal-heading">
-                    Legg til dokumenter
-                </Heading>
-                <React.Suspense fallback={<Loader size={"medium"} />}>
-                    <VelgDokumentTabs
-                        selectDocument={selectDocument}
-                        unselectDocument={unselectDocument}
-                        selectedDocuments={selectedDocuments}
-                    />
-                </React.Suspense>
-            </Modal.Content>
-            <Modal.Content>
-                <div className={"ml-2 flex flex-row gap-2 items-end bottom-2"}>
-                    <Button size="small" onClick={() => onClose(selectedDocuments)}>
-                        Legg til valgte
-                    </Button>
-                    <Button size="small" variant={"tertiary"} onClick={() => onClose([])}>
-                        Avbryt
-                    </Button>
-                </div>
-            </Modal.Content>
+        <Modal
+            ref={ref}
+            onClose={() => onClose([])}
+            header={{
+                heading: "Legg til dokumenter",
+            }}
+            className="max-w-none"
+        >
+            <Modal.Body className="legg_til_dokument_modal">
+                {hasOpened && (
+                    <React.Suspense fallback={<Loader size={"medium"} />}>
+                        <VelgDokumentTabs
+                            selectDocument={selectDocument}
+                            unselectDocument={unselectDocument}
+                            selectedDocuments={selectedDocuments}
+                        />
+                    </React.Suspense>
+                )}
+            </Modal.Body>
+            <Modal.Footer>
+                <Button size="small" onClick={() => onClose(selectedDocuments)}>
+                    Legg til valgte
+                </Button>
+                <Button size="small" variant={"tertiary"} onClick={() => onClose([])}>
+                    Avbryt
+                </Button>
+            </Modal.Footer>
         </Modal>
     );
 }

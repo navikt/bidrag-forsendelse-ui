@@ -17,7 +17,7 @@ export default function AvvikModalButtons({
 }: AvvikModalButtonsProps) {
     const { onCancel } = useAvvikModalContext();
     return (
-        <div className={"mt-4 flex flex-row gap-[10px]"}>
+        <div className={"mt-4 flex flex-row gap-[10px] flex-wrap flex-row-reverse"}>
             <Button
                 variant={"primary"}
                 size="small"

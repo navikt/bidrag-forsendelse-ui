@@ -102,7 +102,7 @@ export interface OpprettDokumentForesporsel {
     /** DokumentmalId sier noe om dokumentets innhold og oppbygning. (Også kjent som brevkode) */
     dokumentmalId?: string;
     /** Om dokumentet med dokumentmalId skal bestilles. Hvis dette er satt til false så antas det at kallende system bestiller dokumentet selv. */
-    bestillDokument: boolean;
+    bestillDokument?: boolean;
 }
 
 /** Metadata for opprettelse av forsendelse */
@@ -233,7 +233,7 @@ export interface Avvikshendelse {
     /** Manuell beskrivelse av avvik */
     beskrivelse?: string;
     /** Eventuelle detaljer som skal følge avviket */
-    detaljer: Record<string, string>;
+    detaljer?: Record<string, string>;
     /** Saksnummer til sak når journalpost er journalført */
     saksnummer?: string;
     /** Adresse for hvor brev sendes ved sentral print */

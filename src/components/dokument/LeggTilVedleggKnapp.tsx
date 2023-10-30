@@ -1,6 +1,6 @@
 import { Add } from "@navikt/ds-icons";
-import { Button, Heading, Loader, Modal, Select } from "@navikt/ds-react";
-import { useEffect, useState } from "react";
+import { Button, Loader, Modal, Select } from "@navikt/ds-react";
+import { useState } from "react";
 import React from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 
@@ -9,7 +9,6 @@ import { DokumentStatus } from "../../constants/DokumentStatus";
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
 import { useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IDokument } from "../../types/Dokument";
-import { cleanupAfterClosedModal } from "../../utils/ModalUtils";
 
 export default function LeggTilVedleggKnapp() {
     const { addDocuments } = useDokumenterForm();
@@ -18,7 +17,6 @@ export default function LeggTilVedleggKnapp() {
 
     const closeModal = () => {
         setModalOpen(false);
-        cleanupAfterClosedModal();
     };
     if (vedleggListe.length == 0) {
         return null;
@@ -63,41 +61,34 @@ function LeggTilVedlegglModal({ onClose, open }: LeggTilDokumentFraSakModalProps
             });
         }
     }
-    useEffect(() => {
-        Modal.setAppElement("#forsendelse-page");
-    }, []);
-
     return (
         <FormProvider {...methods}>
-            <Modal open={open} onClose={() => onClose()}>
+            <Modal
+                open={open}
+                onClose={() => onClose()}
+                header={{
+                    heading: " Legg til vedlegg",
+                }}
+                className="max-w-max"
+            >
                 <form onSubmit={methods.handleSubmit(onSubmit)} className="mb-0">
-                    <Modal.Content
+                    <Modal.Body
                         style={{
                             minWidth: "max-content",
-                            minHeight: "max-content",
                         }}
                     >
-                        <Heading spacing level="1" size="large" id="modal-heading">
-                            Legg til vedlegg
-                        </Heading>
-                        {/* <Detail>
-                            Her kan du legge til et dokument med standard innhold som feks skjema, vedlegg til
-                            varsel/vedtak
-                        </Detail> */}
                         <React.Suspense fallback={<Loader size={"medium"} />}>
                             <DokumentValgVedlegg />
                         </React.Suspense>
-                    </Modal.Content>
-                    <Modal.Content>
-                        <div className={"ml-2 flex flex-row gap-2 items-end"}>
-                            <Button size="small" type="submit">
-                                Legg til
-                            </Button>
-                            <Button size="small" variant={"tertiary"} onClick={() => onClose()}>
-                                Avbryt
-                            </Button>
-                        </div>
-                    </Modal.Content>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button size="small" type="submit">
+                            Legg til
+                        </Button>
+                        <Button size="small" variant={"tertiary"} onClick={() => onClose()}>
+                            Avbryt
+                        </Button>
+                    </Modal.Footer>
                 </form>
             </Modal>
         </FormProvider>

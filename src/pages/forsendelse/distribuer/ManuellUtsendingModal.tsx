@@ -1,4 +1,4 @@
-import { ConfirmationPanel, Heading } from "@navikt/ds-react";
+import { ConfirmationPanel } from "@navikt/ds-react";
 import { Alert } from "@navikt/ds-react";
 import { BodyShort } from "@navikt/ds-react";
 import { Button } from "@navikt/ds-react";
@@ -49,12 +49,14 @@ export default function ManuellUtsendingModal({ onCancel }: ManuellUtsendingModa
         <Modal
             onClose={onCancel}
             open
-            closeButton={!distribuerMutation.isSuccess}
-            shouldCloseOnOverlayClick={!distribuerMutation.isSuccess}
+            header={{
+                heading: "Sende lokalt",
+                closeButton: !distribuerMutation.isSuccess,
+            }}
+            closeOnBackdropClick={!distribuerMutation.isSuccess}
         >
-            <Modal.Content>
+            <Modal.Body>
                 <div>
-                    <Heading size={"large"}>Sende lokalt</Heading>
                     {distribuerMutation.isError &&
                         distribuerMutation.error != CONFIRMATION_MISSING_ERROR &&
                         renderErrorMessage()}
@@ -78,20 +80,15 @@ export default function ManuellUtsendingModal({ onCancel }: ManuellUtsendingModa
                         ></ConfirmationPanel>
                     </div>
                 </div>
-                <div className="flex items-center pt-2 space-x-2 ">
-                    <Button size="small" variant={"primary"} onClick={onSubmit} loading={distribuerMutation.isLoading}>
-                        Bekreft og gå tilbake til sakshistorikk
-                    </Button>
-                    <Button
-                        size="small"
-                        variant={"tertiary"}
-                        disabled={distribuerMutation.isLoading}
-                        onClick={onCancel}
-                    >
-                        Avbryt
-                    </Button>
-                </div>
-            </Modal.Content>
+            </Modal.Body>
+            <Modal.Footer className="flex items-center pt-2 space-x-2 ">
+                <Button size="small" variant={"primary"} onClick={onSubmit} loading={distribuerMutation.isLoading}>
+                    Bekreft og gå tilbake til sakshistorikk
+                </Button>
+                <Button size="small" variant={"tertiary"} disabled={distribuerMutation.isLoading} onClick={onCancel}>
+                    Avbryt
+                </Button>
+            </Modal.Footer>
         </Modal>
     );
 }

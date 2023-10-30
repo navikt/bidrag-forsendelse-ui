@@ -4,16 +4,13 @@ import { Add } from "@navikt/ds-icons";
 import { Button } from "@navikt/ds-react";
 import { Modal } from "@navikt/ds-react";
 import { Loader } from "@navikt/ds-react";
-import { Heading } from "@navikt/ds-react";
 import { useState } from "react";
 import React from "react";
-import { useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 
 import { DokumentStatus } from "../../constants/DokumentStatus";
 import { useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IDokument } from "../../types/Dokument";
-import { cleanupAfterClosedModal } from "../../utils/ModalUtils";
 import DokumentValgForsendelse from "./DokumentValgForsendelse";
 
 export default function LeggTilFraMalKnapp() {
@@ -22,7 +19,6 @@ export default function LeggTilFraMalKnapp() {
 
     const closeModal = () => {
         setModalOpen(false);
-        cleanupAfterClosedModal();
     };
     return (
         <div>
@@ -68,39 +64,37 @@ function LeggTilDokumentFraMalModal({ onClose, open }: LeggTilDokumentFraSakModa
             });
         }
     }
-    useEffect(() => {
-        Modal.setAppElement("#forsendelse-page");
-    }, []);
 
     return (
         <FormProvider {...methods}>
-            <Modal open={open} onClose={() => onClose()}>
+            <Modal
+                open={open}
+                onClose={() => onClose()}
+                header={{
+                    heading: "Legg til dokument fra mal",
+                }}
+            >
                 <form onSubmit={methods.handleSubmit(onSubmit)}>
-                    <Modal.Content
+                    <Modal.Body
                         style={{
                             minWidth: "30rem",
                             minHeight: "max-content",
-                            padding: "3rem 2rem 1rem 2rem",
+                            padding: "0.5rem 2rem 1rem 2rem",
                             overflowY: "auto",
                         }}
                     >
-                        <Heading spacing level="1" size="large" id="modal-heading">
-                            Legg til dokument fra mal
-                        </Heading>
                         <React.Suspense fallback={<Loader size={"medium"} />}>
                             <DokumentValgForsendelse showLegend={false} />
                         </React.Suspense>
-                    </Modal.Content>
-                    <Modal.Content>
-                        <div className={"ml-2 flex flex-row gap-2 items-end bottom-2"}>
-                            <Button size="small" type="submit">
-                                Legg til
-                            </Button>
-                            <Button size="small" variant={"tertiary"} onClick={() => onClose()}>
-                                Avbryt
-                            </Button>
-                        </div>
-                    </Modal.Content>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button size="small" type="submit">
+                            Legg til
+                        </Button>
+                        <Button size="small" variant={"tertiary"} onClick={() => onClose()}>
+                            Avbryt
+                        </Button>
+                    </Modal.Footer>
                 </form>
             </Modal>
         </FormProvider>
