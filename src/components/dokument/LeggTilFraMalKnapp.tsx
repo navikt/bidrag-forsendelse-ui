@@ -4,10 +4,8 @@ import { Add } from "@navikt/ds-icons";
 import { Button } from "@navikt/ds-react";
 import { Modal } from "@navikt/ds-react";
 import { Loader } from "@navikt/ds-react";
-import { Heading } from "@navikt/ds-react";
 import { useState } from "react";
 import React from "react";
-import { useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 
 import { DokumentStatus } from "../../constants/DokumentStatus";
@@ -68,15 +66,18 @@ function LeggTilDokumentFraMalModal({ onClose, open }: LeggTilDokumentFraSakModa
             });
         }
     }
-    useEffect(() => {
-        Modal.setAppElement("#forsendelse-page");
-    }, []);
 
     return (
         <FormProvider {...methods}>
-            <Modal open={open} onClose={() => onClose()}>
+            <Modal
+                open={open}
+                onClose={() => onClose()}
+                header={{
+                    heading: "Legg til dokument fra mal",
+                }}
+            >
                 <form onSubmit={methods.handleSubmit(onSubmit)}>
-                    <Modal.Content
+                    <Modal.Body
                         style={{
                             minWidth: "30rem",
                             minHeight: "max-content",
@@ -84,14 +85,11 @@ function LeggTilDokumentFraMalModal({ onClose, open }: LeggTilDokumentFraSakModa
                             overflowY: "auto",
                         }}
                     >
-                        <Heading spacing level="1" size="large" id="modal-heading">
-                            Legg til dokument fra mal
-                        </Heading>
                         <React.Suspense fallback={<Loader size={"medium"} />}>
                             <DokumentValgForsendelse showLegend={false} />
                         </React.Suspense>
-                    </Modal.Content>
-                    <Modal.Content>
+                    </Modal.Body>
+                    <Modal.Footer>
                         <div className={"ml-2 flex flex-row gap-2 items-end bottom-2"}>
                             <Button size="small" type="submit">
                                 Legg til
@@ -100,7 +98,7 @@ function LeggTilDokumentFraMalModal({ onClose, open }: LeggTilDokumentFraSakModa
                                 Avbryt
                             </Button>
                         </div>
-                    </Modal.Content>
+                    </Modal.Footer>
                 </form>
             </Modal>
         </FormProvider>

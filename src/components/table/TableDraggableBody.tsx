@@ -62,6 +62,7 @@ export default function TableDraggableBody<T>({ children, onChange, rowData, get
         <DndContext
             sensors={sensors}
             onDragEnd={onChange}
+            autoScroll={{ layoutShiftCompensation: true }}
             onDragStart={handleDragStart}
             collisionDetection={closestCenter}
             modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}

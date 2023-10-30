@@ -7,7 +7,6 @@ import { Expand } from "@navikt/ds-icons";
 import { Button, Table, Tabs } from "@navikt/ds-react";
 import { Modal } from "@navikt/ds-react";
 import { Loader } from "@navikt/ds-react";
-import { Heading } from "@navikt/ds-react";
 import { Accordion } from "@navikt/ds-react";
 import { Tag } from "@navikt/ds-react";
 import { Checkbox } from "@navikt/ds-react";
@@ -110,16 +109,15 @@ function LeggTilDokumentFraSakModal({ onClose, open }: LeggTilDokumentFraSakModa
         setSelectedDocuments([]);
     }, [open]);
 
-    useEffect(() => {
-        Modal.setAppElement("#forsendelse-page");
-    }, []);
-
     return (
-        <Modal open={open} onClose={() => onClose([])}>
-            <Modal.Content className="legg_til_dokument_modal">
-                <Heading spacing level="1" size="large" id="modal-heading">
-                    Legg til dokumenter
-                </Heading>
+        <Modal
+            open={open}
+            onClose={() => onClose([])}
+            header={{
+                heading: "Legg til dokumenter",
+            }}
+        >
+            <Modal.Body className="legg_til_dokument_modal">
                 <React.Suspense fallback={<Loader size={"medium"} />}>
                     <VelgDokumentTabs
                         selectDocument={selectDocument}
@@ -127,17 +125,15 @@ function LeggTilDokumentFraSakModal({ onClose, open }: LeggTilDokumentFraSakModa
                         selectedDocuments={selectedDocuments}
                     />
                 </React.Suspense>
-            </Modal.Content>
-            <Modal.Content>
-                <div className={"ml-2 flex flex-row gap-2 items-end bottom-2"}>
-                    <Button size="small" onClick={() => onClose(selectedDocuments)}>
-                        Legg til valgte
-                    </Button>
-                    <Button size="small" variant={"tertiary"} onClick={() => onClose([])}>
-                        Avbryt
-                    </Button>
-                </div>
-            </Modal.Content>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button size="small" onClick={() => onClose(selectedDocuments)}>
+                    Legg til valgte
+                </Button>
+                <Button size="small" variant={"tertiary"} onClick={() => onClose([])}>
+                    Avbryt
+                </Button>
+            </Modal.Footer>
         </Modal>
     );
 }

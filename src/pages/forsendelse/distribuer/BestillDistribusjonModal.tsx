@@ -1,5 +1,5 @@
 import ObjectUtils from "@navikt/bidrag-ui-common/esm/utils/ObjectUtils";
-import { Alert, BodyShort, Button, ConfirmationPanel, Heading, Loader } from "@navikt/ds-react";
+import { Alert, BodyShort, Button, ConfirmationPanel, Loader } from "@navikt/ds-react";
 import { Modal } from "@navikt/ds-react";
 import React from "react";
 import { useState } from "react";
@@ -142,11 +142,11 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
             className="bestill-distribusjon-modal"
             open
             onClose={onCancel}
-            closeButton={true}
-            shouldCloseOnOverlayClick={false}
+            header={{
+                heading: "Bestill distribusjon av forsendelse",
+            }}
         >
-            <Modal.Content>
-                <Heading size={"large"}>Bestill distribusjon av forsendelse</Heading>
+            <Modal.Body>
                 {error && (
                     <Alert variant="error" className={"mt-2"}>
                         <BodyShort>{error}</BodyShort>
@@ -165,7 +165,7 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
                 <div className={"min-w-[35rem] relative px-2 w-full max-w-3xl h-full md:h-auto"}>
                     {renderModalBody()}
                 </div>
-            </Modal.Content>
+            </Modal.Body>
         </Modal>
     );
 }

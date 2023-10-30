@@ -4,7 +4,7 @@ import { EyeIcon } from "@navikt/aksel-icons";
 import { DragVerticalIcon } from "@navikt/aksel-icons";
 import { dateToDDMMYYYYString, OpenDocumentUtils, removeNonPrintableCharachters } from "@navikt/bidrag-ui-common";
 import { Delete } from "@navikt/ds-icons";
-import { BodyShort, Checkbox, Heading, Modal, Table } from "@navikt/ds-react";
+import { BodyShort, Checkbox, Modal, Table } from "@navikt/ds-react";
 import { Button } from "@navikt/ds-react";
 import { Textarea } from "@navikt/ds-react";
 import React, { useRef } from "react";
@@ -197,15 +197,13 @@ function DeleteDocumentButton({ dokument }: { dokument: FormIDokument }) {
             {modalOpen && !hasOnlyOneDocument && (
                 <Modal
                     open={modalOpen}
-                    shouldCloseOnEsc
-                    shouldCloseOnOverlayClick
+                    header={{
+                        heading: "Ønsker du å slette dokumentet?",
+                    }}
                     onClose={closeModal}
                     className={`min-w-[430px] max-w-[700px]`}
                 >
-                    <Modal.Content>
-                        <Heading spacing size={"medium"}>
-                            Ønsker du å slette dokumentet?
-                        </Heading>
+                    <Modal.Body>
                         <BodyShort>
                             Du er i ferd med å slette dokument med tittel
                             <ul>
@@ -223,7 +221,7 @@ function DeleteDocumentButton({ dokument }: { dokument: FormIDokument }) {
                                 </Button>
                             </div>
                         </div>
-                    </Modal.Content>
+                    </Modal.Body>
                 </Modal>
             )}
             {modalOpen && hasOnlyOneDocument && <SlettForsendelseModal closeModal={closeModal} />}

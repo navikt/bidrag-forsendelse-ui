@@ -1,4 +1,4 @@
-import { Alert, BodyShort, Button, Heading, Modal } from "@navikt/ds-react";
+import { Alert, BodyShort, Button, Modal } from "@navikt/ds-react";
 import { useState } from "react";
 import { useMutation } from "react-query";
 
@@ -36,33 +36,38 @@ export default function SlettForsendelseButton() {
                 Slett forsendelse
             </Button>
             {modalOpen && (
-                <Modal open onClose={closeModal}>
-                    <Modal.Content className="">
-                        <Heading size="medium">Slett forsendelse</Heading>
+                <Modal
+                    open
+                    onClose={closeModal}
+                    header={{
+                        heading: "Slett forsendelse",
+                    }}
+                >
+                    <Modal.Body className="">
                         {slettForsendelseFn.isError && (
                             <Alert variant="error">Det skjedde en feil ved sletting av forsendelse</Alert>
                         )}
                         <BodyShort spacing className="pt-2 pb-2">
                             Er du sikker på at du vil slette forsendelse under opprettelse?
                         </BodyShort>
-                        <div className="flex flex-row gap-[5px]">
-                            <Button
-                                size="small"
-                                onClick={() => slettForsendelseFn.mutate()}
-                                loading={slettForsendelseFn.isLoading}
-                            >
-                                Slett og gå tilbake til sakshistorikk
-                            </Button>
-                            <Button
-                                size="small"
-                                onClick={closeModal}
-                                disabled={slettForsendelseFn.isLoading}
-                                variant="tertiary"
-                            >
-                                Avbryt
-                            </Button>
-                        </div>
-                    </Modal.Content>
+                    </Modal.Body>
+                    <Modal.Footer className="flex flex-row gap-[5px]">
+                        <Button
+                            size="small"
+                            onClick={() => slettForsendelseFn.mutate()}
+                            loading={slettForsendelseFn.isLoading}
+                        >
+                            Slett og gå tilbake til sakshistorikk
+                        </Button>
+                        <Button
+                            size="small"
+                            onClick={closeModal}
+                            disabled={slettForsendelseFn.isLoading}
+                            variant="tertiary"
+                        >
+                            Avbryt
+                        </Button>
+                    </Modal.Footer>
                 </Modal>
             )}
         </>

@@ -1,7 +1,7 @@
 import "./DokumenterTable.css";
 
 import { OpenDocumentUtils } from "@navikt/bidrag-ui-common";
-import { BodyShort, Button, Heading, Modal, Switch, Table } from "@navikt/ds-react";
+import { BodyShort, Button, Modal, Switch, Table } from "@navikt/ds-react";
 import React, { useState } from "react";
 
 import { DokumentStatus } from "../../constants/DokumentStatus";
@@ -174,15 +174,15 @@ function BekreftSlettingButton() {
             {modalOpen && !slettAlleDokumenter && (
                 <Modal
                     open
-                    shouldCloseOnEsc
-                    shouldCloseOnOverlayClick
+                    header={{
+                        heading: `Ønsker du å slette ${
+                            deletedDocuments.length > 1 ? " valgte dokumenter" : "valgt dokument"
+                        }?`,
+                    }}
                     onClose={closeModal}
                     className={`min-w-[450px] max-w-[900px]`}
                 >
-                    <Modal.Content>
-                        <Heading spacing size={"medium"}>
-                            Ønsker du å slette {deletedDocuments.length > 1 ? " valgte dokumenter" : "valgt dokument"}?
-                        </Heading>
+                    <Modal.Body>
                         <BodyShort>
                             Du er i ferd med å slette følgende {deletedDocuments.length > 1 ? "dokumenter" : "dokument"}
                             :
@@ -203,7 +203,7 @@ function BekreftSlettingButton() {
                                 </Button>
                             </div>
                         </div>
-                    </Modal.Content>
+                    </Modal.Body>
                 </Modal>
             )}
             {modalOpen && slettAlleDokumenter && <SlettForsendelseModal closeModal={closeModal} />}

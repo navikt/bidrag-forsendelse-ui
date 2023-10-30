@@ -102,7 +102,7 @@ export interface OpprettDokumentForesporsel {
     /** DokumentmalId sier noe om dokumentets innhold og oppbygning. (Også kjent som brevkode) */
     dokumentmalId?: string;
     /** Om dokumentet med dokumentmalId skal bestilles. Hvis dette er satt til false så antas det at kallende system bestiller dokumentet selv. */
-    bestillDokument: boolean;
+    bestillDokument?: boolean;
 }
 
 /** Metadata for opprettelse av forsendelse */
