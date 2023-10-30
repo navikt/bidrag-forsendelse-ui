@@ -10,7 +10,7 @@ import { Loader } from "@navikt/ds-react";
 import { Accordion } from "@navikt/ds-react";
 import { Tag } from "@navikt/ds-react";
 import { Checkbox } from "@navikt/ds-react";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import React from "react";
 import { useEffect } from "react";
 
@@ -41,15 +41,13 @@ export default function LeggTilDokumentKnapp() {
             <Button onClick={() => setModalOpen(true)} variant={"tertiary"} size={"small"} icon={<Add />}>
                 Legg til dokument
             </Button>
-            {modalOpen && (
-                <LeggTilDokumentFraSakModal
-                    open={modalOpen}
-                    onClose={(selectedDocuments) => {
-                        addDocuments(selectedDocuments);
-                        closeModal();
-                    }}
-                />
-            )}
+            <LeggTilDokumentFraSakModal
+                open={modalOpen}
+                onClose={(selectedDocuments) => {
+                    addDocuments(selectedDocuments);
+                    closeModal();
+                }}
+            />
         </div>
     );
 }
@@ -61,6 +59,9 @@ interface LeggTilDokumentFraSakModalProps {
 function LeggTilDokumentFraSakModal({ onClose, open }: LeggTilDokumentFraSakModalProps) {
     const [selectedDocuments, setSelectedDocuments] = useState<IDokument[]>([]);
     const { hentForsendelse } = useForsendelseApi();
+    const [hasOpened, setHasOpened] = useState(false);
+    const ref = useRef<HTMLDialogElement>(null);
+
     const saksnummer = hentForsendelse().saksnummer;
     function selectDocument(document: IDokument, toggle = true) {
         const isSelected = (d: IDokument) => {
@@ -109,11 +110,16 @@ function LeggTilDokumentFraSakModal({ onClose, open }: LeggTilDokumentFraSakModa
 
     useEffect(() => {
         setSelectedDocuments([]);
+        console.log("Is open", open);
+        if (open) {
+            ref.current?.showModal();
+            setHasOpened(true);
+        } else ref.current?.close();
     }, [open]);
 
     return (
         <Modal
-            open
+            ref={ref}
             onClose={() => onClose([])}
             header={{
                 heading: "Legg til dokumenter",
@@ -121,13 +127,15 @@ function LeggTilDokumentFraSakModal({ onClose, open }: LeggTilDokumentFraSakModa
             className="max-w-none"
         >
             <Modal.Body className="legg_til_dokument_modal">
-                <React.Suspense fallback={<Loader size={"medium"} />}>
-                    <VelgDokumentTabs
-                        selectDocument={selectDocument}
-                        unselectDocument={unselectDocument}
-                        selectedDocuments={selectedDocuments}
-                    />
-                </React.Suspense>
+                {hasOpened && (
+                    <React.Suspense fallback={<Loader size={"medium"} />}>
+                        <VelgDokumentTabs
+                            selectDocument={selectDocument}
+                            unselectDocument={unselectDocument}
+                            selectedDocuments={selectedDocuments}
+                        />
+                    </React.Suspense>
+                )}
             </Modal.Body>
             <Modal.Footer>
                 <Button size="small" onClick={() => onClose(selectedDocuments)}>
