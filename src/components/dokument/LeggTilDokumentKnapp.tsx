@@ -110,7 +110,6 @@ function LeggTilDokumentFraSakModal({ onClose, open }: LeggTilDokumentFraSakModa
 
     useEffect(() => {
         setSelectedDocuments([]);
-        console.log("Is open", open);
         if (open) {
             ref.current?.showModal();
             setHasOpened(true);
