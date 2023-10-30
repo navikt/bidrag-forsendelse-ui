@@ -53,7 +53,7 @@ export default function ManuellUtsendingModal({ onCancel }: ManuellUtsendingModa
                 heading: "Sende lokalt",
                 closeButton: !distribuerMutation.isSuccess,
             }}
-            shouldCloseOnOverlayClick={!distribuerMutation.isSuccess}
+            closeOnBackdropClick={!distribuerMutation.isSuccess}
         >
             <Modal.Body>
                 <div>

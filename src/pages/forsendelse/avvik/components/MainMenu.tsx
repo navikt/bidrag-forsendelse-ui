@@ -21,9 +21,11 @@ function MainMenu({ avvikViewModels, onClick }: MainMenuProps) {
                     <MenuEntry avvik={viewModel} onClick={onClick} />
                 ))}
             </div>
-            <Button className="mt-4" onClick={onCancel} size="small" variant="primary">
-                Avbryt
-            </Button>
+            <div className="flex-wrap flex-row-reverse flex flex-row">
+                <Button className="mt-4" onClick={onCancel} size="small" variant="primary">
+                    Avbryt
+                </Button>
+            </div>
         </div>
     );
 }

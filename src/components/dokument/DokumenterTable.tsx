@@ -193,17 +193,15 @@ function BekreftSlettingButton() {
                             </ul>
                             Det vil ikke være mulig å angre slettingen
                         </BodyShort>
-                        <div>
-                            <div className={"mt-2 flex flex-row gap-2 items-end bottom-2"}>
-                                <Button size="small" variant="danger" onClick={deleteDocuments}>
-                                    Slett
-                                </Button>
-                                <Button size="small" variant={"tertiary"} onClick={closeModal}>
-                                    Avbryt
-                                </Button>
-                            </div>
-                        </div>
                     </Modal.Body>
+                    <Modal.Footer>
+                        <Button size="small" variant="danger" onClick={deleteDocuments}>
+                            Slett
+                        </Button>
+                        <Button size="small" variant={"tertiary"} onClick={closeModal}>
+                            Avbryt
+                        </Button>
+                    </Modal.Footer>
                 </Modal>
             )}
             {modalOpen && slettAlleDokumenter && <SlettForsendelseModal closeModal={closeModal} />}

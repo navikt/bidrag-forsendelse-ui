@@ -142,6 +142,9 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
             className="bestill-distribusjon-modal"
             open
             onClose={onCancel}
+            onCancel={(e) => {
+                if (submitState === "pending") e.preventDefault();
+            }}
             header={{
                 heading: "Bestill distribusjon av forsendelse",
             }}

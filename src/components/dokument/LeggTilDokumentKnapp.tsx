@@ -41,13 +41,15 @@ export default function LeggTilDokumentKnapp() {
             <Button onClick={() => setModalOpen(true)} variant={"tertiary"} size={"small"} icon={<Add />}>
                 Legg til dokument
             </Button>
-            <LeggTilDokumentFraSakModal
-                open={modalOpen}
-                onClose={(selectedDocuments) => {
-                    addDocuments(selectedDocuments);
-                    closeModal();
-                }}
-            />
+            {modalOpen && (
+                <LeggTilDokumentFraSakModal
+                    open={modalOpen}
+                    onClose={(selectedDocuments) => {
+                        addDocuments(selectedDocuments);
+                        closeModal();
+                    }}
+                />
+            )}
         </div>
     );
 }
@@ -111,7 +113,7 @@ function LeggTilDokumentFraSakModal({ onClose, open }: LeggTilDokumentFraSakModa
 
     return (
         <Modal
-            open={open}
+            open
             onClose={() => onClose([])}
             header={{
                 heading: "Legg til dokumenter",

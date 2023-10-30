@@ -90,7 +90,7 @@ export default function PageWrapper({ children, name }: PropsWithChildren<PageWr
                 <ErrorProvider>
                     <QueryClientProvider client={queryClient}>
                         <React.Suspense fallback={<Loader size={"3xlarge"} title={"Laster..."} />}>
-                            <div id={name} className={"w-full"}>
+                            <div id={name} className={"w-full bidrag-forsendelse-ui"}>
                                 {children}
                             </div>
                         </React.Suspense>

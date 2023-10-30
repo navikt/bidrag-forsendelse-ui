@@ -21,3 +21,6 @@ figure {
     text-align: center;
   }
   
+  .bidrag-forsendelse-ui .navds-checkbox__icon {
+    top: 5px;
+  }
