@@ -75,12 +75,10 @@ function EditForsendelseTitle({ onCancel, onSubmit, defaultValue }: EditForsende
         mutationFn: ({ title }) =>
             BIDRAG_FORSENDELSE_API.api
                 .oppdaterForsendelse(forsendelse.forsendelseId, {
-                    tittel: title,
                     dokumenter: [],
                 })
                 .then((res) => res.data),
         onSuccess: (data) => onSubmit(data.tittel ?? defaultValue),
-        useErrorBoundary: false,
     });
 
     function onChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -91,7 +89,7 @@ function EditForsendelseTitle({ onCancel, onSubmit, defaultValue }: EditForsende
         if (isCanceled.current) return;
         if (updatedTitle) {
             await updateTitleMutation.mutate({ title: updatedTitle });
-            queryClient.refetchQueries(UseForsendelseApiKeys.hentForsendelse());
+            queryClient.refetchQueries({ queryKey: UseForsendelseApiKeys.hentForsendelse() });
         } else {
             onSubmit(defaultValue);
         }
@@ -119,7 +117,7 @@ function EditForsendelseTitle({ onCancel, onSubmit, defaultValue }: EditForsende
                         if (e.key.toLowerCase() == "escape") onCancel();
                     }}
                     autoFocus
-                    disabled={updateTitleMutation.isLoading}
+                    disabled={updateTitleMutation.isPending}
                     defaultValue={defaultValue}
                     name="tittel"
                     size="small"
@@ -129,7 +127,7 @@ function EditForsendelseTitle({ onCancel, onSubmit, defaultValue }: EditForsende
                 />
                 <div className="self-end">
                     <Button
-                        loading={updateTitleMutation.isLoading}
+                        loading={updateTitleMutation.isPending}
                         size="small"
                         variant="tertiary"
                         icon={<CloudUpIcon />}
@@ -138,7 +136,7 @@ function EditForsendelseTitle({ onCancel, onSubmit, defaultValue }: EditForsende
                         Lagre
                     </Button>
                     <Button
-                        disabled={updateTitleMutation.isLoading}
+                        disabled={updateTitleMutation.isPending}
                         size="small"
                         variant="tertiary"
                         icon={<XMarkIcon />}

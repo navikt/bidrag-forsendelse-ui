@@ -1,4 +1,4 @@
-import { useQuery } from "react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { PostnummerPoststed } from "../types/KodeverkTypes";
 import { LandkodeLand } from "../types/KodeverkTypes";
@@ -18,7 +18,7 @@ export const QueryKeys = {
 };
 
 export const hentLandkoder = (): LandkodeLand[] => {
-    const { data: landkoder } = useQuery({
+    const { data: landkoder } = useSuspenseQuery({
         queryKey: QueryKeys.landkoder,
         queryFn: ({ signal }) => new KodeverkService().getLandkoder(),
     });
@@ -27,7 +27,7 @@ export const hentLandkoder = (): LandkodeLand[] => {
 };
 
 export const hentPostnummere = (): PostnummerPoststed[] => {
-    const { data: postnummere } = useQuery({
+    const { data: postnummere } = useSuspenseQuery({
         queryKey: QueryKeys.postnummere,
         queryFn: ({ signal }) => new KodeverkService().getPostnummere(),
     });

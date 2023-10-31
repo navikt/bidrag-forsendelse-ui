@@ -88,7 +88,7 @@ export default function OpprettNotatPage() {
     function onSubmit(data: OpprettForsendelseFormProps) {
         opprettForsendelseFn.mutate(data);
     }
-    const isLoading = opprettForsendelseFn.isLoading || opprettForsendelseFn.isSuccess;
+    const isLoading = opprettForsendelseFn.isPending || opprettForsendelseFn.isSuccess;
     return (
         <ContentContainer>
             <Grid>

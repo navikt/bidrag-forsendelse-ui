@@ -1,4 +1,4 @@
-import { useQuery, UseQueryResult } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery, UseSuspenseQueryResult } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 
 import { BIDRAG_DOKUMENT_API, BIDRAG_DOKUMENT_ARKIV_API, BIDRAG_FORSENDELSE_API } from "../api/api";
@@ -58,16 +58,20 @@ export default function useDokumentApi() {
     }
 
     function hentJournalpost(journalpostId: string) {
-        return useQuery({
+        return useSuspenseQuery({
             queryKey: DokumentQueryKeys.hentJournalpost(journalpostId),
             queryFn: () => BIDRAG_DOKUMENT_API.journal.hentJournalpost(journalpostId),
             select: (data): IJournalpost => journalpostMapper(data.data.journalpost, data.data.sakstilknytninger),
         });
     }
 
-    function hentAvvikListe(_journalpostId: string, saksnummer?: string, enhet?: string): UseQueryResult<AvvikType[]> {
+    function hentAvvikListe(
+        _journalpostId: string,
+        saksnummer?: string,
+        enhet?: string
+    ): UseSuspenseQueryResult<AvvikType[]> {
         const journalpostId = _journalpostId.startsWith("BIF") ? _journalpostId : `BIF-${_journalpostId}`;
-        return useQuery({
+        return useSuspenseQuery({
             queryKey: DokumentQueryKeys.hentAvvikListe(journalpostId),
             queryFn: () =>
                 BIDRAG_DOKUMENT_API.journal.hentAvvik(

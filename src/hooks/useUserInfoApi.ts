@@ -11,7 +11,7 @@ interface UserInfo {
 export default function useUserInfoApi() {
     const userInfoQuery = () => {
         return useQuery<UserInfo>({
-            queryKey: "userinfo",
+            queryKey: ["userinfo"],
             queryFn: () => fetch("/me").then((res) => res.json()),
         });
     };

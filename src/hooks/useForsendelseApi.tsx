@@ -1,6 +1,6 @@
 import { IRolleDetaljer, RolleType, RolleTypeAbbreviation, RolleTypeFullName } from "@navikt/bidrag-ui-common";
 import IdentUtils from "@navikt/bidrag-ui-common/esm/utils/IdentUtils";
-import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseQuery, UseSuspenseQueryResult } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse, HttpStatusCode } from "axios";
 import React from "react";
 
@@ -51,7 +51,7 @@ export function useForsendelseApi(): UseForsendelseDataProps {
     const { addError } = useErrorContext();
     const saksnummer = saksnummerFromSession ?? hentForsendelseQuery().saksnummer;
     const hentSak = (): BidragSakDto => {
-        const { data: sak, refetch } = useQuery({
+        const { data: sak, refetch } = useSuspenseQuery({
             queryKey: [`sak_${saksnummer}`],
             queryFn: ({ signal }) => SAK_API.bidragSak.findMetadataForSak(saksnummer),
         });
@@ -71,7 +71,7 @@ export function useForsendelseApi(): UseForsendelseDataProps {
     };
     const hentJournalposterForSak = (saksnummer: string): IJournalpost[] => {
         // console.log("Henter journalposter for sak", saksnummer);
-        const { data: journalposter } = useQuery({
+        const { data: journalposter } = useSuspenseQuery({
             queryKey: [`journal_sak_${saksnummer}`],
             queryFn: ({ signal }) =>
                 BIDRAG_DOKUMENT_API.sak.hentJournal(
@@ -93,7 +93,7 @@ export function useForsendelseApi(): UseForsendelseDataProps {
     };
 
     const hentSakerPerson = (ident: string): string[] => {
-        const { data: sakerPerson, refetch } = useQuery({
+        const { data: sakerPerson, refetch } = useSuspenseQuery({
             queryKey: UseForsendelseApiKeys.sakerPerson(ident),
             queryFn: ({ signal }) => SAK_API.bidragSak.find(ident),
         });
@@ -176,9 +176,10 @@ export function useForsendelseApi(): UseForsendelseDataProps {
                 const state = query.state;
                 return state?.error?.response?.status != HttpStatusCode.NotFound;
             },
-            refetchInterval: (data) => {
+            refetchInterval: (result) => {
+                const data = result.state?.data;
                 if (!data) return 0;
-                const forsendelse = data as IForsendelse;
+                const forsendelse = data.data as IForsendelse;
                 const hasDokumentsWithStatus = forsendelse.dokumenter.some((d) =>
                     [
                         "UNDER_PRODUKSJON",
@@ -189,7 +190,6 @@ export function useForsendelseApi(): UseForsendelseDataProps {
                     ].includes(d.status)
                 );
                 return hasDokumentsWithStatus ? 3000 : 0;
-                // return 0;
             },
             select: React.useCallback((response: AxiosResponse): IForsendelse => {
                 const forsendelse = response.data as ForsendelseResponsTo;

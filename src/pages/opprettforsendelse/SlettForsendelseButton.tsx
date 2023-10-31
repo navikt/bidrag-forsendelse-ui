@@ -4,6 +4,7 @@ import { useRef } from "react";
 
 import { BIDRAG_FORSENDELSE_API } from "../../api/api";
 import { Avvikshendelse } from "../../api/BidragForsendelseApi";
+import useOnMutationSuccess from "../../hooks/useOnMutationSuccess";
 import { RedirectTo } from "../../utils/RedirectUtils";
 import { useSession } from "../forsendelse/context/SessionContext";
 
@@ -28,10 +29,10 @@ export default function SlettForsendelseButton() {
                 },
             });
         },
-        onSuccess: () => {
-            RedirectTo.sakshistorikk(saksnummer);
-        },
     });
+
+    useOnMutationSuccess(slettForsendelseFn, () => RedirectTo.sakshistorikk(saksnummer));
+
     if (!forsendelseIdMedPrefix) return null;
     return (
         <>
@@ -55,14 +56,14 @@ export default function SlettForsendelseButton() {
                     <Button
                         size="small"
                         onClick={() => slettForsendelseFn.mutate()}
-                        loading={slettForsendelseFn.isLoading}
+                        loading={slettForsendelseFn.isPending}
                     >
                         Slett og gå tilbake til sakshistorikk
                     </Button>
                     <Button
                         size="small"
                         onClick={closeModal}
-                        disabled={slettForsendelseFn.isLoading}
+                        disabled={slettForsendelseFn.isPending}
                         variant="tertiary"
                     >
                         Avbryt

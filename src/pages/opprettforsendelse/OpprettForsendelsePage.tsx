@@ -145,7 +145,7 @@ function OpprettForsendelseNy() {
     const { addError } = useErrorContext();
     const options = useOpprettForsendelse();
     const opprettForsendelseFn = useMutation({
-        mutationKey: OPPRETT_FORSENDELSE_MUTATION_KEY,
+        mutationKey: [OPPRETT_FORSENDELSE_MUTATION_KEY],
         mutationFn: (data: OpprettForsendelseFormProps) => {
             const request = mapToOpprettEllerOppdaterForsendelseRequest(data);
             return BIDRAG_FORSENDELSE_API.api.opprettForsendelse({
@@ -203,7 +203,7 @@ function OpprettForsendelsContainer({ onSubmit, tittel }: OpprettForsendelsConta
     const forsendelseEksisterer = forsendelseId != null;
     const roller = useForsendelseApi().hentRoller();
     const methods = useFormContext();
-    const isLoading = useIsMutating([OPPRETT_FORSENDELSE_MUTATION_KEY]) > 0;
+    const isLoading = useIsMutating({ mutationKey: [OPPRETT_FORSENDELSE_MUTATION_KEY] }) > 0;
     return (
         <ContentContainer>
             <Grid>

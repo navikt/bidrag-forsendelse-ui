@@ -8,6 +8,7 @@ import React, { useContext, useEffect, useMemo, useState } from "react";
 
 import { BIDRAG_FORSENDELSE_API } from "../../../../api/api";
 import { Avvikshendelse } from "../../../../api/BidragForsendelseApi";
+import { UseForsendelseApiKeys } from "../../../../hooks/useForsendelseApi";
 import useTilgangskontrollApi from "../../../../hooks/useTilgangskontrollApi";
 import { Avvik, AvvikType } from "../../../../types/AvvikTypes";
 import { FAGOMRADE } from "../../../../types/Journalpost";
@@ -26,7 +27,7 @@ interface AvvikshandteringModalProps {
     initialAvvikType?: AvvikType;
 }
 export const AvvikMutationKeys = {
-    sendAvvik: "sendAvvik",
+    sendAvvik: ["sendAvvik"],
 };
 interface AvvikStateContextProps {
     sendAvvikStatus: "idle" | "error" | "loading";
@@ -65,7 +66,7 @@ function AvvikshandteringModalContent(props: AvvikshandteringModalProps) {
             if (!skalKunneViderebehandleJournalpostEtterUtførtAvvik(avvik)) {
                 RedirectTo.sakshistorikk(saksnummer);
             } else {
-                queryClient.invalidateQueries("forsendelse");
+                queryClient.invalidateQueries({ queryKey: UseForsendelseApiKeys.forsendelse });
             }
         },
     });
@@ -153,7 +154,7 @@ function AvvikshandteringModalContent(props: AvvikshandteringModalProps) {
 
     function getSendAvvikStatus() {
         if (sendAvvikFn.isError) return "error";
-        if (sendAvvikFn.isLoading) return "loading";
+        if (sendAvvikFn.isPending) return "loading";
         return "idle";
     }
 

@@ -44,7 +44,7 @@ export default function SlettForsendelseModal({ closeModal }: { closeModal: () =
                     size="small"
                     variant="danger"
                     onClick={deleteDocuments}
-                    loading={deleteForsendelseFnf.isLoading}
+                    loading={deleteForsendelseFnf.isPending}
                 >
                     Slett forsendelse og gå tilbake til sakshistorikk
                 </Button>

@@ -148,7 +148,7 @@ function KopierForsendelseModal({ onClose, open }: KopierForsendelseModalProps) 
                         </React.Suspense>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button size="small" type="submit" loading={opprettForsendelseFn.isLoading}>
+                        <Button size="small" type="submit" loading={opprettForsendelseFn.isPending}>
                             Opprett
                         </Button>
                         <Button size="small" variant={"tertiary"} onClick={() => onClose()}>

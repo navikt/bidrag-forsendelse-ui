@@ -4,11 +4,11 @@ import { BodyShort } from "@navikt/ds-react";
 import { Button } from "@navikt/ds-react";
 import { Modal } from "@navikt/ds-react";
 import { useMutation } from "@tanstack/react-query";
-import React from "react";
+import { AxiosResponse } from "axios";
 import { useState } from "react";
 
 import { BIDRAG_FORSENDELSE_API } from "../../../api/api";
-import { DistribuerJournalpostRequest } from "../../../api/BidragForsendelseApi";
+import { DistribuerJournalpostRequest, DistribuerJournalpostResponse } from "../../../api/BidragForsendelseApi";
 import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
 import { RedirectTo } from "../../../utils/RedirectUtils";
 
@@ -19,7 +19,7 @@ interface ManuellUtsendingModalProps {
 export default function ManuellUtsendingModal({ onCancel }: ManuellUtsendingModalProps) {
     const forsendelse = useForsendelseApi().hentForsendelse();
     const [confirmationState, setConfirmationState] = useState(false);
-    const distribuerMutation = useMutation({
+    const distribuerMutation = useMutation<AxiosResponse<DistribuerJournalpostResponse>, string>({
         mutationFn: () => {
             if (!confirmationState) {
                 throw CONFIRMATION_MISSING_ERROR;
@@ -82,10 +82,10 @@ export default function ManuellUtsendingModal({ onCancel }: ManuellUtsendingModa
                 </div>
             </Modal.Body>
             <Modal.Footer className="flex items-center pt-2 space-x-2 ">
-                <Button size="small" variant={"primary"} onClick={onSubmit} loading={distribuerMutation.isLoading}>
+                <Button size="small" variant={"primary"} onClick={onSubmit} loading={distribuerMutation.isPending}>
                     Bekreft og gå tilbake til sakshistorikk
                 </Button>
-                <Button size="small" variant={"tertiary"} disabled={distribuerMutation.isLoading} onClick={onCancel}>
+                <Button size="small" variant={"tertiary"} disabled={distribuerMutation.isPending} onClick={onCancel}>
                     Avbryt
                 </Button>
             </Modal.Footer>
