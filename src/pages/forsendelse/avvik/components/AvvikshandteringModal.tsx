@@ -36,12 +36,12 @@ const AvvikStateContext = React.createContext<AvvikStateContextProps>({} as Avvi
 function AvvikshandteringModal(props: AvvikshandteringModalProps) {
     const { onCancel } = useAvvikModalContext();
     return (
-        <Modal className="min-w-[35rem] max-w-[55rem]" open onClose={onCancel} shouldCloseOnOverlayClick>
-            <Modal.Content>
+        <Modal className="min-w-[35rem] max-w-[55rem]" open onClose={onCancel}>
+            <Modal.Body>
                 <React.Suspense fallback={<Loader size="medium" />}>
                     <AvvikshandteringModalContent {...props} />
                 </React.Suspense>
-            </Modal.Content>
+            </Modal.Body>
         </Modal>
     );
 }
@@ -156,10 +156,6 @@ function AvvikshandteringModalContent(props: AvvikshandteringModalProps) {
         if (sendAvvikFn.isLoading) return "loading";
         return "idle";
     }
-
-    useEffect(() => {
-        Modal.setAppElement("#forsendelse-page");
-    }, []);
 
     return (
         <React.Suspense fallback={<Loader size="medium" />}>

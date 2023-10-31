@@ -2,9 +2,8 @@ import "./InfoKnapp.css";
 
 import { QuestionmarkIcon } from "@navikt/aksel-icons";
 import { Button, Modal } from "@navikt/ds-react";
-import { PropsWithChildren, useState } from "react";
+import React, { PropsWithChildren, useRef } from "react";
 
-import { cleanupAfterClosedModal } from "../utils/ModalUtils";
 type InfoKnappProps = {
     buttonClassName?: string;
     className?: string;
@@ -19,16 +18,16 @@ export default function InfoKnapp({
     buttonText,
     title,
 }: PropsWithChildren<InfoKnappProps>) {
-    const [modalOpen, setModalOpen] = useState(false);
+    const ref = useRef<HTMLDialogElement>(null);
 
     const closeModal = () => {
-        setModalOpen(false);
-        cleanupAfterClosedModal();
+        ref.current?.close();
+        // cleanupAfterClosedModal();
     };
-    const openModal = (e) => {
-        e.stopPropagation();
+    const openModal = (e: React.MouseEvent) => {
         e.preventDefault();
-        setModalOpen(true);
+        e.stopPropagation();
+        ref.current?.showModal();
     };
     const onlyIcon = buttonText == undefined;
     return (
@@ -44,17 +43,11 @@ export default function InfoKnapp({
                 {buttonText}
             </Button>
 
-            <Modal
-                open={modalOpen}
-                overlayClassName="test"
-                shouldCloseOnEsc
-                shouldCloseOnOverlayClick
-                onClose={closeModal}
-                className={`max-w-[900px] ${className}`}
-            >
-                <Modal.Content>
+            <Modal ref={ref} closeOnBackdropClick onClose={closeModal} className={`max-w-[900px] ${className} m-auto `}>
+                <Modal.Header className="h-[10px]" closeButton></Modal.Header>
+                <Modal.Body>
                     <div className="max-h-[800px] mdx-content">{children}</div>
-                </Modal.Content>
+                </Modal.Body>
             </Modal>
         </>
     );

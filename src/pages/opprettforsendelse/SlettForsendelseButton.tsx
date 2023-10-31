@@ -1,6 +1,6 @@
-import { Alert, BodyShort, Button, Heading, Modal } from "@navikt/ds-react";
+import { Alert, BodyShort, Button, Modal } from "@navikt/ds-react";
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { useRef } from "react";
 
 import { BIDRAG_FORSENDELSE_API } from "../../api/api";
 import { Avvikshendelse } from "../../api/BidragForsendelseApi";
@@ -9,9 +9,12 @@ import { useSession } from "../forsendelse/context/SessionContext";
 
 export default function SlettForsendelseButton() {
     const { forsendelseIdMedPrefix, enhet, saksnummer } = useSession();
-    const [modalOpen, setModalOpen] = useState(false);
-    const openModal = () => setModalOpen(true);
-    const closeModal = () => setModalOpen(false);
+    const openModal = () => ref.current?.showModal();
+    const closeModal = (e: React.MouseEvent<any>) => {
+        e.preventDefault();
+        ref.current?.close();
+    };
+    const ref = useRef<HTMLDialogElement>(null);
 
     const slettForsendelseFn = useMutation({
         mutationKey: ["slett_forsendelse"],
@@ -35,36 +38,37 @@ export default function SlettForsendelseButton() {
             <Button type="button" size="small" onClick={openModal} variant="secondary" value="Slett forsendelse">
                 Slett forsendelse
             </Button>
-            {modalOpen && (
-                <Modal open onClose={closeModal}>
-                    <Modal.Content className="">
-                        <Heading size="medium">Slett forsendelse</Heading>
-                        {slettForsendelseFn.isError && (
-                            <Alert variant="error">Det skjedde en feil ved sletting av forsendelse</Alert>
-                        )}
-                        <BodyShort spacing className="pt-2 pb-2">
-                            Er du sikker på at du vil slette forsendelse under opprettelse?
-                        </BodyShort>
-                        <div className="flex flex-row gap-[5px]">
-                            <Button
-                                size="small"
-                                onClick={() => slettForsendelseFn.mutate()}
-                                loading={slettForsendelseFn.isPending}
-                            >
-                                Slett og gå tilbake til sakshistorikk
-                            </Button>
-                            <Button
-                                size="small"
-                                onClick={closeModal}
-                                disabled={slettForsendelseFn.isPending}
-                                variant="tertiary"
-                            >
-                                Avbryt
-                            </Button>
-                        </div>
-                    </Modal.Content>
-                </Modal>
-            )}
+            <Modal
+                ref={ref}
+                onClose={closeModal}
+                header={{
+                    heading: "Slett forsendelse",
+                }}
+            >
+                <Modal.Body>
+                    {slettForsendelseFn.isError && (
+                        <Alert variant="error">Det skjedde en feil ved sletting av forsendelse</Alert>
+                    )}
+                    <BodyShort>Er du sikker på at du vil slette forsendelse under opprettelse?</BodyShort>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button
+                        size="small"
+                        onClick={() => slettForsendelseFn.mutate()}
+                        loading={slettForsendelseFn.isLoading}
+                    >
+                        Slett og gå tilbake til sakshistorikk
+                    </Button>
+                    <Button
+                        size="small"
+                        onClick={closeModal}
+                        disabled={slettForsendelseFn.isLoading}
+                        variant="tertiary"
+                    >
+                        Avbryt
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </>
     );
 }

@@ -1,5 +1,5 @@
 import ObjectUtils from "@navikt/bidrag-ui-common/esm/utils/ObjectUtils";
-import { Alert, BodyShort, Button, ConfirmationPanel, Heading, Loader } from "@navikt/ds-react";
+import { Alert, BodyShort, Button, ConfirmationPanel, Loader } from "@navikt/ds-react";
 import { Modal } from "@navikt/ds-react";
 import { useMutation } from "@tanstack/react-query";
 import { useQuery } from "@tanstack/react-query";
@@ -141,11 +141,14 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
             className="bestill-distribusjon-modal"
             open
             onClose={onCancel}
-            closeButton={true}
-            shouldCloseOnOverlayClick={false}
+            onCancel={(e) => {
+                if (submitState === "pending") e.preventDefault();
+            }}
+            header={{
+                heading: "Bestill distribusjon av forsendelse",
+            }}
         >
-            <Modal.Content>
-                <Heading size={"large"}>Bestill distribusjon av forsendelse</Heading>
+            <Modal.Body>
                 {error && (
                     <Alert variant="error" className={"mt-2"}>
                         <BodyShort>{error}</BodyShort>
@@ -164,7 +167,7 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
                 <div className={"min-w-[35rem] relative px-2 w-full max-w-3xl h-full md:h-auto"}>
                     {renderModalBody()}
                 </div>
-            </Modal.Content>
+            </Modal.Body>
         </Modal>
     );
 }
@@ -211,7 +214,7 @@ function DistribusjonKnapper({
     return (
         <div className="flex flex-col">
             {renderIngenDistribusjonChoice()}
-            <div className="flex items-center space-x-2">
+            <div className="flex gap-2 flex-row flex-wrap flex-row-reverse ">
                 <Button
                     variant={"primary"}
                     onClick={() => onSubmit(trengerAdresseForDistribusjon, ingenDistribusjon)}

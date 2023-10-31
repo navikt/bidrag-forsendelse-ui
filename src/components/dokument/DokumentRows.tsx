@@ -4,7 +4,7 @@ import { EyeIcon } from "@navikt/aksel-icons";
 import { DragVerticalIcon } from "@navikt/aksel-icons";
 import { dateToDDMMYYYYString, OpenDocumentUtils, removeNonPrintableCharachters } from "@navikt/bidrag-ui-common";
 import { Delete } from "@navikt/ds-icons";
-import { BodyShort, Checkbox, Heading, Modal, Table } from "@navikt/ds-react";
+import { BodyShort, Checkbox, Modal, Table } from "@navikt/ds-react";
 import { Button } from "@navikt/ds-react";
 import { Textarea } from "@navikt/ds-react";
 import React, { useRef } from "react";
@@ -18,7 +18,6 @@ import { DokumentStatus } from "../../constants/DokumentStatus";
 import { FormIDokument, useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IForsendelseFormProps } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IDokument } from "../../types/Dokument";
-import { cleanupAfterClosedModal } from "../../utils/ModalUtils";
 import TableDraggableBody from "../table/TableDraggableBody";
 import DokumentLinkedTag from "./DokumentLinkedTag";
 import DokumentStatusTag from "./DokumentStatusTag";
@@ -164,7 +163,6 @@ function DeleteDocumentButton({ dokument }: { dokument: FormIDokument }) {
     const [modalOpen, setModalOpen] = useState(false);
     const closeModal = () => {
         setModalOpen(false);
-        cleanupAfterClosedModal();
     };
     const openModal = (e) => {
         e.stopPropagation();
@@ -196,16 +194,14 @@ function DeleteDocumentButton({ dokument }: { dokument: FormIDokument }) {
             <Button size={"small"} variant={"tertiary"} icon={<Delete />} onClick={openModal} />
             {modalOpen && !hasOnlyOneDocument && (
                 <Modal
-                    open={modalOpen}
-                    shouldCloseOnEsc
-                    shouldCloseOnOverlayClick
+                    header={{
+                        heading: "Ønsker du å slette dokumentet?",
+                    }}
                     onClose={closeModal}
-                    className={`min-w-[430px] max-w-[700px]`}
+                    open={true}
+                    closeOnBackdropClick
                 >
-                    <Modal.Content>
-                        <Heading spacing size={"medium"}>
-                            Ønsker du å slette dokumentet?
-                        </Heading>
+                    <Modal.Body>
                         <BodyShort>
                             Du er i ferd med å slette dokument med tittel
                             <ul>
@@ -213,17 +209,15 @@ function DeleteDocumentButton({ dokument }: { dokument: FormIDokument }) {
                             </ul>
                             Det vil ikke være mulig å angre slettingen
                         </BodyShort>
-                        <div>
-                            <div className={"mt-2 flex flex-row gap-2 items-end bottom-2"}>
-                                <Button size="small" variant="danger" onClick={deleteDocumentFromForsendelse}>
-                                    Slett
-                                </Button>
-                                <Button size="small" variant={"tertiary"} onClick={closeModal}>
-                                    Avbryt
-                                </Button>
-                            </div>
-                        </div>
-                    </Modal.Content>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button size="small" variant="danger" onClick={deleteDocumentFromForsendelse}>
+                            Slett
+                        </Button>
+                        <Button size="small" variant={"tertiary"} onClick={closeModal}>
+                            Avbryt
+                        </Button>
+                    </Modal.Footer>
                 </Modal>
             )}
             {modalOpen && hasOnlyOneDocument && <SlettForsendelseModal closeModal={closeModal} />}

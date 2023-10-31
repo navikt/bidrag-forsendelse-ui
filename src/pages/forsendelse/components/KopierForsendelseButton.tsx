@@ -1,6 +1,6 @@
 import { BodyShort, Button, Checkbox, Heading, Loader, Modal, Table } from "@navikt/ds-react";
 import { useMutation } from "@tanstack/react-query";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { FormProvider, useFieldArray, useForm, useFormContext } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 
@@ -87,6 +87,7 @@ function KopierForsendelseModal({ onClose, open }: KopierForsendelseModalProps) 
                 saksnummer: forsendelse.saksnummer,
                 behandlingInfo: {
                     ...forsendelse.behandlingInfo,
+                    barnIBehandling: [],
                 },
                 opprettTittel: true,
                 enhet: forsendelse.enhet,
@@ -116,18 +117,14 @@ function KopierForsendelseModal({ onClose, open }: KopierForsendelseModalProps) 
     });
 
     function onSubmit(data: KopierForsendelseFormProps) {
-        console.log(data);
         opprettForsendelseFn.mutate(data);
     }
-    useEffect(() => {
-        Modal.setAppElement("#forsendelse-page");
-    }, []);
 
     return (
         <FormProvider {...methods}>
-            <Modal open={open} onClose={() => onClose()}>
+            <Modal open={open} onClose={() => onClose()} header={{ heading: "Kopier forsendelse" }}>
                 <form onSubmit={methods.handleSubmit(onSubmit)}>
-                    <Modal.Content
+                    <Modal.Body
                         style={{
                             minWidth: "max-content",
                             minHeight: "max-content",
@@ -135,9 +132,6 @@ function KopierForsendelseModal({ onClose, open }: KopierForsendelseModalProps) 
                             overflowY: "auto",
                         }}
                     >
-                        <Heading spacing level="1" size="large" id="modal-heading">
-                            Kopier forsendelse
-                        </Heading>
                         <BodyShort>
                             Opprett ny forsendelse med valgte dokumenter
                             <br />
@@ -152,17 +146,15 @@ function KopierForsendelseModal({ onClose, open }: KopierForsendelseModalProps) 
                             <Heading size="small">Kopier dokumenter</Heading>
                             <DokumentValgTable />
                         </React.Suspense>
-                    </Modal.Content>
-                    <Modal.Content>
-                        <div className={"ml-2 flex flex-row gap-2 items-end bottom-2"}>
-                            <Button size="small" type="submit" loading={opprettForsendelseFn.isPending}>
-                                Opprett
-                            </Button>
-                            <Button size="small" variant={"tertiary"} onClick={() => onClose()}>
-                                Avbryt
-                            </Button>
-                        </div>
-                    </Modal.Content>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button size="small" type="submit" loading={opprettForsendelseFn.isLoading}>
+                            Opprett
+                        </Button>
+                        <Button size="small" variant={"tertiary"} onClick={() => onClose()}>
+                            Avbryt
+                        </Button>
+                    </Modal.Footer>
                 </form>
             </Modal>
         </FormProvider>

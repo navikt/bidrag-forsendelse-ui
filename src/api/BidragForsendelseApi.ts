@@ -233,7 +233,7 @@ export interface Avvikshendelse {
     /** Manuell beskrivelse av avvik */
     beskrivelse?: string;
     /** Eventuelle detaljer som skal følge avviket */
-    detaljer: Record<string, string>;
+    detaljer?: Record<string, string>;
     /** Saksnummer til sak når journalpost er journalført */
     saksnummer?: string;
     /** Adresse for hvor brev sendes ved sentral print */

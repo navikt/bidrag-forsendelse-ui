@@ -1,7 +1,7 @@
 import "./DokumenterTable.css";
 
 import { OpenDocumentUtils } from "@navikt/bidrag-ui-common";
-import { BodyShort, Button, Heading, Modal, Switch, Table } from "@navikt/ds-react";
+import { BodyShort, Button, Modal, Switch, Table } from "@navikt/ds-react";
 import React, { useState } from "react";
 
 import { DokumentStatus } from "../../constants/DokumentStatus";
@@ -9,7 +9,6 @@ import { useErrorContext } from "../../context/ErrorProvider";
 import DokumentStatusInfo from "../../docs/DokumentStatusInfo.mdx";
 import DokumentTittelInfo from "../../docs/DokumentTittel.mdx";
 import { useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
-import { cleanupAfterClosedModal } from "../../utils/ModalUtils";
 import InfoKnapp from "../InfoKnapp";
 import DokumentRows from "./DokumentRows";
 import LeggTilDokumentButton from "./LeggTilDokumentKnapp";
@@ -145,7 +144,6 @@ function BekreftSlettingButton() {
     const [modalOpen, setModalOpen] = useState(false);
     const closeModal = () => {
         setModalOpen(false);
-        cleanupAfterClosedModal();
     };
     const openModal = (e) => {
         e.stopPropagation();
@@ -174,15 +172,15 @@ function BekreftSlettingButton() {
             {modalOpen && !slettAlleDokumenter && (
                 <Modal
                     open
-                    shouldCloseOnEsc
-                    shouldCloseOnOverlayClick
+                    header={{
+                        heading: `Ønsker du å slette ${
+                            deletedDocuments.length > 1 ? " valgte dokumenter" : "valgt dokument"
+                        }?`,
+                    }}
                     onClose={closeModal}
                     className={`min-w-[450px] max-w-[900px]`}
                 >
-                    <Modal.Content>
-                        <Heading spacing size={"medium"}>
-                            Ønsker du å slette {deletedDocuments.length > 1 ? " valgte dokumenter" : "valgt dokument"}?
-                        </Heading>
+                    <Modal.Body>
                         <BodyShort>
                             Du er i ferd med å slette følgende {deletedDocuments.length > 1 ? "dokumenter" : "dokument"}
                             :
@@ -193,17 +191,15 @@ function BekreftSlettingButton() {
                             </ul>
                             Det vil ikke være mulig å angre slettingen
                         </BodyShort>
-                        <div>
-                            <div className={"mt-2 flex flex-row gap-2 items-end bottom-2"}>
-                                <Button size="small" variant="danger" onClick={deleteDocuments}>
-                                    Slett
-                                </Button>
-                                <Button size="small" variant={"tertiary"} onClick={closeModal}>
-                                    Avbryt
-                                </Button>
-                            </div>
-                        </div>
-                    </Modal.Content>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button size="small" variant="danger" onClick={deleteDocuments}>
+                            Slett
+                        </Button>
+                        <Button size="small" variant={"tertiary"} onClick={closeModal}>
+                            Avbryt
+                        </Button>
+                    </Modal.Footer>
                 </Modal>
             )}
             {modalOpen && slettAlleDokumenter && <SlettForsendelseModal closeModal={closeModal} />}
