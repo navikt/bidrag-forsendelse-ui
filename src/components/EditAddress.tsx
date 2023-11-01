@@ -12,8 +12,7 @@ import { useFormContext } from "react-hook-form";
 import { useWatch } from "react-hook-form";
 
 import { DistribuerTilAdresse } from "../api/BidragDokumentApi";
-import { hentPostnummere } from "../api/queries";
-import { hentLandkoder } from "../api/queries";
+import { hentLandkoder, hentPostnummere } from "../hooks/kodeverkQueries";
 import { IMottakerAdresse } from "../types/Adresse";
 import { countryCodeIso2ToIso3, isCountryCodeNorway } from "../utils/AdresseUtils";
 

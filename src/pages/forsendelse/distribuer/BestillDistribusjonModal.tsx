@@ -12,12 +12,12 @@ import { PERSON_API } from "../../../api/api";
 import { DistribuerTilAdresse } from "../../../api/BidragDokumentApi";
 import { BestemKanalResponseDistribusjonskanalEnum } from "../../../api/BidragDokumentArkivApi";
 import { DistribuerJournalpostRequest } from "../../../api/BidragForsendelseApi";
-import { hentPostnummere } from "../../../api/queries";
 import useDokumentApi from "../../../hooks/useDokumentApi";
 import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
 import { hasOnlyNullValues } from "../../../utils/ObjectUtils";
 import { RedirectTo } from "../../../utils/RedirectUtils";
 import BestillDistribusjonInfo from "./BestillDistribusjonInfo";
+import { hentPostnummere } from "../../../hooks/kodeverkQueries";
 
 interface BestillDistribusjonModalProps {
     onCancel: () => void;

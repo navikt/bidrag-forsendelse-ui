@@ -26,7 +26,7 @@ export default function useDokumentApi() {
     function dokumentMalDetaljerForsendelse() {
         return useQuery({
             queryKey: ["dokumentMalDetaljer", forsendelseId],
-            queryFn: ({ signal }) => BIDRAG_FORSENDELSE_API.api.hentDokumentValgForForsendelse(forsendelseId),
+            queryFn: () => BIDRAG_FORSENDELSE_API.api.hentDokumentValgForForsendelse(forsendelseId),
             select: (data) => data.data,
         });
     }
@@ -52,7 +52,7 @@ export default function useDokumentApi() {
     function hentNotatMalDetaljer(request: HentDokumentValgRequest) {
         return useQuery({
             queryKey: ["notatDetaljer", request?.vedtakType],
-            queryFn: ({ signal }) => BIDRAG_FORSENDELSE_API.api.hentDokumentValgNotater({ ...request, enhet }),
+            queryFn: () => BIDRAG_FORSENDELSE_API.api.hentDokumentValgNotater({ ...request, enhet }),
             select: (data) => data.data,
         });
     }
@@ -94,28 +94,27 @@ export default function useDokumentApi() {
         const størrelseIMb = useForsendelseApi().hentStørrelseIMb();
         const gjelderId = forsendelse.gjelderIdent;
         const mottakerId = forsendelse.mottaker?.ident;
-        const result = useQuery({
+        const result = useSuspenseQuery({
             queryKey: DokumentQueryKeys.hentDistribusjonKanal(mottakerId, mottakerId),
-            queryFn: () =>
-                BIDRAG_DOKUMENT_ARKIV_API.journal.hentDistribusjonKanal({
-                    mottakerId,
-                    gjelderId,
-                    tema: forsendelse.tema,
-                    forsendelseStoerrelse: størrelseIMb,
-                }),
-            select: (data) => {
-                return data.data;
+            queryFn: async () => {
+                if (gjelderId != mottakerId)
+                    return {
+                        distribusjonskanal: BestemKanalResponseDistribusjonskanalEnum.PRINT,
+                        regelBegrunnelse: "Gjelder er ulik mottaker",
+                        regel: "",
+                    };
+                return (
+                    await BIDRAG_DOKUMENT_ARKIV_API.journal.hentDistribusjonKanal({
+                        mottakerId,
+                        gjelderId,
+                        tema: forsendelse.tema,
+                        forsendelseStoerrelse: størrelseIMb,
+                    })
+                )?.data;
             },
-            enabled: gjelderId == mottakerId,
         });
 
-        return (
-            result.data ?? {
-                distribusjonskanal: BestemKanalResponseDistribusjonskanalEnum.PRINT,
-                regelBegrunnelse: "Gjelder er ulik mottaker",
-                regel: "",
-            }
-        );
+        return result.data;
     }
     return {
         distribusjonKanal,

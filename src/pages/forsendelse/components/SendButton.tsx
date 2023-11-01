@@ -1,14 +1,17 @@
 import { Button } from "@navikt/ds-react";
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { useDokumenterForm } from "../context/DokumenterFormContext";
 import BestillDistribusjonModal from "../distribuer/BestillDistribusjonModal";
 import ManuellUtsendingModal from "../distribuer/ManuellUtsendingModal";
+import {  prefetchPostnummere } from "../../../hooks/kodeverkQueries";
 
 export default function SendButton() {
     const { validateCanSendForsendelse } = useDokumenterForm();
 
+    prefetchPostnummere()
     const [isDistribuerModalOpen, setIsDistribuerModalOpen] = useState(false);
     const [isDistribuerManueltModalOpen, setIsDistribuerManueltModalOpen] = useState(false);
     function sendForsendelse() {
