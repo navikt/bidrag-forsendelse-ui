@@ -76,7 +76,6 @@ module.exports = {
                                 loose: false,
                                 externalHelpers: false,
                                 // Requires v1.2.50 or upper and requires target to be es2016 or upper.
-                                keepClassNames: true,
                             },
                             minify: false,
                         },

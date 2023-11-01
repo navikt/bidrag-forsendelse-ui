@@ -1,3 +1,4 @@
+import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import dayjs from "dayjs";
 import { createContext, useState } from "react";
@@ -9,13 +10,12 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { FormProvider } from "react-hook-form";
 import { FieldArrayWithId } from "react-hook-form";
 import { useFormContext } from "react-hook-form";
-import { useMutation } from "react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../../../api/api";
 import { OppdaterForsendelseForesporsel } from "../../../api/BidragForsendelseApi";
 import { DokumentStatus } from "../../../constants/DokumentStatus";
 import { useErrorContext } from "../../../context/ErrorProvider";
-import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
+import { useForsendelseApi, UseForsendelseApiKeys } from "../../../hooks/useForsendelseApi";
 import { IDokument } from "../../../types/Dokument";
 import { parseErrorMessageFromAxiosError } from "../../../utils/ErrorUtils";
 import { queryClient } from "../../PageWrapper";
@@ -93,7 +93,7 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
     });
 
     const oppdaterDokumenterMutation = useMutation({
-        mutationKey: "oppdaterDokumenterMutation",
+        mutationKey: ["oppdaterDokumenterMutation"],
         mutationFn: (dokumenter: IDokument[]) => {
             resetError();
             const request: OppdaterForsendelseForesporsel = {
@@ -110,7 +110,7 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
             return BIDRAG_FORSENDELSE_API.api.oppdaterForsendelse(props.forsendelseId, request);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries("forsendelse");
+            queryClient.invalidateQueries({ queryKey: UseForsendelseApiKeys.forsendelse });
         },
         onError: (error: AxiosError, variables, context) => {
             const errorMessage = parseErrorMessageFromAxiosError(error);
@@ -213,7 +213,7 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
                 forsendelseId: props.forsendelseId,
                 dokumenter: fields,
                 hasChanged: hasChanged,
-                isSavingChanges: oppdaterDokumenterMutation.isLoading,
+                isSavingChanges: oppdaterDokumenterMutation.isPending,
                 addDocuments,
                 deleteDocument,
                 validateCanSendForsendelse,

@@ -1,24 +1,23 @@
 import ObjectUtils from "@navikt/bidrag-ui-common/esm/utils/ObjectUtils";
 import { Alert, BodyShort, Button, ConfirmationPanel, Loader } from "@navikt/ds-react";
 import { Modal } from "@navikt/ds-react";
+import { useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { useState } from "react";
 import { useEffect } from "react";
-import { useMutation } from "react-query";
-import { useQuery } from "react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../../../api/api";
 import { PERSON_API } from "../../../api/api";
 import { DistribuerTilAdresse } from "../../../api/BidragDokumentApi";
 import { BestemKanalResponseDistribusjonskanalEnum } from "../../../api/BidragDokumentArkivApi";
 import { DistribuerJournalpostRequest } from "../../../api/BidragForsendelseApi";
-import { hentPostnummere } from "../../../api/queries";
+import { hentPostnummere } from "../../../hooks/kodeverkQueries";
 import useDokumentApi from "../../../hooks/useDokumentApi";
 import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
 import { hasOnlyNullValues } from "../../../utils/ObjectUtils";
 import { RedirectTo } from "../../../utils/RedirectUtils";
 import BestillDistribusjonInfo from "./BestillDistribusjonInfo";
-
 interface BestillDistribusjonModalProps {
     onCancel: () => void;
 }
@@ -36,7 +35,7 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
     const mottaker = forsendelse.mottaker;
     const harAdresse = adresse != undefined && adresse != null;
     const personAdresseQuery = useQuery({
-        queryKey: `person_adresse_${ident}`,
+        queryKey: [`person_adresse_${ident}`],
         queryFn: async () => {
             if (mottaker.adresse) {
                 const adresse = { ...mottaker.adresse, land: mottaker.adresse.landkode };
@@ -50,11 +49,10 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
                 return response?.status == 204 ? null : response?.data;
             }
         },
-        onSuccess: (adresse) => {
+        select: (adresse) => {
             const erTomAdresse = ObjectUtils.isEmpty(adresse) || hasOnlyNullValues(adresse);
             return erTomAdresse ? null : adresse;
         },
-        suspense: false,
     });
 
     useEffect(() => {

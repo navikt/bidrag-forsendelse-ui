@@ -1,7 +1,7 @@
 import { BodyShort, Button, Checkbox, Heading, Loader, Modal, Table } from "@navikt/ds-react";
+import { useMutation } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { FormProvider, useFieldArray, useForm, useFormContext } from "react-hook-form";
-import { useMutation } from "react-query";
 import { useNavigate } from "react-router-dom";
 
 import { BIDRAG_FORSENDELSE_API } from "../../../api/api";
@@ -77,7 +77,7 @@ function KopierForsendelseModal({ onClose, open }: KopierForsendelseModalProps) 
     });
 
     const opprettForsendelseFn = useMutation({
-        mutationKey: OPPRETT_FORSENDELSE_MUTATION_KEY,
+        mutationKey: [OPPRETT_FORSENDELSE_MUTATION_KEY],
         mutationFn: (data: KopierForsendelseFormProps) =>
             BIDRAG_FORSENDELSE_API.api.opprettForsendelse({
                 gjelderIdent: data.gjelderIdent,
@@ -148,7 +148,7 @@ function KopierForsendelseModal({ onClose, open }: KopierForsendelseModalProps) 
                         </React.Suspense>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button size="small" type="submit" loading={opprettForsendelseFn.isLoading}>
+                        <Button size="small" type="submit" loading={opprettForsendelseFn.isPending}>
                             Opprett
                         </Button>
                         <Button size="small" variant={"tertiary"} onClick={() => onClose()}>

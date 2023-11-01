@@ -1,9 +1,9 @@
 import ObjectUtils from "@navikt/bidrag-ui-common/esm/utils/ObjectUtils";
 import { Button, Cell, ContentContainer, ErrorSummary, Grid, Heading } from "@navikt/ds-react";
 import ErrorSummaryItem from "@navikt/ds-react/esm/form/error-summary/ErrorSummaryItem";
+import { useIsMutating, useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { FieldErrors, FormProvider, useForm, useFormContext } from "react-hook-form";
-import { useIsMutating, useMutation } from "react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../../api/api";
 import { JournalTema, OppdaterForsendelseForesporsel } from "../../api/BidragForsendelseApi";
@@ -99,7 +99,7 @@ function OpprettForsendelseUnderOpprettelse() {
     const { addError } = useErrorContext();
     const { forsendelseId, navigateToForsendelse, enhet } = useSession();
     const opprettForsendelseFn = useMutation({
-        mutationKey: OPPRETT_FORSENDELSE_MUTATION_KEY,
+        mutationKey: [OPPRETT_FORSENDELSE_MUTATION_KEY],
         mutationFn: (data: OpprettForsendelseFormProps) =>
             BIDRAG_FORSENDELSE_API.api.oppdaterForsendelse(
                 forsendelseId,
@@ -107,7 +107,7 @@ function OpprettForsendelseUnderOpprettelse() {
             ),
         onSuccess: (data) => {
             navigateToForsendelse(forsendelseId, "UTGÅENDE");
-            queryClient.refetchQueries(UseForsendelseApiKeys.forsendelse);
+            queryClient.refetchQueries({ queryKey: UseForsendelseApiKeys.forsendelse });
         },
         onError: (error: AxiosError) => {
             const errorMessage = parseErrorMessageFromAxiosError(error);
@@ -145,7 +145,7 @@ function OpprettForsendelseNy() {
     const { addError } = useErrorContext();
     const options = useOpprettForsendelse();
     const opprettForsendelseFn = useMutation({
-        mutationKey: OPPRETT_FORSENDELSE_MUTATION_KEY,
+        mutationKey: [OPPRETT_FORSENDELSE_MUTATION_KEY],
         mutationFn: (data: OpprettForsendelseFormProps) => {
             const request = mapToOpprettEllerOppdaterForsendelseRequest(data);
             return BIDRAG_FORSENDELSE_API.api.opprettForsendelse({
@@ -203,7 +203,7 @@ function OpprettForsendelsContainer({ onSubmit, tittel }: OpprettForsendelsConta
     const forsendelseEksisterer = forsendelseId != null;
     const roller = useForsendelseApi().hentRoller();
     const methods = useFormContext();
-    const isLoading = useIsMutating([OPPRETT_FORSENDELSE_MUTATION_KEY]) > 0;
+    const isLoading = useIsMutating({ mutationKey: [OPPRETT_FORSENDELSE_MUTATION_KEY] }) > 0;
     return (
         <ContentContainer>
             <Grid>

@@ -30,7 +30,7 @@ export default function OpenDokumentButton({
                 journalpostId={journalpostId}
                 dokumentreferanse={dokumentreferanse}
                 erSkjema={erSkjema}
-                onEditFinished={() => queryClient.invalidateQueries("forsendelse")}
+                onEditFinished={() => queryClient.invalidateQueries({ queryKey: ["forsendelse"] })}
             />
         );
     }

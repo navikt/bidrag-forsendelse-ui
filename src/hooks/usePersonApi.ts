@@ -1,6 +1,6 @@
 import IdentUtils from "@navikt/bidrag-ui-common/esm/utils/IdentUtils";
 import ObjectUtils from "@navikt/bidrag-ui-common/esm/utils/ObjectUtils";
-import { useQuery } from "react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 
 import { PERSON_API, SAMHANDLER_API } from "../api/api";
 import { MottakerAdresseTo } from "../api/BidragForsendelseApi";
@@ -16,15 +16,15 @@ const PersonApiQueryKeys = {
 };
 export default function useSamhandlerPersonApi() {
     const hentPerson = (ident?: string): PersonDto => {
-        if (!ident) {
-            return { ident };
-        }
-        const { data: personData, refetch } = useQuery({
+        const { data: personData, refetch } = useSuspenseQuery({
             queryKey: PersonApiQueryKeys.hentPerson(ident),
-            queryFn: ({ signal }) => PERSON_API.informasjon.hentPersonPost({ ident }),
+            queryFn: async () => {
+                if (!ident) return { ident };
+                return (await PERSON_API.informasjon.hentPersonPost({ ident }))?.data;
+            },
         });
 
-        return personData.data;
+        return personData;
     };
 
     function hentSamhandlerEllerPersonForIdent(ident: string) {
@@ -66,9 +66,8 @@ export default function useSamhandlerPersonApi() {
                 }
                 return { ident, valid: false };
             },
-            useErrorBoundary: false,
+            throwOnError: false,
             retry: 2,
-            suspense: false,
         });
     }
 

@@ -156,6 +156,7 @@ function MottakerNavnOgAdresse() {
     const { setValue, watch } = useOpprettForsendelseFormContext();
     const mottakerIdent: string = useWatch<OpprettForsendelseFormProps>({ name: "mottaker.ident" }) as string;
     const { data, isFetching, isError } = useSamhandlerPersonApi().hentSamhandlerEllerPersonForIdent(mottakerIdent);
+    console.log("MottakerNavnOgAdresse", isFetching, isError);
     const roller = useForsendelseApi().hentRoller();
     function hentRolle(ident: string) {
         return roller.find((rolle) => rolle.ident == ident)?.rolleType;

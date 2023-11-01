@@ -1,9 +1,9 @@
 import { dateToDDMMYYYYString, LoggerService } from "@navikt/bidrag-ui-common";
 import { Button, Cell, ContentContainer, ErrorSummary, Grid, Heading } from "@navikt/ds-react";
 import ErrorSummaryItem from "@navikt/ds-react/esm/form/error-summary/ErrorSummaryItem";
+import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { FieldErrors, FormProvider, useForm, useFormContext } from "react-hook-form";
-import { useMutation } from "react-query";
 
 import { BIDRAG_FORSENDELSE_API } from "../../api/api";
 import { ForsendelseTypeTo, JournalTema } from "../../api/BidragForsendelseApi";
@@ -88,7 +88,7 @@ export default function OpprettNotatPage() {
     function onSubmit(data: OpprettForsendelseFormProps) {
         opprettForsendelseFn.mutate(data);
     }
-    const isLoading = opprettForsendelseFn.isLoading || opprettForsendelseFn.isSuccess;
+    const isLoading = opprettForsendelseFn.isPending || opprettForsendelseFn.isSuccess;
     return (
         <ContentContainer>
             <Grid>

@@ -1,5 +1,5 @@
+import { useQuery, useSuspenseQuery, UseSuspenseQueryResult } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import { useQuery, UseQueryResult } from "react-query";
 
 import { BIDRAG_DOKUMENT_API, BIDRAG_DOKUMENT_ARKIV_API, BIDRAG_FORSENDELSE_API } from "../api/api";
 import { DokumentDto, JournalpostDto } from "../api/BidragDokumentApi";
@@ -26,9 +26,8 @@ export default function useDokumentApi() {
     function dokumentMalDetaljerForsendelse() {
         return useQuery({
             queryKey: ["dokumentMalDetaljer", forsendelseId],
-            queryFn: ({ signal }) => BIDRAG_FORSENDELSE_API.api.hentDokumentValgForForsendelse(forsendelseId),
+            queryFn: () => BIDRAG_FORSENDELSE_API.api.hentDokumentValgForForsendelse(forsendelseId),
             select: (data) => data.data,
-            optimisticResults: false,
         });
     }
     function dokumentMalDetaljer(request: HentDokumentValgRequest) {
@@ -47,30 +46,32 @@ export default function useDokumentApi() {
                 if (error.response.status == 400) return false;
                 return failureCount < 3;
             },
-            optimisticResults: false,
         });
     }
 
     function hentNotatMalDetaljer(request: HentDokumentValgRequest) {
         return useQuery({
             queryKey: ["notatDetaljer", request?.vedtakType],
-            queryFn: ({ signal }) => BIDRAG_FORSENDELSE_API.api.hentDokumentValgNotater({ ...request, enhet }),
+            queryFn: () => BIDRAG_FORSENDELSE_API.api.hentDokumentValgNotater({ ...request, enhet }),
             select: (data) => data.data,
-            optimisticResults: false,
         });
     }
 
     function hentJournalpost(journalpostId: string) {
-        return useQuery({
+        return useSuspenseQuery({
             queryKey: DokumentQueryKeys.hentJournalpost(journalpostId),
             queryFn: () => BIDRAG_DOKUMENT_API.journal.hentJournalpost(journalpostId),
             select: (data): IJournalpost => journalpostMapper(data.data.journalpost, data.data.sakstilknytninger),
         });
     }
 
-    function hentAvvikListe(_journalpostId: string, saksnummer?: string, enhet?: string): UseQueryResult<AvvikType[]> {
+    function hentAvvikListe(
+        _journalpostId: string,
+        saksnummer?: string,
+        enhet?: string
+    ): UseSuspenseQueryResult<AvvikType[]> {
         const journalpostId = _journalpostId.startsWith("BIF") ? _journalpostId : `BIF-${_journalpostId}`;
-        return useQuery({
+        return useSuspenseQuery({
             queryKey: DokumentQueryKeys.hentAvvikListe(journalpostId),
             queryFn: () =>
                 BIDRAG_DOKUMENT_API.journal.hentAvvik(
@@ -93,28 +94,27 @@ export default function useDokumentApi() {
         const størrelseIMb = useForsendelseApi().hentStørrelseIMb();
         const gjelderId = forsendelse.gjelderIdent;
         const mottakerId = forsendelse.mottaker?.ident;
-        const result = useQuery({
+        const result = useSuspenseQuery({
             queryKey: DokumentQueryKeys.hentDistribusjonKanal(mottakerId, mottakerId),
-            queryFn: () =>
-                BIDRAG_DOKUMENT_ARKIV_API.journal.hentDistribusjonKanal({
-                    mottakerId,
-                    gjelderId,
-                    tema: forsendelse.tema,
-                    forsendelseStoerrelse: størrelseIMb,
-                }),
-            select: (data) => {
-                return data.data;
+            queryFn: async () => {
+                if (gjelderId != mottakerId)
+                    return {
+                        distribusjonskanal: BestemKanalResponseDistribusjonskanalEnum.PRINT,
+                        regelBegrunnelse: "Gjelder er ulik mottaker",
+                        regel: "",
+                    };
+                return (
+                    await BIDRAG_DOKUMENT_ARKIV_API.journal.hentDistribusjonKanal({
+                        mottakerId,
+                        gjelderId,
+                        tema: forsendelse.tema,
+                        forsendelseStoerrelse: størrelseIMb,
+                    })
+                )?.data;
             },
-            enabled: gjelderId == mottakerId,
         });
 
-        return (
-            result.data ?? {
-                distribusjonskanal: BestemKanalResponseDistribusjonskanalEnum.PRINT,
-                regelBegrunnelse: "Gjelder er ulik mottaker",
-                regel: "",
-            }
-        );
+        return result.data;
     }
     return {
         distribusjonKanal,

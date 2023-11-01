@@ -1,4 +1,4 @@
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 
 interface UserInfo {
     displayName: string;
@@ -11,7 +11,7 @@ interface UserInfo {
 export default function useUserInfoApi() {
     const userInfoQuery = () => {
         return useQuery<UserInfo>({
-            queryKey: "userinfo",
+            queryKey: ["userinfo"],
             queryFn: () => fetch("/me").then((res) => res.json()),
         });
     };

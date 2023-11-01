@@ -3,9 +3,9 @@ import "./ForsendelsePage.css";
 import { Alert, BodyShort, Cell, Grid, Heading, Skeleton } from "@navikt/ds-react";
 import { Loader } from "@navikt/ds-react";
 import { ContentContainer } from "@navikt/ds-react";
+import { useIsMutating } from "@tanstack/react-query";
 import React, { useEffect } from "react";
 import { PropsWithChildren } from "react";
-import { useIsMutating } from "react-query";
 
 import DokumenterTable from "../../components/dokument/DokumenterTable";
 import ForsendelseDocsButton from "../../components/ForsendelseDocsButton";

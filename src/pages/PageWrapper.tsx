@@ -3,12 +3,12 @@ import "../index.css";
 import { MDXProvider, useMDXComponents } from "@mdx-js/react";
 import { ArrowRightIcon } from "@navikt/aksel-icons";
 import { BodyLong, BodyShort, Heading, Label, Loader } from "@navikt/ds-react";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
 import { useThemedStylesWithMdx } from "@theme-ui/mdx";
 import * as dayjs from "dayjs";
 import * as customParseFormat from "dayjs/plugin/customParseFormat";
 import React, { PropsWithChildren } from "react";
-import { QueryClientProvider } from "react-query";
-import { QueryClient } from "react-query";
 import { Theme, ThemeUIProvider } from "theme-ui";
 
 import { initMock } from "../__mocks__/msw";
@@ -23,7 +23,7 @@ const initReactQuery = () =>
     new QueryClient({
         defaultOptions: {
             queries: {
-                suspense: true,
+                suspense: false,
                 staleTime: Infinity,
                 retry: 3,
                 retryDelay: 3000,
