@@ -21,5 +21,5 @@ const url = {
     bidragOrganisasjon: process.env.BIDRAG_ORGANISASJON,
     bisys: process.env.BISYS_URL,
 };
- 
+
 export default { url, system, feature };

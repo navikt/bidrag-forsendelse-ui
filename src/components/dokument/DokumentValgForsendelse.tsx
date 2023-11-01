@@ -1,4 +1,5 @@
 import { Loader } from "@navikt/ds-react";
+
 import useDokumentApi from "../../hooks/useDokumentApi";
 import DokumentValg from "./DokumentValg";
 
@@ -9,7 +10,7 @@ export default function DokumentValgForsendelse({ showLegend = true }: DokumentV
     const { data: dokumentDetaljer, isFetching } = useDokumentApi().dokumentMalDetaljerForsendelse();
 
     if (isFetching) {
-        return <Loader size={"medium"}/>;
+        return <Loader size={"medium"} />;
     }
 
     return <DokumentValg malDetaljer={dokumentDetaljer} showLegend={showLegend} />;

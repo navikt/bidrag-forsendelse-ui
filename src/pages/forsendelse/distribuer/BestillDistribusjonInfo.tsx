@@ -76,7 +76,7 @@ function Adresse({ editable = true, adresse, onAdresseChanged, onEditModeChanged
         setAdressEditable(value);
     }
 
-        return (
+    return (
         <div>
             <Heading size="xsmall">{adressEditable ? "Endre adresse" : "Til følgende adresse"}</Heading>
             <div className={"flex w-full"}>
