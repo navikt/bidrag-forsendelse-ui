@@ -1,7 +1,6 @@
 const { merge } = require("webpack-merge");
 const webpackCommon = require("./webpack.common.config.js");
 const { EnvironmentPlugin } = require("webpack");
-console.log(JSON.stringify(process.env.BIDRAG_PERSON_URL));
 module.exports = merge(webpackCommon, {
     mode: "production",
     plugins: [
