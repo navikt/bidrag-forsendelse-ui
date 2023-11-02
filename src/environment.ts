@@ -6,6 +6,7 @@ const system = {
 };
 
 const feature = {
+    isDebug: localStorage.getItem("DEBUG_MODE") == "true",
     visDokumentmalKode:
         process.env.VIS_DOKUMENTMAL_KODE === "true" || localStorage.getItem("VIS_DOKUMENTMAL_KODE") == "true",
 };
