@@ -8,13 +8,14 @@ import { QueryClient } from "@tanstack/react-query";
 import { useThemedStylesWithMdx } from "@theme-ui/mdx";
 import * as dayjs from "dayjs";
 import * as customParseFormat from "dayjs/plugin/customParseFormat";
-import React, { PropsWithChildren } from "react";
+import React, { PropsWithChildren, useEffect } from "react";
 import { Theme, ThemeUIProvider } from "theme-ui";
 
 import { initMock } from "../__mocks__/msw";
 import DokumentLinkedTag from "../components/dokument/DokumentLinkedTag";
 import DokumentStatusTag from "../components/dokument/DokumentStatusTag";
 import ErrorProvider from "../context/ErrorProvider";
+import environment from "../environment";
 const mdxComponents = { Heading, DokumentStatusTag, BodyShort, ArrowRightIcon, DokumentLinkedTag, BodyLong, Label };
 
 dayjs.extend(customParseFormat);
@@ -85,6 +86,11 @@ const theme: Theme = {
 
 export default function PageWrapper({ children, name }: PropsWithChildren<PageWrapperProps>) {
     const componentsWithStyles = useThemedStylesWithMdx(useMDXComponents());
+
+    useEffect(() => {
+        environment.feature.isDebug && console.log(JSON.stringify(environment));
+    }, []);
+
     return (
         <ThemeUIProvider theme={theme}>
             <MDXProvider components={{ ...mdxComponents, ...componentsWithStyles }}>
