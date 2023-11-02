@@ -60,6 +60,7 @@ const theme: Theme = {
         },
         p: {
             maxWidth: "65rem",
+            fontWeight: "var(--a-font-weight-regular)",
         },
         h1: {
             fontSize: "var(--a-font-size-heading-xlarge)",
