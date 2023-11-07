@@ -21,7 +21,7 @@ figure {
     text-align: center;
   }
   
-  .bidrag-forsendelse-ui .navds-checkbox--small .navds-checkbox__icon {
+  .bidrag-forsendelse-ui .navds-modal .navds-checkbox--small .navds-checkbox__icon {
     top: 13px;
   }
 

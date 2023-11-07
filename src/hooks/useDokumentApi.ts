@@ -1,4 +1,4 @@
-import { useQuery, useSuspenseQuery, UseSuspenseQueryResult } from "@tanstack/react-query";
+import { useSuspenseQuery, UseSuspenseQueryResult } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 
 import { BIDRAG_DOKUMENT_API, BIDRAG_DOKUMENT_ARKIV_API, BIDRAG_FORSENDELSE_API } from "../api/api";
@@ -24,14 +24,14 @@ const DokumentQueryKeys = {
 export default function useDokumentApi() {
     const { forsendelseId, saksnummer, enhet } = useSession();
     function dokumentMalDetaljerForsendelse() {
-        return useQuery({
+        return useSuspenseQuery({
             queryKey: ["dokumentMalDetaljer", forsendelseId],
             queryFn: () => BIDRAG_FORSENDELSE_API.api.hentDokumentValgForForsendelse(forsendelseId),
             select: (data) => data.data,
         });
     }
     function dokumentMalDetaljer(request: HentDokumentValgRequest) {
-        return useQuery({
+        return useSuspenseQuery({
             queryKey: [
                 "dokumentMalDetaljer",
                 request.behandlingType,
@@ -50,7 +50,7 @@ export default function useDokumentApi() {
     }
 
     function hentNotatMalDetaljer(request: HentDokumentValgRequest) {
-        return useQuery({
+        return useSuspenseQuery({
             queryKey: ["notatDetaljer", request?.vedtakType],
             queryFn: () => BIDRAG_FORSENDELSE_API.api.hentDokumentValgNotater({ ...request, enhet }),
             select: (data) => data.data,
