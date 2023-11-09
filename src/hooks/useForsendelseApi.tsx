@@ -126,7 +126,7 @@ export function useForsendelseApi(): UseForsendelseDataProps {
         const person = useSamhandlerPersonApi().hentPerson(gjelderIdent);
 
         const ident = gjelderIdent;
-        const navn = person.navn;
+        const navn = person.kortnavn;
         return {
             rolleType: rolleISak(ident),
             navn,
