@@ -108,7 +108,7 @@ export function useForsendelseApi(): UseForsendelseDataProps {
             rolleType: RolleTypeAbbreviation[rolle.rolleType] ?? RolleTypeFullName[rolle.rolleType],
             ident: rolle.fodselsnummer ?? rolle.samhandlerIdent,
             objektnummer: rolle.objektnummer,
-            navn: useSamhandlerPersonApi().hentPerson(rolle.fodselsnummer)?.navn,
+            navn: useSamhandlerPersonApi().hentPerson(rolle.fodselsnummer)?.kortnavn,
         }));
     };
 
