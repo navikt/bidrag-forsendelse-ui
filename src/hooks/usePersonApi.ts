@@ -52,7 +52,7 @@ export default function useSamhandlerPersonApi() {
                     if (result.status != 200) throw Error(`Fant ikke person med ident ${ident}`);
                     return {
                         ident,
-                        navn: result.data.navn,
+                        navn: result.data.kortnavn,
                         valid: true,
                         adresse: postAdresseResult
                             ? {
