@@ -1,6 +1,7 @@
 import "./index.css";
 
-import { Cell, ContentContainer, Grid } from "@navikt/ds-react";
+import { BidragCell, BidragGrid } from "@navikt/bidrag-ui-common";
+import { ContentContainer } from "@navikt/ds-react";
 import React from "react";
 import { BrowserRouter, Route, Routes, useParams, useSearchParams } from "react-router-dom";
 
@@ -38,11 +39,11 @@ function BrukerveiledningPageWrapper() {
     return (
         <PageWrapper name="Forsendelse brukerveiledning">
             <ContentContainer>
-                <Grid>
-                    <Cell xs={12} md={12} lg={12}>
+                <BidragGrid>
+                    <BidragCell xs={12} md={12} lg={12}>
                         <Brukerveiledning saksbehandlerNavn={""} />
-                    </Cell>
-                </Grid>
+                    </BidragCell>
+                </BidragGrid>
             </ContentContainer>
         </PageWrapper>
     );

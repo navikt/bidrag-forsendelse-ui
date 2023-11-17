@@ -1,5 +1,6 @@
+import { BidragCell, BidragGrid } from "@navikt/bidrag-ui-common";
 import ObjectUtils from "@navikt/bidrag-ui-common/esm/utils/ObjectUtils";
-import { Button, Cell, ContentContainer, ErrorSummary, Grid, Heading } from "@navikt/ds-react";
+import { Button, ContentContainer, ErrorSummary, Heading } from "@navikt/ds-react";
 import ErrorSummaryItem from "@navikt/ds-react/esm/form/error-summary/ErrorSummaryItem";
 import { useIsMutating, useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
@@ -206,8 +207,8 @@ function OpprettForsendelsContainer({ onSubmit, tittel }: OpprettForsendelsConta
     const isLoading = useIsMutating({ mutationKey: [OPPRETT_FORSENDELSE_MUTATION_KEY] }) > 0;
     return (
         <ContentContainer>
-            <Grid>
-                <Cell xs={12} md={12} lg={10}>
+            <BidragGrid>
+                <BidragCell xs={12} md={12} lg={10}>
                     <div className={"leading-xlarge tracking-wide"}>
                         <Heading size="large">{tittel ? `${tittel}` : "Opprett forsendelse"}</Heading>
 
@@ -234,8 +235,8 @@ function OpprettForsendelsContainer({ onSubmit, tittel }: OpprettForsendelsConta
                             </form>
                         </FormProvider>
                     </div>
-                </Cell>
-            </Grid>
+                </BidragCell>
+            </BidragGrid>
         </ContentContainer>
     );
 }
