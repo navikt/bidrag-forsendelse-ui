@@ -19,7 +19,7 @@ export default function useSamhandlerPersonApi() {
         const { data: personData, refetch } = useSuspenseQuery({
             queryKey: PersonApiQueryKeys.hentPerson(ident),
             queryFn: async () => {
-                if (!ident) return { ident };
+                if (!ident) return { ident, visningsnavn: "" };
                 return (await PERSON_API.informasjon.hentPersonPost({ ident }))?.data;
             },
         });
@@ -52,7 +52,7 @@ export default function useSamhandlerPersonApi() {
                     if (result.status != 200) throw Error(`Fant ikke person med ident ${ident}`);
                     return {
                         ident,
-                        navn: result.data.kortnavn,
+                        navn: result.data.visningsnavn,
                         valid: true,
                         adresse: postAdresseResult
                             ? {

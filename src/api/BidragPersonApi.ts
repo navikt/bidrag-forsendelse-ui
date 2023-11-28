@@ -14,40 +14,47 @@ export interface PersonRequest {
 }
 
 /** Liste over alle hentede forekomster av sivilstand fra bidrag-person */
-export interface Sivilstand {
-    type?:
-        | "ENKE_ELLER_ENKEMANN"
-        | "GIFT"
-        | "GJENLEVENDE_PARTNER"
-        | "REGISTRERT_PARTNER"
-        | "SEPARERT"
-        | "SEPARERT_PARTNER"
-        | "SKILT"
-        | "SKILT_PARTNER"
-        | "UGIFT"
-        | "UOPPGITT";
+export interface SivilstandDto {
+    type?: Sivilstandstype;
     /** @format date */
     gyldigFraOgMed?: string;
     /** @format date */
     bekreftelsesdato?: string;
+    master?: string;
+    /** @format date-time */
+    registrert?: string;
+    historisk?: boolean;
 }
 
-export interface Sivilstandshistorikk {
+export interface SivilstandshistorikkDto {
     /** Liste over alle hentede forekomster av sivilstand fra bidrag-person */
-    sivilstand: Sivilstand[];
+    sivilstandDto: SivilstandDto[];
+}
+
+export enum Sivilstandstype {
+    ENKE_ELLER_ENKEMANN = "ENKE_ELLER_ENKEMANN",
+    GIFT = "GIFT",
+    GJENLEVENDE_PARTNER = "GJENLEVENDE_PARTNER",
+    REGISTRERT_PARTNER = "REGISTRERT_PARTNER",
+    SEPARERT = "SEPARERT",
+    SEPARERT_PARTNER = "SEPARERT_PARTNER",
+    SKILT = "SKILT",
+    SKILT_PARTNER = "SKILT_PARTNER",
+    UGIFT = "UGIFT",
+    UOPPGITT = "UOPPGITT",
 }
 
 export interface HentePersonidenterRequest {
     ident: string;
     /** @uniqueItems true */
-    grupper: ("AKTORID" | "FOLKEREGISTERIDENT" | "NPID")[];
+    grupper: HentePersonidenterRequestGrupperEnum[];
     inkludereHistoriske: boolean;
 }
 
 export interface PersonidentDto {
     ident: string;
     historisk: boolean;
-    gruppe: "AKTORID" | "FOLKEREGISTERIDENT" | "NPID";
+    gruppe: PersonidentDtoGruppeEnum;
 }
 
 export interface NavnFodselDodDto {
@@ -82,7 +89,7 @@ export interface NavnFodselDodDto {
 
 /** Familieenheter til personen */
 export interface MotpartBarnRelasjon {
-    forelderrolleMotpart: "BARN" | "FAR" | "MEDMOR" | "MOR";
+    forelderrolleMotpart: MotpartBarnRelasjonForelderrolleMotpartEnum;
     motpart?: PersonDto;
     fellesBarn: PersonDto[];
 }
@@ -105,12 +112,12 @@ export interface PersonDto {
     /** Etternavn til personen */
     etternavn?: string;
     /** Kjønn til personen */
-    kjønn?: "KVINNE" | "MANN" | "UKJENT";
+    kjønn?: PersonDtoKjonnEnum;
     /**
      * Kjønn til personen
      * @deprecated
      */
-    kjoenn?: "KVINNE" | "MANN" | "UKJENT";
+    kjoenn?: PersonDtoKjoennEnum;
     /**
      * Dødsdato til personen
      * @format date
@@ -134,7 +141,7 @@ export interface PersonDto {
      */
     foedselsdato?: string;
     /** Diskresjonskode (personvern) */
-    diskresjonskode?: "SPSF" | "SPFO" | "URIK" | "MILI" | "PEND" | "SVAL" | "P19";
+    diskresjonskode?: PersonDtoDiskresjonskodeEnum;
     /** Aktør id til personen */
     aktørId?: string;
     /**
@@ -149,11 +156,21 @@ export interface PersonDto {
      * @deprecated
      */
     kortNavn?: string;
+    /** Navn som benyttes for visning av personavn i skjermbilder og dokumenter */
+    visningsnavn: string;
+}
+
+/** Gyldige adressetyper: BOSTEDSADRESSE, KONTAKTADRESSE, eller OPPHOLDSADRESSE */
+export enum Adressetype {
+    BOSTEDSADRESSE = "BOSTEDSADRESSE",
+    KONTAKTADRESSE = "KONTAKTADRESSE",
+    OPPHOLDSADRESSE = "OPPHOLDSADRESSE",
+    DELT_BOSTED = "DELT_BOSTED",
 }
 
 export interface DodsboDto {
     /** Fra Tingretten angis skifteformen for booppgjøret. */
-    skifteform: "OFFENTLIG" | "ANNET";
+    skifteform: DodsboDtoSkifteformEnum;
     /**
      * Attestutstedelsesdato for skifteattest.
      * @format date
@@ -220,7 +237,7 @@ export interface MetadataDto {
 
 export interface PersonAdresseDto {
     /** Gyldige adressetyper: BOSTEDSADRESSE, KONTAKTADRESSE, eller OPPHOLDSADRESSE */
-    adressetype: "BOSTEDSADRESSE" | "KONTAKTADRESSE" | "OPPHOLDSADRESSE" | "DELT_BOSTED";
+    adressetype: Adressetype;
     /** Adresselinje 1 */
     adresselinje1?: string;
     /** Adresselinje 2 */
@@ -299,7 +316,7 @@ export interface HusstandsmedlemmerDto {
 
 export interface Graderingsinfo {
     /** Map med ident til gradering. */
-    identerTilGradering: Record<string, "STRENGT_FORTROLIG" | "FORTROLIG" | "STRENGT_FORTROLIG_UTLAND" | "UGRADERT">;
+    identerTilGradering: Record<string, GraderingsinfoIdenterTilGraderingEnum>;
     /** Hvor vidt hovedident fra GraderingQuery er skjerment. */
     identerTilSkjerming: Record<string, boolean>;
 }
@@ -319,15 +336,15 @@ export interface GeografiskTilknytningDto {
     /** Om geografisk tilknytning til personen er utlandet. Geografisktilknytning feltet vil da ha landkode istedenfor kommune/bydel nummer */
     erUtland: boolean;
     /** Diskresjonskode (personvern) */
-    diskresjonskode?: "SPSF" | "SPFO" | "URIK" | "MILI" | "PEND" | "SVAL" | "P19";
+    diskresjonskode?: GeografiskTilknytningDtoDiskresjonskodeEnum;
 }
 
 /** Liste over alle hentede forekomster av foreldre-barnrelasjoner */
 export interface ForelderBarnRelasjon {
-    minRolleForPerson: "BARN" | "FAR" | "MEDMOR" | "MOR";
+    minRolleForPerson: ForelderBarnRelasjonMinRolleForPersonEnum;
     relatertPersonsIdent?: string;
     /** Hvilken rolle personen i requesten har til personen i responsen */
-    relatertPersonsRolle: "BARN" | "FAR" | "MEDMOR" | "MOR";
+    relatertPersonsRolle: ForelderBarnRelasjonRelatertPersonsRolleEnum;
 }
 
 export interface ForelderBarnRelasjonDto {
@@ -340,7 +357,95 @@ export interface Fodselsdatoer {
     identerTilDatoer: Record<string, string>;
 }
 
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType } from "axios";
+export enum HentePersonidenterRequestGrupperEnum {
+    AKTORID = "AKTORID",
+    FOLKEREGISTERIDENT = "FOLKEREGISTERIDENT",
+    NPID = "NPID",
+}
+
+export enum PersonidentDtoGruppeEnum {
+    AKTORID = "AKTORID",
+    FOLKEREGISTERIDENT = "FOLKEREGISTERIDENT",
+    NPID = "NPID",
+}
+
+export enum MotpartBarnRelasjonForelderrolleMotpartEnum {
+    BARN = "BARN",
+    FAR = "FAR",
+    MEDMOR = "MEDMOR",
+    MOR = "MOR",
+}
+
+/** Kjønn til personen */
+export enum PersonDtoKjonnEnum {
+    KVINNE = "KVINNE",
+    MANN = "MANN",
+    UKJENT = "UKJENT",
+}
+
+/**
+ * Kjønn til personen
+ * @deprecated
+ */
+export enum PersonDtoKjoennEnum {
+    KVINNE = "KVINNE",
+    MANN = "MANN",
+    UKJENT = "UKJENT",
+}
+
+/** Diskresjonskode (personvern) */
+export enum PersonDtoDiskresjonskodeEnum {
+    SPSF = "SPSF",
+    SPFO = "SPFO",
+    URIK = "URIK",
+    MILI = "MILI",
+    PEND = "PEND",
+    SVAL = "SVAL",
+    P19 = "P19",
+}
+
+/** Fra Tingretten angis skifteformen for booppgjøret. */
+export enum DodsboDtoSkifteformEnum {
+    OFFENTLIG = "OFFENTLIG",
+    ANNET = "ANNET",
+}
+
+/** Map med ident til gradering. */
+export enum GraderingsinfoIdenterTilGraderingEnum {
+    STRENGT_FORTROLIG = "STRENGT_FORTROLIG",
+    FORTROLIG = "FORTROLIG",
+    STRENGT_FORTROLIG_UTLAND = "STRENGT_FORTROLIG_UTLAND",
+    UGRADERT = "UGRADERT",
+}
+
+/** Diskresjonskode (personvern) */
+export enum GeografiskTilknytningDtoDiskresjonskodeEnum {
+    SPSF = "SPSF",
+    SPFO = "SPFO",
+    URIK = "URIK",
+    MILI = "MILI",
+    PEND = "PEND",
+    SVAL = "SVAL",
+    P19 = "P19",
+}
+
+export enum ForelderBarnRelasjonMinRolleForPersonEnum {
+    BARN = "BARN",
+    FAR = "FAR",
+    MEDMOR = "MEDMOR",
+    MOR = "MOR",
+}
+
+/** Hvilken rolle personen i requesten har til personen i responsen */
+export enum ForelderBarnRelasjonRelatertPersonsRolleEnum {
+    BARN = "BARN",
+    FAR = "FAR",
+    MEDMOR = "MEDMOR",
+    MOR = "MOR",
+}
+
+import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType } from "axios";
+import axios from "axios";
 
 export type QueryParamsType = Record<string | number, any>;
 
@@ -508,29 +613,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @secure
          */
         hentSivilstand: (data: PersonRequest, params: RequestParams = {}) =>
-            this.request<Sivilstandshistorikk, any>({
+            this.request<SivilstandshistorikkDto, any>({
                 path: `/sivilstand`,
                 method: "POST",
                 body: data,
                 secure: true,
                 type: ContentType.Json,
-                ...params,
-            }),
-
-        /**
-         * @description Hent sivilstand for en person
-         *
-         * @tags person-controller
-         * @name GetSivilstand
-         * @request GET:/sivilstand/{ident}
-         * @deprecated
-         * @secure
-         */
-        getSivilstand: (ident: string, params: RequestParams = {}) =>
-            this.request<Sivilstandshistorikk, any>({
-                path: `/sivilstand/${ident}`,
-                method: "GET",
-                secure: true,
                 ...params,
             }),
     };
