@@ -108,7 +108,7 @@ export function useForsendelseApi(): UseForsendelseDataProps {
             rolleType: RolleTypeAbbreviation[rolle.rolleType] ?? RolleTypeFullName[rolle.rolleType],
             ident: rolle.fodselsnummer ?? rolle.samhandlerIdent,
             objektnummer: rolle.objektnummer,
-            navn: useSamhandlerPersonApi().hentPerson(rolle.fodselsnummer)?.kortnavn,
+            navn: useSamhandlerPersonApi().hentPerson(rolle.fodselsnummer)?.visningsnavn,
         }));
     };
 
@@ -126,7 +126,7 @@ export function useForsendelseApi(): UseForsendelseDataProps {
         const person = useSamhandlerPersonApi().hentPerson(gjelderIdent);
 
         const ident = gjelderIdent;
-        const navn = person.kortnavn;
+        const navn = person.visningsnavn;
         return {
             rolleType: rolleISak(ident),
             navn,

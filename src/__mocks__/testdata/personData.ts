@@ -1,4 +1,4 @@
-import { PersonDto } from "../../api/BidragPersonApi";
+import { PersonDto, PersonDtoKjonnEnum } from "../../api/BidragPersonApi";
 import { TESTDATA_CASE_1 } from "./fellesdata";
 
 export const personGjelder1: PersonDto = {
@@ -6,9 +6,10 @@ export const personGjelder1: PersonDto = {
     navn: "Lørdag, Treig",
     fornavn: "Treig",
     etternavn: "Lørdag",
-    kjoenn: "MANN",
+    kjønn: PersonDtoKjonnEnum.KVINNE,
     foedselsdato: "1992-07-15",
     kortnavn: "Treig Lørdag",
+    visningsnavn: "Treig Lørdag",
 };
 
 export const personGjelder2: PersonDto = {
@@ -16,9 +17,10 @@ export const personGjelder2: PersonDto = {
     navn: "Bokstav, Urimelig",
     fornavn: "Urimelig",
     etternavn: "Bokstav",
-    kjoenn: "KVINNE",
+    kjønn: PersonDtoKjonnEnum.MANN,
     foedselsdato: "1977-04-14",
     kortnavn: "Urimelig Bokstav",
+    visningsnavn: "Urimelig Bokstav",
 };
 
 export const personGjelder3: PersonDto = {
@@ -27,9 +29,10 @@ export const personGjelder3: PersonDto = {
     fornavn: "Kontrollert",
     mellomnavn: "Utnyttende",
     etternavn: "Kaie",
-    kjoenn: "KVINNE",
+    kjønn: PersonDtoKjonnEnum.KVINNE,
     foedselsdato: "2017-02-25",
     kortnavn: "Kontrollert Kaie",
+    visningsnavn: "Kontrollert Kaie",
 };
 
 export const personGjelder4: PersonDto = {
@@ -37,9 +40,10 @@ export const personGjelder4: PersonDto = {
     navn: "Opportunist, Riktig",
     fornavn: "Riktig",
     etternavn: "Opportunist",
-    kjoenn: "MANN",
+    kjønn: PersonDtoKjonnEnum.KVINNE,
     foedselsdato: "1984-08-21",
     kortnavn: "Riktig Opportunist",
+    visningsnavn: "Riktig Opportunist",
 };
 export const personMap: Map<string, Partial<PersonDto>> = new Map([
     [personGjelder1.ident, personGjelder1],
