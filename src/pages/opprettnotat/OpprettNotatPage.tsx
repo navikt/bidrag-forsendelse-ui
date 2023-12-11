@@ -1,5 +1,5 @@
-import { dateToDDMMYYYYString, LoggerService } from "@navikt/bidrag-ui-common";
-import { Button, Cell, ContentContainer, ErrorSummary, Grid, Heading } from "@navikt/ds-react";
+import { BidragCell, BidragGrid, dateToDDMMYYYYString, LoggerService } from "@navikt/bidrag-ui-common";
+import { Button, ContentContainer, ErrorSummary, Heading } from "@navikt/ds-react";
 import ErrorSummaryItem from "@navikt/ds-react/esm/form/error-summary/ErrorSummaryItem";
 import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
@@ -91,8 +91,8 @@ export default function OpprettNotatPage() {
     const isLoading = opprettForsendelseFn.isPending || opprettForsendelseFn.isSuccess;
     return (
         <ContentContainer>
-            <Grid>
-                <Cell xs={12} md={12} lg={10}>
+            <BidragGrid>
+                <BidragCell xs={12} md={12} lg={10}>
                     <div className={"leading-xlarge tracking-wide"}>
                         <Heading spacing size="large">
                             Opprett notat
@@ -118,8 +118,8 @@ export default function OpprettNotatPage() {
                             </form>
                         </FormProvider>
                     </div>
-                </Cell>
-            </Grid>
+                </BidragCell>
+            </BidragGrid>
         </ContentContainer>
     );
 }

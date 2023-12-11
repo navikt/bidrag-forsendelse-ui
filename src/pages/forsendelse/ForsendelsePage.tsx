@@ -1,16 +1,16 @@
 import "./ForsendelsePage.css";
 
-import { Alert, BodyShort, Cell, Grid, Heading, Skeleton } from "@navikt/ds-react";
+import { BidragCell, BidragGrid, SaveStatusIndicator } from "@navikt/bidrag-ui-common";
+import { Alert, BodyShort, Heading, Skeleton } from "@navikt/ds-react";
 import { Loader } from "@navikt/ds-react";
 import { ContentContainer } from "@navikt/ds-react";
-import { useIsMutating } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import React, { useEffect } from "react";
 import { PropsWithChildren } from "react";
 
 import DokumenterTable from "../../components/dokument/DokumenterTable";
 import ForsendelseDocsButton from "../../components/ForsendelseDocsButton";
 import InfoKnapp from "../../components/InfoKnapp";
-import SaveStatusIndicator from "../../components/SaveStatusIndicator";
 import BidragErrorPanel from "../../context/BidragErrorPanel";
 import { useErrorContext } from "../../context/ErrorProvider";
 import DokumentTableInfo from "../../docs/DokumentTable.mdx";
@@ -39,8 +39,8 @@ function ForsendelseView() {
     const { navigateToJournalpost } = useSession();
     const isDebug = useIsDebugMode();
     const { errorSource, errorMessage } = useErrorContext();
-    const lagrerDokumenter = useIsMutating("oppdaterDokumenterMutation");
 
+    const qClient = useQueryClient();
     useEffect(() => {
         if (["FERDIGSTILT", "DISTRIBUERT", "DISTRIBUERT_LOKALT"].includes(forsendelse.status) && !isDebug) {
             navigateToJournalpost(forsendelse.arkivJournalpostId);
@@ -60,20 +60,20 @@ function ForsendelseView() {
     }
     return (
         <ContentContainer>
-            <Grid>
-                <Cell xs={12} md={12} lg={10}>
+            <BidragGrid>
+                <BidragCell xs={12} md={12} lg={10}>
                     <ForsendelseNotEditableWarning />
                     <div className={"leading-xlarge tracking-wide"}>
                         <ForsendelseTittel />
-                        <Grid className={"w-max"}>
-                            <Cell xs={12} md={12} lg={10}>
+                        <BidragGrid className={"w-max"}>
+                            <BidragCell xs={12} md={12} lg={10}>
                                 <Gjelder />
                                 <Mottaker />
-                            </Cell>
-                            <Cell xs={12} md={12} lg={4}>
+                            </BidragCell>
+                            <BidragCell xs={12} md={12} lg={4}>
                                 <ForsendelseDetaljer />
-                            </Cell>
-                        </Grid>
+                            </BidragCell>
+                        </BidragGrid>
                         <div>
                             <div className="flex flex-row gap-[2px]">
                                 <Heading level={"3"} size={"medium"} className={"max-w"}>
@@ -83,9 +83,8 @@ function ForsendelseView() {
                                     <DokumentTableInfo />
                                 </InfoKnapp>
                                 <SaveStatusIndicator
-                                    state={
-                                        errorSource == "dokumenter" ? "error" : lagrerDokumenter > 0 ? "saving" : "idle"
-                                    }
+                                    queryClient={qClient}
+                                    mutationKey={["oppdaterDokumenterMutation"]}
                                 />
                             </div>
 
@@ -98,8 +97,8 @@ function ForsendelseView() {
                             <BottomButtons />
                         </div>
                     </div>
-                </Cell>
-            </Grid>
+                </BidragCell>
+            </BidragGrid>
         </ContentContainer>
     );
 }
@@ -181,8 +180,8 @@ function LoadingIndicator() {
 function LoadingIndicatorSkeleton() {
     return (
         <ContentContainer>
-            <Grid>
-                <Cell xs={12} md={12} lg={10}>
+            <BidragGrid>
+                <BidragCell xs={12} md={12} lg={10}>
                     <div className="flex flex-col gap-[20px]">
                         <Skeleton variant="rectangle" width="70%" height="50px" />
 
@@ -191,8 +190,8 @@ function LoadingIndicatorSkeleton() {
                         {/* 'as'-prop kan brukes på all typografien vår med Skeleton */}
                         <Skeleton variant="rectangle" width="50%" height="50px" />
                     </div>
-                </Cell>
-            </Grid>
+                </BidragCell>
+            </BidragGrid>
         </ContentContainer>
     );
 }
