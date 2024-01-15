@@ -206,6 +206,7 @@ function EditableAndSelectableTitle({ onTitleChange, row }: EditableAndSelectabl
             placeholder={row.tittel + " (skriv inn tittel)"}
             label={""}
             onChange={onTitleChange}
+            sortOptions={false}
         />
     );
 }
