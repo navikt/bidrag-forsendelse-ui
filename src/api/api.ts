@@ -30,7 +30,8 @@ export const BIDRAG_ORGANISASJON_API = useApi(
 export const BIDRAG_FORSENDELSE_API = useApi(
     new BidragForsendelseApi({ baseURL: environment.url.bidragDokumentForsendelse }),
     "bidrag-dokument-forsendelse",
-    "gcp"
+    "gcp",
+    environment.system.environment
 );
 
 export const BIDRAG_TILGANGSKONTROLL_API = useApi(
