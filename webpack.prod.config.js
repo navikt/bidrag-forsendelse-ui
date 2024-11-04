@@ -14,6 +14,7 @@ module.exports = merge(webpackCommon, {
             BIDRAG_DOKUMENT_FORSENDELSE_URL: "",
             BIDRAG_DOKUMENT_ARKIV_URL: "",
             BIDRAG_SAK_URL: "",
+            TELEMETRY_URL: "",
             BISYS_URL: "",
             VIS_DOKUMENTMAL_KODE: false,
         }),
