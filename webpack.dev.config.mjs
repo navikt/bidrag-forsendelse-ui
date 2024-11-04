@@ -1,12 +1,12 @@
-const { merge } = require("webpack-merge");
-const webpackCommon = require("./webpack.common.config.js");
-const Dotenv = require("dotenv-webpack");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const { EnvironmentPlugin } = require("webpack");
-const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
-const buildConfig = require("./buildConfig");
+import ReactRefreshWebpackPlugin from "@pmmmwh/react-refresh-webpack-plugin";
+import Dotenv from "dotenv-webpack";
+import HtmlWebpackPlugin from "html-webpack-plugin";
+import webpack from "webpack";
+import { merge } from "webpack-merge";
 
-module.exports = merge(webpackCommon, {
+import webpackCommon from "./webpack.common.config.mjs";
+
+export default merge(webpackCommon, {
     mode: "development",
     devtool: "source-map",
     devServer: {
@@ -33,7 +33,7 @@ module.exports = merge(webpackCommon, {
             publicPath: "/",
             template: "./src/index.html",
         }),
-        new EnvironmentPlugin({
+        new webpack.EnvironmentPlugin({
             ENABLE_MOCK: "",
         }),
         // new ModuleFederationPlugin({
