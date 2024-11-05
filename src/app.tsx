@@ -1,8 +1,27 @@
 import "./index.css";
 
+import {
+    createReactRouterV6Options,
+    FaroRoutes,
+    getWebInstrumentations,
+    initializeFaro,
+    LogLevel,
+    ReactIntegration,
+} from "@grafana/faro-react";
+import { SecuritySessionUtils } from "@navikt/bidrag-ui-common";
 import { Cell, ContentContainer, Grid } from "@navikt/ds-react";
 import React from "react";
-import { BrowserRouter, Route, Routes, useParams, useSearchParams } from "react-router-dom";
+import {
+    BrowserRouter,
+    createRoutesFromChildren,
+    matchRoutes,
+    Route,
+    Routes,
+    useLocation,
+    useNavigationType,
+    useParams,
+    useSearchParams,
+} from "react-router-dom";
 
 import { initMock } from "./__mocks__/msw";
 import { EngangsbelopType, SoknadFra, StonadType, VedtakType } from "./api/BidragForsendelseApi";
@@ -12,14 +31,39 @@ import ForsendelsePage from "./pages/forsendelse/ForsendelsePage";
 import Opprettforsendelse from "./pages/opprettforsendelse";
 import Opprettnotat from "./pages/opprettnotat";
 import PageWrapper from "./pages/PageWrapper";
+export const faro = initializeFaro({
+    app: {
+        name: "bidrag-forsendelse-ui",
+    },
+    url: process.env.TELEMETRY_URL as string,
+    user: {
+        username: await SecuritySessionUtils.hentSaksbehandlerId(),
+    },
+    instrumentations: [
+        // Load the default Web instrumentations
+        ...getWebInstrumentations({
+            captureConsole: true,
+            captureConsoleDisabledLevels: [LogLevel.DEBUG, LogLevel.TRACE],
+        }),
 
+        new ReactIntegration({
+            router: createReactRouterV6Options({
+                createRoutesFromChildren,
+                matchRoutes,
+                Routes,
+                useLocation,
+                useNavigationType,
+            }),
+        }),
+    ],
+});
 // This file is only used for development. The entrypoint is under pages folder
 initMock();
 export default function App() {
     return (
         <React.StrictMode>
             <BrowserRouter>
-                <Routes>
+                <FaroRoutes>
                     <Route path="/forsendelse/brukerveiledning" element={<BrukerveiledningPageWrapper />} />
                     <Route path="/:forsendelseId" element={<ForsendelsePageWrapper />} />
                     <Route path="/forsendelse/:forsendelseId" element={<ForsendelsePageWrapper />} />
@@ -28,7 +72,7 @@ export default function App() {
                         <Route path="notat" element={<OpprettNyNotatPageWrapper />} />
                         <Route path="forsendelse/:forsendelseId" element={<ForsendelsePageWrapper />} />
                     </Route>
-                </Routes>
+                </FaroRoutes>
             </BrowserRouter>
         </React.StrictMode>
     );

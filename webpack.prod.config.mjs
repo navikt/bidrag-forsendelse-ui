@@ -1,7 +1,9 @@
-const { merge } = require("webpack-merge");
-const webpackCommon = require("./webpack.common.config.js");
-const { EnvironmentPlugin } = require("webpack");
-module.exports = merge(webpackCommon, {
+import webpack from "webpack";
+import { merge } from "webpack-merge";
+
+import webpackCommon from "./webpack.common.config.mjs";
+const { EnvironmentPlugin } = webpack;
+export default merge(webpackCommon, {
     mode: "production",
     plugins: [
         // Defined as variable: default-value
@@ -14,6 +16,7 @@ module.exports = merge(webpackCommon, {
             BIDRAG_DOKUMENT_FORSENDELSE_URL: "",
             BIDRAG_DOKUMENT_ARKIV_URL: "",
             BIDRAG_SAK_URL: "",
+            TELEMETRY_URL: "",
             BISYS_URL: "",
             VIS_DOKUMENTMAL_KODE: false,
         }),
