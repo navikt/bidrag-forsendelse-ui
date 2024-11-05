@@ -1,3 +1,4 @@
+import { faro } from "@grafana/faro-react";
 import { ExternalLinkIcon } from "@navikt/aksel-icons";
 import { Button } from "@navikt/ds-react";
 
@@ -14,7 +15,10 @@ export default function ForsendelseDocsButton() {
                     className={`border rounded-xl border-solid`}
                     size="xsmall"
                     icon={<ExternalLinkIcon />}
-                    onClick={() => window.open("/forsendelse/brukerveiledning", "_blank")}
+                    onClick={() => {
+                        faro.api.pushEvent("click.link.brukerveiledning");
+                        window.open("/forsendelse/brukerveiledning", "_blank");
+                    }}
                 >
                     Brukerveiledning
                 </Button>
@@ -34,12 +38,13 @@ function BrevmalerButtons() {
                 className={`border rounded-xl border-solid w-max`}
                 size="xsmall"
                 icon={<ExternalLinkIcon />}
-                onClick={() =>
+                onClick={() => {
+                    faro.api.pushEvent("click.link.brevmaler.foreldreskap");
                     window.open(
                         "https://navno.sharepoint.com/sites/fag-og-ytelser-familie-farskap-og-morskap/SitePages/Brevmaler---foreldreskap.aspx",
                         "_blank"
-                    )
-                }
+                    );
+                }}
             >
                 Brevmaler foreldreskap
             </Button>
@@ -53,12 +58,13 @@ function BrevmalerButtons() {
                 className={`border rounded-xl border-solid w-max`}
                 size="xsmall"
                 icon={<ExternalLinkIcon />}
-                onClick={() =>
+                onClick={() => {
+                    faro.api.pushEvent("click.link.brevmaler.varsel");
                     window.open(
                         "https://navno.sharepoint.com/sites/fag-og-ytelser-familie-barnebidrag-og-forskudd/SitePages/Brevmaler-varsler.aspx",
                         "_blank"
-                    )
-                }
+                    );
+                }}
             >
                 Brevmaler varsel
             </Button>
@@ -68,12 +74,13 @@ function BrevmalerButtons() {
                 className={`border rounded-xl border-solid w-max`}
                 size="xsmall"
                 icon={<ExternalLinkIcon />}
-                onClick={() =>
+                onClick={() => {
+                    faro.api.pushEvent("click.link.brevmaler.vedtak");
                     window.open(
                         "https://navno.sharepoint.com/sites/fag-og-ytelser-familie-barnebidrag-og-forskudd/SitePages/Brevmaler-vedtak.aspx",
                         "_blank"
-                    )
-                }
+                    );
+                }}
             >
                 Brevmaler vedtak
             </Button>
