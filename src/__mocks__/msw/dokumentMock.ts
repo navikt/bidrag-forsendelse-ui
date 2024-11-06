@@ -8,7 +8,6 @@ export default function dokumentMock(): RestHandler[] {
     return [
         rest.get(`${baseUrl}/sak/:saksnr/journal`, async (req: RestRequest, res, ctx) => {
             const saksnummer = req.params.saksnr as string;
-            console.log("SDasdasd", saksnummer);
             return res(
                 ctx.set("Content-Type", "application/json"),
                 ctx.delay(500),

@@ -92,7 +92,6 @@ function BrukerveiledningPageWrapper() {
     );
 }
 function ForsendelsePageWrapper() {
-    console.log("HERE");
     const { forsendelseId, saksnummer } = useParams();
     const [searchParams, _] = useSearchParams();
     return (

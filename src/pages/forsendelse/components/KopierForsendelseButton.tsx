@@ -209,7 +209,6 @@ function DokumentValgTableRows({ rows, update }: DokumentValgTableProps) {
                             value={row.dokumentreferanse}
                             checked={row.selected}
                             onChange={() => {
-                                console.log("ipdate", index, row.selected);
                                 update(index, {
                                     ...row,
                                     selected: !row.selected,
