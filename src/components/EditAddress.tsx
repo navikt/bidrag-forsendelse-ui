@@ -46,7 +46,7 @@ export function EditAddress(props: EditAddressProps) {
     return (
         <div className={"md:grow"}>
             <EditAddressLines {...props} />
-            <div className="flex  gap-[5px] h-max items-center" style={{ flexDirection: isNorway ? "column" : "row" }}>
+            <div className="flex pt-1 h-max items-center" style={{ flexDirection: isNorway ? "column" : "row" }}>
                 <EditPostcodeAndState {...props} />
                 <EditCountry {...props} />
             </div>
@@ -147,22 +147,24 @@ function EditPostcodeAndState(props: EditAddressProps) {
                     />
                 </>
             )}
-            <TextField
-                {...register(poststedFormKey as "poststed", {
-                    validate: (value?: string) => {
-                        if (isNorway) {
-                            return StringUtils.isEmpty(value) ? "Skriv inn gyldig postnummer" : true;
-                        }
-                        return true;
-                        // return !value || value.trim().length == 0 ? "Poststed må fylles ut" : true;
-                    },
-                })}
-                error={!isNorway ? getPostnummerErrorMessage() : undefined}
-                size="small"
-                className="w-full"
-                label={isNorway ? "Poststed (fylles automatisk)" : "Poststed"}
-                disabled={isNorway}
-            />
+            {isNorway && (
+                <TextField
+                    {...register(poststedFormKey as "poststed", {
+                        validate: (value?: string) => {
+                            if (isNorway) {
+                                return StringUtils.isEmpty(value) ? "Skriv inn gyldig postnummer" : true;
+                            }
+                            return true;
+                            // return !value || value.trim().length == 0 ? "Poststed må fylles ut" : true;
+                        },
+                    })}
+                    error={!isNorway ? getPostnummerErrorMessage() : undefined}
+                    size="small"
+                    className="w-full"
+                    label={isNorway ? "Poststed (fylles automatisk)" : "Poststed"}
+                    disabled={isNorway}
+                />
+            )}
         </div>
     );
 }

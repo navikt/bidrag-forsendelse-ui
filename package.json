@@ -9,6 +9,7 @@
     "start": "",
     "env:export:local": "export $(cat env/.env.local | xargs)",
     "dev": "cross-env-shell NODE_ENV=development webpack serve --config webpack.dev.config.mjs",
+    "dev:localq1": "cross-env-shell NODE_ENV=development webpack serve --env envfile=.env.local.q1 --config webpack.dev.config.mjs",
     "dev:mock": "cross-env ENABLE_MOCK=true NODE_ENV=development webpack serve --config webpack.dev.config.mjs",
     "build": "webpack --config webpack.prod.config.mjs",
     "types:person": "swagger-typescript-api -p https://bidrag-person-feature.dev.adeo.no/bidrag-person/v3/api-docs --axios -n BidragPersonApi.ts -o src/api --extract-enums",
