@@ -97,8 +97,8 @@ export default {
                 "./Forsendelse": "./src/app.tsx",
             },
             shared: {
-                react: { singleton: true, requiredVersion: deps.react },
-                "react-dom": { singleton: true, requiredVersion: deps.react },
+                react: { singleton: true, requiredVersion: deps.dependencies.react },
+                "react-dom": { singleton: true, requiredVersion: deps.dependencies.react },
             },
         }),
     ],
