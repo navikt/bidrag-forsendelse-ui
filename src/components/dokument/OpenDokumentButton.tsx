@@ -4,6 +4,7 @@ import { Button } from "@navikt/ds-react";
 import React, { useState } from "react";
 
 import { DOKUMENT_KAN_IKKE_ÅPNES_STATUS, DokumentStatus } from "../../constants/DokumentStatus";
+import useDokumentApi from "../../hooks/useDokumentApi";
 import { queryClient } from "../../pages/PageWrapper";
 import { IJournalpostStatus } from "../../types/Journalpost";
 import EditDocumentButton from "./EditDocumentButton";
@@ -45,6 +46,7 @@ export default function OpenDokumentButton({
     }
     return (
         <>
+            <MbdokUrl dokumentreferanse={dokumentreferanse} journalpostId={journalpostId} />
             <Button
                 size={"small"}
                 variant={"tertiary"}
@@ -60,6 +62,12 @@ export default function OpenDokumentButton({
             />
         </>
     );
+}
+
+function MbdokUrl({ dokumentreferanse, journalpostId }: IOpenDokumentButtonProps) {
+    const response = useDokumentApi().hentDokumentUrl(journalpostId, dokumentreferanse);
+
+    return <a href={response.data.dokumentUrl}>Åpne</a>;
 }
 
 interface OpenDokumentIframeProps {
