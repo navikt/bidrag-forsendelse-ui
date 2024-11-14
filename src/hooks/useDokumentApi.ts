@@ -2,7 +2,7 @@ import { useSuspenseQuery, UseSuspenseQueryResult } from "@tanstack/react-query"
 import { AxiosError } from "axios";
 
 import { BIDRAG_DOKUMENT_API, BIDRAG_DOKUMENT_ARKIV_API, BIDRAG_FORSENDELSE_API } from "../api/api";
-import { DokumentDto, JournalpostDto } from "../api/BidragDokumentApi";
+import { DokumentDto, DokumentTilgangResponse, JournalpostDto } from "../api/BidragDokumentApi";
 import { BestemKanalResponse, BestemKanalResponseDistribusjonskanalEnum } from "../api/BidragDokumentArkivApi";
 import { HentDokumentValgRequest } from "../api/BidragForsendelseApi";
 import { useSession } from "../pages/forsendelse/context/SessionContext";
@@ -12,6 +12,7 @@ import { useForsendelseApi } from "./useForsendelseApi";
 const DokumentQueryKeys = {
     dokument: "dokument",
     hentJournalpost: (jpId: string) => [DokumentQueryKeys.dokument, "hentJournalpost", jpId],
+    tilgangDokument: (jpId: string) => [DokumentQueryKeys.dokument, "tilgang", jpId],
     hentAvvikListe: (jpId: string) => [DokumentQueryKeys.dokument, "hentAvvikListe", jpId],
     hentAvvik: (jpId: string) => [DokumentQueryKeys.dokument, "hentAvvik", jpId],
     hentDistribusjonKanal: (mottakerId: string, gjelderId: string) => [
@@ -62,6 +63,24 @@ export default function useDokumentApi() {
             queryKey: DokumentQueryKeys.hentJournalpost(journalpostId),
             queryFn: () => BIDRAG_DOKUMENT_API.journal.hentJournalpost(journalpostId),
             select: (data): IJournalpost => journalpostMapper(data.data.journalpost, data.data.sakstilknytninger),
+        });
+    }
+
+    function hentDokumentUrl(
+        journalpostId: string,
+        dokumentreferanse?: string
+    ): UseSuspenseQueryResult<DokumentTilgangResponse> {
+        return useSuspenseQuery({
+            queryKey: DokumentQueryKeys.tilgangDokument(journalpostId),
+            queryFn: () =>
+                BIDRAG_DOKUMENT_API.tilgang.giTilgangTilDokument(journalpostId, dokumentreferanse, {
+                    headers: {
+                        "X-enhet": enhet,
+                    },
+                }),
+            select: (data) => {
+                return data.data as DokumentTilgangResponse;
+            },
         });
     }
 
@@ -117,6 +136,7 @@ export default function useDokumentApi() {
         return result.data;
     }
     return {
+        hentDokumentUrl,
         distribusjonKanal,
         hentNotatMalDetaljer,
         dokumentMalDetaljerForsendelse,

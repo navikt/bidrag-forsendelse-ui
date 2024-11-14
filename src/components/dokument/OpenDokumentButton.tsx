@@ -4,6 +4,7 @@ import { Button } from "@navikt/ds-react";
 import React, { useState } from "react";
 
 import { DOKUMENT_KAN_IKKE_ÅPNES_STATUS, DokumentStatus } from "../../constants/DokumentStatus";
+import useDokumentApi from "../../hooks/useDokumentApi";
 import { queryClient } from "../../pages/PageWrapper";
 import { IJournalpostStatus } from "../../types/Journalpost";
 import EditDocumentButton from "./EditDocumentButton";
@@ -43,6 +44,10 @@ export default function OpenDokumentButton({
             setIsOpeningIframe(false);
         }, 4000);
     }
+    console.log(status);
+    if (status == "UNDER_REDIGERING") {
+        return <MbdokUrl dokumentreferanse={dokumentreferanse} journalpostId={journalpostId} />;
+    }
     return (
         <>
             <Button
@@ -59,6 +64,16 @@ export default function OpenDokumentButton({
                 path={OpenDocumentUtils.getÅpneDokumentLenke(journalpostId, dokumentreferanse, false, true)}
             />
         </>
+    );
+}
+
+function MbdokUrl({ dokumentreferanse, journalpostId }: IOpenDokumentButtonProps) {
+    const response = useDokumentApi().hentDokumentUrl(journalpostId, dokumentreferanse);
+
+    return (
+        <a className="hover:cursor-pointer m-auto" style={{ scale: 1.1 }} href={response.data.dokumentUrl}>
+            <ExternalLink />
+        </a>
     );
 }
 
