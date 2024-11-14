@@ -44,7 +44,6 @@ export default function OpenDokumentButton({
             setIsOpeningIframe(false);
         }, 4000);
     }
-    console.log(status);
     if (status == "UNDER_REDIGERING") {
         return <MbdokUrl dokumentreferanse={dokumentreferanse} journalpostId={journalpostId} />;
     }
@@ -71,7 +70,11 @@ function MbdokUrl({ dokumentreferanse, journalpostId }: IOpenDokumentButtonProps
     const response = useDokumentApi().hentDokumentUrl(journalpostId, dokumentreferanse);
 
     return (
-        <a className="hover:cursor-pointer m-auto" style={{ scale: 1.1 }} href={response.data.dokumentUrl}>
+        <a
+            className="hover:cursor-pointer m-auto hover:text-blue-900"
+            style={{ scale: 1.8 }}
+            href={response.data.dokumentUrl}
+        >
             <ExternalLink />
         </a>
     );

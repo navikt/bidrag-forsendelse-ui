@@ -12,7 +12,7 @@ import { useForsendelseApi } from "./useForsendelseApi";
 const DokumentQueryKeys = {
     dokument: "dokument",
     hentJournalpost: (jpId: string) => [DokumentQueryKeys.dokument, "hentJournalpost", jpId],
-    tilgangDokument: (jpId: string) => [DokumentQueryKeys.dokument, "tilgang", jpId],
+    tilgangDokument: (jpId: string, dokref: string) => [DokumentQueryKeys.dokument, "tilgang", jpId, dokref],
     hentAvvikListe: (jpId: string) => [DokumentQueryKeys.dokument, "hentAvvikListe", jpId],
     hentAvvik: (jpId: string) => [DokumentQueryKeys.dokument, "hentAvvik", jpId],
     hentDistribusjonKanal: (mottakerId: string, gjelderId: string) => [
@@ -71,7 +71,7 @@ export default function useDokumentApi() {
         dokumentreferanse?: string
     ): UseSuspenseQueryResult<DokumentTilgangResponse> {
         return useSuspenseQuery({
-            queryKey: DokumentQueryKeys.tilgangDokument(journalpostId),
+            queryKey: DokumentQueryKeys.tilgangDokument(journalpostId, dokumentreferanse),
             queryFn: () =>
                 BIDRAG_DOKUMENT_API.tilgang.giTilgangTilDokument(journalpostId, dokumentreferanse, {
                     headers: {
