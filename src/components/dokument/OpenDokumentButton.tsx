@@ -44,9 +44,12 @@ export default function OpenDokumentButton({
             setIsOpeningIframe(false);
         }, 4000);
     }
+    console.log(status);
+    if (status == "UNDER_REDIGERING") {
+        return <MbdokUrl dokumentreferanse={dokumentreferanse} journalpostId={journalpostId} />;
+    }
     return (
         <>
-            <MbdokUrl dokumentreferanse={dokumentreferanse} journalpostId={journalpostId} />
             <Button
                 size={"small"}
                 variant={"tertiary"}
@@ -67,7 +70,11 @@ export default function OpenDokumentButton({
 function MbdokUrl({ dokumentreferanse, journalpostId }: IOpenDokumentButtonProps) {
     const response = useDokumentApi().hentDokumentUrl(journalpostId, dokumentreferanse);
 
-    return <a href={response.data.dokumentUrl}>Åpne</a>;
+    return (
+        <a className="hover:cursor-pointer m-auto" style={{ scale: 1.1 }} href={response.data.dokumentUrl}>
+            <ExternalLink />
+        </a>
+    );
 }
 
 interface OpenDokumentIframeProps {
