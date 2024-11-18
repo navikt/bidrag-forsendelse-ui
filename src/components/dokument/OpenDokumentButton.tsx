@@ -44,9 +44,9 @@ export default function OpenDokumentButton({
             setIsOpeningIframe(false);
         }, 4000);
     }
-    if (status == "UNDER_REDIGERING") {
-        return <MbdokUrl dokumentreferanse={dokumentreferanse} journalpostId={journalpostId} />;
-    }
+    // if (status == "UNDER_REDIGERING") {
+    //     return <MbdokUrl dokumentreferanse={dokumentreferanse} journalpostId={journalpostId} />;
+    // }
     return (
         <>
             <Button
