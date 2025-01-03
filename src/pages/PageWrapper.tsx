@@ -88,7 +88,9 @@ export default function PageWrapper({ children, name }: PropsWithChildren<PageWr
     const componentsWithStyles = useThemedStylesWithMdx(useMDXComponents());
 
     useEffect(() => {
-        environment.feature.isDebug && console.log(JSON.stringify(environment));
+        if (environment.feature.isDebug) {
+            console.log(JSON.stringify(environment));
+        }
     }, []);
 
     return (

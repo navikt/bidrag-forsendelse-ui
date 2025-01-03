@@ -1,8 +1,8 @@
 import ObjectUtils from "@navikt/bidrag-ui-common/esm/utils/ObjectUtils";
-import { Button, Cell, ContentContainer, ErrorSummary, Grid, Heading } from "@navikt/ds-react";
-import ErrorSummaryItem from "@navikt/ds-react/esm/form/error-summary/ErrorSummaryItem";
+import { Button, ErrorSummary, Heading, Page, VStack } from "@navikt/ds-react";
 import { useIsMutating, useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
+import { useEffect } from "react";
 import { FieldErrors, FormProvider, useForm, useFormContext } from "react-hook-form";
 
 import { BIDRAG_FORSENDELSE_API } from "../../api/api";
@@ -16,6 +16,7 @@ import { mapToBehandlingInfoDto } from "../../types/Forsendelse";
 import { countryCodeIso2ToIso3 } from "../../utils/AdresseUtils";
 import { parseErrorMessageFromAxiosError } from "../../utils/ErrorUtils";
 import { hasOnlyNullValues } from "../../utils/ObjectUtils";
+import { updateUrlSearchParam } from "../../utils/window-utils";
 import { useSession } from "../forsendelse/context/SessionContext";
 import { queryClient } from "../PageWrapper";
 import AvbrytOpprettForsendelseButton from "./AvbrytOpprettForsendelseButton";
@@ -204,10 +205,13 @@ function OpprettForsendelsContainer({ onSubmit, tittel }: OpprettForsendelsConta
     const roller = useForsendelseApi().hentRoller();
     const methods = useFormContext();
     const isLoading = useIsMutating({ mutationKey: [OPPRETT_FORSENDELSE_MUTATION_KEY] }) > 0;
+    useEffect(() => {
+        updateUrlSearchParam("page", `Opprett forsendelse`);
+    }, []);
     return (
-        <ContentContainer>
-            <Grid>
-                <Cell xs={12} md={12} lg={10}>
+        <Page className="pt-4">
+            <Page.Block width="xl" gutters>
+                <VStack gap={{ xs: "12", md: "12", lg: "10" }}>
                     <div className={"leading-xlarge tracking-wide"}>
                         <Heading size="large">{tittel ? `${tittel}` : "Opprett forsendelse"}</Heading>
 
@@ -234,9 +238,9 @@ function OpprettForsendelsContainer({ onSubmit, tittel }: OpprettForsendelsConta
                             </form>
                         </FormProvider>
                     </div>
-                </Cell>
-            </Grid>
-        </ContentContainer>
+                </VStack>
+            </Page.Block>
+        </Page>
     );
 }
 
@@ -267,7 +271,7 @@ function OpprettForsendelsValidationErrorSummary() {
 
     return (
         <ErrorSummary heading={"Følgende må rettes opp før forsendelse kan opprettes"} className="mt-4">
-            {getAllErrors(errors)?.map((err, i) => <ErrorSummaryItem key={"err" + i}>{err}</ErrorSummaryItem>)}
+            {getAllErrors(errors)?.map((err, i) => <ErrorSummary.Item key={"err" + i}>{err}</ErrorSummary.Item>)}
         </ErrorSummary>
     );
 }

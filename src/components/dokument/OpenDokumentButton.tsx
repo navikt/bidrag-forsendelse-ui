@@ -50,6 +50,7 @@ export default function OpenDokumentButton({
     return (
         <>
             <Button
+                as="span"
                 size={"small"}
                 variant={"tertiary"}
                 icon={<ExternalLink />}

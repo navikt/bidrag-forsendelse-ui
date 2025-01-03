@@ -1,5 +1,4 @@
 import { ErrorSummary } from "@navikt/ds-react";
-import ErrorSummaryItem from "@navikt/ds-react/esm/form/error-summary/ErrorSummaryItem";
 import { useFormContext } from "react-hook-form";
 
 import { IForsendelseFormProps } from "../context/DokumenterFormContext";
@@ -25,7 +24,7 @@ export default function ValidationErrorSummary() {
     }
     return (
         <ErrorSummary heading={"Følgende må rettes opp før forsendelse kan distribueres"}>
-            {getAllErrors()?.map((err) => <ErrorSummaryItem>{err}</ErrorSummaryItem>)}
+            {getAllErrors()?.map((err) => <ErrorSummary.Item>{err}</ErrorSummary.Item>)}
         </ErrorSummary>
     );
 }

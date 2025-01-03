@@ -124,13 +124,13 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
                     {dateToDDMMYYYYString(dokumentDato ? new Date(dokumentDato) : new Date())}
                 </Table.DataCell>
                 <Table.DataCell style={{ width: "200px" }}>
-                    <div className="flex flex-row gap-[5px]">
+                    <span className="flex flex-row gap-[5px]">
                         <DokumentStatusTag status={status} />
                         {erLenkeTilDokumentIAnnenForsendelse && <DokumentLinkedTag />}
-                    </div>
+                    </span>
                 </Table.DataCell>
                 <Table.DataCell style={{ width: "50px" }}>
-                    <div className={"flex flex-row gap-1 justify-end"}>
+                    <span className={"flex flex-row gap-1 justify-end"}>
                         {dokument.status == "KONTROLLERT" && (
                             <Button
                                 size={"small"}
@@ -151,7 +151,7 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
                             erSkjema={dokument.erSkjema}
                         />
                         <DeleteDocumentButton dokument={dokument} />
-                    </div>
+                    </span>
                 </Table.DataCell>
             </Table.Row>
         );

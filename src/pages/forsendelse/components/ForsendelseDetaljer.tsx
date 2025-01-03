@@ -7,9 +7,9 @@ import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
 export default function ForsendelseDetaljer() {
     const forsendelse = useForsendelseApi().hentForsendelse();
     return (
-        <div className="mt-[-15px]">
+        <div>
             {/* <Heading size="small">Andre detaljer</Heading> */}
-            <div className="h-px w-full bg-border-divider" />
+            <div className="h-px w-full bg-border-divider mt-2 mb-2" />
             <div className="flex flex-row static_data">
                 <DetailsGrid
                     rows={[

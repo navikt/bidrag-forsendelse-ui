@@ -175,7 +175,7 @@ function EditableTitle({ row, onTitleChange }: EditableTitleProps) {
         return (
             <div>
                 {beskrivelse}
-                {harAnnenTittel && <Detail>{tittel}</Detail>}
+                {harAnnenTittel && <div>{tittel}</div>}
             </div>
         );
     }

@@ -16,7 +16,12 @@ export const SAMHANDLER_API = useApi(
     "gcp"
 );
 export const PERSON_API = useApi(new PersonApi({ baseURL: environment.url.bidragPerson }), "bidrag-person", "fss");
-export const SAK_API = useApi(new SakApi({ baseURL: environment.url.bidragSak }), "bidrag-sak", "fss");
+export const SAK_API = useApi(
+    new SakApi({ baseURL: environment.url.bidragSak }),
+    "bidrag-sak",
+    "fss",
+    environment.system.environment
+);
 export const BIDRAG_DOKUMENT_API = useApi(
     new BidragDokumentApi({ baseURL: environment.url.bidragDokument }),
     "bidrag-dokument",
@@ -30,8 +35,7 @@ export const BIDRAG_ORGANISASJON_API = useApi(
 export const BIDRAG_FORSENDELSE_API = useApi(
     new BidragForsendelseApi({ baseURL: environment.url.bidragDokumentForsendelse }),
     "bidrag-dokument-forsendelse",
-    "gcp",
-    environment.system.environment
+    "gcp"
 );
 
 export const BIDRAG_TILGANGSKONTROLL_API = useApi(
