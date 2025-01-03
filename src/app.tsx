@@ -9,6 +9,7 @@ import {
     ReactIntegration,
 } from "@grafana/faro-react";
 import { SecuritySessionUtils } from "@navikt/bidrag-ui-common";
+import { HGrid, HStack } from "@navikt/ds-react";
 import React from "react";
 import {
     BrowserRouter,
@@ -30,7 +31,6 @@ import ForsendelsePage from "./pages/forsendelse/ForsendelsePage";
 import Opprettforsendelse from "./pages/opprettforsendelse";
 import Opprettnotat from "./pages/opprettnotat";
 import PageWrapper from "./pages/PageWrapper";
-import { HGrid, HStack } from "@navikt/ds-react";
 export const faro = initializeFaro({
     app: {
         name: "bidrag-forsendelse-ui",
