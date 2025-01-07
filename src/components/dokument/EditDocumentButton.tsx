@@ -29,7 +29,9 @@ function openDocumentSkjemaEditor(forsendelseId, dokumentreferanse, editedDocume
     LoggerService.info(
         `Åpner skjemaredigering av forsendelse ${forsendelseId} og dokument ${dokumentreferanse} på nettleser`
     );
-    id && editedDocument && EditorConfigStorage.save(id, editedDocument?.config);
+    if (id && editedDocument) {
+        EditorConfigStorage.save(id, editedDocument?.config);
+    }
     window.open(`/rediger/skjemautfylling/${forsendelseId}/${dokumentreferanse}?id=${id}`);
 }
 async function editDocument(
