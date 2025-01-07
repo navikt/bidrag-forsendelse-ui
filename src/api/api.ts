@@ -16,12 +16,7 @@ export const SAMHANDLER_API = useApi(
     "gcp"
 );
 export const PERSON_API = useApi(new PersonApi({ baseURL: environment.url.bidragPerson }), "bidrag-person", "fss");
-export const SAK_API = useApi(
-    new SakApi({ baseURL: environment.url.bidragSak }),
-    "bidrag-sak",
-    "fss",
-    environment.system.environment
-);
+export const SAK_API = useApi(new SakApi({ baseURL: environment.url.bidragSak }), "bidrag-sak", "fss");
 export const BIDRAG_DOKUMENT_API = useApi(
     new BidragDokumentApi({ baseURL: environment.url.bidragDokument }),
     "bidrag-dokument",
@@ -30,22 +25,26 @@ export const BIDRAG_DOKUMENT_API = useApi(
 export const BIDRAG_ORGANISASJON_API = useApi(
     new BidragOrganisasjontApi({ baseURL: environment.url.bidragOrganisasjon }),
     "bidrag-organisasjon",
-    "fss"
+    "fss",
+    environment.system.legacyEnvironment
 );
 export const BIDRAG_FORSENDELSE_API = useApi(
     new BidragForsendelseApi({ baseURL: environment.url.bidragDokumentForsendelse }),
     "bidrag-dokument-forsendelse",
-    "gcp"
+    "gcp",
+    environment.system.legacyEnvironment
 );
 
 export const BIDRAG_TILGANGSKONTROLL_API = useApi(
     new BidragTilgangskontrollApi({ baseURL: environment.url.bidragTilgangskontroll }),
     "bidrag-tilgangskontroll",
-    "gcp"
+    "gcp",
+    environment.system.legacyEnvironment
 );
 
 export const BIDRAG_DOKUMENT_ARKIV_API = useApi(
     new BidragDokumentArkivApi({ baseURL: environment.url.bidragDokumentArkiv }),
     "bidrag-dokument-arkiv",
-    "fss"
+    "fss",
+    environment.system.legacyEnvironment
 );

@@ -19,6 +19,7 @@ export default merge(webpackCommon, {
             TELEMETRY_URL: "",
             BISYS_URL: "",
             VIS_DOKUMENTMAL_KODE: false,
+            LEGACY_ENVIRONMENT: false,
         }),
     ],
 });
