@@ -1,8 +1,8 @@
 import { dateToDDMMYYYYString, LoggerService } from "@navikt/bidrag-ui-common";
-import { Button, Cell, ContentContainer, ErrorSummary, Grid, Heading } from "@navikt/ds-react";
-import ErrorSummaryItem from "@navikt/ds-react/esm/form/error-summary/ErrorSummaryItem";
+import { Button, ErrorSummary, Heading, Page, VStack } from "@navikt/ds-react";
 import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
+import { useEffect } from "react";
 import { FieldErrors, FormProvider, useForm, useFormContext } from "react-hook-form";
 
 import { BIDRAG_FORSENDELSE_API } from "../../api/api";
@@ -17,6 +17,7 @@ import { useForsendelseApi } from "../../hooks/useForsendelseApi";
 import { ENHET_FARSKAP } from "../../types/EnhetTypes";
 import { mapToBehandlingInfoDto } from "../../types/Forsendelse";
 import { parseErrorMessageFromAxiosError } from "../../utils/ErrorUtils";
+import { updateUrlSearchParam } from "../../utils/window-utils";
 import { useSession } from "../forsendelse/context/SessionContext";
 import AvbrytOpprettForsendelseButton from "../opprettforsendelse/AvbrytOpprettForsendelseButton";
 import { useOpprettForsendelse } from "../opprettforsendelse/OpprettForsendelseContext";
@@ -89,10 +90,13 @@ export default function OpprettNotatPage() {
         opprettForsendelseFn.mutate(data);
     }
     const isLoading = opprettForsendelseFn.isPending || opprettForsendelseFn.isSuccess;
+    useEffect(() => {
+        updateUrlSearchParam("page", `Opprett notat`);
+    }, []);
     return (
-        <ContentContainer>
-            <Grid>
-                <Cell xs={12} md={12} lg={10}>
+        <Page className="pt-4">
+            <Page.Block width="xl" gutters>
+                <VStack gap={{ xs: "12", md: "12", lg: "10" }}>
                     <div className={"leading-xlarge tracking-wide"}>
                         <Heading spacing size="large">
                             Opprett notat
@@ -118,9 +122,9 @@ export default function OpprettNotatPage() {
                             </form>
                         </FormProvider>
                     </div>
-                </Cell>
-            </Grid>
-        </ContentContainer>
+                </VStack>
+            </Page.Block>
+        </Page>
     );
 }
 
@@ -151,7 +155,7 @@ function OpprettNotatValidationErrorSummary() {
 
     return (
         <ErrorSummary heading={"Følgende må rettes opp før notat kan opprettes"} className="mt-4">
-            {getAllErrors(errors)?.map((err, i) => <ErrorSummaryItem key={"err" + i}>{err}</ErrorSummaryItem>)}
+            {getAllErrors(errors)?.map((err, i) => <ErrorSummary.Item key={"err" + i}>{err}</ErrorSummary.Item>)}
         </ErrorSummary>
     );
 }

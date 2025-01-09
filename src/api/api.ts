@@ -25,23 +25,26 @@ export const BIDRAG_DOKUMENT_API = useApi(
 export const BIDRAG_ORGANISASJON_API = useApi(
     new BidragOrganisasjontApi({ baseURL: environment.url.bidragOrganisasjon }),
     "bidrag-organisasjon",
-    "fss"
+    "fss",
+    environment.system.legacyEnvironment
 );
 export const BIDRAG_FORSENDELSE_API = useApi(
     new BidragForsendelseApi({ baseURL: environment.url.bidragDokumentForsendelse }),
     "bidrag-dokument-forsendelse",
     "gcp",
-    environment.system.environment
+    environment.system.legacyEnvironment
 );
 
 export const BIDRAG_TILGANGSKONTROLL_API = useApi(
     new BidragTilgangskontrollApi({ baseURL: environment.url.bidragTilgangskontroll }),
     "bidrag-tilgangskontroll",
-    "gcp"
+    "gcp",
+    environment.system.legacyEnvironment
 );
 
 export const BIDRAG_DOKUMENT_ARKIV_API = useApi(
     new BidragDokumentArkivApi({ baseURL: environment.url.bidragDokumentArkiv }),
     "bidrag-dokument-arkiv",
-    "fss"
+    "fss",
+    environment.system.legacyEnvironment
 );

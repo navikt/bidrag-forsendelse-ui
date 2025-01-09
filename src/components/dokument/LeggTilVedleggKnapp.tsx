@@ -30,7 +30,9 @@ export default function LeggTilVedleggKnapp() {
                 <LeggTilVedlegglModal
                     open={modalOpen}
                     onClose={(selectedDocuments) => {
-                        selectedDocuments && addDocuments([selectedDocuments]);
+                        if (selectedDocuments) {
+                            addDocuments([selectedDocuments]);
+                        }
                         closeModal();
                     }}
                 />

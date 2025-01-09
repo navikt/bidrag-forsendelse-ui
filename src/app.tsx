@@ -9,7 +9,7 @@ import {
     ReactIntegration,
 } from "@grafana/faro-react";
 import { SecuritySessionUtils } from "@navikt/bidrag-ui-common";
-import { Cell, ContentContainer, Grid } from "@navikt/ds-react";
+import { HGrid, HStack } from "@navikt/ds-react";
 import React from "react";
 import {
     BrowserRouter,
@@ -81,13 +81,11 @@ export default function App() {
 function BrukerveiledningPageWrapper() {
     return (
         <PageWrapper name="Forsendelse brukerveiledning">
-            <ContentContainer>
-                <Grid>
-                    <Cell xs={12} md={12} lg={12}>
-                        <Brukerveiledning saksbehandlerNavn={""} />
-                    </Cell>
-                </Grid>
-            </ContentContainer>
+            <HGrid>
+                <HStack gap={{ xs: "12", md: "12", lg: "4" }}>
+                    <Brukerveiledning saksbehandlerNavn={""} />
+                </HStack>
+            </HGrid>
         </PageWrapper>
     );
 }

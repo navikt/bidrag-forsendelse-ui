@@ -29,7 +29,9 @@ export default function KopierForsendelseButton() {
             <KopierForsendelseModal
                 open={modalOpen}
                 onClose={(selectedDocuments) => {
-                    selectedDocuments && addDocuments([selectedDocuments]);
+                    if (selectedDocuments) {
+                        addDocuments([selectedDocuments]);
+                    }
                     setModalOpen(false);
                 }}
             />

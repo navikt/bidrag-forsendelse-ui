@@ -29,7 +29,9 @@ export default function LeggTilFraMalKnapp() {
                 <LeggTilDokumentFraMalModal
                     open={modalOpen}
                     onClose={(selectedDocuments) => {
-                        selectedDocuments && addDocuments([selectedDocuments]);
+                        if (selectedDocuments) {
+                            addDocuments([selectedDocuments]);
+                        }
                         closeModal();
                     }}
                 />

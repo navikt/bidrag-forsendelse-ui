@@ -1,5 +1,5 @@
 import { AutoSuggest, removeNonPrintableCharachters } from "@navikt/bidrag-ui-common";
-import { Detail, Heading, Radio, RadioGroup, Table, Textarea } from "@navikt/ds-react";
+import { Heading, Radio, RadioGroup, Table, Textarea } from "@navikt/ds-react";
 import { useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
@@ -175,7 +175,7 @@ function EditableTitle({ row, onTitleChange }: EditableTitleProps) {
         return (
             <div>
                 {beskrivelse}
-                {harAnnenTittel && <Detail>{tittel}</Detail>}
+                {harAnnenTittel && <div>{tittel}</div>}
             </div>
         );
     }

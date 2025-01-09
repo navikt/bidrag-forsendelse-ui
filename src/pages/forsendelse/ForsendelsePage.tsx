@@ -1,8 +1,7 @@
 import "./ForsendelsePage.css";
 
-import { Alert, BodyShort, Cell, Grid, Heading, Skeleton } from "@navikt/ds-react";
+import { Alert, BodyShort, Heading, HGrid, Page, VStack } from "@navikt/ds-react";
 import { Loader } from "@navikt/ds-react";
-import { ContentContainer } from "@navikt/ds-react";
 import { useIsMutating } from "@tanstack/react-query";
 import React, { useEffect } from "react";
 import { PropsWithChildren } from "react";
@@ -16,6 +15,7 @@ import { useErrorContext } from "../../context/ErrorProvider";
 import DokumentTableInfo from "../../docs/DokumentTable.mdx";
 import useIsDebugMode from "../../hooks/useDebugMode";
 import { useForsendelseApi } from "../../hooks/useForsendelseApi";
+import { updateUrlSearchParam } from "../../utils/window-utils";
 import OpprettForsendelsePage from "../opprettforsendelse/OpprettForsendelsePage";
 import PageWrapper from "../PageWrapper";
 import AvvikshandteringButton from "./avvik/AvvikshandteringButton";
@@ -39,7 +39,7 @@ function ForsendelseView() {
     const { navigateToJournalpost } = useSession();
     const isDebug = useIsDebugMode();
     const { errorSource, errorMessage } = useErrorContext();
-    const lagrerDokumenter = useIsMutating("oppdaterDokumenterMutation");
+    const lagrerDokumenter = useIsMutating({ mutationKey: ["oppdaterDokumenterMutation"] });
 
     useEffect(() => {
         if (["FERDIGSTILT", "DISTRIBUERT", "DISTRIBUERT_LOKALT"].includes(forsendelse.status) && !isDebug) {
@@ -59,48 +59,44 @@ function ForsendelseView() {
         return <OpprettForsendelsePage />;
     }
     return (
-        <ContentContainer>
-            <Grid>
-                <Cell xs={12} md={12} lg={10}>
-                    <ForsendelseNotEditableWarning />
-                    <div className={"leading-xlarge tracking-wide"}>
-                        <ForsendelseTittel />
-                        <Grid className={"w-max"}>
-                            <Cell xs={12} md={12} lg={10}>
-                                <Gjelder />
-                                <Mottaker />
-                            </Cell>
-                            <Cell xs={12} md={12} lg={4}>
-                                <ForsendelseDetaljer />
-                            </Cell>
-                        </Grid>
-                        <div>
-                            <div className="flex flex-row gap-[2px]">
-                                <Heading level={"3"} size={"medium"} className={"max-w"}>
-                                    Dokumenter
-                                </Heading>
-                                <InfoKnapp>
-                                    <DokumentTableInfo />
-                                </InfoKnapp>
-                                <SaveStatusIndicator
-                                    state={
-                                        errorSource == "dokumenter" ? "error" : lagrerDokumenter > 0 ? "saving" : "idle"
-                                    }
-                                />
-                            </div>
-
-                            <DokumenterTable />
-                        </div>
-                        <div className={"mt-10"}>
-                            <ValidationErrorSummary />
-                            <BidragErrorPanel />
-
-                            <BottomButtons />
-                        </div>
+        <HGrid>
+            <VStack gap={{ xs: "12", md: "12", lg: "10" }}>
+                <ForsendelseNotEditableWarning />
+                <div className={"leading-xlarge tracking-wide"}>
+                    <ForsendelseTittel />
+                    <div className={"w-max"}>
+                        <VStack gap={{ xs: "12", md: "12", lg: "4" }}>
+                            <Gjelder />
+                            <Mottaker />
+                        </VStack>
+                        <VStack gap={{ xs: "12", md: "12", lg: "4" }}>
+                            <ForsendelseDetaljer />
+                        </VStack>
                     </div>
-                </Cell>
-            </Grid>
-        </ContentContainer>
+                    <div>
+                        <div className="flex flex-row gap-[2px]">
+                            <Heading level={"3"} size={"medium"} className={"max-w"}>
+                                Dokumenter
+                            </Heading>
+                            <InfoKnapp>
+                                <DokumentTableInfo />
+                            </InfoKnapp>
+                            <SaveStatusIndicator
+                                state={errorSource == "dokumenter" ? "error" : lagrerDokumenter > 0 ? "saving" : "idle"}
+                            />
+                        </div>
+
+                        <DokumenterTable />
+                    </div>
+                    <div className={"mt-10"}>
+                        <ValidationErrorSummary />
+                        <BidragErrorPanel />
+
+                        <BottomButtons />
+                    </div>
+                </div>
+            </VStack>
+        </HGrid>
     );
 }
 
@@ -152,18 +148,23 @@ export default function ForsendelsePage({
     enhet,
     saksnummer,
 }: PropsWithChildren<ForsendelsePageProps>) {
+    useEffect(() => {
+        updateUrlSearchParam("page", `Forsendelse ${forsendelseId}`);
+    }, []);
     return (
         <PageWrapper name={"forsendelse-page"}>
             <SessionProvider forsendelseId={forsendelseId} saksnummer={saksnummer} sessionId={sessionId} enhet={enhet}>
-                <div>
+                <Page>
                     <ForsendelseSakHeader />
                     <React.Suspense fallback={<LoadingIndicator />}>
-                        <DokumenterFormProvider forsendelseId={forsendelseId}>
-                            <ForsendelseView />
-                            <ForsendelseDocsButton />
-                        </DokumenterFormProvider>
+                        <Page.Block width="xl" gutters className="pt-4">
+                            <DokumenterFormProvider forsendelseId={forsendelseId}>
+                                <ForsendelseView />
+                                <ForsendelseDocsButton />
+                            </DokumenterFormProvider>
+                        </Page.Block>
                     </React.Suspense>
-                </div>
+                </Page>
             </SessionProvider>
         </PageWrapper>
     );
@@ -175,24 +176,5 @@ function LoadingIndicator() {
             <Loader size={"3xlarge"} title={"Laster..."} className="m-auto" />
             <BodyShort>Laster forsendelse...</BodyShort>
         </div>
-    );
-}
-
-function LoadingIndicatorSkeleton() {
-    return (
-        <ContentContainer>
-            <Grid>
-                <Cell xs={12} md={12} lg={10}>
-                    <div className="flex flex-col gap-[20px]">
-                        <Skeleton variant="rectangle" width="70%" height="50px" />
-
-                        <Skeleton variant="rectangle" width="70%" height="270px" />
-                        <Skeleton variant="rectangle" width="100%" height="317px" />
-                        {/* 'as'-prop kan brukes på all typografien vår med Skeleton */}
-                        <Skeleton variant="rectangle" width="50%" height="50px" />
-                    </div>
-                </Cell>
-            </Grid>
-        </ContentContainer>
     );
 }

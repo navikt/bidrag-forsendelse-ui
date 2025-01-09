@@ -15,11 +15,11 @@ export default function DokumentStatusTag({ status }: DokumentStatusTagProps) {
         DokumentStatus.IKKE_BESTILT,
     ].includes(status);
     return (
-        <div className="flex flex-row gap-[5px] align-center">
+        <span className="flex flex-row gap-[5px] align-center">
             <Tag variant={DokumentStatusTags[status]} size="xsmall" className="w-max p-[0.3rem] rounded-md">
                 {DokumentStatusDisplayName[status] ?? "Ukjent"}
             </Tag>
             {erUnderProduksjon && <Loader size="xsmall" />}
-        </div>
+        </span>
     );
 }
