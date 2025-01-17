@@ -20,7 +20,8 @@ export const SAK_API = useApi(new SakApi({ baseURL: environment.url.bidragSak })
 export const BIDRAG_DOKUMENT_API = useApi(
     new BidragDokumentApi({ baseURL: environment.url.bidragDokument }),
     "bidrag-dokument",
-    "fss"
+    "fss",
+    environment.system.legacyEnvironment
 );
 export const BIDRAG_ORGANISASJON_API = useApi(
     new BidragOrganisasjontApi({ baseURL: environment.url.bidragOrganisasjon }),

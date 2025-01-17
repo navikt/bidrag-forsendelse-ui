@@ -6,7 +6,7 @@ import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import path from "path";
 import webpack from "webpack";
 
-import deps from "./package.json" assert { type: "json" };
+import deps from "./package.json" with { type: "json" };
 const { ModuleFederationPlugin } = webpack.container;
 
 const __filename = fileURLToPath(import.meta.url);
@@ -98,7 +98,7 @@ export default {
             },
             shared: {
                 react: { singleton: true, requiredVersion: deps.dependencies.react },
-                "react-dom": { singleton: true, requiredVersion: deps.dependencies.react },
+                "react-dom": { singleton: true, requiredVersion: deps.dependencies["react-dom"] },
             },
         }),
     ],
