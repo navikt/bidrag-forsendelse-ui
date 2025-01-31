@@ -31,6 +31,7 @@ import ForsendelsePage from "./pages/forsendelse/ForsendelsePage";
 import Opprettforsendelse from "./pages/opprettforsendelse";
 import Opprettnotat from "./pages/opprettnotat";
 import PageWrapper from "./pages/PageWrapper";
+
 export const faro = initializeFaro({
     app: {
         name: "bidrag-forsendelse-ui",

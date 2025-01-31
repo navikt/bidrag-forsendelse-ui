@@ -9,52 +9,72 @@
  * ---------------------------------------------------------------
  */
 
-/** Detaljer om behandling hvis forsendelsen inneholder brev for en behandling eller vedtak */
+export interface OppdaterEttersendelseDokumentRequest {
+    /** @format int64 */
+    id?: number;
+    tittel: string;
+    skjemaId?: string;
+}
+
+export interface OppdaterEttersendingsoppgaveRequest {
+    /** @format int64 */
+    forsendelseId: number;
+    tittel?: string;
+    ettersendelseForJournalpostId?: string;
+    skjemaId?: string;
+    /** @format int32 */
+    innsendingsfristDager?: number;
+    oppdaterDokument?: OppdaterEttersendelseDokumentRequest;
+}
+
+export interface EttersendingsoppgaveDto {
+    tittel?: string;
+    ettersendelseForJournalpostId?: string;
+    skjemaId?: string;
+    /** @format int32 */
+    innsendingsfristDager?: number;
+    vedleggsliste: EttersendingsoppgaveVedleggDto[];
+}
+
+export interface EttersendingsoppgaveVedleggDto {
+    tittel: string;
+    skjemaId?: string;
+    /** @format int64 */
+    id: number;
+}
+
 export interface BehandlingInfoDto {
     vedtakId?: string;
     behandlingId?: string;
     soknadId?: string;
-    engangsBelopType?: EngangsbelopType;
-    stonadType?: StonadType;
+    engangsBelopType?: Engangsbeloptype;
+    stonadType?: Stonadstype;
     /** Brukes bare hvis stonadType og engangsbelopType er null */
     behandlingType?: string;
-    vedtakType?: VedtakType;
+    vedtakType?: Vedtakstype;
     /** Soknadtype er gamle kodeverdier som er erstattet av vedtaktype. */
     soknadType?: string;
     erFattetBeregnet?: boolean;
     /** Hvis resultatkoden fra BBM er IT så skal denne være sann */
     erVedtakIkkeTilbakekreving?: boolean;
-    soknadFra?: SoknadFra;
+    soknadFra?: SoktAvType;
     barnIBehandling: string[];
 }
 
-/** Arkivsystem hvor dokument er lagret */
-export enum DokumentArkivSystemDto {
-    JOARK = "JOARK",
-    MIDLERTIDLIG_BREVLAGER = "MIDLERTIDLIG_BREVLAGER",
-    UKJENT = "UKJENT",
-    BIDRAG = "BIDRAG",
-    FORSENDELSE = "FORSENDELSE",
-}
-
-export enum EngangsbelopType {
+export enum Engangsbeloptype {
     DIREKTE_OPPGJOR = "DIREKTE_OPPGJOR",
+    DIREKTEOPPGJOR = "DIREKTE_OPPGJØR",
     ETTERGIVELSE = "ETTERGIVELSE",
     ETTERGIVELSE_TILBAKEKREVING = "ETTERGIVELSE_TILBAKEKREVING",
     GEBYR_MOTTAKER = "GEBYR_MOTTAKER",
     GEBYR_SKYLDNER = "GEBYR_SKYLDNER",
     INNKREVING_GJELD = "INNKREVING_GJELD",
-    SAERTILSKUDD = "SAERTILSKUDD",
     TILBAKEKREVING = "TILBAKEKREVING",
+    SAERTILSKUDD = "SAERTILSKUDD",
+    SAeRTILSKUDD = "SÆRTILSKUDD",
+    SAeRBIDRAG = "SÆRBIDRAG",
 }
 
-/** Tema forsendelsen skal opprettes med */
-export enum JournalTema {
-    BID = "BID",
-    FAR = "FAR",
-}
-
-/** Adresse til mottaker hvis dokumentet sendes som brev */
 export interface MottakerAdresseTo {
     adresselinje1: string;
     adresselinje2?: string;
@@ -89,7 +109,7 @@ export interface OpprettDokumentForesporsel {
     /** Språket på inneholdet i dokumentet. */
     språk?: string;
     /** Arkivsystem hvor dokument er lagret */
-    arkivsystem?: DokumentArkivSystemDto;
+    arkivsystem?: OpprettDokumentForesporselArkivsystemEnum;
     /**
      * Dato dokument ble opprettet
      * @format date-time
@@ -102,7 +122,7 @@ export interface OpprettDokumentForesporsel {
     /** DokumentmalId sier noe om dokumentets innhold og oppbygning. (Også kjent som brevkode) */
     dokumentmalId?: string;
     /** Om dokumentet med dokumentmalId skal bestilles. Hvis dette er satt til false så antas det at kallende system bestiller dokumentet selv. */
-    bestillDokument?: boolean;
+    bestillDokument: boolean;
 }
 
 /** Metadata for opprettelse av forsendelse */
@@ -126,7 +146,7 @@ export interface OpprettForsendelseForesporsel {
     /** Identifikator til batch kjøring forsendelsen ble opprettet av */
     batchId?: string;
     /** Tema forsendelsen skal opprettes med */
-    tema?: JournalTema;
+    tema?: OpprettForsendelseForesporselTemaEnum;
     /** Språk forsendelsen skal være på */
     språk?: string;
     /** Ident til saksbehandler som oppretter journalpost. Dette vil prioriteres over ident som tilhører tokenet til kallet. */
@@ -135,24 +155,7 @@ export interface OpprettForsendelseForesporsel {
     opprettTittel?: boolean;
 }
 
-export enum SoknadFra {
-    BM_I_ANNEN_SAK = "BM_I_ANNEN_SAK",
-    BARN18AAR = "BARN_18_AAR",
-    NAV_BIDRAG = "NAV_BIDRAG",
-    FYLKESNEMDA = "FYLKESNEMDA",
-    NAV_INTERNASJONALT = "NAV_INTERNASJONALT",
-    KOMMUNE = "KOMMUNE",
-    KONVERTERING = "KONVERTERING",
-    BIDRAGSMOTTAKER = "BIDRAGSMOTTAKER",
-    NORSKE_MYNDIGHET = "NORSKE_MYNDIGHET",
-    BIDRAGSPLIKTIG = "BIDRAGSPLIKTIG",
-    UTENLANDSKE_MYNDIGHET = "UTENLANDSKE_MYNDIGHET",
-    VERGE = "VERGE",
-    TRYGDEETATEN_INNKREVING = "TRYGDEETATEN_INNKREVING",
-    KLAGE_ANKE = "KLAGE_ANKE",
-}
-
-export enum StonadType {
+export enum Stonadstype {
     BIDRAG = "BIDRAG",
     FORSKUDD = "FORSKUDD",
     BIDRAG18AAR = "BIDRAG18AAR",
@@ -161,7 +164,24 @@ export enum StonadType {
     OPPFOSTRINGSBIDRAG = "OPPFOSTRINGSBIDRAG",
 }
 
-export enum VedtakType {
+export enum SoktAvType {
+    BIDRAGSMOTTAKER = "BIDRAGSMOTTAKER",
+    BIDRAGSPLIKTIG = "BIDRAGSPLIKTIG",
+    BARN18AR = "BARN_18_ÅR",
+    BM_I_ANNEN_SAK = "BM_I_ANNEN_SAK",
+    NAV_BIDRAG = "NAV_BIDRAG",
+    FYLKESNEMDA = "FYLKESNEMDA",
+    NAV_INTERNASJONALT = "NAV_INTERNASJONALT",
+    KOMMUNE = "KOMMUNE",
+    NORSKE_MYNDIGHET = "NORSKE_MYNDIGHET",
+    UTENLANDSKE_MYNDIGHET = "UTENLANDSKE_MYNDIGHET",
+    VERGE = "VERGE",
+    TRYGDEETATEN_INNKREVING = "TRYGDEETATEN_INNKREVING",
+    KLAGE_ANKE = "KLAGE_ANKE",
+    KONVERTERING = "KONVERTERING",
+}
+
+export enum Vedtakstype {
     INDEKSREGULERING = "INDEKSREGULERING",
     ALDERSJUSTERING = "ALDERSJUSTERING",
     OPPHOR = "OPPHØR",
@@ -191,8 +211,7 @@ export interface DokumentRespons {
     erSkjema: boolean;
     /** Dette skal være UNDER_PRODUKSJON for redigerbare dokumenter som ikke er ferdigprodusert. Ellers settes det til FERDIGSTILT */
     status?: DokumentStatusTo;
-    /** Arkivsystem hvor dokument er lagret */
-    arkivsystem?: DokumentArkivSystemDto;
+    arkivsystem?: DokumentResponsArkivsystemEnum;
 }
 
 /** Dette skal være UNDER_PRODUKSJON for redigerbare dokumenter som ikke er ferdigprodusert. Ellers settes det til FERDIGSTILT */
@@ -233,10 +252,10 @@ export interface Avvikshendelse {
     /** Manuell beskrivelse av avvik */
     beskrivelse?: string;
     /** Eventuelle detaljer som skal følge avviket */
-    detaljer?: Record<string, string>;
+    detaljer: Record<string, string>;
     /** Saksnummer til sak når journalpost er journalført */
     saksnummer?: string;
-    /** Adresse for hvor brev sendes ved sentral print */
+    /** Addresse som skal brukes ved bestilling av ny distribusjon av utgående journalpost. Benyttes ved avvik BESTILL_NY_DISTRIBUSJON */
     adresse?: DistribuerTilAdresse;
     /** Dokumenter som brukes ved kopiering ny journalpost. Benyttes ved avvik KOPIER_FRA_ANNEN_FAGOMRADE */
     dokumenter?: DokumentDto[];
@@ -276,21 +295,11 @@ export interface DokumentDto {
     /** Typen dokument. Dokumentmal sier noe om dokumentets innhold og oppbygning. */
     dokumentmalId?: string;
     /** Dokumentets status. Benyttes hvis journalposten er av typen forsendelse */
-    status?: DokumentStatusDto;
-    /** Arkivsystem hvor dokument er lagret */
-    arkivSystem?: DokumentArkivSystemDto;
+    status?: DokumentDtoStatusEnum;
+    /** Arkivsystem hvor dokumentet er produsert og lagret */
+    arkivSystem?: DokumentDtoArkivSystemEnum;
     /** Metadata om dokumentet */
     metadata: Record<string, string>;
-}
-
-/** Dokumentets status. Benyttes hvis journalposten er av typen forsendelse */
-export enum DokumentStatusDto {
-    IKKE_BESTILT = "IKKE_BESTILT",
-    BESTILLING_FEILET = "BESTILLING_FEILET",
-    UNDER_PRODUKSJON = "UNDER_PRODUKSJON",
-    UNDER_REDIGERING = "UNDER_REDIGERING",
-    FERDIGSTILT = "FERDIGSTILT",
-    AVBRUTT = "AVBRUTT",
 }
 
 /** Bestill distribusjon av journalpost */
@@ -301,6 +310,21 @@ export interface DistribuerJournalpostRequest {
     lokalUtskrift: boolean;
     /** Adresse for hvor brev sendes ved sentral print */
     adresse?: DistribuerTilAdresse;
+    ettersendingsoppgave?: OpprettEttersendingsppgaveDto;
+}
+
+export interface OpprettEttersendingsoppgaveVedleggDto {
+    tittel?: string;
+    vedleggsnr: string;
+}
+
+export interface OpprettEttersendingsppgaveDto {
+    tittel: string;
+    skjemaId: string;
+    språk: OpprettEttersendingsppgaveDtoSprakEnum;
+    /** @format int32 */
+    innsendingsFristDager: number;
+    vedleggsliste: OpprettEttersendingsoppgaveVedleggDto[];
 }
 
 /** Respons etter bestilt distribusjon */
@@ -309,20 +333,104 @@ export interface DistribuerJournalpostResponse {
     journalpostId: string;
     /** Bestillingid som unikt identifiserer distribusjonsbestillingen. Vil være null hvis ingen distribusjon er bestilt. */
     bestillingsId?: string;
+    ettersendingsoppgave?: OpprettEttersendingsoppgaveResponseDto;
+}
+
+export interface OpprettEttersendingsoppgaveResponseDto {
+    innsendingsId: string;
+}
+
+export interface OpprettEttersendingsoppgaveRequest {
+    /** @format int64 */
+    forsendelseId: number;
+    tittel: string;
+    ettersendelseForJournalpostId: string;
+    skjemaId: string;
+}
+
+export interface HentEttersendingsoppgaverRequest {
+    forsendelseId: string;
+    skjemaIder: string[];
+}
+
+export interface DokumentSoknadDto {
+    brukerId: string;
+    skjemanr: string;
+    tittel: string;
+    tema: string;
+    status: DokumentSoknadDtoStatusEnum;
+    /** @format date-time */
+    opprettetDato: string;
+    vedleggsListe: VedleggDto[];
+    /** @format int64 */
+    id?: number;
+    innsendingsId?: string;
+    ettersendingsId?: string;
+    spraak?: string;
+    /** @format date-time */
+    endretDato?: string;
+    /** @format date-time */
+    innsendtDato?: string;
+    /** @format int64 */
+    visningsSteg?: number;
+    visningsType?: DokumentSoknadDtoVisningsTypeEnum;
+    kanLasteOppAnnet?: boolean;
+    /** @format date-time */
+    innsendingsFristDato?: string;
+    /** @format date-time */
+    forsteInnsendingsDato?: string;
+    /** @format int64 */
+    fristForEttersendelse?: number;
+    arkiveringsStatus?: DokumentSoknadDtoArkiveringsStatusEnum;
+    erSystemGenerert?: boolean;
+    soknadstype?: DokumentSoknadDtoSoknadstypeEnum;
+    skjemaPath?: string;
+    applikasjon?: string;
+    /** @format date-time */
+    skalSlettesDato?: string;
+    /** @format int32 */
+    mellomlagringDager?: number;
+}
+
+export interface VedleggDto {
+    tittel: string;
+    label: string;
+    erHoveddokument: boolean;
+    erVariant: boolean;
+    erPdfa: boolean;
+    erPakrevd: boolean;
+    opplastingsStatus: VedleggDtoOpplastingsStatusEnum;
+    /** @format date-time */
+    opprettetdato: string;
+    /** @format int64 */
+    id?: number;
+    vedleggsnr?: string;
+    beskrivelse?: string;
+    uuid?: string;
+    mimetype?: VedleggDtoMimetypeEnum;
+    /** @format byte */
+    document?: string;
+    skjemaurl?: string;
+    /** @format date-time */
+    innsendtdato?: string;
+    formioId?: string;
+    opplastingsValgKommentarLedetekst?: string;
+    opplastingsValgKommentar?: string;
 }
 
 export interface HentDokumentValgRequest {
     soknadType?: string;
-    vedtakType?: VedtakType;
+    vedtakType?: Vedtakstype;
     behandlingType?: string;
-    soknadFra?: SoknadFra;
+    soknadFra?: SoktAvType;
     erFattetBeregnet?: boolean;
     erVedtakIkkeTilbakekreving?: boolean;
     vedtakId?: string;
     behandlingId?: string;
     enhet?: string;
-    stonadType?: StonadType;
-    engangsBelopType?: EngangsbelopType;
+    stonadType?: Stonadstype;
+    engangsBelopType?: Engangsbeloptype;
+    behandlingtypeKonvertert?: string;
 }
 
 export interface DokumentMalDetaljer {
@@ -332,6 +440,8 @@ export interface DokumentMalDetaljer {
     redigerbar: boolean;
     beskrivelse: string;
     statiskInnhold: boolean;
+    kreverVedtak: boolean;
+    kreverBehandling: boolean;
     innholdType?: DokumentMalDetaljerInnholdTypeEnum;
     gruppeVisningsnavn?: string;
     språk: string[];
@@ -369,7 +479,7 @@ export interface OppdaterForsendelseForesporsel {
     /** NAV-enheten som oppretter forsendelsen. Kan bare oppdateres hvis status = UNDER_OPPRETTELSE */
     enhet?: string;
     /** Tema forsendelsen skal opprettes med */
-    tema?: JournalTema;
+    tema?: OppdaterForsendelseForesporselTemaEnum;
     /** Språk forsendelsen skal være på */
     språk?: string;
 }
@@ -385,8 +495,8 @@ export interface OppdaterForsendelseResponse {
 }
 
 export interface FerdigstillDokumentRequest {
-    /** @format byte */
-    fysiskDokument: string;
+    /** @format binary */
+    fysiskDokument: File;
     redigeringMetadata?: string;
 }
 
@@ -440,8 +550,8 @@ export interface EndreJournalpostCommand {
     behandlingstema?: string;
     /** Endre fagområde */
     fagomrade?: string;
-    /** Identtypene til en aktør */
-    gjelderType?: IdentType;
+    /** Type ident for gjelder: FNR, ORGNR, AKTOERID */
+    gjelderType?: EndreJournalpostCommandGjelderTypeEnum;
     /** Tittel på journalposten */
     tittel?: string;
     /** Skal journalposten journalføres aka. registreres */
@@ -466,31 +576,17 @@ export interface EndreReturDetaljer {
     beskrivelse: string;
 }
 
-/** Identtypene til en aktør */
-export enum IdentType {
-    AKTOERID = "AKTOERID",
-    FNR = "FNR",
-    ORGNR = "ORGNR",
-}
-
-/** Hvilken format dokument er på. Dette forteller hvordan dokumentet må åpnes. */
-export enum DokumentFormatDto {
-    PDF = "PDF",
-    MBDOK = "MBDOK",
-    HTML = "HTML",
-}
-
 export interface DokumentMetadata {
     /** Journalpostid med arkiv prefiks som skal benyttes når dokumentet hentes */
     journalpostId?: string;
     dokumentreferanse?: string;
     tittel?: string;
     /** Hvilken format dokument er på. Dette forteller hvordan dokumentet må åpnes. */
-    format: DokumentFormatDto;
-    /** Dokumentets status. Benyttes hvis journalposten er av typen forsendelse */
-    status: DokumentStatusDto;
-    /** Arkivsystem hvor dokument er lagret */
-    arkivsystem: DokumentArkivSystemDto;
+    format: DokumentMetadataFormatEnum;
+    /** Status på dokumentet */
+    status: DokumentMetadataStatusEnum;
+    /** Hvilken arkivsystem dokumentet er lagret på */
+    arkivsystem: DokumentMetadataArkivsystemEnum;
 }
 
 /** Metadata om behandling */
@@ -518,8 +614,10 @@ export interface ForsendelseResponsTo {
     enhet?: string;
     /** Tema på forsendelsen */
     tema?: string;
-    /** Metadata om behandling */
+    /** Detaljer om behandling forsendelse er knyttet til */
     behandlingInfo?: BehandlingInfoResponseDto;
+    /** Detaljer om varsel ettersendelse */
+    ettersendingsoppgave?: EttersendingsoppgaveDto;
     /** Ident på saksbehandler eller applikasjon som opprettet forsendelsen */
     opprettetAvIdent?: string;
     /** Navn på saksbehandler eller applikasjon som opprettet forsendelsen */
@@ -563,8 +661,8 @@ export enum ForsendelseStatusTo {
 export interface AktorDto {
     /** Identifaktor til aktøren */
     ident: string;
-    /** Identtypene til en aktør */
-    type?: IdentType;
+    /** Hvilken identtype som skal brukes */
+    type?: AktorDtoTypeEnum;
 }
 
 /**
@@ -578,18 +676,9 @@ export interface AvsenderMottakerDto {
     /** Person ident eller organisasjonsnummer */
     ident?: string;
     /** Identtype */
-    type: AvsenderMottakerDtoIdType;
-    /** Adresse til mottaker hvis dokumentet sendes som brev */
+    type: AvsenderMottakerDtoTypeEnum;
+    /** Adresse til mottaker hvis dokumentet skal sendes/er sendt gjennom sentral print */
     adresse?: MottakerAdresseTo;
-}
-
-/** Identtype */
-export enum AvsenderMottakerDtoIdType {
-    FNR = "FNR",
-    SAMHANDLER = "SAMHANDLER",
-    ORGNR = "ORGNR",
-    UTENLANDSK_ORGNR = "UTENLANDSK_ORGNR",
-    UKJENT = "UKJENT",
 }
 
 /** Metadata til en journalpost */
@@ -599,11 +688,7 @@ export interface JournalpostDto {
      * @deprecated
      */
     avsenderNavn?: string;
-    /**
-     *
-     * Avsender journalposten ble sendt fra hvis utgående.
-     * Mottaker journalposten skal sendes til hvis inngående.
-     */
+    /** Informasjon om avsender eller mottaker */
     avsenderMottaker?: AvsenderMottakerDto;
     /** Dokumentene som følger journalposten */
     dokumenter: DokumentDto[];
@@ -626,7 +711,7 @@ export interface JournalpostDto {
     fagomrade?: string;
     /** Ident for hvem/hva dokumente(t/ne) gjelder */
     gjelderIdent?: string;
-    /** Metadata om en aktør */
+    /** Aktøren for hvem/hva dokumente(t/ne) gjelder */
     gjelderAktor?: AktorDto;
     /** Kort oppsummert av journalført innhold */
     innhold?: string;
@@ -641,10 +726,13 @@ export interface JournalpostDto {
     journalfortDato?: string;
     /** Identifikator av journalpost i midlertidig brevlager eller fra joark på formatet [BID|JOARK]-<journalpostId> */
     journalpostId?: string;
-    /** Journalposten ble mottatt/sendt ut i kanal */
-    kilde?: Kanal;
-    /** Journalposten ble mottatt/sendt ut i kanal */
-    kanal?: Kanal;
+    /**
+     * Kanalen som er kilden til at journalposten ble registrert
+     * @deprecated
+     */
+    kilde?: JournalpostDtoKildeEnum;
+    /** Kanalen journalposten ble mottatt i eller sendt ut på */
+    kanal?: JournalpostDtoKanalEnum;
     /**
      * Dato for når dokument er mottat, dvs. dato for journalføring eller skanning
      * @format date
@@ -658,16 +746,16 @@ export interface JournalpostDto {
      */
     journalstatus?: string;
     /** Journalpostens status */
-    status?: JournalpostStatus;
+    status?: JournalpostDtoStatusEnum;
     /** Om journalposten er feilført på bidragssak */
     feilfort?: boolean;
-    /** Metadata for kode vs dekode i et kodeobjekt */
+    /** Brevkoden til en journalpost */
     brevkode?: KodeDto;
-    /** Metadata for retur detaljer */
+    /** Informasjon om returdetaljer til journalpost */
     returDetaljer?: ReturDetaljer;
     /** Joark journalpostid for bidrag journalpost som er arkivert i Joark */
     joarkJournalpostId?: string;
-    /** Adresse for hvor brev sendes ved sentral print */
+    /** Adresse som utgående journalpost var distribuert til ved sentral print */
     distribuertTilAdresse?: DistribuerTilAdresse;
     /** Informasjon om returdetaljer til journalpost */
     sakstilknytninger: string[];
@@ -677,48 +765,6 @@ export interface JournalpostDto {
     opprettetAvIdent?: string;
     /** Referanse til originale kilden til journalposten. Kan være referanse til forsendelse eller bidrag journalpost med prefiks. Feks BID_12323 eller BIF_123213 */
     eksternReferanseId?: string;
-}
-
-/** Journalpostens status */
-export enum JournalpostStatus {
-    AVVIK_ENDRE_FAGOMRADE = "AVVIK_ENDRE_FAGOMRADE",
-    AVVIK_BESTILL_RESKANNING = "AVVIK_BESTILL_RESKANNING",
-    AVVIK_BESTILL_SPLITTING = "AVVIK_BESTILL_SPLITTING",
-    MOTTATT = "MOTTATT",
-    JOURNALFORT = "JOURNALFØRT",
-    EKSPEDERT = "EKSPEDERT",
-    EKSPEDERT_JOARK = "EKSPEDERT_JOARK",
-    MOTTAKSREGISTRERT = "MOTTAKSREGISTRERT",
-    UKJENT = "UKJENT",
-    DISTRIBUERT = "DISTRIBUERT",
-    AVBRUTT = "AVBRUTT",
-    KLAR_FOR_DISTRIBUSJON = "KLAR_FOR_DISTRIBUSJON",
-    RETUR = "RETUR",
-    FERDIGSTILT = "FERDIGSTILT",
-    FEILREGISTRERT = "FEILREGISTRERT",
-    RESERVERT = "RESERVERT",
-    UTGAR = "UTGÅR",
-    SLETTET = "SLETTET",
-    UNDER_OPPRETTELSE = "UNDER_OPPRETTELSE",
-    TIL_LAGRING = "TIL_LAGRING",
-    OPPRETTET = "OPPRETTET",
-    UNDER_PRODUKSJON = "UNDER_PRODUKSJON",
-}
-
-/** Journalposten ble mottatt/sendt ut i kanal */
-export enum Kanal {
-    NAV_NO = "NAV_NO",
-    NAV_NO_BID = "NAV_NO_BID",
-    SKAN_BID = "SKAN_BID",
-    SKAN_NETS = "SKAN_NETS",
-    SKAN_IM = "SKAN_IM",
-    LOKAL_UTSKRIFT = "LOKAL_UTSKRIFT",
-    SENTRAL_UTSKRIFT = "SENTRAL_UTSKRIFT",
-    SDP = "SDP",
-    INGEN_DISTRIBUSJON = "INGEN_DISTRIBUSJON",
-    INNSENDT_NAV_ANSATT = "INNSENDT_NAV_ANSATT",
-    NAV_NO_UINNLOGGET = "NAV_NO_UINNLOGGET",
-    NAV_NO_CHAT = "NAV_NO_CHAT",
 }
 
 /** Metadata for kode vs dekode i et kodeobjekt */
@@ -779,7 +825,7 @@ export interface DokumentRedigeringMetadataResponsDto {
 
 /** Metadata til en respons etter journalpost med tilhørende data */
 export interface JournalpostResponse {
-    /** Metadata til en journalpost */
+    /** journalposten som er etterspurt */
     journalpost?: JournalpostDto;
     /** alle saker som journalposten er tilknyttet */
     sakstilknytninger: string[];
@@ -802,14 +848,127 @@ export interface ForsendelseIkkeDistribuertResponsTo {
     opprettetDato?: string;
 }
 
+export interface SlettEttersendingsoppgave {
+    /** @format int64 */
+    forsendelseId: number;
+}
+
+export interface SlettEttersendingsoppgaveVedleggRequest {
+    /** @format int64 */
+    forsendelseId: number;
+    /** @format int64 */
+    id: number;
+}
+
+/** Arkivsystem hvor dokument er lagret */
+export enum OpprettDokumentForesporselArkivsystemEnum {
+    JOARK = "JOARK",
+    MIDLERTIDLIG_BREVLAGER = "MIDLERTIDLIG_BREVLAGER",
+    UKJENT = "UKJENT",
+    BIDRAG = "BIDRAG",
+    FORSENDELSE = "FORSENDELSE",
+}
+
+/** Tema forsendelsen skal opprettes med */
+export enum OpprettForsendelseForesporselTemaEnum {
+    BID = "BID",
+    FAR = "FAR",
+}
+
+export enum DokumentResponsArkivsystemEnum {
+    JOARK = "JOARK",
+    MIDLERTIDLIG_BREVLAGER = "MIDLERTIDLIG_BREVLAGER",
+    UKJENT = "UKJENT",
+    BIDRAG = "BIDRAG",
+    FORSENDELSE = "FORSENDELSE",
+}
+
+/** Dokumentets status. Benyttes hvis journalposten er av typen forsendelse */
+export enum DokumentDtoStatusEnum {
+    IKKE_BESTILT = "IKKE_BESTILT",
+    BESTILLING_FEILET = "BESTILLING_FEILET",
+    UNDER_PRODUKSJON = "UNDER_PRODUKSJON",
+    UNDER_REDIGERING = "UNDER_REDIGERING",
+    FERDIGSTILT = "FERDIGSTILT",
+    AVBRUTT = "AVBRUTT",
+}
+
+/** Arkivsystem hvor dokumentet er produsert og lagret */
+export enum DokumentDtoArkivSystemEnum {
+    JOARK = "JOARK",
+    MIDLERTIDLIG_BREVLAGER = "MIDLERTIDLIG_BREVLAGER",
+    UKJENT = "UKJENT",
+    BIDRAG = "BIDRAG",
+    FORSENDELSE = "FORSENDELSE",
+}
+
+export enum OpprettEttersendingsppgaveDtoSprakEnum {
+    NB = "NB",
+    NN = "NN",
+    DE = "DE",
+    FR = "FR",
+    EN = "EN",
+}
+
+export enum DokumentSoknadDtoStatusEnum {
+    Opprettet = "Opprettet",
+    Utfylt = "Utfylt",
+    Innsendt = "Innsendt",
+    SlettetAvBruker = "SlettetAvBruker",
+    AutomatiskSlettet = "AutomatiskSlettet",
+}
+
+export enum DokumentSoknadDtoVisningsTypeEnum {
+    FyllUt = "fyllUt",
+    Dokumentinnsending = "dokumentinnsending",
+    Ettersending = "ettersending",
+    Lospost = "lospost",
+}
+
+export enum DokumentSoknadDtoArkiveringsStatusEnum {
+    IkkeSatt = "IkkeSatt",
+    Arkivert = "Arkivert",
+    ArkiveringFeilet = "ArkiveringFeilet",
+}
+
+export enum DokumentSoknadDtoSoknadstypeEnum {
+    Soknad = "soknad",
+    Ettersendelse = "ettersendelse",
+}
+
+export enum VedleggDtoOpplastingsStatusEnum {
+    IkkeValgt = "IkkeValgt",
+    LastetOpp = "LastetOpp",
+    Innsendt = "Innsendt",
+    SendSenere = "SendSenere",
+    SendesAvAndre = "SendesAvAndre",
+    SendesIkke = "SendesIkke",
+    LastetOppIkkeRelevantLenger = "LastetOppIkkeRelevantLenger",
+    LevertDokumentasjonTidligere = "LevertDokumentasjonTidligere",
+    HarIkkeDokumentasjonen = "HarIkkeDokumentasjonen",
+    NavKanHenteDokumentasjon = "NavKanHenteDokumentasjon",
+}
+
+export enum VedleggDtoMimetypeEnum {
+    ApplicationPdf = "application/pdf",
+    ApplicationJson = "application/json",
+    ImagePng = "image/png",
+    ImageJpeg = "image/jpeg",
+    ApplicationXml = "application/xml",
+}
+
 export enum DokumentMalDetaljerTypeEnum {
     UTGAENDE = "UTGÅENDE",
     NOTAT = "NOTAT",
 }
 
 export enum DokumentMalDetaljerInnholdTypeEnum {
+    NOTAT = "NOTAT",
+    VARSEL_STANDARD = "VARSEL_STANDARD",
     VARSEL = "VARSEL",
     VEDTAK = "VEDTAK",
+    VEDLEGG_VEDTAK = "VEDLEGG_VEDTAK",
+    VEDLEGG_VARSEL = "VEDLEGG_VARSEL",
     VEDLEGG = "VEDLEGG",
     SKJEMA = "SKJEMA",
 }
@@ -820,6 +979,122 @@ export enum OppdaterDokumentForesporselArkivsystemEnum {
     UKJENT = "UKJENT",
     BIDRAG = "BIDRAG",
     FORSENDELSE = "FORSENDELSE",
+}
+
+/** Tema forsendelsen skal opprettes med */
+export enum OppdaterForsendelseForesporselTemaEnum {
+    BID = "BID",
+    FAR = "FAR",
+}
+
+/** Type ident for gjelder: FNR, ORGNR, AKTOERID */
+export enum EndreJournalpostCommandGjelderTypeEnum {
+    AKTOERID = "AKTOERID",
+    FNR = "FNR",
+    ORGNR = "ORGNR",
+}
+
+/** Hvilken format dokument er på. Dette forteller hvordan dokumentet må åpnes. */
+export enum DokumentMetadataFormatEnum {
+    PDF = "PDF",
+    MBDOK = "MBDOK",
+    HTML = "HTML",
+}
+
+/** Status på dokumentet */
+export enum DokumentMetadataStatusEnum {
+    IKKE_BESTILT = "IKKE_BESTILT",
+    BESTILLING_FEILET = "BESTILLING_FEILET",
+    UNDER_PRODUKSJON = "UNDER_PRODUKSJON",
+    UNDER_REDIGERING = "UNDER_REDIGERING",
+    FERDIGSTILT = "FERDIGSTILT",
+    AVBRUTT = "AVBRUTT",
+}
+
+/** Hvilken arkivsystem dokumentet er lagret på */
+export enum DokumentMetadataArkivsystemEnum {
+    JOARK = "JOARK",
+    MIDLERTIDLIG_BREVLAGER = "MIDLERTIDLIG_BREVLAGER",
+    UKJENT = "UKJENT",
+    BIDRAG = "BIDRAG",
+    FORSENDELSE = "FORSENDELSE",
+}
+
+/** Hvilken identtype som skal brukes */
+export enum AktorDtoTypeEnum {
+    AKTOERID = "AKTOERID",
+    FNR = "FNR",
+    ORGNR = "ORGNR",
+}
+
+/** Identtype */
+export enum AvsenderMottakerDtoTypeEnum {
+    FNR = "FNR",
+    SAMHANDLER = "SAMHANDLER",
+    ORGNR = "ORGNR",
+    UTENLANDSK_ORGNR = "UTENLANDSK_ORGNR",
+    UKJENT = "UKJENT",
+}
+
+/**
+ * Kanalen som er kilden til at journalposten ble registrert
+ * @deprecated
+ */
+export enum JournalpostDtoKildeEnum {
+    NAV_NO = "NAV_NO",
+    NAV_NO_BID = "NAV_NO_BID",
+    SKAN_BID = "SKAN_BID",
+    SKAN_NETS = "SKAN_NETS",
+    SKAN_IM = "SKAN_IM",
+    LOKAL_UTSKRIFT = "LOKAL_UTSKRIFT",
+    SENTRAL_UTSKRIFT = "SENTRAL_UTSKRIFT",
+    SDP = "SDP",
+    INGEN_DISTRIBUSJON = "INGEN_DISTRIBUSJON",
+    INNSENDT_NAV_ANSATT = "INNSENDT_NAV_ANSATT",
+    NAV_NO_UINNLOGGET = "NAV_NO_UINNLOGGET",
+    NAV_NO_CHAT = "NAV_NO_CHAT",
+}
+
+/** Kanalen journalposten ble mottatt i eller sendt ut på */
+export enum JournalpostDtoKanalEnum {
+    NAV_NO = "NAV_NO",
+    NAV_NO_BID = "NAV_NO_BID",
+    SKAN_BID = "SKAN_BID",
+    SKAN_NETS = "SKAN_NETS",
+    SKAN_IM = "SKAN_IM",
+    LOKAL_UTSKRIFT = "LOKAL_UTSKRIFT",
+    SENTRAL_UTSKRIFT = "SENTRAL_UTSKRIFT",
+    SDP = "SDP",
+    INGEN_DISTRIBUSJON = "INGEN_DISTRIBUSJON",
+    INNSENDT_NAV_ANSATT = "INNSENDT_NAV_ANSATT",
+    NAV_NO_UINNLOGGET = "NAV_NO_UINNLOGGET",
+    NAV_NO_CHAT = "NAV_NO_CHAT",
+}
+
+/** Journalpostens status */
+export enum JournalpostDtoStatusEnum {
+    AVVIK_ENDRE_FAGOMRADE = "AVVIK_ENDRE_FAGOMRADE",
+    AVVIK_BESTILL_RESKANNING = "AVVIK_BESTILL_RESKANNING",
+    AVVIK_BESTILL_SPLITTING = "AVVIK_BESTILL_SPLITTING",
+    MOTTATT = "MOTTATT",
+    JOURNALFORT = "JOURNALFØRT",
+    EKSPEDERT = "EKSPEDERT",
+    EKSPEDERT_JOARK = "EKSPEDERT_JOARK",
+    MOTTAKSREGISTRERT = "MOTTAKSREGISTRERT",
+    UKJENT = "UKJENT",
+    DISTRIBUERT = "DISTRIBUERT",
+    AVBRUTT = "AVBRUTT",
+    KLAR_FOR_DISTRIBUSJON = "KLAR_FOR_DISTRIBUSJON",
+    RETUR = "RETUR",
+    FERDIGSTILT = "FERDIGSTILT",
+    FEILREGISTRERT = "FEILREGISTRERT",
+    RESERVERT = "RESERVERT",
+    UTGAR = "UTGÅR",
+    SLETTET = "SLETTET",
+    UNDER_OPPRETTELSE = "UNDER_OPPRETTELSE",
+    TIL_LAGRING = "TIL_LAGRING",
+    OPPRETTET = "OPPRETTET",
+    UNDER_PRODUKSJON = "UNDER_PRODUKSJON",
 }
 
 export enum HentAvvikEnum {
@@ -946,6 +1221,9 @@ export class HttpClient<SecurityDataType = unknown> {
     }
 
     protected createFormData(input: Record<string, unknown>): FormData {
+        if (input instanceof FormData) {
+            return input;
+        }
         return Object.keys(input || {}).reduce((formData, key) => {
             const property = input[key];
             const propertyContent: any[] = property instanceof Array ? property : [property];
@@ -988,7 +1266,7 @@ export class HttpClient<SecurityDataType = unknown> {
             ...requestParams,
             headers: {
                 ...(requestParams.headers || {}),
-                ...(type && type !== ContentType.FormData ? { "Content-Type": type } : {}),
+                ...(type ? { "Content-Type": type } : {}),
             },
             params: query,
             responseType: responseFormat,
@@ -1005,6 +1283,63 @@ export class HttpClient<SecurityDataType = unknown> {
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
     api = {
+        /**
+         * No description
+         *
+         * @tags ettersendingsoppgave-controller
+         * @name OppdaterEttesendingsoppgave
+         * @summary Oppretter ny varsel ettersendelse
+         * @request PUT:/api/forsendelse/ettersendingsoppgave
+         * @secure
+         */
+        oppdaterEttesendingsoppgave: (data: OppdaterEttersendingsoppgaveRequest, params: RequestParams = {}) =>
+            this.request<EttersendingsoppgaveDto, any>({
+                path: `/api/forsendelse/ettersendingsoppgave`,
+                method: "PUT",
+                body: data,
+                secure: true,
+                type: ContentType.Json,
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags ettersendingsoppgave-controller
+         * @name OpprettEttersendingsoppgave
+         * @summary Oppretter ny ettersendingsoppgave
+         * @request POST:/api/forsendelse/ettersendingsoppgave
+         * @secure
+         */
+        opprettEttersendingsoppgave: (data: OpprettEttersendingsoppgaveRequest, params: RequestParams = {}) =>
+            this.request<EttersendingsoppgaveDto, any>({
+                path: `/api/forsendelse/ettersendingsoppgave`,
+                method: "POST",
+                body: data,
+                secure: true,
+                type: ContentType.Json,
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags ettersendingsoppgave-controller
+         * @name SlettEttersendingsoppgave
+         * @summary Oppretter ny ettersendingsoppave
+         * @request DELETE:/api/forsendelse/ettersendingsoppgave
+         * @secure
+         */
+        slettEttersendingsoppgave: (data: SlettEttersendingsoppgave, params: RequestParams = {}) =>
+            this.request<void, void>({
+                path: `/api/forsendelse/ettersendingsoppgave`,
+                method: "DELETE",
+                body: data,
+                secure: true,
+                type: ContentType.Json,
+                ...params,
+            }),
+
         /**
          * No description
          *
@@ -1044,6 +1379,78 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 body: data,
                 secure: true,
                 type: ContentType.Json,
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags rediger-dokument-kontroller
+         * @name ValiderPdf
+         * @summary Valider om PDF er gyldig PDF/A dokument. Respons vil gi hva som ikke er gyldig hvis ikke gyldig PDF/A.
+         * @request POST:/api/forsendelse/redigering/validerPDF
+         * @secure
+         */
+        validerPdf: (data: File, params: RequestParams = {}) =>
+            this.request<string, any>({
+                path: `/api/forsendelse/redigering/validerPDF`,
+                method: "POST",
+                body: data,
+                secure: true,
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags rediger-dokument-kontroller
+         * @name ReparerPdf
+         * @summary Reparer PDF hvis den er korrupt
+         * @request POST:/api/forsendelse/redigering/reparerPDF
+         * @secure
+         */
+        reparerPdf: (data: File, params: RequestParams = {}) =>
+            this.request<any, File>({
+                path: `/api/forsendelse/redigering/reparerPDF`,
+                method: "POST",
+                body: data,
+                secure: true,
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags rediger-dokument-kontroller
+         * @name ReparerPdfBase64
+         * @summary Reparer PDF hvis den er korrupt
+         * @request POST:/api/forsendelse/redigering/reparerPDFBase64
+         * @secure
+         */
+        reparerPdfBase64: (data: string, params: RequestParams = {}) =>
+            this.request<any, File>({
+                path: `/api/forsendelse/redigering/reparerPDFBase64`,
+                method: "POST",
+                body: data,
+                secure: true,
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags rediger-dokument-kontroller
+         * @name ConvertToPdfa2
+         * @summary Valider om PDF er gyldig PDF/A dokument. Respons vil gi hva som ikke er gyldig hvis ikke gyldig PDF/A.
+         * @request POST:/api/forsendelse/redigering/convertToPDFA
+         * @secure
+         */
+        convertToPdfa2: (data: File, params: RequestParams = {}) =>
+            this.request<string, any>({
+                path: `/api/forsendelse/redigering/convertToPDFA`,
+                method: "POST",
+                body: data,
+                secure: true,
                 ...params,
             }),
 
@@ -1103,6 +1510,183 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 path: `/api/forsendelse/journal/distribuer/${forsendelseIdMedPrefix}`,
                 method: "POST",
                 query: query,
+                body: data,
+                secure: true,
+                type: ContentType.Json,
+                ...params,
+            }),
+
+        /**
+         * @description Sjekk status på dokumentene i en enkel forsendelse og oppdater status hvis det er ute av synk. Dette skal brukes hvis feks en dokument er ferdigstilt i midlertidlig brevlager men status i databasen er fortsatt "under redigering" Denne tjenesten vil sjekke om dokumentet er ferdigstilt og oppdatere status hvis det er det. Bruk denne tjenesten istedenfor å oppdatere databasen direkte da ferdigstilt notat blir automatisk arkivert i Joark.
+         *
+         * @tags admin-controller
+         * @name SynkForsendelseDistribusjonStatusForAlle
+         * @summary Sjekk status på dokumentene i en enkel forsendelse og oppdater status hvis det er ute av synk
+         * @request POST:/api/forsendelse/internal/synkForsendelseDistribusjonStatus
+         * @secure
+         */
+        synkForsendelseDistribusjonStatusForAlle: (params: RequestParams = {}) =>
+            this.request<any, void>({
+                path: `/api/forsendelse/internal/synkForsendelseDistribusjonStatus`,
+                method: "POST",
+                secure: true,
+                ...params,
+            }),
+
+        /**
+         * @description Sjekk status på dokumentene i en enkel forsendelse og oppdater status hvis det er ute av synk. Dette skal brukes hvis feks en dokument er ferdigstilt i midlertidlig brevlager men status i databasen er fortsatt "under redigering" Denne tjenesten vil sjekke om dokumentet er ferdigstilt og oppdatere status hvis det er det. Bruk denne tjenesten istedenfor å oppdatere databasen direkte da ferdigstilt notat blir automatisk arkivert i Joark.
+         *
+         * @tags admin-controller
+         * @name SynkForsendelseDistribusjonStatus
+         * @summary Sjekk status på dokumentene i en enkel forsendelse og oppdater status hvis det er ute av synk
+         * @request POST:/api/forsendelse/internal/synkForsendelseDistribusjonStatus/{forsendelseId}
+         * @secure
+         */
+        synkForsendelseDistribusjonStatus: (forsendelseId: string, params: RequestParams = {}) =>
+            this.request<any, void>({
+                path: `/api/forsendelse/internal/synkForsendelseDistribusjonStatus/${forsendelseId}`,
+                method: "POST",
+                secure: true,
+                ...params,
+            }),
+
+        /**
+         * @description Sjekk status på dokumentene i forsendelse og oppdater status hvis det er ute av synk. Dette skal brukes hvis feks en dokument er ferdigstilt i midlertidlig brevlager men status i databasen er fortsatt "under redigering" Denne tjenesten vil sjekke om dokumentet er ferdigstilt og oppdatere status hvis det er det. Bruk denne tjenesten istedenfor å oppdatere databasen direkte da ferdigstilt notat blir automatisk arkivert i Joark.
+         *
+         * @tags admin-controller
+         * @name SjekkOgOppdaterStatus
+         * @summary Sjekk status på dokumentene i forsendelser og oppdater status hvis det er ute av synk
+         * @request POST:/api/forsendelse/internal/sjekkOgOppdaterStatus
+         * @secure
+         */
+        sjekkOgOppdaterStatus: (
+            query?: {
+                /**
+                 * @format int32
+                 * @default 100
+                 */
+                limit?: number;
+                /**
+                 * @format date
+                 * @example "2023-11-01"
+                 */
+                afterDate?: string;
+                /**
+                 * @format date
+                 * @example "2023-12-31"
+                 */
+                beforeDate?: string;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<Record<string, string>[], any>({
+                path: `/api/forsendelse/internal/sjekkOgOppdaterStatus`,
+                method: "POST",
+                query: query,
+                secure: true,
+                ...params,
+            }),
+
+        /**
+         * @description Sjekk status på dokumentene i en enkel forsendelse og oppdater status hvis det er ute av synk. Dette skal brukes hvis feks en dokument er ferdigstilt i midlertidlig brevlager men status i databasen er fortsatt "under redigering" Denne tjenesten vil sjekke om dokumentet er ferdigstilt og oppdatere status hvis det er det. Bruk denne tjenesten istedenfor å oppdatere databasen direkte da ferdigstilt notat blir automatisk arkivert i Joark.
+         *
+         * @tags admin-controller
+         * @name SjekkOgOppdaterStatus1
+         * @summary Sjekk status på dokumentene i en enkel forsendelse og oppdater status hvis det er ute av synk
+         * @request POST:/api/forsendelse/internal/sjekkOgOppdaterStatus/{forsendelseId}
+         * @secure
+         */
+        sjekkOgOppdaterStatus1: (
+            forsendelseId: string,
+            query?: {
+                /** @default false */
+                oppdaterStatus?: boolean;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<any, Record<string, string>[]>({
+                path: `/api/forsendelse/internal/sjekkOgOppdaterStatus/${forsendelseId}`,
+                method: "POST",
+                query: query,
+                secure: true,
+                ...params,
+            }),
+
+        /**
+         * @description Resynk distribusjonkanal. Hvis forsendelse er distribuert via nav.no og mottaker ikke har åpnet dokumentet i løpet av 48 timer vil forsendelsen bli redistribuert via sentral print. Denne tjenesten trigger en resynk av alle forsendelser som er sendt via nav.no for å oppdatere til riktig distribusjonstatus. Dette kjøres også som en egen skedulert jobb.
+         *
+         * @tags admin-controller
+         * @name DistTilNavNoMenHarKanalSentralPrint
+         * @summary Resynk distribusjonkanal for forsendelser som er distribuert via nav.no
+         * @request POST:/api/forsendelse/internal/distribusjon/navno
+         * @secure
+         */
+        distTilNavNoMenHarKanalSentralPrint: (
+            query?: {
+                /** @default true */
+                simulering?: boolean;
+                /**
+                 * @format date
+                 * @example "2023-11-01"
+                 */
+                afterDate?: string;
+                /**
+                 * @format date
+                 * @example "2023-12-31"
+                 */
+                beforeDate?: string;
+                sjekketNavNoRedistribusjonTilSentralPrint?: boolean;
+                /** @format int32 */
+                pageSize?: number;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<Record<string, string>[], any>({
+                path: `/api/forsendelse/internal/distribusjon/navno`,
+                method: "POST",
+                query: query,
+                secure: true,
+                ...params,
+            }),
+
+        /**
+         * @description Resynk distribusjonkanal. Hvis forsendelse er distribuert via nav.no og mottaker ikke har åpnet dokumentet i løpet av 48 timer vil forsendelsen bli redistribuert via sentral print. Denne tjenesten trigger en resynk av alle forsendelser som er sendt via nav.no for å oppdatere til riktig distribusjonstatus. Dette kjøres også som en egen skedulert jobb.
+         *
+         * @tags admin-controller
+         * @name DistTilNavNoMenHarKanalSentralPrintForForsendelse
+         * @summary Resynk distribusjonkanal for forsendelse
+         * @request POST:/api/forsendelse/internal/distribusjon/navno/{forsendelseId}
+         * @secure
+         */
+        distTilNavNoMenHarKanalSentralPrintForForsendelse: (
+            forsendelseId: number,
+            query?: {
+                /** @default true */
+                simulering?: boolean;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<Record<string, string>, any>({
+                path: `/api/forsendelse/internal/distribusjon/navno/${forsendelseId}`,
+                method: "POST",
+                query: query,
+                secure: true,
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags ettersendingsoppgave-controller
+         * @name HentEksisterendeEttersendingsoppgaver
+         * @summary Hent ettersendingsoppgaver
+         * @request POST:/api/forsendelse/ettersendingsoppgave/oppgaver
+         * @secure
+         */
+        hentEksisterendeEttersendingsoppgaver: (data: HentEttersendingsoppgaverRequest, params: RequestParams = {}) =>
+            this.request<Record<string, DokumentSoknadDto[]>, any>({
+                path: `/api/forsendelse/ettersendingsoppgave/oppgaver`,
+                method: "POST",
                 body: data,
                 secure: true,
                 type: ContentType.Json,
@@ -1581,6 +2165,23 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             }),
 
         /**
+         * No description
+         *
+         * @tags ettersendingsoppgave-controller
+         * @name HentEksisterendeEttersendingsoppgaverForsendelse
+         * @summary Hent ettersendingsoppgaver
+         * @request GET:/api/forsendelse/ettersendingsoppgave/oppgaver/{forsendelseId}
+         * @secure
+         */
+        hentEksisterendeEttersendingsoppgaverForsendelse: (forsendelseId: string, params: RequestParams = {}) =>
+            this.request<Record<string, DokumentSoknadDto[]>, any>({
+                path: `/api/forsendelse/ettersendingsoppgave/oppgaver/${forsendelseId}`,
+                method: "GET",
+                secure: true,
+                ...params,
+            }),
+
+        /**
          * @description Henter dokumentmaler som er støttet av applikasjonen
          *
          * @tags forsendelse-innsyn-kontroller
@@ -1614,6 +2215,25 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 path: `/api/forsendelse/${forsendelseIdMedPrefix}/${dokumentreferanse}`,
                 method: "DELETE",
                 secure: true,
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags ettersendingsoppgave-controller
+         * @name SlettEttersendingsoppgaveVedlegg
+         * @summary Oppretter ny varsel ettersendelse
+         * @request DELETE:/api/forsendelse/ettersendingsoppgave/dokument
+         * @secure
+         */
+        slettEttersendingsoppgaveVedlegg: (data: SlettEttersendingsoppgaveVedleggRequest, params: RequestParams = {}) =>
+            this.request<EttersendingsoppgaveDto, EttersendingsoppgaveDto>({
+                path: `/api/forsendelse/ettersendingsoppgave/dokument`,
+                method: "DELETE",
+                body: data,
+                secure: true,
+                type: ContentType.Json,
                 ...params,
             }),
     };

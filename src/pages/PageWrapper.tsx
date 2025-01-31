@@ -5,6 +5,7 @@ import { ArrowRightIcon } from "@navikt/aksel-icons";
 import { BodyLong, BodyShort, Heading, Label, Loader } from "@navikt/ds-react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { QueryClient } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useThemedStylesWithMdx } from "@theme-ui/mdx";
 import * as dayjs from "dayjs";
 import * as customParseFormat from "dayjs/plugin/customParseFormat";
@@ -103,6 +104,7 @@ export default function PageWrapper({ children, name }: PropsWithChildren<PageWr
                                 {children}
                             </div>
                         </React.Suspense>
+                        <ReactQueryDevtools />
                     </QueryClientProvider>
                 </ErrorProvider>
             </MDXProvider>

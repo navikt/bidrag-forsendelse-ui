@@ -20,6 +20,7 @@ export default merge(webpackCommon, {
             BISYS_URL: "",
             VIS_DOKUMENTMAL_KODE: false,
             LEGACY_ENVIRONMENT: false,
+            BIDRAG_KODEVERK_URL: "",
         }),
     ],
 });

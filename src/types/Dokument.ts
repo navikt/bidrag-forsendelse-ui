@@ -1,9 +1,10 @@
 import { RolleType } from "@navikt/bidrag-ui-common";
 
-import { DokumentArkivSystemDto } from "../api/BidragForsendelseApi";
+import { DokumentArkivSystemDto } from "../api/BidragDokumentApi";
+import { DokumentDto } from "../api/BidragForsendelseApi";
 import { DokumentStatus } from "../constants/DokumentStatus";
 
-export interface IDokument {
+export interface IDokument extends DokumentDto {
     index: number;
     journalpostId?: string;
     erSkjema?: boolean;

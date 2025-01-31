@@ -49,7 +49,7 @@ interface UseForsendelseDataProps {
 export function useForsendelseApi(): UseForsendelseDataProps {
     const { forsendelseId, saksnummer: saksnummerFromSession } = useSession();
     const { addError } = useErrorContext();
-    const saksnummer = saksnummerFromSession ?? hentForsendelseQuery().saksnummer;
+    const saksnummer = saksnummerFromSession ?? useHentForsendelseQuery().saksnummer;
     const hentSak = (): BidragSakDto => {
         const { data: sak, refetch } = useSuspenseQuery({
             queryKey: [`sak_${saksnummer}`],
@@ -121,7 +121,7 @@ export function useForsendelseApi(): UseForsendelseDataProps {
     };
 
     const hentGjelder = (): IRolleDetaljer => {
-        const forsendelse = hentForsendelseQuery();
+        const forsendelse = useHentForsendelseQuery();
         const gjelderIdent = forsendelse.gjelderIdent;
         const person = useSamhandlerPersonApi().hentPerson(gjelderIdent);
 
@@ -135,7 +135,7 @@ export function useForsendelseApi(): UseForsendelseDataProps {
     };
 
     const hentMottaker = (): IRolleDetaljer => {
-        const forsendelse = hentForsendelseQuery();
+        const forsendelse = useHentForsendelseQuery();
         let mottaker = forsendelse.mottaker;
         // TODO: Sjekk om mottaker er samhandler
 
@@ -153,67 +153,6 @@ export function useForsendelseApi(): UseForsendelseDataProps {
             ident,
         };
     };
-    function hentForsendelseQuery(): IForsendelse {
-        const { data: forsendelse, isRefetching } = useSuspenseQuery({
-            queryKey: UseForsendelseApiKeys.hentForsendelse(),
-            queryFn: () => {
-                try {
-                    return BIDRAG_FORSENDELSE_API.api.hentForsendelse(forsendelseId, {
-                        saksnummer: saksnummerFromSession,
-                    });
-                } catch (error) {
-                    const errorMessage = parseErrorMessageFromAxiosError(error);
-                    addError({
-                        message: `Kunne ikke hente forsendelse: ${errorMessage}`,
-                        source: "hentforsendelse",
-                    });
-                }
-            },
-            retry: (retryCount, error: AxiosError) => {
-                return error?.response?.status == HttpStatusCode.NotFound ? retryCount < 1 : retryCount < 3;
-            },
-            refetchOnWindowFocus: (query) => {
-                const state = query.state;
-                return state?.error?.response?.status != HttpStatusCode.NotFound;
-            },
-            refetchInterval: (result) => {
-                const data = result.state?.data;
-                if (!data) return 0;
-                const forsendelse = data.data as IForsendelse;
-                const hasDokumentsWithStatus = forsendelse.dokumenter.some((d) =>
-                    [
-                        "UNDER_PRODUKSJON",
-                        "BESTILLING_FEILET",
-                        "UNDER_PRODUKSJON",
-                        "UNDER_REDIGERING",
-                        "MÅ_KONTROLLERES",
-                    ].includes(d.status)
-                );
-                return hasDokumentsWithStatus ? 3000 : 0;
-            },
-            select: React.useCallback((response: AxiosResponse): IForsendelse => {
-                const forsendelse = response.data as ForsendelseResponsTo;
-                return {
-                    ...forsendelse,
-                    forsendelseId,
-                    dokumenter: forsendelse.dokumenter.map((dokument, index) => {
-                        return {
-                            ...dokument,
-                            status: DokumentStatus[dokument.status],
-                            fraSaksnummer: forsendelse.saksnummer,
-                            lagret: true,
-                            index,
-                        };
-                    }),
-                };
-            }, []),
-        });
-
-        return {
-            ...forsendelse,
-            isStaleData: isRefetching,
-        };
-    }
 
     function vedleggListe() {
         const { enhet } = useSession();
@@ -237,7 +176,7 @@ export function useForsendelseApi(): UseForsendelseDataProps {
     }
 
     function kanEndre() {
-        const forsendelse = hentForsendelseQuery();
+        const forsendelse = useHentForsendelseQuery();
         return forsendelse.status == "UNDER_PRODUKSJON";
     }
 
@@ -250,7 +189,7 @@ export function useForsendelseApi(): UseForsendelseDataProps {
         return result.data;
     }
     return {
-        hentForsendelse: hentForsendelseQuery,
+        hentForsendelse: useHentForsendelseQuery,
         hentMottaker,
         hentGjelder,
         hentRoller,
@@ -259,5 +198,71 @@ export function useForsendelseApi(): UseForsendelseDataProps {
         kanEndre,
         hentStørrelseIMb,
         vedleggListe,
+    };
+}
+export function useHentForsendelseQuery(): IForsendelse {
+    const { forsendelseId, saksnummer: saksnummerFromSession } = useSession();
+    const { addError } = useErrorContext();
+    const { data: forsendelse, isRefetching } = useSuspenseQuery({
+        queryKey: UseForsendelseApiKeys.hentForsendelse(),
+        queryFn: () => {
+            try {
+                return BIDRAG_FORSENDELSE_API.api.hentForsendelse(forsendelseId, {
+                    saksnummer: saksnummerFromSession,
+                });
+            } catch (error) {
+                const errorMessage = parseErrorMessageFromAxiosError(error);
+                addError({
+                    message: `Kunne ikke hente forsendelse: ${errorMessage}`,
+                    source: "hentforsendelse",
+                });
+            }
+        },
+        retry: (retryCount, error: AxiosError) => {
+            return error?.response?.status == HttpStatusCode.NotFound ? retryCount < 1 : retryCount < 3;
+        },
+        refetchOnWindowFocus: (query) => {
+            const state = query.state;
+            return state?.error?.response?.status != HttpStatusCode.NotFound;
+        },
+        refetchInterval: (result) => {
+            const data = result.state?.data;
+            if (!data) return 0;
+            const forsendelse = data.data as IForsendelse;
+            const hasDokumentsWithStatus = forsendelse.dokumenter.some((d) =>
+                [
+                    "UNDER_PRODUKSJON",
+                    "BESTILLING_FEILET",
+                    "UNDER_PRODUKSJON",
+                    "UNDER_REDIGERING",
+                    "MÅ_KONTROLLERES",
+                ].includes(d.status)
+            );
+            return hasDokumentsWithStatus ? 3000 : 0;
+        },
+        select: React.useCallback((response: AxiosResponse): IForsendelse => {
+            const forsendelse = response.data as ForsendelseResponsTo;
+
+            const forsendelseInternal: IForsendelse = {
+                ...forsendelse,
+                forsendelseId,
+                dokumenter: forsendelse.dokumenter.map((dokument, index) => {
+                    return {
+                        ...dokument,
+                        status: DokumentStatus[dokument.status],
+                        fraSaksnummer: forsendelse.saksnummer,
+                        lagret: true,
+                        index,
+                    };
+                }),
+            };
+
+            return forsendelseInternal;
+        }, []),
+    });
+
+    return {
+        ...forsendelse,
+        isStaleData: isRefetching,
     };
 }

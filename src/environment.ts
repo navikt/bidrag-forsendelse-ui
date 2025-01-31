@@ -15,6 +15,7 @@ const feature = {
 
 const url = {
     bidragDokumentForsendelse: process.env.BIDRAG_DOKUMENT_FORSENDELSE_URL,
+    bidragKodeverk: process.env.BIDRAG_KODEVERK_URL,
     bidragTilgangskontroll: process.env.BIDRAG_TILGANGSKONTROLL_URL,
     bidragDokumentArkiv: process.env.BIDRAG_DOKUMENT_ARKIV_URL,
     bidragPerson: process.env.BIDRAG_PERSON_URL,

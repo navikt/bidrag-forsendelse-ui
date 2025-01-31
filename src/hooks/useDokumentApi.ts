@@ -8,9 +8,11 @@ import { HentDokumentValgRequest } from "../api/BidragForsendelseApi";
 import { useSession } from "../pages/forsendelse/context/SessionContext";
 import { AvvikType } from "../types/AvvikTypes";
 import { IDokumentJournalDto, IJournalpost } from "../types/Journalpost";
-import { useForsendelseApi } from "./useForsendelseApi";
+import { useHentNavSkjemaer } from "./kodeverkQueries";
+import { useForsendelseApi, useHentForsendelseQuery } from "./useForsendelseApi";
 const DokumentQueryKeys = {
     dokument: "dokument",
+    hentJournal: (saksnummer: string) => [DokumentQueryKeys.dokument, "journal", saksnummer],
     hentJournalpost: (jpId: string) => [DokumentQueryKeys.dokument, "hentJournalpost", jpId],
     tilgangDokument: (jpId: string, dokref: string) => [DokumentQueryKeys.dokument, "tilgang", jpId, dokref],
     hentAvvikListe: (jpId: string) => [DokumentQueryKeys.dokument, "hentAvvikListe", jpId],
@@ -145,6 +147,34 @@ export default function useDokumentApi() {
         hentAvvikListe,
     };
 }
+
+const useHentJournal = () => {
+    const { saksnummer } = useSession();
+    return useSuspenseQuery({
+        queryKey: DokumentQueryKeys.hentJournal(saksnummer),
+        queryFn: () =>
+            BIDRAG_DOKUMENT_API.sak.hentJournal(
+                saksnummer,
+                { fagomrade: ["BID", "FAR"] },
+                {
+                    paramsSerializer: {
+                        indexes: null, // use brackets with indexes
+                    },
+                }
+            ),
+    }).data;
+};
+
+export const useHentJournalInngående = () => {
+    const forsendelse = useHentForsendelseQuery();
+    const navskjemaer = useHentNavSkjemaer();
+    const skjemaIder = navskjemaer.map((skjema) => skjema.kode);
+    const journalposter = useHentJournal();
+    return journalposter.data
+        .filter((jp) => jp.gjelderAktor?.ident === forsendelse.gjelderIdent)
+        .filter((jp) => jp.dokumentType === "I")
+        .filter((jp) => jp.dokumenter.some((d) => skjemaIder.includes(d.dokumentmalId)));
+};
 
 export enum DistribusjonKanalUkjentEnum {
     UKJENT,

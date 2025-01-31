@@ -19,3 +19,8 @@ export interface KodeverkBetydning {
         };
     };
 }
+
+export interface KodeBeskrivelse {
+    kode: string;
+    beskrivelse: string;
+}
