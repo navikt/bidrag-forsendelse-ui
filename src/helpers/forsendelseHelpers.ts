@@ -9,7 +9,7 @@ export function mapVarselEttersendelse(ettersendingsoppgave: Ettersendingsoppgav
             tittel: ettersendingsoppgave.tittel,
             journalpostId: ettersendingsoppgave.ettersendelseForJournalpostId,
             innsendingsfristDager: ettersendingsoppgave.innsendingsfristDager,
-            dokumenter: ettersendingsoppgave.vedleggsliste?.map((d) => ({
+            vedleggsliste: ettersendingsoppgave.vedleggsliste?.map((d) => ({
                 ...d,
                 varselDokumentId: d.id,
                 type: (d.skjemaId ? "SKJEMA" : "FRITEKST") as VarselDokumentType,

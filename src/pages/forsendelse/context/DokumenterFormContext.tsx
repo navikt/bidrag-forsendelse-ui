@@ -48,7 +48,7 @@ export type VarselEttersendelseFormProps = {
     tittel: string;
     journalpostId?: string;
     innsendingsfristDager: number;
-    dokumenter: {
+    vedleggsliste: {
         varselDokumentId?: number;
         tittel: string;
         skjemaId?: string;
@@ -185,7 +185,7 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
         }
         const varsel = getValues("ettersendingsoppgave");
 
-        if (varsel && varsel.dokumenter.length == 0) {
+        if (varsel && varsel.vedleggsliste.length == 0) {
             setError("ettersendingsoppgave", { message: "Varsel må inneholde minst ett dokument" });
             isValid = false;
         }

@@ -8,7 +8,7 @@ import { useHentJournalInngående } from "../../../hooks/useDokumentApi";
 import { useHentForsendelseQuery } from "../../../hooks/useForsendelseApi";
 import { useOppdaterVarselEttersendelse } from "../../../hooks/varselEnderselseApi";
 import { IForsendelseFormProps } from "../context/DokumenterFormContext";
-import { ettersendingsformPrefiks, VarselForJournalpostSelect } from "./OpprettVarselEttersendelseButton";
+import { ettersendingsformPrefiks, VarselForJournalpostSelect } from "./OpprettEttersendingsoppgaveButton";
 
 type VarselDetaljerProps = {
     redigerbar: boolean;

@@ -28,7 +28,7 @@ import SendButton from "./components/SendButton";
 import ValidationErrorSummary from "./components/ValidationErrorSummary";
 import { DokumenterFormProvider } from "./context/DokumenterFormContext";
 import { SessionProvider, useSession } from "./context/SessionContext";
-import OpprettEttersendelseOppgaveButton from "./varselettersendelse/OpprettVarselEttersendelseButton";
+import OpprettEttersendelseOppgaveButton from "./varselettersendelse/OpprettEttersendingsoppgaveButton";
 interface ForsendelsePageProps {
     forsendelseId: string;
     saksnummer: string;

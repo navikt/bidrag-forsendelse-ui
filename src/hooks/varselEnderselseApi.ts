@@ -8,20 +8,6 @@ import {
     SlettEttersendingsoppgaveVedleggRequest,
 } from "../api/BidragForsendelseApi";
 import { useHentForsendelseQuery } from "./useForsendelseApi";
-export const useHentEksisterendeOppgaver = (skjemaIder: string[]) => {
-    const forsendelse = useHentForsendelseQuery();
-    return useSuspenseQuery({
-        queryKey: ["hentEksisterendeOppgaver", ...skjemaIder],
-        queryFn: async () => {
-            return (
-                await BIDRAG_FORSENDELSE_API.api.hentEksisterendeEttersendingsoppgaver({
-                    forsendelseId: forsendelse.forsendelseId!,
-                    skjemaIder: skjemaIder,
-                })
-            ).data;
-        },
-    }).data;
-};
 
 export const useHentEksisterendeOppgaverForsendelse = () => {
     const forsendelse = useHentForsendelseQuery();

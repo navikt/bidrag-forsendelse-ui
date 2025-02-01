@@ -102,7 +102,7 @@ function OpprettEttersendelseOppgaveModal({
         <form onSubmit={form.handleSubmit(opprett)}>
             <Modal open={isOpen} aria-label="" closeOnBackdropClick onClose={() => setIsOpen(false)} className="w-full">
                 <Modal.Header closeButton>
-                    <Heading size="medium">Tilknytt til ettersendelsesoppgave</Heading>
+                    <Heading size="medium">Tilknytt til ettersendingsoppgave</Heading>
                 </Modal.Header>
                 <Modal.Body>
                     <FormProvider {...form}>
@@ -132,8 +132,8 @@ function EttersendelseOppgavePanel() {
             <VStack gap="2" className="max-w-[95vw] w-[1000px]">
                 <VarselDetaljer />
                 <Box>
-                    <Heading size="xsmall">Dokumenter</Heading>
-                    <EttersendelseOppgaveDokumenter />
+                    <Heading size="xsmall">Vedleggsliste</Heading>
+                    <EttersendingsoppgaveVedleggsliste />
                 </Box>
             </VStack>
         </Page.Block>
@@ -184,33 +184,34 @@ function SlettOppgaveButton() {
         </>
     );
 }
-function EttersendelseOppgaveDokumenter() {
+function EttersendingsoppgaveVedleggsliste() {
     const forsendelse = useHentForsendelseQuery();
-    const { control, getValues, register, setError, formState, reset, setValue } =
-        useFormContext<IForsendelseFormProps>();
-    const dokumenter = useFieldArray({ control, name: `${ettersendingsformPrefiks}.dokumenter` });
+    const { control, getValues, setError, reset, setValue } = useFormContext<IForsendelseFormProps>();
+    const vedleggsliste = useFieldArray({ control, name: `${ettersendingsformPrefiks}.vedleggsliste` });
     const [editableRow, setEditableRow] = useState<number>(undefined);
 
-    const oppdaterVarselEttersendelseFn = useOppdaterVarselEttersendelse();
+    const oppdaterEttersendingsoppgaveFn = useOppdaterVarselEttersendelse();
     const slettVarselEttersendelseDokumentFn = useSlettVarselEttersendelseDokument();
     function onSaveRow(index: number) {
-        const dokument = getValues(`${ettersendingsformPrefiks}.dokumenter.${index}`);
-        if (dokument.tittel.length === 0) {
-            setError(`${ettersendingsformPrefiks}.dokumenter.${index}.tittel`, { message: "Tittel kan ikke være tom" });
+        const vedlegg = getValues(`${ettersendingsformPrefiks}.vedleggsliste.${index}`);
+        if (vedlegg.tittel.length === 0) {
+            setError(`${ettersendingsformPrefiks}.vedleggsliste.${index}.tittel`, {
+                message: "Tittel kan ikke være tom",
+            });
             return;
         }
-        oppdaterVarselEttersendelseFn
+        oppdaterEttersendingsoppgaveFn
             .mutateAsync({
                 forsendelseId: Number(forsendelse.forsendelseId.replace("BIF-", "")),
                 oppdaterDokument: {
-                    id: dokument.varselDokumentId,
-                    tittel: dokument.tittel,
-                    skjemaId: dokument.skjemaId,
+                    id: vedlegg.varselDokumentId,
+                    tittel: vedlegg.tittel,
+                    skjemaId: vedlegg.skjemaId,
                 },
             })
             .then((response) => {
                 setEditableRow(undefined);
-                dokumenter.replace(
+                vedleggsliste.replace(
                     response.data.vedleggsliste.map((d) => ({
                         ...d,
                         varselDokumentId: d.id,
@@ -223,9 +224,9 @@ function EttersendelseOppgaveDokumenter() {
     function onDeleteRow(index: number) {
         setEditableRow(undefined);
 
-        const dokument = getValues(`${ettersendingsformPrefiks}.dokumenter.${index}`);
+        const dokument = getValues(`${ettersendingsformPrefiks}.vedleggsliste.${index}`);
         if (dokument.varselDokumentId === undefined) {
-            dokumenter.remove(index);
+            vedleggsliste.remove(index);
             return;
         }
         slettVarselEttersendelseDokumentFn
@@ -234,13 +235,13 @@ function EttersendelseOppgaveDokumenter() {
                 id: dokument.varselDokumentId,
             })
             .then(() => {
-                dokumenter.remove(index);
+                vedleggsliste.remove(index);
             });
     }
 
     function addDokument() {
-        dokumenter.append({ tittel: "" });
-        setEditableRow(dokumenter.fields.length);
+        vedleggsliste.append({ tittel: "" });
+        setEditableRow(vedleggsliste.fields.length);
     }
     return (
         <Box>
@@ -256,7 +257,7 @@ function EttersendelseOppgaveDokumenter() {
                     Legg til vedlegg
                 </Button>
             </HStack>
-            {dokumenter.fields.length > 0 && (
+            {vedleggsliste.fields.length > 0 && (
                 <Table size="small">
                     <Table.Header>
                         <Table.Row>
@@ -267,7 +268,7 @@ function EttersendelseOppgaveDokumenter() {
                         </Table.Row>
                     </Table.Header>
                     <Table.Body>
-                        {dokumenter.fields.map((dokument, index) => (
+                        {vedleggsliste.fields.map((dokument, index) => (
                             <Table.Row shadeOnHover={false} key={dokument.id + "_" + index}>
                                 <Table.DataCell textSize="small">
                                     {editableRow == index ? (
@@ -287,9 +288,13 @@ function EttersendelseOppgaveDokumenter() {
                                         onEditRow={() => {
                                             if (editableRow === undefined) {
                                                 setEditableRow(index);
-                                                setValue(`${ettersendingsformPrefiks}.dokumenter.${index}`, dokument, {
-                                                    shouldDirty: true,
-                                                });
+                                                setValue(
+                                                    `${ettersendingsformPrefiks}.vedleggsliste.${index}`,
+                                                    dokument,
+                                                    {
+                                                        shouldDirty: true,
+                                                    }
+                                                );
                                             }
                                         }}
                                     />
@@ -405,7 +410,7 @@ function EksisterendeOppgaveVarsel() {
 
 function NavSkjemaSelect2({ hideLabel = true, index }: { hideLabel?: boolean; index: number }) {
     const bidragSkjemaer = useHentVedleggskoder();
-    const form = useFormContext();
+    const form = useFormContext<IForsendelseFormProps>();
 
     return (
         <UNSAFE_Combobox
@@ -414,7 +419,7 @@ function NavSkjemaSelect2({ hideLabel = true, index }: { hideLabel?: boolean; in
             allowNewValues
             size="small"
             error={form.formState.errors?.dokumenter?.[index]?.tittel?.message}
-            defaultValue={form.getValues(`${ettersendingsformPrefiks}.dokumenter.${index}.tittel`)}
+            defaultValue={form.getValues(`${ettersendingsformPrefiks}.vedleggsliste.${index}.tittel`)}
             onChange={() => {
                 return null;
             }}
@@ -424,8 +429,11 @@ function NavSkjemaSelect2({ hideLabel = true, index }: { hideLabel?: boolean; in
             }))}
             onToggleSelected={(value) => {
                 const skjema = bidragSkjemaer.find((skjema) => skjema.kode === value);
-                form.setValue(`${ettersendingsformPrefiks}.dokumenter.${index}.skjemaId`, skjema?.kode ?? "N6");
-                form.setValue(`${ettersendingsformPrefiks}.dokumenter.${index}.tittel`, skjema?.beskrivelse ?? value);
+                form.setValue(`${ettersendingsformPrefiks}.vedleggsliste.${index}.skjemaId`, skjema?.kode ?? "N6");
+                form.setValue(
+                    `${ettersendingsformPrefiks}.vedleggsliste.${index}.tittel`,
+                    skjema?.beskrivelse ?? value
+                );
             }}
         ></UNSAFE_Combobox>
     );

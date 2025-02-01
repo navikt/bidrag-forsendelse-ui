@@ -348,76 +348,6 @@ export interface OpprettEttersendingsoppgaveRequest {
     skjemaId: string;
 }
 
-export interface HentEttersendingsoppgaverRequest {
-    forsendelseId: string;
-    skjemaIder: string[];
-}
-
-export interface DokumentSoknadDto {
-    brukerId: string;
-    skjemanr: string;
-    tittel: string;
-    tema: string;
-    status: DokumentSoknadDtoStatusEnum;
-    /** @format date-time */
-    opprettetDato: string;
-    vedleggsListe: VedleggDto[];
-    /** @format int64 */
-    id?: number;
-    innsendingsId?: string;
-    ettersendingsId?: string;
-    spraak?: string;
-    /** @format date-time */
-    endretDato?: string;
-    /** @format date-time */
-    innsendtDato?: string;
-    /** @format int64 */
-    visningsSteg?: number;
-    visningsType?: DokumentSoknadDtoVisningsTypeEnum;
-    kanLasteOppAnnet?: boolean;
-    /** @format date-time */
-    innsendingsFristDato?: string;
-    /** @format date-time */
-    forsteInnsendingsDato?: string;
-    /** @format int64 */
-    fristForEttersendelse?: number;
-    arkiveringsStatus?: DokumentSoknadDtoArkiveringsStatusEnum;
-    erSystemGenerert?: boolean;
-    soknadstype?: DokumentSoknadDtoSoknadstypeEnum;
-    skjemaPath?: string;
-    applikasjon?: string;
-    /** @format date-time */
-    skalSlettesDato?: string;
-    /** @format int32 */
-    mellomlagringDager?: number;
-}
-
-export interface VedleggDto {
-    tittel: string;
-    label: string;
-    erHoveddokument: boolean;
-    erVariant: boolean;
-    erPdfa: boolean;
-    erPakrevd: boolean;
-    opplastingsStatus: VedleggDtoOpplastingsStatusEnum;
-    /** @format date-time */
-    opprettetdato: string;
-    /** @format int64 */
-    id?: number;
-    vedleggsnr?: string;
-    beskrivelse?: string;
-    uuid?: string;
-    mimetype?: VedleggDtoMimetypeEnum;
-    /** @format byte */
-    document?: string;
-    skjemaurl?: string;
-    /** @format date-time */
-    innsendtdato?: string;
-    formioId?: string;
-    opplastingsValgKommentarLedetekst?: string;
-    opplastingsValgKommentar?: string;
-}
-
 export interface HentDokumentValgRequest {
     soknadType?: string;
     vedtakType?: Vedtakstype;
@@ -681,6 +611,21 @@ export interface AvsenderMottakerDto {
     adresse?: MottakerAdresseTo;
 }
 
+export interface EttersendingsppgaveDto {
+    tittel: string;
+    skjemaId: string;
+    innsendingsId?: string;
+    språk: string;
+    status: EttersendingsppgaveDtoStatusEnum;
+    /** @format date */
+    opprettetDato?: string;
+    /** @format date */
+    fristDato?: string;
+    /** @format date */
+    slettesDato?: string;
+    vedleggsliste: EttersendingsoppgaveVedleggDto[];
+}
+
 /** Metadata til en journalpost */
 export interface JournalpostDto {
     /**
@@ -765,6 +710,7 @@ export interface JournalpostDto {
     opprettetAvIdent?: string;
     /** Referanse til originale kilden til journalposten. Kan være referanse til forsendelse eller bidrag journalpost med prefiks. Feks BID_12323 eller BIF_123213 */
     eksternReferanseId?: string;
+    ettersendingsppgave?: EttersendingsppgaveDto;
 }
 
 /** Metadata for kode vs dekode i et kodeobjekt */
@@ -848,6 +794,71 @@ export interface ForsendelseIkkeDistribuertResponsTo {
     opprettetDato?: string;
 }
 
+export interface DokumentSoknadDto {
+    brukerId: string;
+    skjemanr: string;
+    tittel: string;
+    tema: string;
+    status: DokumentSoknadDtoStatusEnum;
+    /** @format date-time */
+    opprettetDato: string;
+    vedleggsListe: VedleggDto[];
+    /** @format int64 */
+    id?: number;
+    innsendingsId?: string;
+    ettersendingsId?: string;
+    spraak?: string;
+    /** @format date-time */
+    endretDato?: string;
+    /** @format date-time */
+    innsendtDato?: string;
+    /** @format int64 */
+    visningsSteg?: number;
+    visningsType?: DokumentSoknadDtoVisningsTypeEnum;
+    kanLasteOppAnnet?: boolean;
+    /** @format date-time */
+    innsendingsFristDato?: string;
+    /** @format date-time */
+    forsteInnsendingsDato?: string;
+    /** @format int64 */
+    fristForEttersendelse?: number;
+    arkiveringsStatus?: DokumentSoknadDtoArkiveringsStatusEnum;
+    erSystemGenerert?: boolean;
+    soknadstype?: DokumentSoknadDtoSoknadstypeEnum;
+    skjemaPath?: string;
+    applikasjon?: string;
+    /** @format date-time */
+    skalSlettesDato?: string;
+    /** @format int32 */
+    mellomlagringDager?: number;
+}
+
+export interface VedleggDto {
+    tittel: string;
+    label: string;
+    erHoveddokument: boolean;
+    erVariant: boolean;
+    erPdfa: boolean;
+    erPakrevd: boolean;
+    opplastingsStatus: VedleggDtoOpplastingsStatusEnum;
+    /** @format date-time */
+    opprettetdato: string;
+    /** @format int64 */
+    id?: number;
+    vedleggsnr?: string;
+    beskrivelse?: string;
+    uuid?: string;
+    mimetype?: VedleggDtoMimetypeEnum;
+    /** @format byte */
+    document?: string;
+    skjemaurl?: string;
+    /** @format date-time */
+    innsendtdato?: string;
+    formioId?: string;
+    opplastingsValgKommentarLedetekst?: string;
+    opplastingsValgKommentar?: string;
+}
+
 export interface SlettEttersendingsoppgave {
     /** @format int64 */
     forsendelseId: number;
@@ -908,53 +919,6 @@ export enum OpprettEttersendingsppgaveDtoSprakEnum {
     DE = "DE",
     FR = "FR",
     EN = "EN",
-}
-
-export enum DokumentSoknadDtoStatusEnum {
-    Opprettet = "Opprettet",
-    Utfylt = "Utfylt",
-    Innsendt = "Innsendt",
-    SlettetAvBruker = "SlettetAvBruker",
-    AutomatiskSlettet = "AutomatiskSlettet",
-}
-
-export enum DokumentSoknadDtoVisningsTypeEnum {
-    FyllUt = "fyllUt",
-    Dokumentinnsending = "dokumentinnsending",
-    Ettersending = "ettersending",
-    Lospost = "lospost",
-}
-
-export enum DokumentSoknadDtoArkiveringsStatusEnum {
-    IkkeSatt = "IkkeSatt",
-    Arkivert = "Arkivert",
-    ArkiveringFeilet = "ArkiveringFeilet",
-}
-
-export enum DokumentSoknadDtoSoknadstypeEnum {
-    Soknad = "soknad",
-    Ettersendelse = "ettersendelse",
-}
-
-export enum VedleggDtoOpplastingsStatusEnum {
-    IkkeValgt = "IkkeValgt",
-    LastetOpp = "LastetOpp",
-    Innsendt = "Innsendt",
-    SendSenere = "SendSenere",
-    SendesAvAndre = "SendesAvAndre",
-    SendesIkke = "SendesIkke",
-    LastetOppIkkeRelevantLenger = "LastetOppIkkeRelevantLenger",
-    LevertDokumentasjonTidligere = "LevertDokumentasjonTidligere",
-    HarIkkeDokumentasjonen = "HarIkkeDokumentasjonen",
-    NavKanHenteDokumentasjon = "NavKanHenteDokumentasjon",
-}
-
-export enum VedleggDtoMimetypeEnum {
-    ApplicationPdf = "application/pdf",
-    ApplicationJson = "application/json",
-    ImagePng = "image/png",
-    ImageJpeg = "image/jpeg",
-    ApplicationXml = "application/xml",
 }
 
 export enum DokumentMalDetaljerTypeEnum {
@@ -1036,6 +1000,16 @@ export enum AvsenderMottakerDtoTypeEnum {
     UKJENT = "UKJENT",
 }
 
+export enum EttersendingsppgaveDtoStatusEnum {
+    OPPRETTET = "OPPRETTET",
+    UTFYLT = "UTFYLT",
+    INNSENDT = "INNSENDT",
+    SLETTET_AV_BRUKER = "SLETTET_AV_BRUKER",
+    AUTOMATISK_SLETTET = "AUTOMATISK_SLETTET",
+    UKJENT = "UKJENT",
+    IKKE_OPPRETTET = "IKKE_OPPRETTET",
+}
+
 /**
  * Kanalen som er kilden til at journalposten ble registrert
  * @deprecated
@@ -1095,6 +1069,53 @@ export enum JournalpostDtoStatusEnum {
     TIL_LAGRING = "TIL_LAGRING",
     OPPRETTET = "OPPRETTET",
     UNDER_PRODUKSJON = "UNDER_PRODUKSJON",
+}
+
+export enum DokumentSoknadDtoStatusEnum {
+    Opprettet = "Opprettet",
+    Utfylt = "Utfylt",
+    Innsendt = "Innsendt",
+    SlettetAvBruker = "SlettetAvBruker",
+    AutomatiskSlettet = "AutomatiskSlettet",
+}
+
+export enum DokumentSoknadDtoVisningsTypeEnum {
+    FyllUt = "fyllUt",
+    Dokumentinnsending = "dokumentinnsending",
+    Ettersending = "ettersending",
+    Lospost = "lospost",
+}
+
+export enum DokumentSoknadDtoArkiveringsStatusEnum {
+    IkkeSatt = "IkkeSatt",
+    Arkivert = "Arkivert",
+    ArkiveringFeilet = "ArkiveringFeilet",
+}
+
+export enum DokumentSoknadDtoSoknadstypeEnum {
+    Soknad = "soknad",
+    Ettersendelse = "ettersendelse",
+}
+
+export enum VedleggDtoOpplastingsStatusEnum {
+    IkkeValgt = "IkkeValgt",
+    LastetOpp = "LastetOpp",
+    Innsendt = "Innsendt",
+    SendSenere = "SendSenere",
+    SendesAvAndre = "SendesAvAndre",
+    SendesIkke = "SendesIkke",
+    LastetOppIkkeRelevantLenger = "LastetOppIkkeRelevantLenger",
+    LevertDokumentasjonTidligere = "LevertDokumentasjonTidligere",
+    HarIkkeDokumentasjonen = "HarIkkeDokumentasjonen",
+    NavKanHenteDokumentasjon = "NavKanHenteDokumentasjon",
+}
+
+export enum VedleggDtoMimetypeEnum {
+    ApplicationPdf = "application/pdf",
+    ApplicationJson = "application/json",
+    ImagePng = "image/png",
+    ImageJpeg = "image/jpeg",
+    ApplicationXml = "application/xml",
 }
 
 export enum HentAvvikEnum {
@@ -1671,25 +1692,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 method: "POST",
                 query: query,
                 secure: true,
-                ...params,
-            }),
-
-        /**
-         * No description
-         *
-         * @tags ettersendingsoppgave-controller
-         * @name HentEksisterendeEttersendingsoppgaver
-         * @summary Hent ettersendingsoppgaver
-         * @request POST:/api/forsendelse/ettersendingsoppgave/oppgaver
-         * @secure
-         */
-        hentEksisterendeEttersendingsoppgaver: (data: HentEttersendingsoppgaverRequest, params: RequestParams = {}) =>
-            this.request<Record<string, DokumentSoknadDto[]>, any>({
-                path: `/api/forsendelse/ettersendingsoppgave/oppgaver`,
-                method: "POST",
-                body: data,
-                secure: true,
-                type: ContentType.Json,
                 ...params,
             }),
 
