@@ -53,7 +53,7 @@ export default function OpprettEttersendelseOppgaveButton() {
             ) : (
                 <>
                     <Button variant="tertiary" size="small" icon={<PlusIcon />} onClick={() => setIsOpen(true)}>
-                        Opprett oppgave om ettersendelse
+                        Opprett ettersendingsoppgave
                     </Button>
                     <OpprettEttersendelseOppgaveModal isOpen={isOpen} setIsOpen={setIsOpen} />
                 </>
@@ -102,7 +102,7 @@ function OpprettEttersendelseOppgaveModal({
         <form onSubmit={form.handleSubmit(opprett)}>
             <Modal open={isOpen} aria-label="" closeOnBackdropClick onClose={() => setIsOpen(false)} className="w-full">
                 <Modal.Header closeButton>
-                    <Heading size="medium">Tilknytt til ettersendingsoppgave</Heading>
+                    <Heading size="medium">Opprett ettersendingsoppgave</Heading>
                 </Modal.Header>
                 <Modal.Body>
                     <FormProvider {...form}>
@@ -124,7 +124,7 @@ function EttersendelseOppgavePanel() {
         <Page.Block className="pb-4">
             <HStack gap="2" className="pb-4">
                 <Heading className="self-center" size="medium">
-                    Oppgave om ettersendelse
+                    Ettersendingsoppgave
                 </Heading>
                 <SlettOppgaveButton />
             </HStack>

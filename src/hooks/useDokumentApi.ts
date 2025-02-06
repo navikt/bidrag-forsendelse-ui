@@ -168,7 +168,9 @@ const useHentJournal = () => {
 export const useHentJournalInngående = () => {
     const forsendelse = useHentForsendelseQuery();
     const navskjemaer = useHentNavSkjemaer();
-    const skjemaIder = navskjemaer.map((skjema) => skjema.kode);
+    const skjemaIder = navskjemaer
+        .map((skjema) => skjema.kode)
+        .filter((kode) => !kode.toLowerCase().startsWith("nave"));
     const journalposter = useHentJournal();
     return journalposter.data
         .filter((jp) => jp.gjelderAktor?.ident === forsendelse.gjelderIdent)
