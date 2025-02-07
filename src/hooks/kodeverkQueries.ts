@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { BIDRAG_KODEVERK_API } from "../api/api";
 import { KodeverkHierarkiResponse, KodeverkKoderBetydningerResponse } from "../api/BidragKodeverkApi";
 import KodeverkService from "../api/KodeverkService";
+import { visAndreVedleggskoder, visVedleggskoder } from "../constants/ettersendingConstants";
 import { KodeBeskrivelse, LandkodeLand, PostnummerPoststed } from "../types/KodeverkTypes";
 export const KodeverkQueryKeys = {
     landkoder: ["landkoder"],
@@ -45,14 +46,17 @@ export const useHentNavSkjemaer = (): KodeBeskrivelse[] => {
     return data;
 };
 
-const ignorerVedleggskoder = ["N6", "BL", "P9", "T5", "CC", "BD"];
 export const useHentVedleggskoder = (): KodeBeskrivelse[] => {
     const { data } = useSuspenseQuery({
         queryKey: KodeverkQueryKeys.navBidragSkjema,
         queryFn: async () => {
             const response = await BIDRAG_KODEVERK_API.kodeverk.hentKodeverk("Vedleggskoder");
-            console.log(mapKodeverkResponseToCodeAndName(response.data));
-            return mapKodeverkResponseToCodeAndName(response.data);
+            return [
+                ...mapKodeverkResponseToCodeAndName(response.data).filter((kodeBeskrivelse) =>
+                    visVedleggskoder.includes(kodeBeskrivelse.kode)
+                ),
+                ...visAndreVedleggskoder,
+            ];
         },
     });
 
@@ -72,17 +76,15 @@ export const mapHierarkiResponseToCodeAndName = (kodeverk: KodeverkHierarkiRespo
         );
 
 export const mapKodeverkResponseToCodeAndName = (kodeverk: KodeverkKoderBetydningerResponse): KodeBeskrivelse[] =>
-    Object.entries(kodeverk.betydninger)
-        .filter(([kode, _]) => !ignorerVedleggskoder.includes(kode))
-        .map(([kode, betydning]) => {
-            const tekst = StringUtils.isEmpty(betydning[0].beskrivelser["nb"].tekst)
-                ? betydning[0].beskrivelser["nb"].term
-                : betydning[0].beskrivelser["nb"].tekst;
-            return {
-                kode,
-                beskrivelse: tekst,
-            };
-        });
+    Object.entries(kodeverk.betydninger).map(([kode, betydning]) => {
+        const tekst = StringUtils.isEmpty(betydning[0].beskrivelser["nb"].tekst)
+            ? betydning[0].beskrivelser["nb"].term
+            : betydning[0].beskrivelser["nb"].tekst;
+        return {
+            kode,
+            beskrivelse: tekst,
+        };
+    });
 
 export const prefetchPostnummere = (): void => {
     const queryClient = useQueryClient();
