@@ -21,6 +21,8 @@ export default merge(webpackCommon, {
             VIS_DOKUMENTMAL_KODE: false,
             LEGACY_ENVIRONMENT: false,
             BIDRAG_KODEVERK_URL: "",
+            UNLEASH_API_URL: "",
+            UNLEASH_FRONTEND_TOKEN: "",
         }),
     ],
 });

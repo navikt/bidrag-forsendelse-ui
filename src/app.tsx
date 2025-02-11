@@ -10,6 +10,7 @@ import {
 } from "@grafana/faro-react";
 import { SecuritySessionUtils } from "@navikt/bidrag-ui-common";
 import { HGrid, HStack } from "@navikt/ds-react";
+import FlagProvider, { IConfig } from "@unleash/proxy-client-react";
 import React from "react";
 import {
     BrowserRouter,
@@ -32,6 +33,12 @@ import Opprettforsendelse from "./pages/opprettforsendelse";
 import Opprettnotat from "./pages/opprettnotat";
 import PageWrapper from "./pages/PageWrapper";
 
+const config: IConfig = {
+    url: process.env.UNLEASH_API_URL as string,
+    clientKey: process.env.UNLEASH_FRONTEND_TOKEN,
+    refreshInterval: 15, // How often (in seconds) the client should poll the proxy for updates
+    appName: "bidrag-forskudd-ui",
+};
 export const faro = initializeFaro({
     app: {
         name: "bidrag-forsendelse-ui",
@@ -63,18 +70,20 @@ initMock();
 export default function App() {
     return (
         <React.StrictMode>
-            <BrowserRouter>
-                <FaroRoutes>
-                    <Route path="/forsendelse/brukerveiledning" element={<BrukerveiledningPageWrapper />} />
-                    <Route path="/:forsendelseId" element={<ForsendelsePageWrapper />} />
-                    <Route path="/forsendelse/:forsendelseId" element={<ForsendelsePageWrapper />} />
-                    <Route path="sak/:saksnummer/">
-                        <Route path="forsendelse" element={<OpprettNyForsendelsePageWrapper />} />
-                        <Route path="notat" element={<OpprettNyNotatPageWrapper />} />
-                        <Route path="forsendelse/:forsendelseId" element={<ForsendelsePageWrapper />} />
-                    </Route>
-                </FaroRoutes>
-            </BrowserRouter>
+            <FlagProvider config={config}>
+                <BrowserRouter>
+                    <FaroRoutes>
+                        <Route path="/forsendelse/brukerveiledning" element={<BrukerveiledningPageWrapper />} />
+                        <Route path="/:forsendelseId" element={<ForsendelsePageWrapper />} />
+                        <Route path="/forsendelse/:forsendelseId" element={<ForsendelsePageWrapper />} />
+                        <Route path="sak/:saksnummer/">
+                            <Route path="forsendelse" element={<OpprettNyForsendelsePageWrapper />} />
+                            <Route path="notat" element={<OpprettNyNotatPageWrapper />} />
+                            <Route path="forsendelse/:forsendelseId" element={<ForsendelsePageWrapper />} />
+                        </Route>
+                    </FaroRoutes>
+                </BrowserRouter>
+            </FlagProvider>
         </React.StrictMode>
     );
 }

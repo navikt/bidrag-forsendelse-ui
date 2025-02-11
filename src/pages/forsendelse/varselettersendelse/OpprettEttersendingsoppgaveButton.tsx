@@ -27,6 +27,7 @@ import {
 } from "../../../helpers/forsendelseHelpers";
 import { useHentVedleggskoder } from "../../../hooks/kodeverkQueries";
 import { useHentJournalInngående } from "../../../hooks/useDokumentApi";
+import useFeatureToogle from "../../../hooks/useFeatureToggle";
 import { UseForsendelseApiKeys, useHentForsendelseQuery } from "../../../hooks/useForsendelseApi";
 import {
     useHentEksisterendeOppgaverForsendelse,
@@ -41,11 +42,13 @@ import { VarselDetaljer } from "./EttersendingsoppgaveDetaljer";
 export const ettersendingsformPrefiks = "ettersendingsoppgave";
 
 export default function OpprettEttersendelseOppgaveButton() {
+    const { isEttersendingsoppgaveEnabled } = useFeatureToogle();
     const [isOpen, setIsOpen] = useState(false);
     const forsendelse = useHentForsendelseQuery();
     const inngåendeJournalposter = useHentJournalInngående();
 
-    if (inngåendeJournalposter.length === 0 && !forsendelse.ettersendingsoppgave) return;
+    if ((inngåendeJournalposter.length === 0 && !forsendelse.ettersendingsoppgave) || !isEttersendingsoppgaveEnabled)
+        return;
     return (
         <>
             {forsendelse.ettersendingsoppgave ? (
