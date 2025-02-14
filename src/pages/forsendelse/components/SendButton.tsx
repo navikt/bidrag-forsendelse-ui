@@ -20,7 +20,7 @@ export default function SendButton() {
     }
 
     function sendForsendelseManuelt() {
-        if (validateCanSendForsendelse()) {
+        if (validateCanSendForsendelse(true)) {
             setIsDistribuerManueltModalOpen(true);
         }
     }

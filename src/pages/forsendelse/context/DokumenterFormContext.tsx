@@ -28,7 +28,7 @@ interface IDokumenterContext {
     deleteMode: boolean;
     toggleDeleteMode: () => void;
     saveChanges: () => void;
-    validateCanSendForsendelse: () => boolean;
+    validateCanSendForsendelse: (manueltDistribusjon?: boolean) => boolean;
     forsendelseId: string;
     dokumenter: FormIDokument[];
     swapDocuments: (from: number, to: number) => void;
@@ -162,7 +162,7 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
         update(index, updatedDocument);
     };
 
-    function validateCanSendForsendelse() {
+    function validateCanSendForsendelse(manueltDistribusjon?: boolean) {
         clearErrors("root.kanDistribueres");
         if (isDirty && Object.keys(dirtyFields).length > 0) {
             setError("root", { message: "Endringene må lagres før distribusjon av forsendelse kan bestilles" });
@@ -187,6 +187,12 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
 
         if (varsel && varsel.vedleggsliste.length == 0) {
             setError("ettersendingsoppgave", { message: "Varsel må inneholde minst ett dokument" });
+            isValid = false;
+        }
+        if (varsel && manueltDistribusjon) {
+            setError("root", {
+                message: "Kan ikke bestille lokal utskrift med ettersendingsoppgave",
+            });
             isValid = false;
         }
         if (!isValid) {
