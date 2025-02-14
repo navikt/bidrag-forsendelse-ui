@@ -8,7 +8,7 @@ export default function ValidationErrorSummary() {
         formState: { errors },
     } = useFormContext<IForsendelseFormProps>();
 
-    if ((!errors.dokumenter || errors.dokumenter.length == 0) && !errors.root?.message) {
+    if (errors.root?.kanDistribueres == undefined) {
         return null;
     }
 
@@ -16,6 +16,10 @@ export default function ValidationErrorSummary() {
         let allErrors = [];
         if (errors.dokumenter) {
             allErrors = allErrors.concat(errors.dokumenter?.map((err) => err?.message));
+        }
+
+        if (errors.varselEttersendelse && errors.varselEttersendelse?.dokumenter == undefined) {
+            allErrors = allErrors.concat(errors.varselEttersendelse?.message);
         }
         if (errors.root?.message) {
             allErrors = allErrors.concat([errors.root?.message]);

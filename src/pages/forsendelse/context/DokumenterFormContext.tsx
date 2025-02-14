@@ -15,6 +15,7 @@ import { BIDRAG_FORSENDELSE_API } from "../../../api/api";
 import { OppdaterForsendelseForesporsel } from "../../../api/BidragForsendelseApi";
 import { DokumentStatus } from "../../../constants/DokumentStatus";
 import { useErrorContext } from "../../../context/ErrorProvider";
+import { mapVarselEttersendelse } from "../../../helpers/forsendelseHelpers";
 import { useForsendelseApi, UseForsendelseApiKeys } from "../../../hooks/useForsendelseApi";
 import { IDokument } from "../../../types/Dokument";
 import { parseErrorMessageFromAxiosError } from "../../../utils/ErrorUtils";
@@ -27,7 +28,7 @@ interface IDokumenterContext {
     deleteMode: boolean;
     toggleDeleteMode: () => void;
     saveChanges: () => void;
-    validateCanSendForsendelse: () => boolean;
+    validateCanSendForsendelse: (manueltDistribusjon?: boolean) => boolean;
     forsendelseId: string;
     dokumenter: FormIDokument[];
     swapDocuments: (from: number, to: number) => void;
@@ -41,9 +42,21 @@ interface IDokumenterContext {
 interface IDokumenterPropsContext {
     forsendelseId: string;
 }
+export type VarselDokumentType = "SKJEMA" | "FRITEKST";
 
+export type VarselEttersendelseFormProps = {
+    tittel: string;
+    journalpostId?: string;
+    innsendingsfristDager: number;
+    vedleggsliste: {
+        varselDokumentId?: number;
+        tittel: string;
+        skjemaId?: string;
+    }[];
+};
 export interface IForsendelseFormProps {
     dokumenter: IDokument[];
+    ettersendingsoppgave?: VarselEttersendelseFormProps;
 }
 
 export type OppdaterDokumentTittelMutationProps = { tittel: string; dokumentreferanse: string };
@@ -54,6 +67,7 @@ function DokumenterFormProvider({ children, ...props }: PropsWithChildren<IDokum
     const methods = useForm<IForsendelseFormProps>({
         defaultValues: {
             dokumenter: forsendelse.dokumenter,
+            ettersendingsoppgave: mapVarselEttersendelse(forsendelse.ettersendingsoppgave),
         },
     });
 
@@ -68,8 +82,9 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
     const { addError, resetError } = useErrorContext();
     const forsendelse = useForsendelseApi().hentForsendelse();
     const [deleteMode, setDeleteMode] = useState(false);
-    const { reset, handleSubmit, formState, setError, resetField } = useFormContext<IForsendelseFormProps>();
-    const { fields, append, update, move } = useFieldArray<IForsendelseFormProps>({
+    const { reset, handleSubmit, formState, setError, resetField, getValues, clearErrors } =
+        useFormContext<IForsendelseFormProps>();
+    const { fields, append, update, move } = useFieldArray<IForsendelseFormProps, "dokumenter">({
         name: "dokumenter",
     });
 
@@ -126,6 +141,7 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
     const resetForm = () => {
         reset({
             dokumenter: forsendelse.dokumenter,
+            ettersendingsoppgave: mapVarselEttersendelse(forsendelse.ettersendingsoppgave),
         });
     };
     const saveChanges = (formProps: IForsendelseFormProps) => {
@@ -146,9 +162,11 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
         update(index, updatedDocument);
     };
 
-    function validateCanSendForsendelse() {
-        if (isDirty) {
+    function validateCanSendForsendelse(manueltDistribusjon?: boolean) {
+        clearErrors("root.kanDistribueres");
+        if (isDirty && Object.keys(dirtyFields).length > 0) {
             setError("root", { message: "Endringene må lagres før distribusjon av forsendelse kan bestilles" });
+            setError("root.kanDistribueres", { message: "Forsendelse kan ikke distribueres" });
             return false;
         }
         let isValid = true;
@@ -164,6 +182,21 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
                 setError(`dokumenter.${index}`, { message: errorMessage });
             }
             index++;
+        }
+        const varsel = getValues("ettersendingsoppgave");
+
+        if (varsel && varsel.vedleggsliste.length == 0) {
+            setError("ettersendingsoppgave", { message: "Varsel må inneholde minst ett dokument" });
+            isValid = false;
+        }
+        if (varsel && manueltDistribusjon) {
+            setError("root", {
+                message: "Kan ikke bestille lokal utskrift med ettersendingsoppgave",
+            });
+            isValid = false;
+        }
+        if (!isValid) {
+            setError("root.kanDistribueres", { message: "Forsendelse kan ikke distribueres" });
         }
         return isValid;
     }

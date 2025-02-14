@@ -1,6 +1,11 @@
 import ObjectUtils from "@navikt/bidrag-ui-common/esm/utils/ObjectUtils";
 
-import { BehandlingInfoDto, BehandlingInfoResponseDto, MottakerTo } from "../api/BidragForsendelseApi";
+import {
+    BehandlingInfoDto,
+    BehandlingInfoResponseDto,
+    EttersendingsoppgaveDto,
+    MottakerTo,
+} from "../api/BidragForsendelseApi";
 import { IOpprettForsendelsePropsContext } from "../pages/opprettforsendelse/OpprettForsendelseContext";
 import { hasOnlyNullValues } from "../utils/ObjectUtils";
 import { IDokument } from "./Dokument";
@@ -12,6 +17,7 @@ export interface IForsendelse {
     mottaker?: MottakerTo;
     dokumenter: IDokument[];
     behandlingInfo?: BehandlingInfoResponseDto;
+    ettersendingsoppgave?: EttersendingsoppgaveDto;
     saksnummer?: string;
     enhet?: string;
     tema?: string;

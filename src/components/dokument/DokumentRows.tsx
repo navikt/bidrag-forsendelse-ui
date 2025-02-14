@@ -13,7 +13,7 @@ import { useEffect } from "react";
 import { CSSProperties } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
-import { DokumentArkivSystemDto } from "../../api/BidragForsendelseApi";
+import { DokumentArkivSystemDto } from "../../api/BidragDokumentApi";
 import { DokumentStatus } from "../../constants/DokumentStatus";
 import { FormIDokument, useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IForsendelseFormProps } from "../../pages/forsendelse/context/DokumenterFormContext";

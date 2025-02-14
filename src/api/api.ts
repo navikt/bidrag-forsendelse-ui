@@ -4,6 +4,7 @@ import environment from "../environment";
 import { Api as BidragDokumentApi } from "./BidragDokumentApi";
 import { Api as BidragDokumentArkivApi } from "./BidragDokumentArkivApi";
 import { Api as BidragForsendelseApi } from "./BidragForsendelseApi";
+import { Api as BidragKodeverkApi } from "./BidragKodeverkApi";
 import { Api as BidragOrganisasjontApi } from "./BidragOrganisasjontApi";
 import { Api as PersonApi } from "./BidragPersonApi";
 import { Api as SakApi } from "./BidragSakApi";
@@ -48,4 +49,10 @@ export const BIDRAG_DOKUMENT_ARKIV_API = useApi(
     "bidrag-dokument-arkiv",
     "fss",
     environment.system.legacyEnvironment
+);
+
+export const BIDRAG_KODEVERK_API = useApi(
+    new BidragKodeverkApi({ baseURL: environment.url.bidragKodeverk }),
+    "bidrag-kodeverk",
+    "gcp"
 );
