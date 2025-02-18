@@ -48,11 +48,13 @@ export type VarselEttersendelseFormProps = {
     tittel: string;
     journalpostId?: string;
     innsendingsfristDager: number;
-    vedleggsliste: {
-        varselDokumentId?: number;
-        tittel: string;
-        skjemaId?: string;
-    }[];
+    vedleggsliste: VarselEttersendelseVedleggProps[];
+};
+
+export type VarselEttersendelseVedleggProps = {
+    varselDokumentId?: number;
+    tittel: string;
+    skjemaId?: string;
 };
 export interface IForsendelseFormProps {
     dokumenter: IDokument[];

@@ -36,7 +36,8 @@ import {
     useSlettVarselEttersendelse,
     useSlettVarselEttersendelseDokument,
 } from "../../../hooks/varselEnderselseApi";
-import { IForsendelseFormProps } from "../context/DokumenterFormContext";
+import { KodeBeskrivelse } from "../../../types/KodeverkTypes";
+import { IForsendelseFormProps, VarselEttersendelseVedleggProps } from "../context/DokumenterFormContext";
 import { useSession } from "../context/SessionContext";
 import { VarselDetaljer } from "./EttersendingsoppgaveDetaljer";
 export const ettersendingsformPrefiks = "ettersendingsoppgave";
@@ -279,7 +280,7 @@ function EttersendingsoppgaveVedleggsliste() {
                                             <NavSkjemaSelect2 index={index} />
                                         </Suspense>
                                     ) : (
-                                        <span>{dokument.tittel}</span>
+                                        <span>{convertSkjemaBeskrivelse(dokument)}</span>
                                     )}
                                 </Table.DataCell>
                                 {/* <Table.DataCell textSize="small">{dokument.skjemaId ?? "Annen"}</Table.DataCell> */}
@@ -422,21 +423,20 @@ function NavSkjemaSelect2({ hideLabel = true, index }: { hideLabel?: boolean; in
             allowNewValues
             size="small"
             error={form.formState.errors?.dokumenter?.[index]?.tittel?.message}
-            defaultValue={form.getValues(`${ettersendingsformPrefiks}.vedleggsliste.${index}.tittel`)}
+            defaultValue={convertSkjemaBeskrivelse(
+                form.getValues(`${ettersendingsformPrefiks}.vedleggsliste.${index}`)
+            )}
             onChange={() => {
                 return null;
             }}
             options={bidragSkjemaer.map((skjema) => ({
-                label: skjema.beskrivelse,
+                label: convertSkjemaBeskrivelse(skjema),
                 value: skjema.kode,
             }))}
             onToggleSelected={(value) => {
                 const skjema = bidragSkjemaer.find((skjema) => skjema.kode === value);
                 form.setValue(`${ettersendingsformPrefiks}.vedleggsliste.${index}.skjemaId`, skjema?.kode ?? "N6");
-                form.setValue(
-                    `${ettersendingsformPrefiks}.vedleggsliste.${index}.tittel`,
-                    skjema?.beskrivelse ?? value
-                );
+                form.setValue(`${ettersendingsformPrefiks}.vedleggsliste.${index}.tittel`, skjema.beskrivelse ?? value);
             }}
         ></UNSAFE_Combobox>
     );
@@ -470,3 +470,20 @@ export const EditOrSaveButton = ({
         ></Button>
     );
 };
+function convertSkjemaBeskrivelse(skjema: KodeBeskrivelse | VarselEttersendelseVedleggProps) {
+    if ("skjemaId" in skjema) {
+        console.log("here", skjema);
+        if (skjema.skjemaId === "W3" || skjema.skjemaId === "N6_BL") {
+            return `${skjema.tittel} (lenke til dokumentet)`;
+        }
+        return skjema.tittel;
+    } else if ("kode" in skjema) {
+        console.log("HERE", skjema);
+        if (skjema.kode === "W3" || skjema.kode === "N6_BL") {
+            return `${skjema.beskrivelse} (lenke til dokumentet)`;
+        }
+        return skjema.beskrivelse;
+    }
+
+    return skjema["tittel"] ?? skjema["beskrivelse"];
+}
