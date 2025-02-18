@@ -436,7 +436,10 @@ function NavSkjemaSelect2({ hideLabel = true, index }: { hideLabel?: boolean; in
             onToggleSelected={(value) => {
                 const skjema = bidragSkjemaer.find((skjema) => skjema.kode === value);
                 form.setValue(`${ettersendingsformPrefiks}.vedleggsliste.${index}.skjemaId`, skjema?.kode ?? "N6");
-                form.setValue(`${ettersendingsformPrefiks}.vedleggsliste.${index}.tittel`, skjema.beskrivelse ?? value);
+                form.setValue(
+                    `${ettersendingsformPrefiks}.vedleggsliste.${index}.tittel`,
+                    skjema?.beskrivelse ?? value
+                );
             }}
         ></UNSAFE_Combobox>
     );
@@ -472,13 +475,11 @@ export const EditOrSaveButton = ({
 };
 function convertSkjemaBeskrivelse(skjema: KodeBeskrivelse | VarselEttersendelseVedleggProps) {
     if ("skjemaId" in skjema) {
-        console.log("here", skjema);
         if (skjema.skjemaId === "W3" || skjema.skjemaId === "N6_BL") {
             return `${skjema.tittel} (lenke til dokumentet)`;
         }
         return skjema.tittel;
     } else if ("kode" in skjema) {
-        console.log("HERE", skjema);
         if (skjema.kode === "W3" || skjema.kode === "N6_BL") {
             return `${skjema.beskrivelse} (lenke til dokumentet)`;
         }
