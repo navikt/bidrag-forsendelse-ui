@@ -85,7 +85,7 @@ export function useForsendelseApi(): UseForsendelseDataProps {
                         }
                     );
                 } catch (error) {
-                    console.log("Error", error);
+                    console.log("Feil ved henting av journal for sak", error);
                     return { data: [] } as AxiosResponse;
                 }
             },
