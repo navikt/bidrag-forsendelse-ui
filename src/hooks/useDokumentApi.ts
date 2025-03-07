@@ -152,16 +152,17 @@ const useHentJournal = () => {
     const { saksnummer } = useSession();
     return useSuspenseQuery({
         queryKey: DokumentQueryKeys.hentJournal(saksnummer),
-        queryFn: () =>
-            BIDRAG_DOKUMENT_API.sak.hentJournal(
+        queryFn: async () => {
+            return await BIDRAG_DOKUMENT_API.sak.hentJournal(
                 saksnummer,
                 { fagomrade: ["BID", "FAR"] },
                 {
                     paramsSerializer: {
-                        indexes: null, // use brackets with indexes
+                        indexes: null,
                     },
                 }
-            ),
+            );
+        },
     }).data;
 };
 

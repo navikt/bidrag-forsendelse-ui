@@ -73,16 +73,22 @@ export function useForsendelseApi(): UseForsendelseDataProps {
         // console.log("Henter journalposter for sak", saksnummer);
         const { data: journalposter } = useSuspenseQuery({
             queryKey: [`journal_sak_${saksnummer}`],
-            queryFn: ({ signal }) =>
-                BIDRAG_DOKUMENT_API.sak.hentJournal(
-                    saksnummer,
-                    { fagomrade: ["BID", "FAR"] },
-                    {
-                        paramsSerializer: {
-                            indexes: null,
-                        },
-                    }
-                ),
+            queryFn: async ({ signal }) => {
+                try {
+                    return await BIDRAG_DOKUMENT_API.sak.hentJournal(
+                        saksnummer,
+                        { fagomrade: ["BID", "FAR"] },
+                        {
+                            paramsSerializer: {
+                                indexes: null,
+                            },
+                        }
+                    );
+                } catch (error) {
+                    console.log("Error", error);
+                    return { data: [] } as AxiosResponse;
+                }
+            },
             select: React.useCallback((response: AxiosResponse): IJournalpost[] => {
                 const journalposter = response.data as JournalpostDto[];
                 return journalposter.map((journalpost) => journalpostMapper(journalpost));
