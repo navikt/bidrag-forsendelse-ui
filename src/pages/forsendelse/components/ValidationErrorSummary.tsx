@@ -18,8 +18,8 @@ export default function ValidationErrorSummary() {
             allErrors = allErrors.concat(errors.dokumenter?.map((err) => err?.message));
         }
 
-        if (errors.varselEttersendelse && errors.varselEttersendelse?.dokumenter == undefined) {
-            allErrors = allErrors.concat(errors.varselEttersendelse?.message);
+        if (errors.ettersendingsoppgave && errors.ettersendingsoppgave?.vedleggsliste == undefined) {
+            allErrors = allErrors.concat(errors.ettersendingsoppgave?.message);
         }
         if (errors.root?.message) {
             allErrors = allErrors.concat([errors.root?.message]);

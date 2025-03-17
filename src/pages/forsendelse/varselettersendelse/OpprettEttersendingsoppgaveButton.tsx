@@ -48,8 +48,7 @@ export default function OpprettEttersendelseOppgaveButton() {
     const forsendelse = useHentForsendelseQuery();
     const inngåendeJournalposter = useHentJournalInngående();
 
-    if ((inngåendeJournalposter.length === 0 && !forsendelse.ettersendingsoppgave) || !isEttersendingsoppgaveEnabled)
-        return;
+    if (!isEttersendingsoppgaveEnabled) return;
     return (
         <>
             {forsendelse.ettersendingsoppgave ? (
@@ -89,9 +88,9 @@ function OpprettEttersendelseOppgaveModal({
         opprettVarselEttersendelseFn
             .mutateAsync({
                 forsendelseId: Number(forsendelseId.replace("BIF-", "")),
-                tittel: journalpost?.innhold,
+                tittel: journalpost?.innhold ?? "",
                 ettersendelseForJournalpostId: data.journalpostId,
-                skjemaId: journalpost.brevkode.kode,
+                skjemaId: journalpost?.brevkode?.kode ?? data.journalpostId,
             })
             .then(async (opprettetVarselEttersendelse) => {
                 setValue("ettersendingsoppgave", mapVarselEttersendelse(opprettetVarselEttersendelse.data));
@@ -319,6 +318,8 @@ function EttersendingsoppgaveVedleggsliste() {
         </Box>
     );
 }
+
+const navAnnenSkjema = "VANL";
 export function VarselForJournalpostSelect({ hideLabel = false, prefiks }: { hideLabel?: boolean; prefiks?: string }) {
     const inngåendeJournalposter = useHentJournalInngående();
     const form = useFormContext();
@@ -331,6 +332,9 @@ export function VarselForJournalpostSelect({ hideLabel = false, prefiks }: { hid
                 size="small"
                 {...form.register(`${prefiks ? `${ettersendingsformPrefiks}.journalpostId` : "journalpostId"}`)}
             >
+                <option key={navAnnenSkjema} value={navAnnenSkjema}>
+                    Uten tilknytning til skjema
+                </option>
                 {inngåendeJournalposter
                     .sort((a, b) => a.dokumentDato.localeCompare(b.dokumentDato))
                     .map((journalpost) => {
