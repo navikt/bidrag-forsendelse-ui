@@ -62,11 +62,6 @@ export function VarselDetaljer() {
                 size="small"
                 className="w-fit [&_.navds-table\_\_data-cell]:border-none [&_.navds-table\_\_header-cell]:border-none [&_.navds-table\_\_data-cell]:pl-0"
             >
-                <Table.Header>
-                    <Table.HeaderCell scope="col" className={"w-[185px]"}></Table.HeaderCell>
-                    <Table.HeaderCell scope="col"></Table.HeaderCell>
-                </Table.Header>
-
                 <Table.Body>
                     <VarselTittel redigerbar={endreDetaljer} />
                     <VarselFrist redigerbar={endreDetaljer} />

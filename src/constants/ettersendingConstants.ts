@@ -39,4 +39,20 @@ export const visAndreVedleggskoder: KodeBeskrivelse[] = [
         kode: "N6_DOB",
         beskrivelse: "Dokumentasjon på omsorg for barn",
     },
+    {
+        kode: "N6_FYLLUT_BIDRAG",
+        beskrivelse: "Avtale om barnebidrag",
+    },
+    {
+        kode: "N6_FYLLUT_BIDRAG18ÅR",
+        beskrivelse: "Avtale om barnebidrag for barn over 18 år",
+    },
+    {
+        kode: "N6_FYLLUT_FORSKUDD",
+        beskrivelse: "Søknad om bidragsforskudd",
+    },
+    {
+        kode: "N6_FYLLUT_SÆRBIDRAG",
+        beskrivelse: "Søknad om bidrag til særlige utgifter",
+    },
 ];
