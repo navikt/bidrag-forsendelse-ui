@@ -24,22 +24,6 @@ export const visVedleggskoder = [
 ];
 export const visAndreVedleggskoder: KodeBeskrivelse[] = [
     {
-        kode: "N6_PA",
-        beskrivelse: "Privat avtale eller dom om bidrag",
-    },
-    {
-        kode: "N6_BL",
-        beskrivelse: "Bekreftelse fra lege på nedsatt arbeidsevne",
-    },
-    {
-        kode: "N6_DOBV",
-        beskrivelse: "Dokumentasjon på omsorgsovertagelse fra barneverntjenesten",
-    },
-    {
-        kode: "N6_DOB",
-        beskrivelse: "Dokumentasjon på omsorg for barn",
-    },
-    {
         kode: "N6_FYLLUT_BIDRAG",
         beskrivelse: "Avtale om barnebidrag",
     },
@@ -54,5 +38,29 @@ export const visAndreVedleggskoder: KodeBeskrivelse[] = [
     {
         kode: "N6_FYLLUT_SÆRBIDRAG",
         beskrivelse: "Søknad om bidrag til særlige utgifter",
+    },
+    {
+        kode: "N6_FYLLUT_SØKNAD_18_SVAR",
+        beskrivelse: "Svar i sak om barnebidrag etter fylte 18 år",
+    },
+    {
+        kode: "N6_FYLLUT_SØKNAD_18",
+        beskrivelse: "Søknad om barnebidrag etter fylte 18 år",
+    },
+    {
+        kode: "N6_PA",
+        beskrivelse: "Privat avtale eller dom om bidrag",
+    },
+    {
+        kode: "N6_BL",
+        beskrivelse: "Bekreftelse fra lege på nedsatt arbeidsevne",
+    },
+    {
+        kode: "N6_DOBV",
+        beskrivelse: "Dokumentasjon på omsorgsovertagelse fra barneverntjenesten",
+    },
+    {
+        kode: "N6_DOB",
+        beskrivelse: "Dokumentasjon på omsorg for barn",
     },
 ];
