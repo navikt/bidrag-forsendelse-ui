@@ -14,12 +14,13 @@ import {
     Page,
     Select,
     Table,
+    TextField,
     UNSAFE_Combobox,
     VStack,
 } from "@navikt/ds-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Suspense, useMemo, useState } from "react";
-import { FormProvider, useFieldArray, useForm, useFormContext } from "react-hook-form";
+import { FormProvider, useFieldArray, useForm, useFormContext, useWatch } from "react-hook-form";
 
 import {
     mapForsendelseResponse as varselForsendelseUpdater,
@@ -67,6 +68,7 @@ export default function OpprettEttersendelseOppgaveButton() {
 
 type FormProps = {
     journalpostId: string;
+    tittel?: string;
 };
 function OpprettEttersendelseOppgaveModal({
     isOpen,
@@ -81,14 +83,19 @@ function OpprettEttersendelseOppgaveModal({
     const form = useForm<FormProps>({});
     const opprettVarselEttersendelseFn = useOpprettVarselEttersendelse();
     const inngåendeJournalposter = useHentJournalInngående();
+    const jpId = useWatch({ control: form.control, name: "journalpostId" });
 
     function opprett(data: FormProps) {
         const journalpost = inngåendeJournalposter.find((jp) => jp.journalpostId === data.journalpostId);
+        if (data.journalpostId == navAnnenSkjema && !data.tittel) {
+            form.setError("tittel", { message: "Tittel må settes når det ikke knyttes til skjema" });
+            return;
+        }
 
         opprettVarselEttersendelseFn
             .mutateAsync({
                 forsendelseId: Number(forsendelseId.replace("BIF-", "")),
-                tittel: journalpost?.innhold ?? "",
+                tittel: data.journalpostId == navAnnenSkjema ? data.tittel : journalpost?.innhold,
                 ettersendelseForJournalpostId: data.journalpostId,
                 skjemaId: journalpost?.brevkode?.kode ?? data.journalpostId,
             })
@@ -101,6 +108,7 @@ function OpprettEttersendelseOppgaveModal({
                 setIsOpen(false);
             });
     }
+    console.log(form.getValues("journalpostId"), jpId);
     return (
         <form onSubmit={form.handleSubmit(opprett)}>
             <Modal open={isOpen} aria-label="" closeOnBackdropClick onClose={() => setIsOpen(false)} className="w-full">
@@ -111,6 +119,17 @@ function OpprettEttersendelseOppgaveModal({
                     <FormProvider {...form}>
                         <EksisterendeOppgaveVarsel />
                         <VarselForJournalpostSelect />
+                        {form.getValues("journalpostId") == navAnnenSkjema && (
+                            <>
+                                <TextField
+                                    className="w-[300px] pt-2"
+                                    size="small"
+                                    label="Tittel"
+                                    {...form.register(`tittel`)}
+                                    error={form.formState?.errors?.tittel?.message}
+                                />
+                            </>
+                        )}
                     </FormProvider>
                 </Modal.Body>
                 <Modal.Footer>
@@ -322,7 +341,7 @@ function EttersendingsoppgaveVedleggsliste() {
 const navAnnenSkjema = "VANL";
 export function VarselForJournalpostSelect({ hideLabel = false, prefiks }: { hideLabel?: boolean; prefiks?: string }) {
     const inngåendeJournalposter = useHentJournalInngående();
-    const form = useFormContext();
+    const form = useFormContext<FormProps | IForsendelseFormProps>();
 
     return (
         <>
@@ -332,9 +351,6 @@ export function VarselForJournalpostSelect({ hideLabel = false, prefiks }: { hid
                 size="small"
                 {...form.register(`${prefiks ? `${ettersendingsformPrefiks}.journalpostId` : "journalpostId"}`)}
             >
-                <option key={navAnnenSkjema} value={navAnnenSkjema}>
-                    Uten tilknytning til skjema
-                </option>
                 {inngåendeJournalposter
                     .sort((a, b) => a.dokumentDato.localeCompare(b.dokumentDato))
                     .map((journalpost) => {
@@ -344,6 +360,9 @@ export function VarselForJournalpostSelect({ hideLabel = false, prefiks }: { hid
                             </option>
                         );
                     })}
+                <option key={navAnnenSkjema} value={navAnnenSkjema}>
+                    Uten tilknytning til skjema
+                </option>
             </Select>
         </>
     );
