@@ -52,10 +52,10 @@ export const useHentVedleggskoder = (): KodeBeskrivelse[] => {
         queryFn: async () => {
             const response = await BIDRAG_KODEVERK_API.kodeverk.hentKodeverk("Vedleggskoder");
             return [
+                ...visAndreVedleggskoder,
                 ...mapKodeverkResponseToCodeAndName(response.data).filter((kodeBeskrivelse) =>
                     visVedleggskoder.includes(kodeBeskrivelse.kode)
                 ),
-                ...visAndreVedleggskoder,
             ];
         },
     });

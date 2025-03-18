@@ -499,10 +499,16 @@ function convertSkjemaBeskrivelse(skjema: KodeBeskrivelse | VarselEttersendelseV
         if (skjema.skjemaId === "W3" || skjema.skjemaId === "N6_BL") {
             return `${skjema.tittel} (lenke til dokumentet)`;
         }
+        if (skjema.skjemaId.startsWith("N6_FYLLUT")) {
+            return `${skjema.tittel} (lenke til skjema)`;
+        }
         return skjema.tittel;
     } else if ("kode" in skjema) {
         if (skjema.kode === "W3" || skjema.kode === "N6_BL") {
             return `${skjema.beskrivelse} (lenke til dokumentet)`;
+        }
+        if (skjema.kode.startsWith("N6_FYLLUT")) {
+            return `${skjema.beskrivelse} (lenke til skjema)`;
         }
         return skjema.beskrivelse;
     }

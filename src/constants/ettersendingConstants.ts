@@ -22,10 +22,15 @@ export const visVedleggskoder = [
     "Y4",
     "Z1",
 ];
+
 export const visAndreVedleggskoder: KodeBeskrivelse[] = [
     {
         kode: "N6_FYLLUT_BIDRAG",
-        beskrivelse: "Avtale om barnebidrag",
+        beskrivelse: "Søknad om barnebidrag",
+    },
+    {
+        kode: "N6_FYLLUT_BIDRAG_SVAR",
+        beskrivelse: "Svar i sak om barnebidrag",
     },
     {
         kode: "N6_FYLLUT_BIDRAG18ÅR",
