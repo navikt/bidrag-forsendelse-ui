@@ -47,7 +47,6 @@ export default function OpprettEttersendelseOppgaveButton() {
     const { isEttersendingsoppgaveEnabled } = useFeatureToogle();
     const [isOpen, setIsOpen] = useState(false);
     const forsendelse = useHentForsendelseQuery();
-    const inngåendeJournalposter = useHentJournalInngående();
 
     if (!isEttersendingsoppgaveEnabled) return;
     return (
@@ -83,7 +82,7 @@ function OpprettEttersendelseOppgaveModal({
     const form = useForm<FormProps>({});
     const opprettVarselEttersendelseFn = useOpprettVarselEttersendelse();
     const inngåendeJournalposter = useHentJournalInngående();
-    const jpId = useWatch({ control: form.control, name: "journalpostId" });
+    const journalpostId = useWatch({ control: form.control, name: "journalpostId" });
 
     function opprett(data: FormProps) {
         const journalpost = inngåendeJournalposter.find((jp) => jp.journalpostId === data.journalpostId);
@@ -108,7 +107,6 @@ function OpprettEttersendelseOppgaveModal({
                 setIsOpen(false);
             });
     }
-    console.log(form.getValues("journalpostId"), jpId);
     return (
         <form onSubmit={form.handleSubmit(opprett)}>
             <Modal open={isOpen} aria-label="" closeOnBackdropClick onClose={() => setIsOpen(false)} className="w-full">
@@ -119,7 +117,7 @@ function OpprettEttersendelseOppgaveModal({
                     <FormProvider {...form}>
                         <EksisterendeOppgaveVarsel />
                         <VarselForJournalpostSelect />
-                        {form.getValues("journalpostId") == navAnnenSkjema && (
+                        {journalpostId == navAnnenSkjema && (
                             <>
                                 <TextField
                                     className="w-[300px] pt-2"
