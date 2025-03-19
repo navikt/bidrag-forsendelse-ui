@@ -156,7 +156,7 @@ export default function ForsendelsePage({
     return (
         <PageWrapper name={"forsendelse-page"}>
             <SessionProvider forsendelseId={forsendelseId} saksnummer={saksnummer} sessionId={sessionId} enhet={enhet}>
-                <Page>
+                <Page className="forsendelse-page">
                     <ForsendelseSakHeader />
                     <React.Suspense fallback={<LoadingIndicator />}>
                         <Page.Block width="xl" gutters className="pt-4">

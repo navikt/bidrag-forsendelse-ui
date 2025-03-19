@@ -102,6 +102,11 @@
   dependencies:
     "@jridgewell/trace-mapping" "0.3.9"
 
+"@date-fns/tz@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@date-fns/tz/-/tz-1.2.0.tgz#81cb3211693830babaf3b96aff51607e143030a6"
+  integrity sha512-LBrd7MiJZ9McsOgxqWX7AaxrDjcFVjWH/tIKJd7pnR7McaslGYOP1QmmiBXdJH/H/yLCT+rcQ7FaPBUxRGUtrg==
+
 "@discoveryjs/json-ext@^0.6.1":
   version "0.6.3"
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.6.3.tgz#f13c7c205915eb91ae54c557f5e92bddd8be0e83"
@@ -800,7 +805,7 @@
     outvariant "^1.4.3"
     strict-event-emitter "^0.5.1"
 
-"@navikt/aksel-icons@7.10.0", "@navikt/aksel-icons@^7.10.0":
+"@navikt/aksel-icons@7.10.0":
   version "7.10.0"
   resolved "https://npm.pkg.github.com/download/@navikt/aksel-icons/7.10.0/746cdb8d2ee771bfffc83f1a7f868967b19254be#746cdb8d2ee771bfffc83f1a7f868967b19254be"
   integrity sha512-k8mcnkx/kiNd6SacR6lQot+WuIz6/3k3oUc9A+mH91FFJ1DcA4GCstS72/A4otmszvvCxCw0ZkivgBtU1JFq1g==
@@ -809,6 +814,11 @@
   version "3.4.2"
   resolved "https://npm.pkg.github.com/download/@navikt/aksel-icons/3.4.2/fa858e1a5fb0557d61b62ad7cdf0d75e26fc89d7#fa858e1a5fb0557d61b62ad7cdf0d75e26fc89d7"
   integrity sha512-9fj+Jb4UrX3SDDzqJpKP3fvizdxtACIFNXgDiPaP/N/61pbeY4tZz/zrtWGtExLpDeg7dAyaiFH/hfo7nBg6nw==
+
+"@navikt/aksel-icons@^7.17.3":
+  version "7.17.3"
+  resolved "https://npm.pkg.github.com/download/@navikt/aksel-icons/7.17.3/587d82a2e1f22a7adff490b384a2415552363a88#587d82a2e1f22a7adff490b384a2415552363a88"
+  integrity sha512-5sy7S9X9DfFAempBQA123Tr1TLeddywmsmZPoONJN5P2aPolnlM6oZfaLytp1RfHBibkUTpfDvfu6CGjNOC7kw==
 
 "@navikt/bidrag-ui-common@1.11.0":
   version "1.11.0"
@@ -846,18 +856,18 @@
     clsx "^1.1.1"
     copy-to-clipboard "^3.3.1"
 
-"@navikt/ds-react@7.10.0":
-  version "7.10.0"
-  resolved "https://npm.pkg.github.com/download/@navikt/ds-react/7.10.0/4cd87a1eb3bc93399bd17fbecb3ed35ba156f3fe#4cd87a1eb3bc93399bd17fbecb3ed35ba156f3fe"
-  integrity sha512-34oQAnn8q4pMVQosw4Rqzntek9yRl01eNR/zGnzNLzg9VvYIYy2xaFVJvS61LJdaigvSo955w+C9VIwXQQ7sUw==
+"@navikt/ds-react@7.17.3":
+  version "7.17.3"
+  resolved "https://npm.pkg.github.com/download/@navikt/ds-react/7.17.3/0b9273acb9828ef6e7d78aa9012502bd287aa362#0b9273acb9828ef6e7d78aa9012502bd287aa362"
+  integrity sha512-BRa1C642XM5oox51rw8COzdr0NbkMZfTHt6qfySfi+vcPWFyojcqHJyhJ8bb85YwA+05Cu/oDGHHtTZRTkCT2g==
   dependencies:
     "@floating-ui/react" "0.25.4"
     "@floating-ui/react-dom" "^2.0.9"
-    "@navikt/aksel-icons" "^7.10.0"
-    "@navikt/ds-tokens" "^7.10.0"
+    "@navikt/aksel-icons" "^7.17.3"
+    "@navikt/ds-tokens" "^7.17.3"
     clsx "^2.1.0"
-    date-fns "^3.0.0"
-    react-day-picker "8.10.1"
+    date-fns "^4.0.0"
+    react-day-picker "9.6.1"
 
 "@navikt/ds-react@^3.4.2":
   version "3.4.2"
@@ -873,15 +883,15 @@
     react-day-picker "8.3.4"
     react-modal "3.15.1"
 
-"@navikt/ds-tailwind@^7.10.0":
-  version "7.10.0"
-  resolved "https://npm.pkg.github.com/download/@navikt/ds-tailwind/7.10.0/b2a81fc795e866e9964be0101001ab2247e51c1a#b2a81fc795e866e9964be0101001ab2247e51c1a"
-  integrity sha512-MPEhaA4tV7MJ4Xqf5681wEowrWnM5hMbzDewOcdfyRED6JM/lYRIkcIarEwIt5f4/tP6GL1kLbUySDXoPsvyig==
+"@navikt/ds-tailwind@^7.17.3":
+  version "7.17.3"
+  resolved "https://npm.pkg.github.com/download/@navikt/ds-tailwind/7.17.3/1d35204186981d5f5c4153c5d5c6d2725f0270cb#1d35204186981d5f5c4153c5d5c6d2725f0270cb"
+  integrity sha512-Lg8vBmMgY+ilQHIFQ+pT91m5qKobpB8xFRmNSFO01YaxPQWeaQbBADVKiBcgr8S75IaooOHLi+c9q5cr/qjzoA==
 
-"@navikt/ds-tokens@^7.10.0":
-  version "7.10.0"
-  resolved "https://npm.pkg.github.com/download/@navikt/ds-tokens/7.10.0/04ceca43c67cd5bcb0a8524e45c94067fd2b278c#04ceca43c67cd5bcb0a8524e45c94067fd2b278c"
-  integrity sha512-yozkLGtD5VtK1p/0+cHR4qWvYl6B6YPOV5aY4E1naBppuS5ykKtWvYeu2lxVlM6sWd6hkV3znbanoloyGFmj+Q==
+"@navikt/ds-tokens@^7.17.3":
+  version "7.17.3"
+  resolved "https://npm.pkg.github.com/download/@navikt/ds-tokens/7.17.3/b7c19ca8a48c08e4b9e23a2b074dbe1e33d6b7a8#b7c19ca8a48c08e4b9e23a2b074dbe1e33d6b7a8"
+  integrity sha512-Vorx6F4N0mEsnN5Vle8w8Pysk0LinQTlbQfMYKkDaiB33Ec6b0S/NO6eRrA631ATG99FIPJohJKdEGl9H4fEGQ==
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
@@ -3208,20 +3218,20 @@ data-urls@^5.0.0:
     whatwg-mimetype "^4.0.0"
     whatwg-url "^14.0.0"
 
+date-fns-jalali@^4.1.0-0:
+  version "4.1.0-0"
+  resolved "https://registry.yarnpkg.com/date-fns-jalali/-/date-fns-jalali-4.1.0-0.tgz#9c7fb286004fab267a300d3e9f1ada9f10b4b6b0"
+  integrity sha512-hTIP/z+t+qKwBDcmmsnmjWTduxCg+5KfdqWQvb2X/8C9+knYY6epN/pfxdDuyVlSVeFz0sM5eEfwIUQ70U4ckg==
+
 date-fns@2.29.3:
   version "2.29.3"
   resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.29.3.tgz#27402d2fc67eb442b511b70bbdf98e6411cd68a8"
   integrity sha512-dDCnyH2WnnKusqvZZ6+jA1O51Ibt8ZMRNkDZdyAyK4YfbDwa/cEmuztzG5pk6hqlp9aSBPYcjOlktquahGwGeA==
 
-date-fns@4.1.0:
+date-fns@4.1.0, date-fns@^4.0.0, date-fns@^4.1.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-4.1.0.tgz#64b3d83fff5aa80438f5b1a633c2e83b8a1c2d14"
   integrity sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==
-
-date-fns@^3.0.0:
-  version "3.6.0"
-  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-3.6.0.tgz#f20ca4fe94f8b754951b24240676e8618c0206bf"
-  integrity sha512-fRHTG8g/Gif+kSh50gaGEdToemgfj74aRX3swtiouboip5JDLAyDE9F11nHMIcvOaXeOC6D7SpNhi7uFyB7Uww==
 
 dayjs@1.11.13:
   version "1.11.13"
@@ -7831,15 +7841,19 @@ raw-body@2.5.2:
     iconv-lite "0.4.24"
     unpipe "1.0.0"
 
-react-day-picker@8.10.1:
-  version "8.10.1"
-  resolved "https://registry.yarnpkg.com/react-day-picker/-/react-day-picker-8.10.1.tgz#4762ec298865919b93ec09ba69621580835b8e80"
-  integrity sha512-TMx7fNbhLk15eqcMt+7Z7S2KF7mfTId/XJDjKE8f+IUcFn0l08/kI4FiYTL/0yuOLmEcbR4Fwe3GJf/NiiMnPA==
-
 react-day-picker@8.3.4:
   version "8.3.4"
   resolved "https://registry.yarnpkg.com/react-day-picker/-/react-day-picker-8.3.4.tgz#0942d66266c58cd815d393ec0d142372b0d42f4f"
   integrity sha512-UuCbfZ69DhQmd+UhEv8nCPp5PxMk7ioNTuOLMlU0X7q3wd7o8TKDdsjduQoeBYTPTMS3LFdbA1qqbrIpRHo/Vg==
+
+react-day-picker@9.6.1:
+  version "9.6.1"
+  resolved "https://registry.yarnpkg.com/react-day-picker/-/react-day-picker-9.6.1.tgz#e4dcf562a2b0c083dd6de12e7dca087c36116508"
+  integrity sha512-PiRT/l6yk+fLpSmyMFUHIep8dbKAlilJGfDB0N2krXFhnxbitZf/t+ePDLk8kou/lYUVWAfIIxBJjFuvrNy7Hw==
+  dependencies:
+    "@date-fns/tz" "^1.2.0"
+    date-fns "^4.1.0"
+    date-fns-jalali "^4.1.0-0"
 
 react-dom@^19.0.0:
   version "19.0.0"

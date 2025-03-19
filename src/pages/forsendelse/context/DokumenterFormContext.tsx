@@ -186,9 +186,11 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
             index++;
         }
         const varsel = getValues("ettersendingsoppgave");
-
-        if (varsel && varsel.vedleggsliste.length == 0) {
-            setError("ettersendingsoppgave", { message: "Varsel må inneholde minst ett dokument" });
+        if (varsel && (!varsel.tittel || varsel.tittel.length == 0)) {
+            setError("ettersendingsoppgave", { message: "Tittel på ettersendingsoppgaven kan ikke være tom" });
+            isValid = false;
+        } else if (varsel && varsel.vedleggsliste.length == 0) {
+            setError("ettersendingsoppgave", { message: "Ettersendingsoppgaven må inneholde minst ett dokument" });
             isValid = false;
         }
         if (varsel && manueltDistribusjon) {

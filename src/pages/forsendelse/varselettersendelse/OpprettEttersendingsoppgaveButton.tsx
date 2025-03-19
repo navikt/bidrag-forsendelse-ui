@@ -14,12 +14,13 @@ import {
     Page,
     Select,
     Table,
+    TextField,
     UNSAFE_Combobox,
     VStack,
 } from "@navikt/ds-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Suspense, useMemo, useState } from "react";
-import { FormProvider, useFieldArray, useForm, useFormContext } from "react-hook-form";
+import { FormProvider, useFieldArray, useForm, useFormContext, useWatch } from "react-hook-form";
 
 import {
     mapForsendelseResponse as varselForsendelseUpdater,
@@ -41,15 +42,15 @@ import { IForsendelseFormProps, VarselEttersendelseVedleggProps } from "../conte
 import { useSession } from "../context/SessionContext";
 import { VarselDetaljer } from "./EttersendingsoppgaveDetaljer";
 export const ettersendingsformPrefiks = "ettersendingsoppgave";
+const navAnnenSkjema = "VANL";
 
 export default function OpprettEttersendelseOppgaveButton() {
     const { isEttersendingsoppgaveEnabled } = useFeatureToogle();
     const [isOpen, setIsOpen] = useState(false);
     const forsendelse = useHentForsendelseQuery();
-    const inngåendeJournalposter = useHentJournalInngående();
 
-    if ((inngåendeJournalposter.length === 0 && !forsendelse.ettersendingsoppgave) || !isEttersendingsoppgaveEnabled)
-        return;
+    if (!isEttersendingsoppgaveEnabled) return;
+    if (forsendelse.gjelderIdent != forsendelse.mottaker?.ident) return;
     return (
         <>
             {forsendelse.ettersendingsoppgave ? (
@@ -68,6 +69,7 @@ export default function OpprettEttersendelseOppgaveButton() {
 
 type FormProps = {
     journalpostId: string;
+    tittel?: string;
 };
 function OpprettEttersendelseOppgaveModal({
     isOpen,
@@ -78,20 +80,29 @@ function OpprettEttersendelseOppgaveModal({
 }) {
     const { forsendelseId } = useSession();
     const qc = useQueryClient();
-    const { setValue } = useFormContext<IForsendelseFormProps>();
-    const form = useForm<FormProps>({});
-    const opprettVarselEttersendelseFn = useOpprettVarselEttersendelse();
     const inngåendeJournalposter = useHentJournalInngående();
+    const { setValue } = useFormContext<IForsendelseFormProps>();
+    const form = useForm<FormProps>({
+        defaultValues: {
+            journalpostId: inngåendeJournalposter.length > 0 ? inngåendeJournalposter[0].journalpostId : navAnnenSkjema,
+        },
+    });
+    const opprettVarselEttersendelseFn = useOpprettVarselEttersendelse();
+    const journalpostId = useWatch({ control: form.control, name: "journalpostId" });
 
     function opprett(data: FormProps) {
         const journalpost = inngåendeJournalposter.find((jp) => jp.journalpostId === data.journalpostId);
+        if (data.journalpostId == navAnnenSkjema && !data.tittel) {
+            form.setError("tittel", { message: "Tittel må settes når det ikke knyttes til skjema" });
+            return;
+        }
 
         opprettVarselEttersendelseFn
             .mutateAsync({
                 forsendelseId: Number(forsendelseId.replace("BIF-", "")),
-                tittel: journalpost?.innhold,
+                tittel: data.journalpostId == navAnnenSkjema ? data.tittel : journalpost?.innhold,
                 ettersendelseForJournalpostId: data.journalpostId,
-                skjemaId: journalpost.brevkode.kode,
+                skjemaId: journalpost?.brevkode?.kode ?? data.journalpostId,
             })
             .then(async (opprettetVarselEttersendelse) => {
                 setValue("ettersendingsoppgave", mapVarselEttersendelse(opprettetVarselEttersendelse.data));
@@ -112,6 +123,17 @@ function OpprettEttersendelseOppgaveModal({
                     <FormProvider {...form}>
                         <EksisterendeOppgaveVarsel />
                         <VarselForJournalpostSelect />
+                        {journalpostId == navAnnenSkjema && (
+                            <>
+                                <TextField
+                                    className="w-[300px] pt-2"
+                                    size="small"
+                                    label="Tittel"
+                                    {...form.register(`tittel`)}
+                                    error={form.formState?.errors?.tittel?.message}
+                                />
+                            </>
+                        )}
                     </FormProvider>
                 </Modal.Body>
                 <Modal.Footer>
@@ -319,9 +341,10 @@ function EttersendingsoppgaveVedleggsliste() {
         </Box>
     );
 }
+
 export function VarselForJournalpostSelect({ hideLabel = false, prefiks }: { hideLabel?: boolean; prefiks?: string }) {
     const inngåendeJournalposter = useHentJournalInngående();
-    const form = useFormContext();
+    const form = useFormContext<FormProps | IForsendelseFormProps>();
 
     return (
         <>
@@ -340,6 +363,9 @@ export function VarselForJournalpostSelect({ hideLabel = false, prefiks }: { hid
                             </option>
                         );
                     })}
+                <option key={navAnnenSkjema} value={navAnnenSkjema}>
+                    Uten tilknytning til skjema
+                </option>
             </Select>
         </>
     );
@@ -478,10 +504,16 @@ function convertSkjemaBeskrivelse(skjema: KodeBeskrivelse | VarselEttersendelseV
         if (skjema.skjemaId === "W3" || skjema.skjemaId === "N6_BL") {
             return `${skjema.tittel} (lenke til dokumentet)`;
         }
+        if (skjema.skjemaId.startsWith("N6_FYLLUT")) {
+            return `${skjema.tittel} (lenke til skjema)`;
+        }
         return skjema.tittel;
     } else if ("kode" in skjema) {
         if (skjema.kode === "W3" || skjema.kode === "N6_BL") {
             return `${skjema.beskrivelse} (lenke til dokumentet)`;
+        }
+        if (skjema.kode.startsWith("N6_FYLLUT")) {
+            return `${skjema.beskrivelse} (lenke til skjema)`;
         }
         return skjema.beskrivelse;
     }

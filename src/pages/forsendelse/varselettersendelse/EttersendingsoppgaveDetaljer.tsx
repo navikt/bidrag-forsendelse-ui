@@ -24,6 +24,12 @@ export function VarselDetaljer() {
         const tittel = getValues(`${ettersendingsformPrefiks}.tittel`);
         const journalpostId = getValues(`${ettersendingsformPrefiks}.journalpostId`);
         const innsendingsfristDager = getValues(`${ettersendingsformPrefiks}.innsendingsfristDager`);
+        if (tittel.trim().length === 0) {
+            setError(`${ettersendingsformPrefiks}.tittel`, {
+                message: "Tittel kan ikke være tom",
+            });
+            return;
+        }
         if (innsendingsfristDager > 28) {
             setError(`${ettersendingsformPrefiks}.innsendingsfristDager`, {
                 message: "Frist kan ikke være mer enn 28 dager",
@@ -38,7 +44,7 @@ export function VarselDetaljer() {
                 forsendelseId: Number(forsendelse.forsendelseId.replace("BIF-", "")),
                 tittel: tittel,
                 ettersendelseForJournalpostId: journalpostId,
-                skjemaId: originalJournalpost.brevkode.kode,
+                skjemaId: originalJournalpost?.brevkode?.kode ?? forsendelse.ettersendingsoppgave?.skjemaId,
                 innsendingsfristDager: innsendingsfristDager,
             })
             .then(() => {
@@ -56,11 +62,6 @@ export function VarselDetaljer() {
                 size="small"
                 className="w-fit [&_.navds-table\_\_data-cell]:border-none [&_.navds-table\_\_header-cell]:border-none [&_.navds-table\_\_data-cell]:pl-0"
             >
-                <Table.Header>
-                    <Table.HeaderCell scope="col" className={"w-[185px]"}></Table.HeaderCell>
-                    <Table.HeaderCell scope="col"></Table.HeaderCell>
-                </Table.Header>
-
                 <Table.Body>
                     <VarselTittel redigerbar={endreDetaljer} />
                     <VarselFrist redigerbar={endreDetaljer} />
@@ -113,7 +114,11 @@ const EditOrSaveButton = ({
 };
 
 function VarselTittel({ redigerbar }: VarselDetaljerProps) {
-    const { getValues, register } = useFormContext<IForsendelseFormProps>();
+    const {
+        getValues,
+        register,
+        formState: { errors },
+    } = useFormContext<IForsendelseFormProps>();
 
     return (
         <Table.Row shadeOnHover={false}>
@@ -130,6 +135,7 @@ function VarselTittel({ redigerbar }: VarselDetaljerProps) {
                         label=""
                         hideLabel
                         {...register(`${ettersendingsformPrefiks}.tittel`)}
+                        error={errors?.ettersendingsoppgave?.tittel?.message}
                     />
                 ) : (
                     <BodyShort size="small" className="self-center">
@@ -149,6 +155,8 @@ function VarselForJournalpost({ redigerbar }: VarselDetaljerProps) {
         (jp) => jp.journalpostId === getValues(`${ettersendingsformPrefiks}.journalpostId`)
     );
 
+    if (!originalJournalpost) return null;
+
     return (
         <Table.Row shadeOnHover={false}>
             <Table.DataCell textSize="small" className="self-left">
@@ -161,8 +169,8 @@ function VarselForJournalpost({ redigerbar }: VarselDetaljerProps) {
                     <VarselForJournalpostSelect hideLabel prefiks={ettersendingsformPrefiks} />
                 ) : (
                     <BodyShort size="small" className="self-center">
-                        {originalJournalpost.innhold} (
-                        {dateToDDMMYYYYString(new Date(originalJournalpost.dokumentDato))})
+                        {originalJournalpost?.innhold} (
+                        {dateToDDMMYYYYString(new Date(originalJournalpost?.dokumentDato))})
                     </BodyShort>
                 )}
             </Table.DataCell>

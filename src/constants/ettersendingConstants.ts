@@ -22,7 +22,40 @@ export const visVedleggskoder = [
     "Y4",
     "Z1",
 ];
+
 export const visAndreVedleggskoder: KodeBeskrivelse[] = [
+    {
+        kode: "N6_FYLLUT_BIDRAG",
+        beskrivelse: "Søknad om barnebidrag",
+    },
+    {
+        kode: "N6_FYLLUT_BIDRAG_SVAR",
+        beskrivelse: "Svar i sak om barnebidrag",
+    },
+    {
+        kode: "N6_FYLLUT_BIDRAG18ÅR",
+        beskrivelse: "Avtale om barnebidrag for barn over 18 år",
+    },
+    {
+        kode: "N6_FYLLUT_FORSKUDD",
+        beskrivelse: "Søknad om bidragsforskudd",
+    },
+    {
+        kode: "N6_FYLLUT_SÆRBIDRAG",
+        beskrivelse: "Søknad om bidrag til særlige utgifter",
+    },
+    {
+        kode: "N6_FYLLUT_SØKNAD_18_SVAR",
+        beskrivelse: "Svar i sak om barnebidrag etter fylte 18 år",
+    },
+    {
+        kode: "N6_FYLLUT_SØKNAD_18",
+        beskrivelse: "Søknad om barnebidrag etter fylte 18 år",
+    },
+    {
+        kode: "N6_FYLLUT_SLETTING_BIDRAGSGJELD",
+        beskrivelse: "Søknad om sletting av bidragsgjeld",
+    },
     {
         kode: "N6_PA",
         beskrivelse: "Privat avtale eller dom om bidrag",
