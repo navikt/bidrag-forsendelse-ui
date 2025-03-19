@@ -84,7 +84,7 @@ function OpprettEttersendelseOppgaveModal({
     const form = useForm<FormProps>({
         defaultValues: {
             journalpostId: inngåendeJournalposter.length > 0 ? inngåendeJournalposter[0].journalpostId : navAnnenSkjema,
-        }
+        },
     });
     const opprettVarselEttersendelseFn = useOpprettVarselEttersendelse();
     const journalpostId = useWatch({ control: form.control, name: "journalpostId" });
