@@ -42,6 +42,7 @@ import { IForsendelseFormProps, VarselEttersendelseVedleggProps } from "../conte
 import { useSession } from "../context/SessionContext";
 import { VarselDetaljer } from "./EttersendingsoppgaveDetaljer";
 export const ettersendingsformPrefiks = "ettersendingsoppgave";
+const navAnnenSkjema = "VANL";
 
 export default function OpprettEttersendelseOppgaveButton() {
     const { isEttersendingsoppgaveEnabled } = useFeatureToogle();
@@ -78,10 +79,14 @@ function OpprettEttersendelseOppgaveModal({
 }) {
     const { forsendelseId } = useSession();
     const qc = useQueryClient();
-    const { setValue } = useFormContext<IForsendelseFormProps>();
-    const form = useForm<FormProps>({});
-    const opprettVarselEttersendelseFn = useOpprettVarselEttersendelse();
     const inngåendeJournalposter = useHentJournalInngående();
+    const { setValue } = useFormContext<IForsendelseFormProps>();
+    const form = useForm<FormProps>({
+        defaultValues: {
+            journalpostId: inngåendeJournalposter.length > 0 ? inngåendeJournalposter[0].journalpostId : navAnnenSkjema,
+        }
+    });
+    const opprettVarselEttersendelseFn = useOpprettVarselEttersendelse();
     const journalpostId = useWatch({ control: form.control, name: "journalpostId" });
 
     function opprett(data: FormProps) {
@@ -107,6 +112,7 @@ function OpprettEttersendelseOppgaveModal({
                 setIsOpen(false);
             });
     }
+    console.log(journalpostId)
     return (
         <form onSubmit={form.handleSubmit(opprett)}>
             <Modal open={isOpen} aria-label="" closeOnBackdropClick onClose={() => setIsOpen(false)} className="w-full">
@@ -336,7 +342,6 @@ function EttersendingsoppgaveVedleggsliste() {
     );
 }
 
-const navAnnenSkjema = "VANL";
 export function VarselForJournalpostSelect({ hideLabel = false, prefiks }: { hideLabel?: boolean; prefiks?: string }) {
     const inngåendeJournalposter = useHentJournalInngående();
     const form = useFormContext<FormProps | IForsendelseFormProps>();
