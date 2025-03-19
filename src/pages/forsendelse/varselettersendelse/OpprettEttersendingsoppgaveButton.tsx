@@ -50,6 +50,7 @@ export default function OpprettEttersendelseOppgaveButton() {
     const forsendelse = useHentForsendelseQuery();
 
     if (!isEttersendingsoppgaveEnabled) return;
+    if (forsendelse.gjelderIdent != forsendelse.mottaker?.ident) return;
     return (
         <>
             {forsendelse.ettersendingsoppgave ? (
