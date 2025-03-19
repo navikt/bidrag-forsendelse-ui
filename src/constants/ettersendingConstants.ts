@@ -53,6 +53,10 @@ export const visAndreVedleggskoder: KodeBeskrivelse[] = [
         beskrivelse: "Søknad om barnebidrag etter fylte 18 år",
     },
     {
+        kode: "N6_FYLLUT_SLETTING_BIDRAGSGJELD",
+        beskrivelse: "Søknad om sletting av bidragsgjeld",
+    },
+    {
         kode: "N6_PA",
         beskrivelse: "Privat avtale eller dom om bidrag",
     },
