@@ -112,7 +112,6 @@ function OpprettEttersendelseOppgaveModal({
                 setIsOpen(false);
             });
     }
-    console.log(journalpostId)
     return (
         <form onSubmit={form.handleSubmit(opprett)}>
             <Modal open={isOpen} aria-label="" closeOnBackdropClick onClose={() => setIsOpen(false)} className="w-full">
