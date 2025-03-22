@@ -1,5 +1,6 @@
 .forsendelse-page {
-    height: calc(100% + 500px);
-    display: flex;
-    justify-content: center;
-}
+    height: 100vh;
+    .navds-combobox__list--with-hover {
+      overscroll-behavior: auto;
+    }
+  }
