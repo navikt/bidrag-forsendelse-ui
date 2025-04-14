@@ -230,6 +230,12 @@ function EttersendingsoppgaveVedleggsliste() {
             });
             return;
         }
+        if (vedlegg.tittel.length > 250) {
+            setError(`${ettersendingsformPrefiks}.vedleggsliste.${index}.tittel`, {
+                message: "Tittel kan ikke være lengre enn 250 tegn",
+            });
+            return;
+        }
         oppdaterEttersendingsoppgaveFn
             .mutateAsync({
                 forsendelseId: Number(forsendelse.forsendelseId.replace("BIF-", "")),
@@ -452,7 +458,7 @@ function NavSkjemaSelect2({ hideLabel = true, index }: { hideLabel?: boolean; in
             label="Velg skjema"
             allowNewValues
             size="small"
-            error={form.formState.errors?.dokumenter?.[index]?.tittel?.message}
+            error={form.formState.errors?.ettersendingsoppgave?.vedleggsliste?.[index]?.tittel?.message}
             defaultValue={convertSkjemaBeskrivelse(
                 form.getValues(`${ettersendingsformPrefiks}.vedleggsliste.${index}`)
             )}
