@@ -458,7 +458,7 @@ function NavSkjemaSelect2({ hideLabel = true, index }: { hideLabel?: boolean; in
             label="Velg skjema"
             allowNewValues
             size="small"
-            error={form.formState.errors?.dokumenter?.[index]?.tittel?.message}
+            error={form.formState.errors?.ettersendingsoppgave?.vedleggsliste?.[index]?.tittel?.message}
             defaultValue={convertSkjemaBeskrivelse(
                 form.getValues(`${ettersendingsformPrefiks}.vedleggsliste.${index}`)
             )}
