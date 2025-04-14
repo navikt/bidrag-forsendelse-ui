@@ -30,6 +30,10 @@ export function VarselDetaljer() {
             });
             return;
         }
+        if (tittel.trim().length > 250) {
+            setError(`${ettersendingsformPrefiks}.tittel`, { message: "Tittel kan ikke være lengre enn 250 tegn" });
+            return;
+        }
         if (innsendingsfristDager > 28) {
             setError(`${ettersendingsformPrefiks}.innsendingsfristDager`, {
                 message: "Frist kan ikke være mer enn 28 dager",
