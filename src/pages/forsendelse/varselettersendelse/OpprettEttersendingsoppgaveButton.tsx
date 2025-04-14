@@ -230,6 +230,12 @@ function EttersendingsoppgaveVedleggsliste() {
             });
             return;
         }
+        if (vedlegg.tittel.length > 250) {
+            setError(`${ettersendingsformPrefiks}.vedleggsliste.${index}.tittel`, {
+                message: "Tittel kan ikke være lengre enn 250 tegn",
+            });
+            return;
+        }
         oppdaterEttersendingsoppgaveFn
             .mutateAsync({
                 forsendelseId: Number(forsendelse.forsendelseId.replace("BIF-", "")),
