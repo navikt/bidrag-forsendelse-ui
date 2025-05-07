@@ -96,7 +96,7 @@ function OpprettEttersendelseOppgaveModal({
             form.setError("tittel", { message: "Tittel må settes når det ikke knyttes til skjema" });
             return;
         }
-        if (data.tittel.length > 250) {
+        if (data.journalpostId == navAnnenSkjema && data.tittel && data.tittel.length > 250) {
             form.setError("tittel", { message: "Tittel kan ikke være lengre enn 250 tegn" });
             return;
         }
