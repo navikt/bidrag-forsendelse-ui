@@ -76,15 +76,31 @@ export const mapHierarkiResponseToCodeAndName = (kodeverk: KodeverkHierarkiRespo
         );
 
 export const mapKodeverkResponseToCodeAndName = (kodeverk: KodeverkKoderBetydningerResponse): KodeBeskrivelse[] =>
-    Object.entries(kodeverk.betydninger).map(([kode, betydning]) => {
-        const tekst = StringUtils.isEmpty(betydning[0].beskrivelser["nb"].tekst)
-            ? betydning[0].beskrivelser["nb"].term
-            : betydning[0].beskrivelser["nb"].tekst;
-        return {
-            kode,
-            beskrivelse: tekst,
-        };
-    });
+    Object.entries(kodeverk.betydninger)
+        .filter(([_, betydning]) => {
+            const gyldigTil = betydning[0].gyldigTil;
+            if (!gyldigTil) {
+                // ingen sluttdato = gyldig
+                return true;
+            }
+            // parse YYYY-MM-DD into a Date at local midnight
+            const [year, month, day] = gyldigTil.split("-").map(Number);
+            const gyldigTilDate = new Date(year, month - 1, day);
+            // dagens dato kl 00:00
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            // behold kun de som ikke er utløpt
+            return gyldigTilDate >= today;
+        })
+        .map(([kode, betydning]) => {
+            const tekst = StringUtils.isEmpty(betydning[0].beskrivelser["nb"].tekst)
+                ? betydning[0].beskrivelser["nb"].term
+                : betydning[0].beskrivelser["nb"].tekst;
+            return {
+                kode,
+                beskrivelse: tekst,
+            };
+        });
 
 export const prefetchPostnummere = (): void => {
     const queryClient = useQueryClient();
