@@ -26,9 +26,11 @@ export default function PersonSok({ onChange, defaultValue }: IPersonSokProps) {
                     onChange(data.ident);
                 }}
             />
-          <SamhandlerSokButton onResult={(data) => {
-            onChange(data.samhandlerId);
-          }} />
+            <SamhandlerSokButton
+                onResult={(data) => {
+                    onChange(data.samhandlerId);
+                }}
+            />
         </div>
     );
 }
