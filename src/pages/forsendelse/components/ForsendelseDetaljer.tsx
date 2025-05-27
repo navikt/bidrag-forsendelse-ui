@@ -3,9 +3,13 @@ import "./ForsendelseDetaljer.css";
 import { dateToDDMMYYYYString } from "@navikt/bidrag-ui-common";
 import { BodyLong, Label } from "@navikt/ds-react";
 
+import { mapToDistribusjonKanalBeskrivelse } from "../../../helpers/forsendelseHelpers";
+import useDokumentApi from "../../../hooks/useDokumentApi";
 import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
 export default function ForsendelseDetaljer() {
     const forsendelse = useForsendelseApi().hentForsendelse();
+    const distribusjonKanal = useDokumentApi().distribusjonKanal();
+
     return (
         <div>
             {/* <Heading size="small">Andre detaljer</Heading> */}
@@ -24,6 +28,10 @@ export default function ForsendelseDetaljer() {
                         {
                             label: "Opprettet av",
                             value: forsendelse.opprettetAvNavn,
+                        },
+                        {
+                            label: "Distribusjonskanal",
+                            value: mapToDistribusjonKanalBeskrivelse(distribusjonKanal.distribusjonskanal),
                         },
                     ]}
                 />
