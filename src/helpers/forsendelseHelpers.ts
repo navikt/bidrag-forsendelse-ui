@@ -2,6 +2,7 @@ import { AxiosResponse } from "axios";
 
 import { EttersendingsoppgaveDto, ForsendelseResponsTo } from "../api/BidragForsendelseApi";
 import { VarselDokumentType } from "../pages/forsendelse/context/DokumenterFormContext";
+import { BestemKanalResponseDistribusjonskanalEnum } from "./../api/BidragDokumentArkivApi";
 
 export function mapVarselEttersendelse(ettersendingsoppgave: EttersendingsoppgaveDto) {
     return (
@@ -28,4 +29,14 @@ export function mapForsendelseResponse(ettersendingsoppgave: Ettersendingsoppgav
             },
         };
     };
+}
+export function mapToDistribusjonKanalBeskrivelse(distribusjonKanal: BestemKanalResponseDistribusjonskanalEnum) {
+    switch (distribusjonKanal) {
+        case "PRINT":
+            return "Fysisk (Sentral print)";
+        case "SDP":
+            return "Digitalt (Digital postkasse)";
+        case "DITT_NAV":
+            return "Digitalt (Nav.no)";
+    }
 }

@@ -8,6 +8,7 @@ import { useState } from "react";
 
 import AdresseInfo from "../../../components/AdresseInfo";
 import { EditAddressForm } from "../../../components/EditAddress";
+import { mapToDistribusjonKanalBeskrivelse } from "../../../helpers/forsendelseHelpers";
 import useDokumentApi from "../../../hooks/useDokumentApi";
 import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
 import { IMottakerAdresse } from "../../../types/Adresse";
@@ -32,17 +33,6 @@ function DistribusjonDetaljer(props: BestillDistribusjonContentProps) {
     const distribusjonKanal = useDokumentApi().distribusjonKanal();
     const forsendelse = useForsendelseApi().hentForsendelse();
 
-    function mapToDistribusjonKanalBeskrivelse() {
-        switch (distribusjonKanal.distribusjonskanal) {
-            case "PRINT":
-                return "Fysisk (Sentral print)";
-            case "SDP":
-                return "Digitalt (Digital postkasse)";
-            case "DITT_NAV":
-                return "Digitalt (Nav.no)";
-        }
-    }
-
     function mapToBegrunnelseBeskrivelse() {
         if (forsendelse.mottaker?.ident != forsendelse.gjelderIdent) return "Mottaker er ulik gjelder";
         if (IdentUtils.isSamhandlerId(forsendelse.mottaker?.ident)) return "Mottaker er samhandler";
@@ -55,7 +45,7 @@ function DistribusjonDetaljer(props: BestillDistribusjonContentProps) {
             </Heading>
             <div>
                 <BodyShort spacing>
-                    <div>{mapToDistribusjonKanalBeskrivelse()}</div>
+                    <div>{mapToDistribusjonKanalBeskrivelse(distribusjonKanal.distribusjonskanal)}</div>
                 </BodyShort>
                 {distribusjonKanal.distribusjonskanal == "PRINT" && (
                     <BodyShort spacing>
