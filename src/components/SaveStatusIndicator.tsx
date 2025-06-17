@@ -6,14 +6,14 @@ type SaveStatusIndicatorProps = {
 };
 export default function SaveStatusIndicator({ state = "idle" }: SaveStatusIndicatorProps) {
     function renderContent() {
-        if (state == "error") {
+        if (state === "error") {
             return (
                 <div className="inline-flex text-nav-red gap-[3px]">
                     <XMarkOctagonIcon /> <BodyShort size="small">Lagring feilet</BodyShort>
                 </div>
             );
         }
-        if (state == "saving") {
+        if (state === "saving") {
             return (
                 <div className="inline-flex gap-[3px]">
                     <Loader size="xsmall" title="Lagrer" />
@@ -32,10 +32,10 @@ export default function SaveStatusIndicator({ state = "idle" }: SaveStatusIndica
     }
 
     function getStyles() {
-        if (state == "error") {
+        if (state === "error") {
             return `border-border-danger pr-1 pl-1 w-[122px]`;
         }
-        if (state == "saving") {
+        if (state === "saving") {
             return `border-border-info w-[70px]`;
         }
         return `transition-[width] ease-in-out border-border-success duration-300 w-[65px]`;

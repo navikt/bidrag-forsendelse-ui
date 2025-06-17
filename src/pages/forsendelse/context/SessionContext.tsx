@@ -29,10 +29,10 @@ export const SessionContext = createContext<ISessionContext>({} as ISessionConte
 
 function SessionProvider({ children, ...props }: PropsWithChildren<ISessionPropsContext>) {
     const navigate = useNavigate();
-    const [forsendelseId, setForsendelseId] = useState(props.forsendelseId);
-    const [saksnummer, setSaksnummer] = useState(props.saksnummer);
-    const [sessionId, setSessionId] = useState(props.sessionId);
-    const [enhet, setEnhet] = useState(props.enhet);
+    const [forsendelseId] = useState(props.forsendelseId);
+    const [saksnummer] = useState(props.saksnummer);
+    const [sessionId] = useState(props.sessionId);
+    const [enhet] = useState(props.enhet);
 
     useEffect(() => {
         if (ObjectUtils.isEmpty(enhet)) {
@@ -51,7 +51,7 @@ function SessionProvider({ children, ...props }: PropsWithChildren<ISessionProps
         const params = new URLSearchParams();
         params.append("enhet", enhet);
         params.append("sessionState", sessionId);
-        if (type == "NOTAT") {
+        if (type === "NOTAT") {
             RedirectTo.sakshistorikk(saksnummer, environment.url.bisys);
         } else {
             navigate(`/sak/${saksnummer}/forsendelse/${forsendelseId}?${params.toString()}`);

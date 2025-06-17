@@ -14,7 +14,7 @@ import BidragErrorPanel from "../../context/BidragErrorPanel";
 import { useErrorContext } from "../../context/ErrorProvider";
 import DokumentTableInfo from "../../docs/DokumentTable.mdx";
 import useIsDebugMode from "../../hooks/useDebugMode";
-import { useForsendelseApi } from "../../hooks/useForsendelseApi";
+import { useHentForsendelseQuery } from "../../hooks/useForsendelseApi";
 import { updateUrlSearchParam } from "../../utils/window-utils";
 import OpprettForsendelsePage from "../opprettforsendelse/OpprettForsendelsePage";
 import PageWrapper from "../PageWrapper";
@@ -36,7 +36,7 @@ interface ForsendelsePageProps {
     enhet: string;
 }
 function ForsendelseView() {
-    const forsendelse = useForsendelseApi().hentForsendelse();
+    const forsendelse = useHentForsendelseQuery();
     const { navigateToJournalpost } = useSession();
     const isDebug = useIsDebugMode();
     const { errorSource, errorMessage } = useErrorContext();
@@ -48,7 +48,7 @@ function ForsendelseView() {
         }
     }, []);
 
-    if (errorSource == "hentforsendelse") {
+    if (errorSource === "hentforsendelse") {
         return (
             <Alert className="m-auto w-max" variant="error">
                 {errorMessage}
@@ -56,7 +56,7 @@ function ForsendelseView() {
         );
     }
 
-    if (forsendelse.status == "UNDER_OPPRETTELSE") {
+    if (forsendelse.status === "UNDER_OPPRETTELSE") {
         return <OpprettForsendelsePage />;
     }
     return (
@@ -83,7 +83,9 @@ function ForsendelseView() {
                                 <DokumentTableInfo />
                             </InfoKnapp>
                             <SaveStatusIndicator
-                                state={errorSource == "dokumenter" ? "error" : lagrerDokumenter > 0 ? "saving" : "idle"}
+                                state={
+                                    errorSource === "dokumenter" ? "error" : lagrerDokumenter > 0 ? "saving" : "idle"
+                                }
                             />
                         </div>
 
@@ -103,9 +105,9 @@ function ForsendelseView() {
 }
 
 function ForsendelseNotEditableWarning() {
-    const forsendelse = useForsendelseApi().hentForsendelse();
+    const forsendelse = useHentForsendelseQuery();
 
-    const erForsendelseUnderProduksjon = forsendelse.status == "UNDER_PRODUKSJON";
+    const erForsendelseUnderProduksjon = forsendelse.status === "UNDER_PRODUKSJON";
 
     function renderForsendelseState() {
         switch (forsendelse.status) {
@@ -131,9 +133,9 @@ function ForsendelseNotEditableWarning() {
 }
 
 function BottomButtons() {
-    const forsendelse = useForsendelseApi().hentForsendelse();
+    const forsendelse = useHentForsendelseQuery();
 
-    const erForsendelseUnderProduksjon = forsendelse.status == "UNDER_PRODUKSJON";
+    const erForsendelseUnderProduksjon = forsendelse.status === "UNDER_PRODUKSJON";
 
     if (!erForsendelseUnderProduksjon) return null;
     return (

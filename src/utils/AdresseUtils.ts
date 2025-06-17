@@ -2,8 +2,8 @@ export function countryCodeToName(countryCode: string) {
     try {
         const regionNames = new Intl.DisplayNames(["nb"], { type: "region" });
         return countryCode ? regionNames.of(countryCode) : " ";
-    } catch (e) {
-        if (countryCode.length == 3) {
+    } catch {
+        if (countryCode.length === 3) {
             return countryCodeToName(countryISOMapping[countryCode]);
         }
         return countryCode;
@@ -15,15 +15,15 @@ export function isCountryCodeNorway(countryCode: string) {
 }
 
 export function countryCodeIso3ToIso2(countryCode: string) {
-    if (countryCode.length == 3) {
+    if (countryCode.length === 3) {
         return countryISOMapping[countryCode];
     }
     return countryCode;
 }
 
 export function countryCodeIso2ToIso3(countryCode: string) {
-    if (countryCode.length == 2) {
-        return Object.keys(countryISOMapping).find((val) => countryISOMapping[val] == countryCode);
+    if (countryCode.length === 2) {
+        return Object.keys(countryISOMapping).find((val) => countryISOMapping[val] === countryCode);
     }
     return countryCode;
 }

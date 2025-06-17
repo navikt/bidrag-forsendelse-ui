@@ -1,14 +1,11 @@
 import { Select } from "@navikt/ds-react";
 import { useFormContext } from "react-hook-form";
 
-import useTilgangskontrollApi from "../../hooks/useTilgangskontrollApi";
-import { useSession } from "../../pages/forsendelse/context/SessionContext";
+import useHarTilgangTilTemaFar from "../../hooks/useTilgangskontrollApi";
 
 export default function TemaSelect() {
     const { register, getValues } = useFormContext();
-    const { enhet } = useSession();
-
-    const { data: harTilgangTilTemaFar } = useTilgangskontrollApi().harTilgangTilTemaFar();
+    const { data: harTilgangTilTemaFar } = useHarTilgangTilTemaFar();
 
     const temaOptions = [
         {

@@ -29,7 +29,7 @@ export default function InfoKnapp({
         e.stopPropagation();
         ref.current?.showModal();
     };
-    const onlyIcon = buttonText == undefined;
+    const onlyIcon = buttonText === undefined;
     return (
         <>
             <Button
@@ -43,7 +43,13 @@ export default function InfoKnapp({
                 {buttonText}
             </Button>
 
-            <Modal ref={ref} closeOnBackdropClick onClose={closeModal} className={`max-w-[900px] ${className} m-auto `}>
+            <Modal
+                ref={ref}
+                aria-labelledby="modal-info"
+                closeOnBackdropClick
+                onClose={closeModal}
+                className={`max-w-[900px] ${className} m-auto `}
+            >
                 <Modal.Header className="h-[10px]" closeButton></Modal.Header>
                 <Modal.Body>
                     <div className="max-h-[800px] mdx-content">{children}</div>

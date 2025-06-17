@@ -6,19 +6,19 @@ import { FormProvider, useForm, useFormContext } from "react-hook-form";
 
 import { DokumentMalDetaljer, DokumentMalDetaljerInnholdTypeEnum } from "../../api/BidragForsendelseApi";
 import { DokumentStatus } from "../../constants/DokumentStatus";
-import { useForsendelseApi } from "../../hooks/useForsendelseApi";
+import { useVedleggListe } from "../../hooks/useForsendelseApi";
 import { useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IDokument } from "../../types/Dokument";
 
 export default function LeggTilVedleggKnapp() {
     const { addDocuments } = useDokumenterForm();
     const [modalOpen, setModalOpen] = useState(false);
-    const { data: vedleggListe } = useForsendelseApi().vedleggListe();
+    const { data: vedleggListe } = useVedleggListe();
 
     const closeModal = () => {
         setModalOpen(false);
     };
-    if (vedleggListe.length == 0) {
+    if (vedleggListe.length === 0) {
         return null;
     }
     return (
@@ -60,6 +60,7 @@ function LeggTilVedlegglModal({ onClose, open }: LeggTilDokumentFraSakModalProps
                 status: DokumentStatus.IKKE_BESTILT,
                 index: -1,
                 lagret: false,
+                metadata: null,
             });
         }
     }
@@ -107,7 +108,7 @@ interface SelectOptionData {
 }
 
 function DokumentValgVedlegg() {
-    const { data: vedleggListe } = useForsendelseApi().vedleggListe();
+    const { data: vedleggListe } = useVedleggListe();
     const {
         register,
         setValue,
@@ -142,10 +143,10 @@ function DokumentValgVedlegg() {
     }
 
     function onSelectionChange(malId: string) {
-        const dokument = vedleggListe.find((d) => d.malId == malId);
+        const dokument = vedleggListe.find((d) => d.malId === malId);
         if (dokument) {
             const beskrivelse = dokument.detaljer.beskrivelse;
-            const erNorsk = dokument.detaljer.språk.length == 0 || dokument.detaljer.språk.includes("NB");
+            const erNorsk = dokument.detaljer.språk.length === 0 || dokument.detaljer.språk.includes("NB");
             const tittel = erNorsk ? dokument.detaljer.tittel : `${dokument.detaljer.tittel} (${beskrivelse})`;
             setValue("dokument", {
                 malId,
@@ -159,7 +160,7 @@ function DokumentValgVedlegg() {
     register("dokument", {
         validate: (dok) => {
             if (dok?.malId == null) return "Dokument må velges";
-            if (dok?.tittel == null || dok.tittel.trim().length == 0) return "Tittel på dokumentet kan ikke være tom";
+            if (dok?.tittel == null || dok.tittel.trim().length === 0) return "Tittel på dokumentet kan ikke være tom";
             return true;
         },
     });
@@ -167,7 +168,7 @@ function DokumentValgVedlegg() {
     const options = getAllOptions();
 
     function mapToBeskrivelse(option: SelectOptionData) {
-        if (option.språk == "NB") return option.beskrivelse;
+        if (option.språk === "NB") return option.beskrivelse;
         return `${option.beskrivelse} (${option.språk})`;
     }
     return (
@@ -188,7 +189,7 @@ function DokumentValgVedlegg() {
                                     ...opt,
                                     beskrivelse: mapToBeskrivelse(opt),
                                 }))
-                                .sort((a, b) => (b.språk == "NB" ? 1 : a.beskrivelse.localeCompare(b.beskrivelse)))
+                                .sort((a, b) => (b.språk === "NB" ? 1 : a.beskrivelse.localeCompare(b.beskrivelse)))
                                 .map((dokument) => (
                                     <option value={dokument.malId}>{dokument.beskrivelse}</option>
                                 ))}

@@ -33,7 +33,7 @@ export default function DokumentValgMulti({ malDetaljer, showLegend }: DokumentV
 
     register("dokumenter", {
         validate: (value: DokumentFormProps[]) => {
-            const valgteDokumenter = value.filter((v) => v != undefined);
+            const valgteDokumenter = value.filter((v) => v !== undefined);
             const harValgtDokument = valgteDokumenter.length > 0;
             if (!harValgtDokument) return "Minst et dokument må velges";
             const harAlleDokumenterTittel = valgteDokumenter.every(

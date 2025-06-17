@@ -5,15 +5,15 @@ import { AxiosError } from "axios";
 import { useEffect } from "react";
 import { FieldErrors, FormProvider, useForm, useFormContext } from "react-hook-form";
 
-import { BIDRAG_FORSENDELSE_API } from "../../api/api";
-import { ForsendelseTypeTo, JournalTema } from "../../api/BidragForsendelseApi";
+import { useBidragForsendelseApi } from "../../api/api";
+import { ForsendelseTypeTo, OpprettForsendelseForesporselTemaEnum } from "../../api/BidragForsendelseApi";
 import GjelderSelect from "../../components/detaljer/GjelderSelect";
 import TemaSelect from "../../components/detaljer/TemaSelect";
 import { DokumentFormProps } from "../../components/dokument/DokumentValg";
 import DokumentValgNotat from "../../components/dokument/DokumentValgNotat";
 import BidragErrorPanel from "../../context/BidragErrorPanel";
 import { useErrorContext } from "../../context/ErrorProvider";
-import { useForsendelseApi } from "../../hooks/useForsendelseApi";
+import { useHentRoller } from "../../hooks/useForsendelseApi";
 import { ENHET_FARSKAP } from "../../types/EnhetTypes";
 import { mapToBehandlingInfoDto } from "../../types/Forsendelse";
 import { parseErrorMessageFromAxiosError } from "../../utils/ErrorUtils";
@@ -37,8 +37,9 @@ export default function OpprettNotatPage() {
     const { saksnummer, enhet, navigateToForsendelse } = useSession();
     const { addError } = useErrorContext();
     const options = useOpprettForsendelse();
+    const bidragForsendelseApi = useBidragForsendelseApi();
     async function opprettNotat(data: OpprettForsendelseFormProps, dokument: DokumentFormProps) {
-        const result = await BIDRAG_FORSENDELSE_API.api.opprettForsendelse({
+        const result = await bidragForsendelseApi.api.opprettForsendelse({
             gjelderIdent: data.gjelderIdent,
             mottaker: {
                 ident: data.gjelderIdent,
@@ -46,7 +47,7 @@ export default function OpprettNotatPage() {
             saksnummer,
             opprettTittel: true,
             enhet: enhet,
-            tema: data.tema as JournalTema,
+            tema: data.tema as OpprettForsendelseForesporselTemaEnum,
             språk: data.språk,
             behandlingInfo: mapToBehandlingInfoDto(options),
             dokumenter: [
@@ -64,7 +65,7 @@ export default function OpprettNotatPage() {
     }
     const opprettForsendelseFn = useMutation({
         mutationFn: async (data: OpprettForsendelseFormProps) => {
-            for (const dokument of data.dokumenter.filter((dokument) => dokument != undefined)) {
+            for (const dokument of data.dokumenter.filter((dokument) => dokument !== undefined)) {
                 await opprettNotat(data, dokument);
             }
             return null;
@@ -78,11 +79,14 @@ export default function OpprettNotatPage() {
         },
     });
 
-    const roller = useForsendelseApi().hentRoller();
+    const roller = useHentRoller();
     const methods = useForm<OpprettForsendelseFormProps>({
         defaultValues: {
             dokumentdato: dateToDDMMYYYYString(new Date()),
-            tema: enhet == ENHET_FARSKAP ? "FAR" : "BID",
+            tema:
+                enhet === ENHET_FARSKAP
+                    ? OpprettForsendelseForesporselTemaEnum.FAR
+                    : OpprettForsendelseForesporselTemaEnum.BID,
             språk: "NB",
         },
     });
@@ -149,7 +153,7 @@ function OpprettNotatValidationErrorSummary() {
         });
         return allErrors.filter((error) => error && error.trim().length > 0);
     }
-    if (getAllErrors(errors).length == 0) {
+    if (getAllErrors(errors).length === 0) {
         return null;
     }
 

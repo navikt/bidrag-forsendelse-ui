@@ -7,9 +7,9 @@ import { useMutation } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { useState } from "react";
 
-import { BIDRAG_FORSENDELSE_API } from "../../../api/api";
+import { useBidragForsendelseApi } from "../../../api/api";
 import { DistribuerJournalpostRequest, DistribuerJournalpostResponse } from "../../../api/BidragForsendelseApi";
-import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
+import { useHentForsendelseQuery } from "../../../hooks/useForsendelseApi";
 import { RedirectTo } from "../../../utils/RedirectUtils";
 
 const CONFIRMATION_MISSING_ERROR = "CONFIRMATION_MISSING_ERROR";
@@ -17,7 +17,8 @@ interface ManuellUtsendingModalProps {
     onCancel: () => void;
 }
 export default function ManuellUtsendingModal({ onCancel }: ManuellUtsendingModalProps) {
-    const forsendelse = useForsendelseApi().hentForsendelse();
+    const forsendelse = useHentForsendelseQuery();
+    const bidragForsendelseApi = useBidragForsendelseApi();
     const [confirmationState, setConfirmationState] = useState(false);
     const distribuerMutation = useMutation<AxiosResponse<DistribuerJournalpostResponse>, string>({
         mutationFn: () => {
@@ -27,7 +28,7 @@ export default function ManuellUtsendingModal({ onCancel }: ManuellUtsendingModa
             const request: DistribuerJournalpostRequest = {
                 lokalUtskrift: true,
             };
-            return BIDRAG_FORSENDELSE_API.api.distribuerForsendelse(forsendelse.forsendelseId, request);
+            return bidragForsendelseApi.api.distribuerForsendelse(forsendelse.forsendelseId, request);
         },
         onSuccess: () => {
             RedirectTo.sakshistorikk(forsendelse.saksnummer);
@@ -58,7 +59,7 @@ export default function ManuellUtsendingModal({ onCancel }: ManuellUtsendingModa
             <Modal.Body>
                 <div>
                     {distribuerMutation.isError &&
-                        distribuerMutation.error != CONFIRMATION_MISSING_ERROR &&
+                        distribuerMutation.error !== CONFIRMATION_MISSING_ERROR &&
                         renderErrorMessage()}
                     <div className={"min-w-[35rem] relative  w-full max-w-2xl h-full md:h-auto"}>
                         <div className={"py-4"}>
@@ -72,7 +73,7 @@ export default function ManuellUtsendingModal({ onCancel }: ManuellUtsendingModa
                             checked={confirmationState}
                             label="Jeg har printet og sendt ut alle dokumentene i forsendelsen"
                             error={
-                                distribuerMutation.error == CONFIRMATION_MISSING_ERROR
+                                distribuerMutation.error === CONFIRMATION_MISSING_ERROR
                                     ? "Du må bekrefte før du går videre"
                                     : null
                             }

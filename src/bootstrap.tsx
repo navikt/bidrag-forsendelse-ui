@@ -8,7 +8,7 @@ const rootElement = document.getElementById("root") as HTMLElement;
 const appElement = document.createElement("div");
 rootElement.appendChild(appElement);
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-    <Provider rootElement={rootElement} appElement={appElement}>
+    <Provider rootElement={rootElement}>
         <App />
     </Provider>
 );

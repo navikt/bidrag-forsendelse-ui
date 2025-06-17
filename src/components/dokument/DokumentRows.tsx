@@ -13,7 +13,7 @@ import { useEffect } from "react";
 import { CSSProperties } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
-import { DokumentArkivSystemDto } from "../../api/BidragDokumentApi";
+import { DokumentDtoArkivSystemEnum } from "../../api/BidragForsendelseApi";
 import { DokumentStatus } from "../../constants/DokumentStatus";
 import { FormIDokument, useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IForsendelseFormProps } from "../../pages/forsendelse/context/DokumenterFormContext";
@@ -24,16 +24,16 @@ import DokumentStatusTag from "./DokumentStatusTag";
 import OpenDokumentButton from "./OpenDokumentButton";
 import SlettForsendelseModal from "./SlettForsendelseModal";
 export default function DokumentRows() {
-    const { dokumenter, forsendelseId, deleteDocument, swapDocuments } = useDokumenterForm();
+    const { dokumenter, forsendelseId, swapDocuments } = useDokumenterForm();
 
     function onDocumentsChange(event: DragEndEvent) {
         const { active, over } = event;
 
         if (active?.id !== over?.id) {
-            const oldIndex = dokumenter.findIndex((d) => getRowKey(d) == active?.id);
-            const newIndex = dokumenter.findIndex((d) => getRowKey(d) == over?.id);
+            const oldIndex = dokumenter.findIndex((d) => getRowKey(d) === active?.id);
+            const newIndex = dokumenter.findIndex((d) => getRowKey(d) === over?.id);
 
-            if (oldIndex != -1 && newIndex != -1) {
+            if (oldIndex !== -1 && newIndex !== -1) {
                 swapDocuments(oldIndex, newIndex);
             }
         }
@@ -74,8 +74,8 @@ interface IDokumentRowProps {
     style: CSSProperties;
 }
 const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
-    ({ id, dokument, forsendelseId, index: rowIndex, listeners, attributes, style }: IDokumentRowProps, ref) => {
-        const { tittel, index: dokindex, status, journalpostId, dokumentreferanse, dokumentDato } = dokument;
+    ({ dokument, forsendelseId, index: rowIndex, listeners, attributes, style }: IDokumentRowProps, ref) => {
+        const { index: dokindex, status, journalpostId, dokumentreferanse, dokumentDato } = dokument;
         const {
             register,
             formState: { errors },
@@ -89,16 +89,16 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
         const getRowStyle = () => {
             let styles = { ...style } as CSSProperties;
 
-            if (dokument.status == DokumentStatus.SLETTET) {
+            if (dokument.status === DokumentStatus.SLETTET) {
                 styles = { ...style };
-            } else if (dokument.lagret == false) {
+            } else if (dokument.lagret === false) {
                 styles = { ...style, backgroundColor: "var(--a-green-50)" };
             }
 
             return styles;
         };
 
-        const erLenkeTilDokumentIAnnenForsendelse = dokument.arkivsystem == DokumentArkivSystemDto.FORSENDELSE;
+        const erLenkeTilDokumentIAnnenForsendelse = dokument.arkivsystem === DokumentDtoArkivSystemEnum.FORSENDELSE;
 
         const forsendelseIdNumeric = erLenkeTilDokumentIAnnenForsendelse
             ? dokument.originalJournalpostId
@@ -107,7 +107,7 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
             ? dokument.originalDokumentreferanse
             : dokument.dokumentreferanse;
 
-        const index = dokindex == -1 ? rowIndex : dokindex;
+        const index = dokindex === -1 ? rowIndex : dokindex;
         return (
             <Table.Row
                 key={rowIndex + dokumentreferanse + journalpostId}
@@ -131,7 +131,7 @@ const DokumentRow = React.forwardRef<HTMLTableRowElement, IDokumentRowProps>(
                 </Table.DataCell>
                 <Table.DataCell style={{ width: "50px" }}>
                     <span className={"flex flex-row gap-1 justify-end"}>
-                        {dokument.status == "KONTROLLERT" && (
+                        {dokument.status === "KONTROLLERT" && (
                             <Button
                                 size={"small"}
                                 variant={"tertiary"}
@@ -176,7 +176,7 @@ function DeleteDocumentButton({ dokument }: { dokument: FormIDokument }) {
     }
 
     if (deleteMode) {
-        const isChecked = dokument.status == DokumentStatus.SLETTET;
+        const isChecked = dokument.status === DokumentStatus.SLETTET;
         return (
             <Checkbox
                 checked={isChecked}
@@ -188,7 +188,7 @@ function DeleteDocumentButton({ dokument }: { dokument: FormIDokument }) {
             </Checkbox>
         );
     }
-    const hasOnlyOneDocument = dokumenter.length == 1;
+    const hasOnlyOneDocument = dokumenter.length === 1;
     return (
         <>
             <Button size={"small"} variant={"tertiary"} icon={<Delete />} onClick={openModal} />
@@ -246,12 +246,12 @@ function EditableDokumentTitleRow({ dokument, index }: IEditableDokumentTitleRow
     }
 
     function onKeyDown(e: React.KeyboardEvent) {
-        if (e.code == "Escape") {
+        if (e.code === "Escape") {
             setInEditMode(false);
             setValue(`dokumenter.${index}.tittel`, dokument.tittel);
         }
 
-        if (e.code == "Enter" && !e.shiftKey) {
+        if (e.code === "Enter" && !e.shiftKey) {
             _updateTitle();
         }
     }

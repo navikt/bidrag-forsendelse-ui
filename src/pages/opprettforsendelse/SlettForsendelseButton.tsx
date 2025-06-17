@@ -2,7 +2,7 @@ import { Alert, BodyShort, Button, Modal } from "@navikt/ds-react";
 import { useMutation } from "@tanstack/react-query";
 import { useRef } from "react";
 
-import { BIDRAG_FORSENDELSE_API } from "../../api/api";
+import { useBidragForsendelseApi } from "../../api/api";
 import { Avvikshendelse } from "../../api/BidragForsendelseApi";
 import useOnMutationSuccess from "../../hooks/useOnMutationSuccess";
 import { RedirectTo } from "../../utils/RedirectUtils";
@@ -10,6 +10,7 @@ import { useSession } from "../forsendelse/context/SessionContext";
 
 export default function SlettForsendelseButton() {
     const { forsendelseIdMedPrefix, enhet, saksnummer } = useSession();
+    const bidragForsendelseApi = useBidragForsendelseApi();
     const openModal = () => ref.current?.showModal();
     const closeModal = (e: React.MouseEvent<any>) => {
         e.preventDefault();
@@ -23,7 +24,7 @@ export default function SlettForsendelseButton() {
             const requestBody: Avvikshendelse = {
                 avvikType: "SLETT_JOURNALPOST",
             };
-            await BIDRAG_FORSENDELSE_API.api.utforAvvik(forsendelseIdMedPrefix, requestBody, {
+            await bidragForsendelseApi.api.utforAvvik(forsendelseIdMedPrefix, requestBody, {
                 headers: {
                     "X-enhet": enhet,
                 },

@@ -53,10 +53,10 @@ interface EndreFagomradeFirstStepValues {
 }
 
 function EndreFagomradeFirstStep(props: EndreFagomradeFirstStepProps) {
-    const erFagområdeBidrag = props.forsendelse?.tema == "BID";
+    const erFagområdeBidrag = props.forsendelse?.tema === "BID";
 
     const nyFagområde = erFagområdeBidrag ? "FAR" : "BID";
-    const fagomradeBeskrivelse = fagomradeOptions.find((option) => option.value == nyFagområde);
+    const fagomradeBeskrivelse = fagomradeOptions.find((option) => option.value === nyFagområde);
     if (!props.isActive) {
         return null;
     }
@@ -100,7 +100,7 @@ function EndreFagomradeBekreftelse(props: EndreFagomradeBekreftelseProps) {
                 {" "}
                 Fagområdet på journalposten er nå endret til {props.fagomrade} ({fagomradeOption.label}).
                 <br />
-                {props.fagomrade == "FAR"
+                {props.fagomrade === "FAR"
                     ? "Bare de som har tilgang til Foreldreskap vil kunne se dokumentet i journalen."
                     : ""}
             </BodyShort>

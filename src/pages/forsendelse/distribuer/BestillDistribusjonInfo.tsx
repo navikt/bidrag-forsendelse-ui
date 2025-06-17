@@ -9,8 +9,8 @@ import { useState } from "react";
 import AdresseInfo from "../../../components/AdresseInfo";
 import { EditAddressForm } from "../../../components/EditAddress";
 import { mapToDistribusjonKanalBeskrivelse } from "../../../helpers/forsendelseHelpers";
-import useDokumentApi from "../../../hooks/useDokumentApi";
-import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
+import { useDistribusjonKanal } from "../../../hooks/useDokumentApi";
+import { useHentForsendelseQuery } from "../../../hooks/useForsendelseApi";
 import { IMottakerAdresse } from "../../../types/Adresse";
 import Mottaker from "../components/Mottaker";
 
@@ -30,11 +30,11 @@ export default function BestillDistribusjonInfo(props: BestillDistribusjonConten
 }
 
 function DistribusjonDetaljer(props: BestillDistribusjonContentProps) {
-    const distribusjonKanal = useDokumentApi().distribusjonKanal();
-    const forsendelse = useForsendelseApi().hentForsendelse();
+    const distribusjonKanal = useDistribusjonKanal();
+    const forsendelse = useHentForsendelseQuery();
 
     function mapToBegrunnelseBeskrivelse() {
-        if (forsendelse.mottaker?.ident != forsendelse.gjelderIdent) return "Mottaker er ulik gjelder";
+        if (forsendelse.mottaker?.ident !== forsendelse.gjelderIdent) return "Mottaker er ulik gjelder";
         if (IdentUtils.isSamhandlerId(forsendelse.mottaker?.ident)) return "Mottaker er samhandler";
         return distribusjonKanal.regelBegrunnelse;
     }
@@ -47,13 +47,13 @@ function DistribusjonDetaljer(props: BestillDistribusjonContentProps) {
                 <BodyShort spacing>
                     <div>{mapToDistribusjonKanalBeskrivelse(distribusjonKanal.distribusjonskanal)}</div>
                 </BodyShort>
-                {distribusjonKanal.distribusjonskanal == "PRINT" && (
+                {distribusjonKanal.distribusjonskanal === "PRINT" && (
                     <BodyShort spacing>
                         <Heading size="xsmall">Begrunnelse</Heading>
                         <div>{mapToBegrunnelseBeskrivelse()}</div>
                     </BodyShort>
                 )}
-                {distribusjonKanal.distribusjonskanal == "PRINT" && <Adresse {...props} />}
+                {distribusjonKanal.distribusjonskanal === "PRINT" && <Adresse {...props} />}
             </div>
         </div>
     );

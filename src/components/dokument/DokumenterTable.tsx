@@ -104,7 +104,7 @@ function DokumenterTableBottomButtons() {
     const { resetDocumentChanges, dokumenter, forsendelseId, deleteMode } = useDokumenterForm();
     const { errorSource, resetError } = useErrorContext();
     const isAllDocumentsFinished = dokumenter.every(
-        (d) => d.status == DokumentStatus.FERDIGSTILT || d.status == DokumentStatus.KONTROLLERT
+        (d) => d.status === DokumentStatus.FERDIGSTILT || d.status === DokumentStatus.KONTROLLERT
     );
     const { addWarning } = useErrorContext();
     function resetErrorAndChanges() {
@@ -155,8 +155,8 @@ function BekreftSlettingButton() {
         saveChanges();
         toggleDeleteMode();
     }
-    const deletedDocuments = dokumenter.filter((d) => d.status == DokumentStatus.SLETTET);
-    const slettAlleDokumenter = deletedDocuments.length == dokumenter.length;
+    const deletedDocuments = dokumenter.filter((d) => d.status === DokumentStatus.SLETTET);
+    const slettAlleDokumenter = deletedDocuments.length === dokumenter.length;
     return (
         <>
             <Button

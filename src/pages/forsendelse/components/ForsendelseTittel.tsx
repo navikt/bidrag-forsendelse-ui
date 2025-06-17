@@ -7,12 +7,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useRef, useState } from "react";
 
-import { BIDRAG_FORSENDELSE_API } from "../../../api/api";
+import { useBidragForsendelseApi } from "../../../api/api";
 import { OppdaterForsendelseResponse } from "../../../api/BidragForsendelseApi";
-import { useErrorContext } from "../../../context/ErrorProvider";
-import { useForsendelseApi, UseForsendelseApiKeys } from "../../../hooks/useForsendelseApi";
+import { UseForsendelseApiKeys, useHentForsendelseQuery } from "../../../hooks/useForsendelseApi";
 export default function ForsendelseTittel() {
-    const forsendelse = useForsendelseApi().hentForsendelse();
+    const forsendelse = useHentForsendelseQuery();
     // const [editMode, setEditMode] = useState(false);
     // const [forsendelseTittel, setForsendelseTittel] = useState(forsendelse.tittel);
 
@@ -66,14 +65,14 @@ interface EditForsendelseTitleProps {
     defaultValue: string;
 }
 function EditForsendelseTitle({ onCancel, onSubmit, defaultValue }: EditForsendelseTitleProps) {
-    const forsendelse = useForsendelseApi().hentForsendelse();
-    const { addError } = useErrorContext();
+    const bidragForsendelseApi = useBidragForsendelseApi();
+    const forsendelse = useHentForsendelseQuery();
     const [updatedTitle, setUpdatedTitle] = useState<string>();
     const queryClient = useQueryClient();
     const isCanceled = useRef(false);
     const updateTitleMutation = useMutation<OppdaterForsendelseResponse, null, { title: string }>({
-        mutationFn: ({ title }) =>
-            BIDRAG_FORSENDELSE_API.api
+        mutationFn: () =>
+            bidragForsendelseApi.api
                 .oppdaterForsendelse(forsendelse.forsendelseId, {
                     dokumenter: [],
                 })
@@ -96,7 +95,7 @@ function EditForsendelseTitle({ onCancel, onSubmit, defaultValue }: EditForsende
     }
 
     function renderError() {
-        if (updateTitleMutation.isError == true) {
+        if (updateTitleMutation.isError === true) {
             const error = updateTitleMutation.error as AxiosError;
             const errorMessage = error?.response?.headers?.["warning"];
             return (
@@ -113,8 +112,8 @@ function EditForsendelseTitle({ onCancel, onSubmit, defaultValue }: EditForsende
             <div className="flex flex-row gap-[5px] mb-4">
                 <TextField
                     onKeyDown={(e) => {
-                        if (e.key.toLowerCase() == "enter") _onSubmit();
-                        if (e.key.toLowerCase() == "escape") onCancel();
+                        if (e.key.toLowerCase() === "enter") _onSubmit();
+                        if (e.key.toLowerCase() === "escape") onCancel();
                     }}
                     autoFocus
                     disabled={updateTitleMutation.isPending}

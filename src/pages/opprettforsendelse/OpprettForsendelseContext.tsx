@@ -3,18 +3,18 @@ import { createContext, useState } from "react";
 import { PropsWithChildren } from "react";
 import { useContext } from "react";
 
-import { EngangsbelopType, SoknadFra, StonadType, VedtakType } from "../../api/BidragForsendelseApi";
-import { useForsendelseApi } from "../../hooks/useForsendelseApi";
+import { Engangsbeloptype, SoktAvType, Stonadstype, Vedtakstype } from "../../api/BidragForsendelseApi";
+import { useHentRoller } from "../../hooks/useForsendelseApi";
 
 export interface IOpprettForsendelseProviderProps {
-    vedtakType: VedtakType;
+    vedtakType: Vedtakstype;
     soknadType: string;
     erFattetBeregnet?: boolean;
     erVedtakIkkeTilbakekreving?: boolean;
-    engangsBelopType: EngangsbelopType;
-    stonadType: StonadType;
+    engangsBelopType: Engangsbeloptype;
+    stonadType: Stonadstype;
     behandlingType: string;
-    soknadFra: SoknadFra;
+    soknadFra: SoktAvType;
     soknadId?: string;
     vedtakId?: string;
     behandlingId?: string;
@@ -25,12 +25,12 @@ export interface IOpprettForsendelseProviderProps {
 export interface IOpprettForsendelsePropsContext {
     soknadType: string;
     behandlingType: string;
-    engangsBelopType: EngangsbelopType;
-    stonadType: StonadType;
-    vedtakType: VedtakType;
+    engangsBelopType: Engangsbeloptype;
+    stonadType: Stonadstype;
+    vedtakType: Vedtakstype;
     erFattetBeregnet?: boolean;
     erVedtakIkkeTilbakekreving?: boolean;
-    soknadFra: SoknadFra;
+    soknadFra: SoktAvType;
     enhet?: string;
     soknadId?: string;
     vedtakId?: string;
@@ -47,8 +47,8 @@ function OpprettForsendelseProvider({
     behandlingType,
     ...otherProps
 }: PropsWithChildren<IOpprettForsendelseProviderProps>) {
-    const [errors, setErrors] = useState<string[]>([]);
-    const roller = useForsendelseApi().hentRoller();
+    const [errors] = useState<string[]>([]);
+    const roller = useHentRoller();
 
     // useEffect(() => {
     //     const tempErrors = [];
@@ -65,13 +65,13 @@ function OpprettForsendelseProvider({
     // }, []);
 
     function isSameRole(urlObjNr: string, rolleObjNr: string) {
-        return urlObjNr == rolleObjNr || isEqualByIntIgnoreError(urlObjNr, rolleObjNr);
+        return urlObjNr === rolleObjNr || isEqualByIntIgnoreError(urlObjNr, rolleObjNr);
     }
 
     function isEqualByIntIgnoreError(valueA: string, valueB: string) {
         try {
-            return parseInt(valueA) == parseInt(valueB);
-        } catch (e) {
+            return parseInt(valueA) === parseInt(valueB);
+        } catch {
             return false;
         }
     }

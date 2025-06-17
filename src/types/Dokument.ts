@@ -1,7 +1,6 @@
 import { RolleType } from "@navikt/bidrag-ui-common";
 
-import { DokumentArkivSystemDto } from "../api/BidragDokumentApi";
-import { DokumentDto } from "../api/BidragForsendelseApi";
+import { DokumentDto, DokumentDtoArkivSystemEnum } from "../api/BidragForsendelseApi";
 import { DokumentStatus } from "../constants/DokumentStatus";
 
 export interface IDokument extends DokumentDto {
@@ -9,7 +8,7 @@ export interface IDokument extends DokumentDto {
     journalpostId?: string;
     erSkjema?: boolean;
     dokumentreferanse?: string;
-    arkivsystem?: DokumentArkivSystemDto;
+    arkivsystem?: DokumentDtoArkivSystemEnum;
     lenkeTilDokumentreferanse?: string;
     /** Originale dokumentreferanse hvis er kopi av en ekstern dokument (feks fra JOARK) */
     originalDokumentreferanse?: string;

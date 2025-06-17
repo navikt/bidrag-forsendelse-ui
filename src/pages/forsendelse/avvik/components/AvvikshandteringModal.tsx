@@ -6,10 +6,10 @@ import { Heading } from "@navikt/ds-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React, { useContext, useEffect, useMemo, useState } from "react";
 
-import { BIDRAG_FORSENDELSE_API } from "../../../../api/api";
+import { useBidragForsendelseApi } from "../../../../api/api";
 import { Avvikshendelse } from "../../../../api/BidragForsendelseApi";
 import { UseForsendelseApiKeys } from "../../../../hooks/useForsendelseApi";
-import useTilgangskontrollApi from "../../../../hooks/useTilgangskontrollApi";
+import useHarTilgangTilTemaFar from "../../../../hooks/useTilgangskontrollApi";
 import { Avvik, AvvikType } from "../../../../types/AvvikTypes";
 import { FAGOMRADE } from "../../../../types/Journalpost";
 import { RedirectTo } from "../../../../utils/RedirectUtils";
@@ -37,7 +37,7 @@ const AvvikStateContext = React.createContext<AvvikStateContextProps>({} as Avvi
 function AvvikshandteringModal(props: AvvikshandteringModalProps) {
     const { onCancel } = useAvvikModalContext();
     return (
-        <Modal className="min-w-[35rem] max-w-[55rem]" open onClose={onCancel}>
+        <Modal className="min-w-[35rem] max-w-[55rem]" aria-labelledby="modal-avvikshandtering" open onClose={onCancel}>
             <Modal.Body>
                 <React.Suspense fallback={<Loader size="medium" />}>
                     <AvvikshandteringModalContent {...props} />
@@ -49,7 +49,8 @@ function AvvikshandteringModal(props: AvvikshandteringModalProps) {
 function AvvikshandteringModalContent(props: AvvikshandteringModalProps) {
     const { forsendelseId, saksnummer, paloggetEnhet, avvikListe, forsendelse } = useAvvikModalContext();
     const queryClient = useQueryClient();
-    const { data: harTilgangTilTemaFar } = useTilgangskontrollApi().harTilgangTilTemaFar();
+    const bidragForsendelseApi = useBidragForsendelseApi();
+    const { data: harTilgangTilTemaFar } = useHarTilgangTilTemaFar();
     const [selectedAvvik, setSelectedAvvik] = useState<AvvikViewModel | undefined>();
     const [activeStep, setActiveStep] = useState(props.initialAvvik || props.initialAvvikType ? 1 : 0);
     const avvikStateValue = useMemo(() => hentAvvik(), [avvikListe, forsendelse]);
@@ -58,7 +59,7 @@ function AvvikshandteringModalContent(props: AvvikshandteringModalProps) {
         mutationKey: AvvikMutationKeys.sendAvvik,
         mutationFn: async (avvik) => {
             const requestBody: Avvikshendelse = mapToAvvikRequest(avvik, saksnummer);
-            await BIDRAG_FORSENDELSE_API.api.utforAvvik(forsendelseId, requestBody, {
+            await bidragForsendelseApi.api.utforAvvik(forsendelseId, requestBody, {
                 headers: {
                     "X-enhet": paloggetEnhet,
                 },
@@ -74,7 +75,7 @@ function AvvikshandteringModalContent(props: AvvikshandteringModalProps) {
     function hentAvvik(): AvvikViewModel[] {
         return avvikListe
             .map(getViewmodelByType)
-            .filter((a) => a != undefined)
+            .filter((a) => a !== undefined)
             .map((avvik) => ({
                 ...avvik,
                 metadata: {
@@ -105,8 +106,8 @@ function AvvikshandteringModalContent(props: AvvikshandteringModalProps) {
     };
 
     function skalKunneViderebehandleJournalpostEtterUtførtAvvik(avvik: Avvik) {
-        if (avvik.type == AvvikType.ENDRE_FAGOMRADE) {
-            return (harTilgangTilTemaFar && avvik.fagomrade == FAGOMRADE.FAR) || avvik.fagomrade == FAGOMRADE.BID;
+        if (avvik.type === AvvikType.ENDRE_FAGOMRADE) {
+            return (harTilgangTilTemaFar && avvik.fagomrade === FAGOMRADE.FAR) || avvik.fagomrade === FAGOMRADE.BID;
         }
         return ![AvvikType.OVERFOR_TIL_ANNEN_ENHET, AvvikType.SLETT_JOURNALPOST].some(
             (avvikType) => avvikType === avvik.type
@@ -150,12 +151,6 @@ function AvvikshandteringModalContent(props: AvvikshandteringModalProps) {
                 </React.Suspense>
             </>
         );
-    }
-
-    function getSendAvvikStatus() {
-        if (sendAvvikFn.isError) return "error";
-        if (sendAvvikFn.isPending) return "loading";
-        return "idle";
     }
 
     return (
