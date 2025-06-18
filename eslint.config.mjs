@@ -7,9 +7,9 @@ import typescriptEslint from "@typescript-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
 import jsonFormat from "eslint-plugin-json-format";
 import prettier from "eslint-plugin-prettier";
+import reactHooks from "eslint-plugin-react-hooks";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
 import unusedImports from "eslint-plugin-unused-imports";
-import reactHooks from "eslint-plugin-react-hooks";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -89,9 +89,11 @@ export default [
     },
     {
         files: ["**/*.js"],
-
         rules: {
             "no-undef": "off",
         },
+    },
+    {
+        ignores: ["**/*.mdx"],
     },
 ];
