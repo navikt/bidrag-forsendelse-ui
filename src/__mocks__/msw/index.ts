@@ -1,5 +1,5 @@
 export function initMock() {
-    if (process.env.NODE_ENV === "development" && process.env.ENABLE_MOCK == "true") {
+    if (process.env.NODE_ENV === "development" && process.env.ENABLE_MOCK === "true") {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const { worker } = require("./browser");
         worker

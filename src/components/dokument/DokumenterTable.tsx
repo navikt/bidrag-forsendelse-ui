@@ -46,7 +46,7 @@ export default function DokumenterTable() {
                     <Switch
                         checked={deleteMode}
                         size="small"
-                        onChange={(e) => {
+                        onChange={() => {
                             toggleDeleteMode();
                         }}
                     >
@@ -113,7 +113,7 @@ function DokumenterTableBottomButtons() {
     }
     return (
         <span className={"flex flex-row mt-[10px] w-full"}>
-            {errorSource == "dokumenter" && (
+            {errorSource === "dokumenter" && (
                 <Button onClick={resetErrorAndChanges} variant={"tertiary"} size={"small"}>
                     Angre siste endringer
                 </Button>
@@ -140,7 +140,7 @@ function DokumenterTableBottomButtons() {
 
 function BekreftSlettingButton() {
     const { isSavingChanges, hasChanged, saveChanges, dokumenter, toggleDeleteMode } = useDokumenterForm();
-    const isOneOrMoreDocumentsDeleted = dokumenter.some((d) => d.status == DokumentStatus.SLETTET);
+    const isOneOrMoreDocumentsDeleted = dokumenter.some((d) => d.status === DokumentStatus.SLETTET);
     const [modalOpen, setModalOpen] = useState(false);
     const closeModal = () => {
         setModalOpen(false);

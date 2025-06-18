@@ -92,7 +92,7 @@ interface EndreFagomradeBekreftelseProps {
 }
 
 function EndreFagomradeBekreftelse(props: EndreFagomradeBekreftelseProps) {
-    const fagomradeOption = fagomradeOptions.find((option) => option.value == props.fagomrade);
+    const fagomradeOption = fagomradeOptions.find((option) => option.value === props.fagomrade);
 
     return (
         <Bekreftelse>

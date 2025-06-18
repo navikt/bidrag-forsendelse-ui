@@ -1,15 +1,8 @@
 import "./ForsendelseTittel.css";
 
-import { XMarkIcon } from "@navikt/aksel-icons";
-import { CloudUpIcon } from "@navikt/aksel-icons";
-import { Alert, Button, Heading, TextField } from "@navikt/ds-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
-import { useRef, useState } from "react";
+import { Heading } from "@navikt/ds-react";
 
-import { useBidragForsendelseApi } from "../../../api/api";
-import { OppdaterForsendelseResponse } from "../../../api/BidragForsendelseApi";
-import { UseForsendelseApiKeys, useHentForsendelseQuery } from "../../../hooks/useForsendelseApi";
+import { useHentForsendelseQuery } from "../../../hooks/useForsendelseApi";
 export default function ForsendelseTittel() {
     const forsendelse = useHentForsendelseQuery();
     // const [editMode, setEditMode] = useState(false);
@@ -59,93 +52,93 @@ export default function ForsendelseTittel() {
     // );
 }
 
-interface EditForsendelseTitleProps {
-    onSubmit: (updatedTitle: string) => void;
-    onCancel: () => void;
-    defaultValue: string;
-}
-function EditForsendelseTitle({ onCancel, onSubmit, defaultValue }: EditForsendelseTitleProps) {
-    const bidragForsendelseApi = useBidragForsendelseApi();
-    const forsendelse = useHentForsendelseQuery();
-    const [updatedTitle, setUpdatedTitle] = useState<string>();
-    const queryClient = useQueryClient();
-    const isCanceled = useRef(false);
-    const updateTitleMutation = useMutation<OppdaterForsendelseResponse, null, { title: string }>({
-        mutationFn: () =>
-            bidragForsendelseApi.api
-                .oppdaterForsendelse(forsendelse.forsendelseId, {
-                    dokumenter: [],
-                })
-                .then((res) => res.data),
-        onSuccess: (data) => onSubmit(data.tittel ?? defaultValue),
-    });
-
-    function onChange(e: React.ChangeEvent<HTMLInputElement>) {
-        const value = e.target.value;
-        setUpdatedTitle(value);
-    }
-    async function _onSubmit() {
-        if (isCanceled.current) return;
-        if (updatedTitle) {
-            await updateTitleMutation.mutate({ title: updatedTitle });
-            queryClient.refetchQueries({ queryKey: UseForsendelseApiKeys.hentForsendelse() });
-        } else {
-            onSubmit(defaultValue);
-        }
-    }
-
-    function renderError() {
-        if (updateTitleMutation.isError === true) {
-            const error = updateTitleMutation.error as AxiosError;
-            const errorMessage = error?.response?.headers?.["warning"];
-            return (
-                <Alert
-                    className="w-max mb-2"
-                    variant="error"
-                    size="small"
-                >{`Kunne ikke lagre tittel: ${errorMessage}`}</Alert>
-            );
-        }
-    }
-    return (
-        <div>
-            <div className="flex flex-row gap-[5px] mb-4">
-                <TextField
-                    onKeyDown={(e) => {
-                        if (e.key.toLowerCase() === "enter") _onSubmit();
-                        if (e.key.toLowerCase() === "escape") onCancel();
-                    }}
-                    autoFocus
-                    disabled={updateTitleMutation.isPending}
-                    defaultValue={defaultValue}
-                    name="tittel"
-                    size="small"
-                    label="Navn på forsendelsen"
-                    onChange={onChange}
-                    className="w-2/3"
-                />
-                <div className="self-end">
-                    <Button
-                        loading={updateTitleMutation.isPending}
-                        size="small"
-                        variant="tertiary"
-                        icon={<CloudUpIcon />}
-                        onClick={_onSubmit}
-                    >
-                        Lagre
-                    </Button>
-                    <Button
-                        disabled={updateTitleMutation.isPending}
-                        size="small"
-                        variant="tertiary"
-                        icon={<XMarkIcon />}
-                        onClick={onCancel}
-                    >
-                        Avbryt
-                    </Button>
-                </div>
-            </div>
-            {renderError()}
-        </div>
-    );
-}
+// interface EditForsendelseTitleProps {
+//     onSubmit: (updatedTitle: string) => void;
+//     onCancel: () => void;
+//     defaultValue: string;
+// }
+// function EditForsendelseTitle({ onCancel, onSubmit, defaultValue }: EditForsendelseTitleProps) {
+//     const bidragForsendelseApi = useBidragForsendelseApi();
+//     const forsendelse = useHentForsendelseQuery();
+//     const [updatedTitle, setUpdatedTitle] = useState<string>();
+//     const queryClient = useQueryClient();
+//     const isCanceled = useRef(false);
+//     const updateTitleMutation = useMutation<OppdaterForsendelseResponse, null, { title: string }>({
+//         mutationFn: () =>
+//             bidragForsendelseApi.api
+//                 .oppdaterForsendelse(forsendelse.forsendelseId, {
+//                     dokumenter: [],
+//                 })
+//                 .then((res) => res.data),
+//         onSuccess: (data) => onSubmit(data.tittel ?? defaultValue),
+//     });
+//
+//     function onChange(e: React.ChangeEvent<HTMLInputElement>) {
+//         const value = e.target.value;
+//         setUpdatedTitle(value);
+//     }
+//     async function _onSubmit() {
+//         if (isCanceled.current) return;
+//         if (updatedTitle) {
+//             await updateTitleMutation.mutate({ title: updatedTitle });
+//             queryClient.refetchQueries({ queryKey: UseForsendelseApiKeys.hentForsendelse() });
+//         } else {
+//             onSubmit(defaultValue);
+//         }
+//     }
+//
+//     function renderError() {
+//         if (updateTitleMutation.isError === true) {
+//             const error = updateTitleMutation.error as AxiosError;
+//             const errorMessage = error?.response?.headers?.["warning"];
+//             return (
+//                 <Alert
+//                     className="w-max mb-2"
+//                     variant="error"
+//                     size="small"
+//                 >{`Kunne ikke lagre tittel: ${errorMessage}`}</Alert>
+//             );
+//         }
+//     }
+//     return (
+//         <div>
+//             <div className="flex flex-row gap-[5px] mb-4">
+//                 <TextField
+//                     onKeyDown={(e) => {
+//                         if (e.key.toLowerCase() === "enter") _onSubmit();
+//                         if (e.key.toLowerCase() === "escape") onCancel();
+//                     }}
+//                     autoFocus
+//                     disabled={updateTitleMutation.isPending}
+//                     defaultValue={defaultValue}
+//                     name="tittel"
+//                     size="small"
+//                     label="Navn på forsendelsen"
+//                     onChange={onChange}
+//                     className="w-2/3"
+//                 />
+//                 <div className="self-end">
+//                     <Button
+//                         loading={updateTitleMutation.isPending}
+//                         size="small"
+//                         variant="tertiary"
+//                         icon={<CloudUpIcon />}
+//                         onClick={_onSubmit}
+//                     >
+//                         Lagre
+//                     </Button>
+//                     <Button
+//                         disabled={updateTitleMutation.isPending}
+//                         size="small"
+//                         variant="tertiary"
+//                         icon={<XMarkIcon />}
+//                         onClick={onCancel}
+//                     >
+//                         Avbryt
+//                     </Button>
+//                 </div>
+//             </div>
+//             {renderError()}
+//         </div>
+//     );
+// }

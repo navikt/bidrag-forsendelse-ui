@@ -9,11 +9,6 @@ import {
 import PageWrapper from "../PageWrapper";
 import OpprettNotatPage from "./OpprettNotatPage";
 
-interface OpprettNotatProps {
-    saksnummer: string;
-    sessionId: string;
-    enhet: string;
-}
 export default function ({ ...otherProps }: IOpprettForsendelseProviderProps) {
     return (
         <PageWrapper name={"opprett-forsendelse-page"}>
