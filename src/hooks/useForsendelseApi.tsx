@@ -64,7 +64,7 @@ export const useHentJournalposterForSak = (saksnummer: string): IJournalpost[] =
                         },
                     }
                 );
-            } catch (error) {
+            } catch {
                 return { data: [] } as AxiosResponse;
             }
         },
