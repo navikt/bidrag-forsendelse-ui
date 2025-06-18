@@ -65,7 +65,6 @@ export const useHentJournalposterForSak = (saksnummer: string): IJournalpost[] =
                     }
                 );
             } catch (error) {
-                console.log("Error", error);
                 return { data: [] } as AxiosResponse;
             }
         },
@@ -231,9 +230,10 @@ export function useHentForsendelseQuery(): IForsendelse {
     const bidragForsendelseApi = useBidragForsendelseApi();
     const { data: forsendelse, isRefetching } = useSuspenseQuery({
         queryKey: UseForsendelseApiKeys.hentForsendelse(),
-        queryFn: () => {
+        queryFn: async () => {
+            if (!forsendelseId) return { data: undefined } as AxiosResponse;
             try {
-                return bidragForsendelseApi.api.hentForsendelse(forsendelseId, {
+                return await bidragForsendelseApi.api.hentForsendelse(forsendelseId, {
                     saksnummer: saksnummerFromSession,
                 });
             } catch (error) {
@@ -253,7 +253,7 @@ export function useHentForsendelseQuery(): IForsendelse {
         },
         refetchInterval: (result) => {
             const data = result.state?.data;
-            if (!data) return 0;
+            if (!data?.data) return 0;
             const forsendelse = data.data as IForsendelse;
             const hasDokumentsWithStatus = forsendelse.dokumenter.some((d) =>
                 [

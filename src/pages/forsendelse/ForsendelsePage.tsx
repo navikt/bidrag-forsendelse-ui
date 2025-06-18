@@ -3,8 +3,9 @@ import "./ForsendelsePage.css";
 import { Alert, BodyShort, Heading, HGrid, Page, VStack } from "@navikt/ds-react";
 import { Loader } from "@navikt/ds-react";
 import { useIsMutating } from "@tanstack/react-query";
-import React, { useEffect } from "react";
+import React, { Suspense, useEffect } from "react";
 import { PropsWithChildren } from "react";
+import { ErrorBoundary } from "react-error-boundary";
 
 import DokumenterTable from "../../components/dokument/DokumenterTable";
 import ForsendelseDocsButton from "../../components/ForsendelseDocsButton";
@@ -39,7 +40,7 @@ function ForsendelseView() {
     const forsendelse = useHentForsendelseQuery();
     const { navigateToJournalpost } = useSession();
     const isDebug = useIsDebugMode();
-    const { errorSource, errorMessage } = useErrorContext();
+    const { errorSource } = useErrorContext();
     const lagrerDokumenter = useIsMutating({ mutationKey: ["oppdaterDokumenterMutation"] });
 
     useEffect(() => {
@@ -47,14 +48,6 @@ function ForsendelseView() {
             navigateToJournalpost(forsendelse.arkivJournalpostId);
         }
     }, []);
-
-    if (errorSource === "hentforsendelse") {
-        return (
-            <Alert className="m-auto w-max" variant="error">
-                {errorMessage}
-            </Alert>
-        );
-    }
 
     if (forsendelse.status === "UNDER_OPPRETTELSE") {
         return <OpprettForsendelsePage />;
@@ -160,14 +153,22 @@ export default function ForsendelsePage({
             <SessionProvider forsendelseId={forsendelseId} saksnummer={saksnummer} sessionId={sessionId} enhet={enhet}>
                 <Page className="forsendelse-page">
                     <ForsendelseSakHeader />
-                    <React.Suspense fallback={<LoadingIndicator />}>
-                        <Page.Block width="xl" gutters className="pt-4">
-                            <DokumenterFormProvider forsendelseId={forsendelseId}>
-                                <ForsendelseView />
-                                <ForsendelseDocsButton />
-                            </DokumenterFormProvider>
-                        </Page.Block>
-                    </React.Suspense>
+                    <ErrorBoundary
+                        fallbackRender={({ error }) => (
+                            <Alert className="m-auto w-max" variant="error">
+                                {error.message}
+                            </Alert>
+                        )}
+                    >
+                        <Suspense fallback={<LoadingIndicator />}>
+                            <Page.Block width="xl" gutters className="pt-4">
+                                <DokumenterFormProvider forsendelseId={forsendelseId}>
+                                    <ForsendelseView />
+                                    <ForsendelseDocsButton />
+                                </DokumenterFormProvider>
+                            </Page.Block>
+                        </Suspense>
+                    </ErrorBoundary>
                 </Page>
             </SessionProvider>
         </PageWrapper>

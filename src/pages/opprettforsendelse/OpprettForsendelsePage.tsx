@@ -218,7 +218,7 @@ interface OpprettForsendelsContainerProps {
 }
 function OpprettForsendelsContainer({ onSubmit, tittel }: OpprettForsendelsContainerProps) {
     const { forsendelseId } = useSession();
-    const forsendelseEksisterer = forsendelseId != null;
+    const forsendelseEksisterer = forsendelseId !== null;
     const roller = useHentRoller();
     const methods = useFormContext();
     const isLoading = useIsMutating({ mutationKey: [OPPRETT_FORSENDELSE_MUTATION_KEY] }) > 0;
