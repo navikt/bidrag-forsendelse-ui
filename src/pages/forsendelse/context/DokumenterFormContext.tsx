@@ -11,12 +11,12 @@ import { FormProvider } from "react-hook-form";
 import { FieldArrayWithId } from "react-hook-form";
 import { useFormContext } from "react-hook-form";
 
-import { BIDRAG_FORSENDELSE_API } from "../../../api/api";
+import { useBidragForsendelseApi } from "../../../api/api";
 import { OppdaterForsendelseForesporsel } from "../../../api/BidragForsendelseApi";
 import { DokumentStatus } from "../../../constants/DokumentStatus";
 import { useErrorContext } from "../../../context/ErrorProvider";
 import { mapVarselEttersendelse } from "../../../helpers/forsendelseHelpers";
-import { useForsendelseApi, UseForsendelseApiKeys } from "../../../hooks/useForsendelseApi";
+import { UseForsendelseApiKeys, useHentForsendelseQuery } from "../../../hooks/useForsendelseApi";
 import { IDokument } from "../../../types/Dokument";
 import { parseErrorMessageFromAxiosError } from "../../../utils/ErrorUtils";
 import { queryClient } from "../../PageWrapper";
@@ -65,7 +65,7 @@ export type OppdaterDokumentTittelMutationProps = { tittel: string; dokumentrefe
 export const DokumenterFormContext = createContext<IDokumenterContext>({} as IDokumenterContext);
 
 function DokumenterFormProvider({ children, ...props }: PropsWithChildren<IDokumenterPropsContext>) {
-    const forsendelse = useForsendelseApi().hentForsendelse();
+    const forsendelse = useHentForsendelseQuery();
     const methods = useForm<IForsendelseFormProps>({
         defaultValues: {
             dokumenter: forsendelse.dokumenter,
@@ -82,7 +82,8 @@ function DokumenterFormProvider({ children, ...props }: PropsWithChildren<IDokum
 
 function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumenterPropsContext>) {
     const { addError, resetError } = useErrorContext();
-    const forsendelse = useForsendelseApi().hentForsendelse();
+    const bidragForsendelseApi = useBidragForsendelseApi();
+    const forsendelse = useHentForsendelseQuery();
     const [deleteMode, setDeleteMode] = useState(false);
     const { reset, handleSubmit, formState, setError, resetField, getValues, clearErrors } =
         useFormContext<IForsendelseFormProps>();
@@ -95,12 +96,12 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
     const oppdaterDokumentTittelFn = useMutation<unknown, unknown, OppdaterDokumentTittelMutationProps>({
         mutationFn: ({ tittel, dokumentreferanse }) => {
             resetError();
-            return BIDRAG_FORSENDELSE_API.api.oppdaterDokument(forsendelse.forsendelseId, dokumentreferanse, {
+            return bidragForsendelseApi.api.oppdaterDokument(forsendelse.forsendelseId, dokumentreferanse, {
                 tittel,
             });
         },
 
-        onError: (error: AxiosError, variables, context) => {
+        onError: (error: AxiosError, variables) => {
             const errorMessage = parseErrorMessageFromAxiosError(error);
             addError({
                 message: `Det skjedde en feil ved lagring av dokumentittel "${variables.tittel}": ${errorMessage}`,
@@ -119,17 +120,17 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
                     dokumentmalId: dokument.dokumentmalId,
                     språk: dokument.språk,
                     dokumentDato: dayjs(dokument.dokumentDato).format("YYYY-MM-DDTHH:mm:ss"),
-                    fjernTilknytning: dokument.status == DokumentStatus.SLETTET,
+                    fjernTilknytning: dokument.status === DokumentStatus.SLETTET,
                     tittel: dokument.tittel,
                     journalpostId: dokument.journalpostId,
                 })),
             };
-            return BIDRAG_FORSENDELSE_API.api.oppdaterForsendelse(props.forsendelseId, request);
+            return bidragForsendelseApi.api.oppdaterForsendelse(props.forsendelseId, request);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: UseForsendelseApiKeys.forsendelse });
         },
-        onError: (error: AxiosError, variables, context) => {
+        onError: (error: AxiosError) => {
             const errorMessage = parseErrorMessageFromAxiosError(error);
             addError({ message: `Kunne ikke lagre endringer: ${errorMessage}`, source: "dokumenter" });
         },
@@ -156,7 +157,7 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
             ...deleteDocument,
             gammelStatus: deleteDocument.status,
             status:
-                deleteDocument.status == DokumentStatus.SLETTET ? deleteDocument.gammelStatus : DokumentStatus.SLETTET,
+                deleteDocument.status === DokumentStatus.SLETTET ? deleteDocument.gammelStatus : DokumentStatus.SLETTET,
         });
     };
     const updateDocument = (updatedDocument: FormIDokument) => {
@@ -178,7 +179,7 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
             if (!hasValidState) {
                 isValid = false;
                 const errorMessage =
-                    dok.status == DokumentStatus.MÅ_KONTROLLERES
+                    dok.status === DokumentStatus.MÅ_KONTROLLERES
                         ? `Dokument "${dok.tittel}" må kontrolleres`
                         : `Dokument "${dok.tittel}" må ferdigstilles`;
                 setError(`dokumenter.${index}`, { message: errorMessage });
@@ -186,10 +187,10 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
             index++;
         }
         const varsel = getValues("ettersendingsoppgave");
-        if (varsel && (!varsel.tittel || varsel.tittel.length == 0)) {
+        if (varsel && (!varsel.tittel || varsel.tittel.length === 0)) {
             setError("ettersendingsoppgave", { message: "Tittel på ettersendingsoppgaven kan ikke være tom" });
             isValid = false;
-        } else if (varsel && varsel.vedleggsliste.length == 0) {
+        } else if (varsel && varsel.vedleggsliste.length === 0) {
             setError("ettersendingsoppgave", { message: "Ettersendingsoppgaven må inneholde minst ett dokument" });
             isValid = false;
         }
@@ -212,7 +213,7 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
 
     function updateTitle(tittel: string, dokumentreferanse: string) {
         oppdaterDokumentTittelFn.mutate({ tittel, dokumentreferanse });
-        const index = fields.find((dok) => dok.dokumentreferanse == dokumentreferanse).index;
+        const index = fields.find((dok) => dok.dokumentreferanse === dokumentreferanse).index;
         resetField(`dokumenter.${index}.tittel`, { defaultValue: tittel });
     }
 
@@ -242,7 +243,7 @@ function DokumenterProvider({ children, ...props }: PropsWithChildren<IDokumente
     const hasChanged =
         isDirty &&
         dirtyFields.dokumenter?.filter((dok) => {
-            return !(dok.tittel && Object.keys(dok).length == 1);
+            return !(dok.tittel && Object.keys(dok).length === 1);
         }).length > 0;
     return (
         <DokumenterFormContext.Provider

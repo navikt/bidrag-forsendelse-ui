@@ -2,7 +2,7 @@ import { StringUtils } from "@navikt/bidrag-ui-common";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 
-import { BIDRAG_KODEVERK_API } from "../api/api";
+import { useBidragKodeverkApi } from "../api/api";
 import { KodeverkHierarkiResponse, KodeverkKoderBetydningerResponse } from "../api/BidragKodeverkApi";
 import KodeverkService from "../api/KodeverkService";
 import { visAndreVedleggskoder, visVedleggskoder } from "../constants/ettersendingConstants";
@@ -19,7 +19,7 @@ const postnummereQuery = {
     queryFn: () => new KodeverkService().getPostnummere(),
 };
 
-export const hentLandkoder = (): LandkodeLand[] => {
+export const useHentLandkoder = (): LandkodeLand[] => {
     const { data: landkoder } = useSuspenseQuery({
         queryKey: KodeverkQueryKeys.landkoder,
         queryFn: () => new KodeverkService().getLandkoder(),
@@ -28,17 +28,18 @@ export const hentLandkoder = (): LandkodeLand[] => {
     return landkoder;
 };
 
-export const hentPostnummere = (): PostnummerPoststed[] => {
+export const useHentPostnummere = (): PostnummerPoststed[] => {
     const { data: postnummere } = useSuspenseQuery(postnummereQuery);
 
     return postnummere;
 };
 
 export const useHentNavSkjemaer = (): KodeBeskrivelse[] => {
+    const bidragKodeverkApi = useBidragKodeverkApi();
     const { data } = useSuspenseQuery({
         queryKey: KodeverkQueryKeys.navskjema,
         queryFn: async () => {
-            const response = await BIDRAG_KODEVERK_API.kodeverk.hentKodeverk("NAVSkjema");
+            const response = await bidragKodeverkApi.kodeverk.hentKodeverk("NAVSkjema");
             return mapKodeverkResponseToCodeAndName(response.data);
         },
     });
@@ -47,10 +48,11 @@ export const useHentNavSkjemaer = (): KodeBeskrivelse[] => {
 };
 
 export const useHentVedleggskoder = (): KodeBeskrivelse[] => {
+    const bidragKodeverkApi = useBidragKodeverkApi();
     const { data } = useSuspenseQuery({
         queryKey: KodeverkQueryKeys.navBidragSkjema,
         queryFn: async () => {
-            const response = await BIDRAG_KODEVERK_API.kodeverk.hentKodeverk("Vedleggskoder");
+            const response = await bidragKodeverkApi.kodeverk.hentKodeverk("Vedleggskoder");
             return [
                 ...visAndreVedleggskoder,
                 ...mapKodeverkResponseToCodeAndName(response.data).filter((kodeBeskrivelse) =>
@@ -102,7 +104,7 @@ export const mapKodeverkResponseToCodeAndName = (kodeverk: KodeverkKoderBetydnin
             };
         });
 
-export const prefetchPostnummere = (): void => {
+export const usePrefetchPostnummere = (): void => {
     const queryClient = useQueryClient();
     useEffect(() => {
         queryClient.prefetchQuery(postnummereQuery);

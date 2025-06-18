@@ -4,8 +4,8 @@ import { useForm } from "react-hook-form";
 
 import { JournalforendeEnhetDto } from "../../../../../api/BidragOrganisasjontApi";
 import SelectGroup, { SelectOption } from "../../../../../components/select/SelectGroup";
-import useOrganisasjonApi from "../../../../../hooks/useOrganisasjonApi";
-import { Avvik, AvvikType, OverforTilAnnenEnhet } from "../../../../../types/AvvikTypes";
+import { useHentJournalforendeEnheter } from "../../../../../hooks/useOrganisasjonApi";
+import { Avvik, AvvikType, OverforTilAnnenEnhet as InitialAvvik } from "../../../../../types/AvvikTypes";
 import { EnhetType } from "../../../../../types/EnhetTypes";
 import { FAGOMRADE } from "../../../../../types/Journalpost";
 import { useAvvikModalContext } from "../../AvvikshandteringButton";
@@ -21,9 +21,9 @@ const enhetTypeByGroupPriority = new Set([
 ]);
 
 function OverforTilAnnenEnhet(props: AvvikTypeCommonProps) {
-    const initialAvvik = props.initialAvvik as OverforTilAnnenEnhet;
+    const initialAvvik = props.initialAvvik as InitialAvvik;
     const { forsendelse, paloggetEnhet } = useAvvikModalContext();
-    const { data: journalforendeEnhetList } = useOrganisasjonApi().hentJournalforendeEnheter();
+    const { data: journalforendeEnhetList } = useHentJournalforendeEnheter();
     const [nyEnhet, setNyEnhet] = useState<string | undefined>(undefined);
     const currentEnhetsnummer = useRef<string>(initialAvvik?.nyttEnhetsnummer ?? forsendelse.enhet ?? paloggetEnhet);
     const handleSubmit = async (values: OverforTilAnnenEnhetStepValues) => {
@@ -147,7 +147,7 @@ function OverforTilAnnenEnhetFirstStep(props: OverforTilAnnenEnhetFirstStepProps
         );
     };
     const renderInfoText = () => {
-        const erFagomradeFAR = forsendelse.tema == FAGOMRADE.FAR;
+        const erFagomradeFAR = forsendelse.tema === FAGOMRADE.FAR;
         return (
             <BodyShort>
                 Her kan du overføre oppgaven til en annen enhet

@@ -2,7 +2,7 @@ import SakHeader from "@navikt/bidrag-ui-common/esm/react_components/header/SakH
 import { Skeleton } from "@navikt/ds-react";
 import React from "react";
 
-import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
+import { useHentForsendelseQuery, useHentRoller } from "../../../hooks/useForsendelseApi";
 import { useSession } from "../context/SessionContext";
 export default function ForsendelseSakHeader() {
     return (
@@ -22,9 +22,9 @@ function SakLoadingIndicator() {
 
 function ForsendelseSakHeaderContent() {
     const { saksnummer: saksnummerFromSession, forsendelseId } = useSession();
-    const { hentRoller, hentForsendelse } = useForsendelseApi();
-    const saksnummer = saksnummerFromSession ?? hentForsendelse()?.saksnummer;
-    const roller = hentRoller();
+    const forsendelse = useHentForsendelseQuery();
+    const roller = useHentRoller();
+    const saksnummer = saksnummerFromSession ?? forsendelse?.saksnummer;
     return (
         <SakHeader
             saksnummer={saksnummer}

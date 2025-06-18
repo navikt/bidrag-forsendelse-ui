@@ -8,7 +8,7 @@ import { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useThemedStylesWithMdx } from "@theme-ui/mdx";
 import * as dayjs from "dayjs";
-import * as customParseFormat from "dayjs/plugin/customParseFormat";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 import React, { PropsWithChildren, useEffect } from "react";
 import { Theme, ThemeUIProvider } from "theme-ui";
 
@@ -25,7 +25,6 @@ const initReactQuery = () =>
     new QueryClient({
         defaultOptions: {
             queries: {
-                suspense: false,
                 staleTime: Infinity,
                 retry: 3,
                 retryDelay: 3000,

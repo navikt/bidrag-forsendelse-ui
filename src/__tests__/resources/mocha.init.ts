@@ -4,9 +4,7 @@ import { cleanup } from "@testing-library/react";
 import { afterEach, beforeEach } from "mocha";
 import sinon from "sinon";
 
-import { mockHentDokument } from "../../__mocks__/sinon/MockDokumentService";
-
-// @ts-ignore
+/* eslint-disable */
 
 export const sinonSandbox = sinon.createSandbox();
 export async function mochaGlobalSetup() {
@@ -39,7 +37,6 @@ export async function mochaGlobalSetup() {
 
     beforeEach(() => {
         cleanup();
-        mockHentDokument(sinonSandbox);
     });
 
     afterEach(() => {
