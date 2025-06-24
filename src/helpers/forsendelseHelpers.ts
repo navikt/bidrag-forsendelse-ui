@@ -23,10 +23,7 @@ export function mapForsendelseResponse(ettersendingsoppgave: Ettersendingsoppgav
     return (prev: AxiosResponse<ForsendelseResponsTo>) => {
         return {
             ...prev,
-            data: {
-                ...prev.data,
-                ettersendingsoppgave: ettersendingsoppgave,
-            },
+            ettersendingsoppgave: ettersendingsoppgave,
         };
     };
 }
