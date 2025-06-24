@@ -79,8 +79,19 @@ export const mapHierarkiResponseToCodeAndName = (kodeverk: KodeverkHierarkiRespo
 
 export const mapKodeverkResponseToCodeAndName = (kodeverk: KodeverkKoderBetydningerResponse): KodeBeskrivelse[] =>
     Object.entries(kodeverk.betydninger)
-        .filter(([_, betydning]) => {
-            const gyldigTil = betydning[0].gyldigTil;
+        .map(([kode, betydninger]) => {
+            if (!betydninger || betydninger.length === 0) {
+                return null;
+            }
+            // Find the Betydning with the most recent gyldigFom date
+            const latestBetydning = betydninger.reduce((latest, current) =>
+                latest.gyldigFra > current.gyldigFra ? latest : current
+            );
+            return { kode, betydning: latestBetydning };
+        })
+        .filter(Boolean) // Remove any null entries from empty betydninger
+        .filter(({ betydning }) => {
+            const gyldigTil = betydning.gyldigTil;
             if (!gyldigTil) {
                 // ingen sluttdato = gyldig
                 return true;
@@ -94,10 +105,10 @@ export const mapKodeverkResponseToCodeAndName = (kodeverk: KodeverkKoderBetydnin
             // behold kun de som ikke er utløpt
             return gyldigTilDate >= today;
         })
-        .map(([kode, betydning]) => {
-            const tekst = StringUtils.isEmpty(betydning[0].beskrivelser["nb"].tekst)
-                ? betydning[0].beskrivelser["nb"].term
-                : betydning[0].beskrivelser["nb"].tekst;
+        .map(({ kode, betydning }) => {
+            const tekst = StringUtils.isEmpty(betydning.beskrivelser["nb"].tekst)
+                ? betydning.beskrivelser["nb"].term
+                : betydning.beskrivelser["nb"].tekst;
             return {
                 kode,
                 beskrivelse: tekst,
