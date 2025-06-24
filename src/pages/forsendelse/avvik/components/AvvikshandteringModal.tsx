@@ -37,7 +37,7 @@ const AvvikStateContext = React.createContext<AvvikStateContextProps>({} as Avvi
 function AvvikshandteringModal(props: AvvikshandteringModalProps) {
     const { onCancel } = useAvvikModalContext();
     return (
-        <Modal className="min-w-[35rem] max-w-[55rem]" aria-labelledby="modal-avvikshandtering" open onClose={onCancel}>
+        <Modal className="min-w-[35rem] max-w-[55rem]" aria-labelledby="modal-avvikshandtering" open onClose={onCancel} closeOnBackdropClick>
             <Modal.Body>
                 <React.Suspense fallback={<Loader size="medium" />}>
                     <AvvikshandteringModalContent {...props} />
