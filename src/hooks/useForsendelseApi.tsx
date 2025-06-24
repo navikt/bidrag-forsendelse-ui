@@ -233,9 +233,26 @@ export function useHentForsendelseQuery(): IForsendelse {
         queryFn: async () => {
             if (!forsendelseId) return { data: undefined } as AxiosResponse;
             try {
-                return await bidragForsendelseApi.api.hentForsendelse(forsendelseId, {
+                const response = await bidragForsendelseApi.api.hentForsendelse(forsendelseId, {
                     saksnummer: saksnummerFromSession,
                 });
+                const forsendelse = response.data as ForsendelseResponsTo;
+                const forsendelseInternal: IForsendelse = {
+                    ...forsendelse,
+                    forsendelseId,
+                    dokumenter: forsendelse.dokumenter.map((dokument, index) => {
+                        return {
+                            ...dokument,
+                            status: DokumentStatus[dokument.status],
+                            fraSaksnummer: forsendelse.saksnummer,
+                            lagret: true,
+                            index,
+                            metadata: null,
+                        };
+                    }),
+                };
+
+                return forsendelseInternal;
             } catch (error) {
                 const errorMessage = parseErrorMessageFromAxiosError(error);
                 addError({
@@ -253,8 +270,8 @@ export function useHentForsendelseQuery(): IForsendelse {
         },
         refetchInterval: (result) => {
             const data = result.state?.data;
-            if (!data?.data) return 0;
-            const forsendelse = data.data as IForsendelse;
+            if (!data) return 0;
+            const forsendelse = data as IForsendelse;
             const hasDokumentsWithStatus = forsendelse.dokumenter.some((d) =>
                 [
                     "UNDER_PRODUKSJON",
@@ -266,29 +283,6 @@ export function useHentForsendelseQuery(): IForsendelse {
             );
             return hasDokumentsWithStatus ? 3000 : 0;
         },
-        select: React.useCallback(
-            (response: AxiosResponse): IForsendelse => {
-                const forsendelse = response.data as ForsendelseResponsTo;
-
-                const forsendelseInternal: IForsendelse = {
-                    ...forsendelse,
-                    forsendelseId,
-                    dokumenter: forsendelse.dokumenter.map((dokument, index) => {
-                        return {
-                            ...dokument,
-                            status: DokumentStatus[dokument.status],
-                            fraSaksnummer: forsendelse.saksnummer,
-                            lagret: true,
-                            index,
-                            metadata: null,
-                        };
-                    }),
-                };
-
-                return forsendelseInternal;
-            },
-            [forsendelseId]
-        ),
     });
 
     return {
