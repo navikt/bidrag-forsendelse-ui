@@ -489,7 +489,7 @@ function JournalpostDokumenterRowMultiDoc({
     ).length;
 
     let tittel = journalpost.dokumenter.length > 0 ? journalpost.dokumenter[0].tittel : journalpost.innhold;
-    tittel = tittel != undefined || tittel.trim().length == 0 ? journalpost.innhold : tittel;
+    tittel = tittel !== undefined || tittel?.trim()?.length === 0 ? journalpost.innhold : tittel;
     const tittelDebug = isDebugMode ? `${tittel}  -  ${journalpost.journalpostId}` : tittel;
     const harBareEttDokument = journalpost.dokumenter.length == 1;
     return (
