@@ -1,4 +1,4 @@
-import { IRolleDetaljer, RolleType, RolleTypeAbbreviation, RolleTypeFullName } from "@navikt/bidrag-ui-common";
+import { IRolleDetaljer, ObjectUtils, RolleType, RolleTypeAbbreviation, RolleTypeFullName } from "@navikt/bidrag-ui-common";
 import IdentUtils from "@navikt/bidrag-ui-common/esm/utils/IdentUtils";
 import { useQueries, useSuspenseQueries, useSuspenseQuery } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse, HttpStatusCode } from "axios";
@@ -231,7 +231,7 @@ export function useHentForsendelseQuery(): IForsendelse {
     const { data: forsendelse, isRefetching } = useSuspenseQuery({
         queryKey: UseForsendelseApiKeys.hentForsendelse(),
         queryFn: async () => {
-            if (!forsendelseId) return { data: undefined } as AxiosResponse;
+            if (!forsendelseId) return {} as IForsendelse;
             try {
                 const response = await bidragForsendelseApi.api.hentForsendelse(forsendelseId, {
                     saksnummer: saksnummerFromSession,
@@ -270,7 +270,7 @@ export function useHentForsendelseQuery(): IForsendelse {
         },
         refetchInterval: (result) => {
             const data = result.state?.data;
-            if (!data) return 0;
+            if (ObjectUtils.isEmpty(data)) return 0;
             const forsendelse = data as IForsendelse;
             const hasDokumentsWithStatus = forsendelse.dokumenter.some((d) =>
                 [
