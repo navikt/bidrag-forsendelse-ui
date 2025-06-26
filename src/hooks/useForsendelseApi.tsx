@@ -28,7 +28,7 @@ export type VedleggListe = { malId: string; detaljer: DokumentMalDetaljer }[];
 export const UseForsendelseApiKeys = {
     forsendelse: ["forsendelse"],
     sak: ["sak"],
-    hentForsendelse: () => [...UseForsendelseApiKeys.forsendelse],
+    hentForsendelse: (forsendelseId: string) => [...UseForsendelseApiKeys.forsendelse, forsendelseId],
     sakerPerson: (personId: string) => [...UseForsendelseApiKeys.sak, personId],
     dokumentValg: (behandlingType: string, soknadFra: string, soknadType: string) => [
         UseForsendelseApiKeys.forsendelse,
@@ -198,7 +198,7 @@ export const useVedleggListe = () => {
     const { enhet } = useSession();
     const bidragForsendelseApi = useBidragForsendelseApi();
     return useSuspenseQuery({
-        queryKey: [`vedlegg_liste`],
+        queryKey: [`vedlegg_liste`, enhet],
         queryFn: () => bidragForsendelseApi.api.stottedeDokumentmalDetaljer(),
         select: React.useCallback(
             (response: AxiosResponse): VedleggListe => {
@@ -223,7 +223,7 @@ export const useHentStørrelseIMb = () => {
     const { forsendelseId } = useSession();
     const bidragForsendelseApi = useBidragForsendelseApi();
     const result = useSuspenseQuery({
-        queryKey: ["forsendelse_størrelse"],
+        queryKey: ["forsendelse_størrelse", forsendelseId],
         queryFn: () => bidragForsendelseApi.api.henStorrelsePaDokumenter(forsendelseId),
         select: (data) => data.data,
     });
@@ -235,7 +235,7 @@ export function useHentForsendelseQuery(): IForsendelse {
     const { addError } = useErrorContext();
     const bidragForsendelseApi = useBidragForsendelseApi();
     const { data: forsendelse, isRefetching } = useSuspenseQuery({
-        queryKey: UseForsendelseApiKeys.hentForsendelse(),
+        queryKey: UseForsendelseApiKeys.hentForsendelse(forsendelseId),
         queryFn: async () => {
             if (!forsendelseId) return {} as IForsendelse;
             try {

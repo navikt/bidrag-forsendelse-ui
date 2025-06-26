@@ -71,10 +71,10 @@ function mapToOpprettEllerOppdaterForsendelseRequest<
             navn: data.mottaker.navn,
             adresse: hasAdresse
                 ? {
-                      ...data.mottaker?.adresse,
-                      landkode,
-                      landkode3: data.mottaker?.adresse?.landkode3 ?? countryCodeIso2ToIso3(landkode),
-                  }
+                    ...data.mottaker?.adresse,
+                    landkode,
+                    landkode3: data.mottaker?.adresse?.landkode3 ?? countryCodeIso2ToIso3(landkode),
+                }
                 : undefined,
         },
         tema: data.tema,
