@@ -8,19 +8,15 @@ interface UserInfo {
     email: string;
     officeLocation: string;
 }
-export default function useUserInfoApi() {
-    const userInfoQuery = () => {
-        return useQuery<UserInfo>({
-            queryKey: ["userinfo"],
-            queryFn: () => fetch("/me").then((res) => res.json()),
-        });
-    };
 
-    const hentSaksbehandlerNavn = () => {
-        const userInfo = userInfoQuery();
-        return userInfo.data.displayName;
-    };
-    return {
-        hentSaksbehandlerNavn,
-    };
-}
+const useUserInfoQuery = () => {
+    return useQuery<UserInfo>({
+        queryKey: ["userinfo"],
+        queryFn: () => fetch("/me").then((res) => res.json()),
+    });
+};
+
+export const useHentSaksbehandlerNavn = () => {
+    const userInfo = useUserInfoQuery();
+    return userInfo.data.displayName;
+};

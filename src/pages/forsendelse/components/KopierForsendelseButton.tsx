@@ -4,13 +4,16 @@ import React, { useState } from "react";
 import { FormProvider, useFieldArray, useForm, useFormContext } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 
-import { BIDRAG_FORSENDELSE_API } from "../../../api/api";
-import { DokumentArkivSystemDto, JournalTema } from "../../../api/BidragForsendelseApi";
+import { useBidragForsendelseApi } from "../../../api/api";
+import {
+    OpprettDokumentForesporselArkivsystemEnum,
+    OpprettForsendelseForesporselTemaEnum,
+} from "../../../api/BidragForsendelseApi";
 import GjelderSelect from "../../../components/detaljer/GjelderSelect";
 import LanguageSelect from "../../../components/detaljer/LanguageSelect";
 import DokumentStatusTag from "../../../components/dokument/DokumentStatusTag";
 import { DokumentStatus } from "../../../constants/DokumentStatus";
-import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
+import { useHentForsendelseQuery, useHentRoller } from "../../../hooks/useForsendelseApi";
 import { IDokument } from "../../../types/Dokument";
 import MottakerSelect from "../../opprettforsendelse/MottakerSelect";
 import { useDokumenterForm } from "../context/DokumenterFormContext";
@@ -59,10 +62,11 @@ interface KopierForsendelseFormProps {
     dokumenter: DokumentRowData[];
 }
 function KopierForsendelseModal({ onClose, open }: KopierForsendelseModalProps) {
-    const forsendelse = useForsendelseApi().hentForsendelse();
-    const roller = useForsendelseApi().hentRoller();
+    const forsendelse = useHentForsendelseQuery();
+    const bidragForsendelseApi = useBidragForsendelseApi();
+    const roller = useHentRoller();
     const navigate = useNavigate();
-    const { forsendelseId, navigateToForsendelse } = useSession();
+    const { navigateToForsendelse } = useSession();
     const methods = useForm<KopierForsendelseFormProps>({
         defaultValues: {
             gjelderIdent: forsendelse.gjelderIdent,
@@ -81,7 +85,7 @@ function KopierForsendelseModal({ onClose, open }: KopierForsendelseModalProps) 
     const opprettForsendelseFn = useMutation({
         mutationKey: [OPPRETT_FORSENDELSE_MUTATION_KEY],
         mutationFn: (data: KopierForsendelseFormProps) =>
-            BIDRAG_FORSENDELSE_API.api.opprettForsendelse({
+            bidragForsendelseApi.api.opprettForsendelse({
                 gjelderIdent: data.gjelderIdent,
                 mottaker: {
                     ident: data.mottakerIdent,
@@ -93,12 +97,13 @@ function KopierForsendelseModal({ onClose, open }: KopierForsendelseModalProps) 
                 },
                 opprettTittel: true,
                 enhet: forsendelse.enhet,
-                tema: forsendelse.tema as JournalTema,
+                tema: forsendelse.tema as OpprettForsendelseForesporselTemaEnum,
                 språk: data.språk,
                 dokumenter: [
                     {
                         tittel: "Forside",
                         dokumentmalId: "BI01S02",
+                        bestillDokument: false,
                     },
                     ...data.dokumenter
                         .filter((d) => d.selected)
@@ -106,7 +111,8 @@ function KopierForsendelseModal({ onClose, open }: KopierForsendelseModalProps) 
                             tittel: d.tittel,
                             dokumentreferanse: d.dokumentreferanse,
                             journalpostId: forsendelse.forsendelseId,
-                            arkivsystem: DokumentArkivSystemDto.BIDRAG,
+                            arkivsystem: OpprettDokumentForesporselArkivsystemEnum.BIDRAG,
+                            bestillDokument: false,
                         })),
                 ],
             }),
@@ -180,7 +186,7 @@ function DokumentValgTable() {
                             hideLabel
                             onChange={() => {
                                 fields.forEach((d, index) => {
-                                    update(index, { ...d, selected: allSelected ? false : true });
+                                    update(index, { ...d, selected: !allSelected });
                                 });
                             }}
                         >

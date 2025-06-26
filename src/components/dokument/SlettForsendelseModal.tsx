@@ -2,17 +2,18 @@ import { RedirectTo } from "@navikt/bidrag-ui-common";
 import { BodyShort, Button, Modal } from "@navikt/ds-react";
 import { useMutation } from "@tanstack/react-query";
 
-import { BIDRAG_FORSENDELSE_API } from "../../api/api";
+import { useBidragForsendelseApi } from "../../api/api";
 import environment from "../../environment";
 import { useSession } from "../../pages/forsendelse/context/SessionContext";
 import { AvvikType } from "../../types/AvvikTypes";
 
 export default function SlettForsendelseModal({ closeModal }: { closeModal: () => void }) {
     const { forsendelseId, saksnummer } = useSession();
+    const bidragForsendelseApi = useBidragForsendelseApi();
 
     const deleteForsendelseFnf = useMutation({
         mutationFn: () =>
-            BIDRAG_FORSENDELSE_API.api.utforAvvik(forsendelseId, {
+            bidragForsendelseApi.api.utforAvvik(forsendelseId, {
                 avvikType: AvvikType.SLETT_JOURNALPOST,
                 detaljer: {},
             }),

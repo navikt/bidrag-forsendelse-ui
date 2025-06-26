@@ -12,7 +12,7 @@ import { useFormContext } from "react-hook-form";
 import { useWatch } from "react-hook-form";
 
 import { DistribuerTilAdresse } from "../api/BidragDokumentApi";
-import { hentLandkoder, hentPostnummere } from "../hooks/kodeverkQueries";
+import { useHentLandkoder, useHentPostnummere } from "../hooks/kodeverkQueries";
 import { IMottakerAdresse } from "../types/Adresse";
 import { countryCodeIso2ToIso3, isCountryCodeNorway } from "../utils/AdresseUtils";
 
@@ -127,7 +127,7 @@ function EditPostcodeAndState(props: EditAddressProps) {
                         name={postnummerFormKey as "postnummer"}
                         rules={{
                             required: "Postnummer påkrevd norske adresser",
-                            validate: (value: string) => (value.length != 4 ? "Postnummer må ha 4 tegn" : true),
+                            validate: (value: string) => (value.length !== 4 ? "Postnummer må ha 4 tegn" : true),
                         }}
                         render={({ field: { name, onChange, value, ref }, fieldState: { error } }) => (
                             <React.Suspense fallback={<Loader size="xsmall" />}>
@@ -254,7 +254,7 @@ interface SelectablePostnummerProps {
 
 function PostnummerInput({ onChange, defaultValue, inputRef, name, error }: SelectablePostnummerProps) {
     const [value, setValue] = useState<string>(defaultValue);
-    const postnummere = hentPostnummere();
+    const postnummere = useHentPostnummere();
 
     function getPoststedByPostnummer(postnummer?: string) {
         if (!postnummer) {
@@ -296,7 +296,7 @@ interface SelectableCountry {
 }
 
 function SelectableCountry({ onChange, defaultValue, inputRef, name, error }: SelectableCountry) {
-    const landkoder = hentLandkoder();
+    const landkoder = useHentLandkoder();
 
     function onSelected(event: ChangeEvent<HTMLSelectElement>) {
         const landkode = event.target.value;
