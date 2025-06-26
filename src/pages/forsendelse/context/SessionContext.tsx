@@ -40,8 +40,8 @@ function SessionProvider({ children, ...props }: PropsWithChildren<ISessionProps
                 "UserError",
                 "",
                 "Mangler pålogget enhet på url. " +
-                "Dette blir lagt til hvis bruker ble videresendt fra Bisys. " +
-                "Hvis bruker har gjort noe endringer på URL så bør ikke enhet= fjernes fra URL da denne informasjonen blir brukt under opprettelse av forsendelse",
+                    "Dette blir lagt til hvis bruker ble videresendt fra Bisys. " +
+                    "Hvis bruker har gjort noe endringer på URL så bør ikke enhet= fjernes fra URL da denne informasjonen blir brukt under opprettelse av forsendelse",
                 ""
             );
         }
@@ -54,7 +54,7 @@ function SessionProvider({ children, ...props }: PropsWithChildren<ISessionProps
         if (type === "NOTAT") {
             RedirectTo.sakshistorikk(saksnummer, environment.url.bisys);
         } else {
-            setForsendelseId(forsendelseId)
+            setForsendelseId(forsendelseId);
             navigate(`/sak/${saksnummer}/forsendelse/${forsendelseId}?${params.toString()}`);
         }
     };
