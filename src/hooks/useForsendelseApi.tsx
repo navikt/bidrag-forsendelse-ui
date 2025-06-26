@@ -1,4 +1,10 @@
-import { IRolleDetaljer, ObjectUtils, RolleType, RolleTypeAbbreviation, RolleTypeFullName } from "@navikt/bidrag-ui-common";
+import {
+    IRolleDetaljer,
+    ObjectUtils,
+    RolleType,
+    RolleTypeAbbreviation,
+    RolleTypeFullName,
+} from "@navikt/bidrag-ui-common";
 import IdentUtils from "@navikt/bidrag-ui-common/esm/utils/IdentUtils";
 import { useQueries, useSuspenseQueries, useSuspenseQuery } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse, HttpStatusCode } from "axios";
