@@ -28,7 +28,10 @@ export type VedleggListe = { malId: string; detaljer: DokumentMalDetaljer }[];
 export const UseForsendelseApiKeys = {
     forsendelse: ["forsendelse"],
     sak: ["sak"],
-    hentForsendelse: (forsendelseId: string) => [...UseForsendelseApiKeys.forsendelse, forsendelseId],
+    hentForsendelse: (forsendelseId: string) => [
+        ...UseForsendelseApiKeys.forsendelse,
+        forsendelseId?.replace(/\D/g, "").toString(),
+    ],
     sakerPerson: (personId: string) => [...UseForsendelseApiKeys.sak, personId],
     dokumentValg: (behandlingType: string, soknadFra: string, soknadType: string) => [
         UseForsendelseApiKeys.forsendelse,

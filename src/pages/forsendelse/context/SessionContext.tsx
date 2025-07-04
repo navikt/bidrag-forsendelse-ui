@@ -1,9 +1,6 @@
 import { CustomError, RedirectTo } from "@navikt/bidrag-ui-common";
 import ObjectUtils from "@navikt/bidrag-ui-common/esm/utils/ObjectUtils";
-import { createContext, useEffect } from "react";
-import { PropsWithChildren } from "react";
-import { useState } from "react";
-import { useContext } from "react";
+import { createContext, PropsWithChildren, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import environment from "../../../environment";

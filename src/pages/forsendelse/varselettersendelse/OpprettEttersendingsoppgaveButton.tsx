@@ -111,7 +111,7 @@ function OpprettEttersendelseOppgaveModal({
             .then(async (opprettetVarselEttersendelse) => {
                 setValue("ettersendingsoppgave", mapVarselEttersendelse(opprettetVarselEttersendelse.data));
                 qc.setQueryData(
-                    UseForsendelseApiKeys.hentForsendelse(),
+                    UseForsendelseApiKeys.hentForsendelse(forsendelseId),
                     varselForsendelseUpdater(opprettetVarselEttersendelse.data)
                 );
                 setIsOpen(false);
@@ -181,7 +181,7 @@ function SlettOppgaveButton() {
                 forsendelseId: Number(forsendelse.forsendelseId.replace("BIF-", "")),
             })
             .then(() => {
-                qc.refetchQueries({ queryKey: UseForsendelseApiKeys.hentForsendelse() });
+                qc.refetchQueries({ queryKey: UseForsendelseApiKeys.hentForsendelse(forsendelse.forsendelseId) });
             });
     }
 
