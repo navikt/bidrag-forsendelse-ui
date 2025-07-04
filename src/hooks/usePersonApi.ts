@@ -51,6 +51,7 @@ export const useHentSamhandlerEllerPersonForIdent = (ident: string) => {
                     adresse: {
                         adresselinje1: "",
                         ...result.data.adresse,
+                        postnummer: result.data.adresse?.postnr,
                         landkode: result.data.adresse?.land ? countryCodeIso3ToIso2(result.data.adresse.land) : "",
                         landkode3: result.data.adresse?.land,
                     },
