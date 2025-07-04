@@ -25,7 +25,7 @@ import {
 } from "react-router-dom";
 
 import { initMock } from "./__mocks__/msw";
-import { EngangsbelopType, SoknadFra, StonadType, VedtakType } from "./api/BidragForsendelseApi";
+import { Engangsbeloptype, SoktAvType, Stonadstype, Vedtakstype } from "./api/BidragForsendelseApi";
 import Brukerveiledning from "./docs/Brukerveiledning.mdx";
 import { SessionProvider } from "./pages/forsendelse/context/SessionContext";
 import ForsendelsePage from "./pages/forsendelse/ForsendelsePage";
@@ -122,27 +122,27 @@ function OpprettNyNotatPageWrapper() {
         >
             <Opprettnotat
                 barnObjNr={searchParams.getAll("barn_obj_nr") ?? []}
-                vedtakType={searchParams.get("vedtakType") as VedtakType}
+                vedtakType={searchParams.get("vedtakType") as Vedtakstype}
                 erFattetBeregnet={
-                    searchParams.get("erFattetBeregnet") != undefined
-                        ? searchParams.get("erFattetBeregnet") == "true"
+                    searchParams.get("erFattetBeregnet") !== undefined
+                        ? searchParams.get("erFattetBeregnet") === "true"
                         : null
                 }
-                erVedtakIkkeTilbakekreving={searchParams.get("erVedtakIkkeTilbakekreving") == "true"}
+                erVedtakIkkeTilbakekreving={searchParams.get("erVedtakIkkeTilbakekreving") === "true"}
                 soknadId={searchParams.get("soknadId")}
                 soknadType={searchParams.get("soknadType")}
                 behandlingId={searchParams.get("behandlingId")}
                 vedtakId={searchParams.get("vedtakId")}
-                soknadFra={searchParams.get("soknadFra") as SoknadFra}
+                soknadFra={searchParams.get("soknadFra") as SoktAvType}
                 behandlingType={searchParams.get("behandlingType")}
-                engangsBelopType={searchParams.get("engangsbelopType") as EngangsbelopType}
-                stonadType={searchParams.get("stonadType") as StonadType}
+                engangsBelopType={searchParams.get("engangsbelopType") as Engangsbeloptype}
+                stonadType={searchParams.get("stonadType") as Stonadstype}
             />
         </SessionProvider>
     );
 }
 function OpprettNyForsendelsePageWrapper() {
-    const { saksnummer, forsendelseId, enhet } = useParams();
+    const { saksnummer, forsendelseId } = useParams();
     const [searchParams, _] = useSearchParams();
     return (
         <SessionProvider
@@ -153,21 +153,21 @@ function OpprettNyForsendelsePageWrapper() {
         >
             <Opprettforsendelse
                 barnObjNr={searchParams.getAll("barn_obj_nr") ?? []}
-                vedtakType={searchParams.get("vedtakType") as VedtakType}
+                vedtakType={searchParams.get("vedtakType") as Vedtakstype}
                 erFattetBeregnet={
-                    searchParams.get("erFattetBeregnet") != undefined
-                        ? searchParams.get("erFattetBeregnet") == "true"
+                    searchParams.get("erFattetBeregnet") !== undefined
+                        ? searchParams.get("erFattetBeregnet") === "true"
                         : null
                 }
-                erVedtakIkkeTilbakekreving={searchParams.get("erVedtakIkkeTilbakekreving") == "true"}
+                erVedtakIkkeTilbakekreving={searchParams.get("erVedtakIkkeTilbakekreving") === "true"}
                 soknadId={searchParams.get("soknadId")}
                 soknadType={searchParams.get("soknadType")}
                 behandlingId={searchParams.get("behandlingId")}
                 vedtakId={searchParams.get("vedtakId")}
-                soknadFra={searchParams.get("soknadFra") as SoknadFra}
+                soknadFra={searchParams.get("soknadFra") as SoktAvType}
                 behandlingType={searchParams.get("behandlingType")}
-                engangsBelopType={searchParams.get("engangsbelopType") as EngangsbelopType}
-                stonadType={searchParams.get("stonadType") as StonadType}
+                engangsBelopType={searchParams.get("engangsbelopType") as Engangsbeloptype}
+                stonadType={searchParams.get("stonadType") as Stonadstype}
             />
         </SessionProvider>
     );

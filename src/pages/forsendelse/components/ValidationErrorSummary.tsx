@@ -8,7 +8,7 @@ export default function ValidationErrorSummary() {
         formState: { errors },
     } = useFormContext<IForsendelseFormProps>();
 
-    if (errors.root?.kanDistribueres == undefined) {
+    if (errors.root?.kanDistribueres === undefined) {
         return null;
     }
 
@@ -18,7 +18,7 @@ export default function ValidationErrorSummary() {
             allErrors = allErrors.concat(errors.dokumenter?.map((err) => err?.message));
         }
 
-        if (errors.ettersendingsoppgave && errors.ettersendingsoppgave?.vedleggsliste == undefined) {
+        if (errors.ettersendingsoppgave && errors.ettersendingsoppgave?.vedleggsliste === undefined) {
             allErrors = allErrors.concat(errors.ettersendingsoppgave?.message);
         }
         if (errors.root?.message) {

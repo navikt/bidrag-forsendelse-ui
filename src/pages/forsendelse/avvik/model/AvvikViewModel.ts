@@ -24,14 +24,14 @@ export const avvikViewModels: AvvikViewModel[] = [
     {
         title: (metadata: any) => {
             if (!metadata) return "Endre fagområde";
-            return metadata?.tema == "BID" ? "Overfør til fagområde Foreldreskap" : "Overfør til fagområde Bidrag";
+            return metadata?.tema === "BID" ? "Overfør til fagområde Foreldreskap" : "Overfør til fagområde Bidrag";
         },
         IconComponent: ArrowRightLeftIcon,
         type: AvvikType.ENDRE_FAGOMRADE,
         stepIndicators: [
             (metadata: any) => {
                 if (!metadata) return "Endre fagområde";
-                return metadata?.tema == "BID" ? "Overfør til fagområde Foreldreskap" : "Overfør til fagområde Bidrag";
+                return metadata?.tema === "BID" ? "Overfør til fagområde Foreldreskap" : "Overfør til fagområde Bidrag";
             },
         ],
     },
@@ -50,5 +50,5 @@ export const avvikViewModels: AvvikViewModel[] = [
 ];
 
 export function getViewmodelByType(avvikType: AvvikType) {
-    return avvikViewModels.find((a) => a.type == avvikType);
+    return avvikViewModels.find((a) => a.type === avvikType);
 }

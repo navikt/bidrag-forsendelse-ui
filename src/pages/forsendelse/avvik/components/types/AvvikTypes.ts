@@ -20,7 +20,7 @@ export function registerToSelectProps(formName: string, register: UseFormRegiste
 
 export function mapToAvvikRequest(avvik: Avvik, saksnummer: string): Avvikshendelse {
     const { type: avvikType, ...otherValues } = avvik;
-    const baseBody = { avvikType, saksnummer };
+    const baseBody = { avvikType, saksnummer, detaljer: {} };
     switch (avvik.type) {
         case AvvikType.ENDRE_FAGOMRADE:
             return {

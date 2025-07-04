@@ -4,11 +4,11 @@ import { dateToDDMMYYYYString } from "@navikt/bidrag-ui-common";
 import { BodyLong, Label } from "@navikt/ds-react";
 
 import { mapToDistribusjonKanalBeskrivelse } from "../../../helpers/forsendelseHelpers";
-import useDokumentApi from "../../../hooks/useDokumentApi";
-import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
+import { useDistribusjonKanal } from "../../../hooks/useDokumentApi";
+import { useHentForsendelseQuery } from "../../../hooks/useForsendelseApi";
 export default function ForsendelseDetaljer() {
-    const forsendelse = useForsendelseApi().hentForsendelse();
-    const distribusjonKanal = useDokumentApi().distribusjonKanal();
+    const forsendelse = useHentForsendelseQuery();
+    const distribusjonKanal = useDistribusjonKanal();
 
     return (
         <div>
@@ -19,7 +19,7 @@ export default function ForsendelseDetaljer() {
                     rows={[
                         {
                             label: "Tema",
-                            value: forsendelse.tema == "FAR" ? "Foreldreskap" : "Bidrag",
+                            value: forsendelse.tema === "FAR" ? "Foreldreskap" : "Bidrag",
                         },
                         {
                             label: "Opprettet dato",
