@@ -137,7 +137,7 @@ export const useHentRoller = () => {
     const idents = sak.roller.map((rolle) => rolle.fodselsnummer ?? rolle.samhandlerIdent);
     const personApi = usePersonApi();
 
-    const personQueries = useQueries({
+    const personQueries = useSuspenseQueries({
         queries: idents.map((ident) => ({
             queryKey: ["person", ident],
             queryFn: async () => {
