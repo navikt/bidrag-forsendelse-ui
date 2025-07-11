@@ -122,7 +122,7 @@ function DokumentValgVedlegg() {
         const tableData = vedleggListe.map((vedlegg) => ({
             malId: vedlegg.malId,
             beskrivelse: vedlegg.detaljer.beskrivelse,
-            tittel: vedlegg.detaljer.beskrivelse,
+            tittel: vedlegg.detaljer.tittel,
             innholdType: vedlegg.detaljer.innholdType,
             gruppeVisningsnavn: vedlegg.detaljer.gruppeVisningsnavn,
             språk: hentSpråk(vedlegg.detaljer),
@@ -142,11 +142,14 @@ function DokumentValgVedlegg() {
     }
 
     function onSelectionChange(malId: string) {
-        const dokument = vedleggListe.find((d) => d.malId == malId);
+        const dokument = vedleggListe.find((d) => d.malId === malId);
         if (dokument) {
             const beskrivelse = dokument.detaljer.beskrivelse;
-            const erNorsk = dokument.detaljer.språk.length == 0 || dokument.detaljer.språk.includes("NB");
-            const tittel = erNorsk ? dokument.detaljer.tittel : `${dokument.detaljer.tittel} (${beskrivelse})`;
+            const erNorsk = dokument.detaljer.språk.length === 0 || dokument.detaljer.språk.includes("NB");
+            const tittel =
+                erNorsk || beskrivelse === dokument.detaljer.tittel
+                    ? dokument.detaljer.tittel
+                    : `${dokument.detaljer.tittel} (${beskrivelse})`;
             setValue("dokument", {
                 malId,
                 tittel,
@@ -159,7 +162,7 @@ function DokumentValgVedlegg() {
     register("dokument", {
         validate: (dok) => {
             if (dok?.malId == null) return "Dokument må velges";
-            if (dok?.tittel == null || dok.tittel.trim().length == 0) return "Tittel på dokumentet kan ikke være tom";
+            if (dok?.tittel == null || dok.tittel.trim().length === 0) return "Tittel på dokumentet kan ikke være tom";
             return true;
         },
     });
@@ -167,7 +170,7 @@ function DokumentValgVedlegg() {
     const options = getAllOptions();
 
     function mapToBeskrivelse(option: SelectOptionData) {
-        if (option.språk == "NB") return option.beskrivelse;
+        if (option.språk === "NB") return option.beskrivelse;
         return `${option.beskrivelse} (${option.språk})`;
     }
     return (
@@ -188,7 +191,7 @@ function DokumentValgVedlegg() {
                                     ...opt,
                                     beskrivelse: mapToBeskrivelse(opt),
                                 }))
-                                .sort((a, b) => (b.språk == "NB" ? 1 : a.beskrivelse.localeCompare(b.beskrivelse)))
+                                .sort((a, b) => (b.språk === "NB" ? 1 : a.beskrivelse.localeCompare(b.beskrivelse)))
                                 .map((dokument) => (
                                     <option value={dokument.malId}>{dokument.beskrivelse}</option>
                                 ))}
