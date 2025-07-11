@@ -6,19 +6,19 @@ import { FormProvider, useForm, useFormContext } from "react-hook-form";
 
 import { DokumentMalDetaljer, DokumentMalDetaljerInnholdTypeEnum } from "../../api/BidragForsendelseApi";
 import { DokumentStatus } from "../../constants/DokumentStatus";
-import { useForsendelseApi } from "../../hooks/useForsendelseApi";
+import { useVedleggListe } from "../../hooks/useForsendelseApi";
 import { useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IDokument } from "../../types/Dokument";
 
 export default function LeggTilVedleggKnapp() {
     const { addDocuments } = useDokumenterForm();
     const [modalOpen, setModalOpen] = useState(false);
-    const { data: vedleggListe } = useForsendelseApi().vedleggListe();
+    const { data: vedleggListe } = useVedleggListe();
 
     const closeModal = () => {
         setModalOpen(false);
     };
-    if (vedleggListe.length == 0) {
+    if (vedleggListe.length === 0) {
         return null;
     }
     return (
@@ -60,6 +60,7 @@ function LeggTilVedlegglModal({ onClose, open }: LeggTilDokumentFraSakModalProps
                 status: DokumentStatus.IKKE_BESTILT,
                 index: -1,
                 lagret: false,
+                metadata: null,
             });
         }
     }
@@ -107,7 +108,7 @@ interface SelectOptionData {
 }
 
 function DokumentValgVedlegg() {
-    const { data: vedleggListe } = useForsendelseApi().vedleggListe();
+    const { data: vedleggListe } = useVedleggListe();
     const {
         register,
         setValue,

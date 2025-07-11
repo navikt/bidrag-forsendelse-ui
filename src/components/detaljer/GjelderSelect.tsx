@@ -12,15 +12,17 @@ export default function GjelderSelect({ roller }: GjelderSelectProps) {
         formState: { errors },
     } = useFormContext<{ gjelderIdent: string }>();
     const rollerFiltrert = roller
-        .sort((_, rolleB) => (rolleB.rolleType == RolleTypeAbbreviation.BP ? 1 : -1))
+        .sort((_, rolleB) => (rolleB.rolleType === RolleTypeAbbreviation.BP ? 1 : -1))
         .filter((rolle) =>
-            [RolleTypeAbbreviation.BA, RolleTypeAbbreviation.BM, RolleTypeAbbreviation.BP].includes(rolle.rolleType)
+            [RolleTypeAbbreviation.BA, RolleTypeAbbreviation.BM, RolleTypeAbbreviation.BP].includes(
+                rolle.rolleType as RolleTypeAbbreviation
+            )
         );
     const rollerIkkeBarn = rollerFiltrert.filter((rolle) => rolle.rolleType !== RolleTypeAbbreviation.BA);
 
     function renderBarnOptions() {
-        const barn = rollerFiltrert.filter((rolle) => rolle.rolleType == RolleTypeAbbreviation.BA);
-        if (barn.length == 0) return null;
+        const barn = rollerFiltrert.filter((rolle) => rolle.rolleType === RolleTypeAbbreviation.BA);
+        if (barn.length === 0) return null;
         return (
             <optgroup label="Barn">
                 {barn.map((rolle) => (

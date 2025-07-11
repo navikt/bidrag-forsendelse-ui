@@ -1,29 +1,29 @@
-import { rest, RestHandler, RestRequest } from "msw";
+import { http, HttpHandler, HttpResponse } from "msw";
 
-import { PersonRequest } from "../../api/BidragPersonApi";
 import environment from "../../environment";
 import { personMap } from "../testdata/personData";
+import { withDelay } from "./dokumentMock";
 
-export default function personMock(): RestHandler[] {
+type InformasjonRequestBody = {
+    ident: string;
+};
+
+type ResponseBody = string;
+
+export default function personMock(): HttpHandler[] {
     const baseUrl = environment.url.bidragPerson;
     return [
-        rest.post(`${baseUrl}/informasjon`, async (req: RestRequest<PersonRequest>, res, ctx) => {
-            const personIdent = (await req.json()).ident;
-            return res(
-                ctx.set("Content-Type", "application/json"),
-                ctx.delay(500),
-                // Respond with the "ArrayBuffer".
-                ctx.body(JSON.stringify(personMap.get(personIdent)))
-            );
-        }),
-        rest.post(
+        http.post<never, InformasjonRequestBody, ResponseBody>(
+            `${baseUrl}/informasjon`,
+            withDelay(500, async ({ request }) => {
+                const personIdent = await request.json();
+                return HttpResponse.json(JSON.stringify(personMap.get(personIdent.ident)));
+            })
+        ),
+        http.post<never, never, ResponseBody>(
             `${environment.url.bidragTilgangskontroll}/api/tilgang/tema`,
-            async (req: RestRequest<PersonRequest>, res, ctx) => {
-                const personIdent = (await req.json()).ident;
-                return res(
-                    // Respond with the "ArrayBuffer".
-                    ctx.body("true")
-                );
+            async () => {
+                return HttpResponse.json("true");
             }
         ),
     ];

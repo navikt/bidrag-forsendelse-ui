@@ -22,7 +22,7 @@ export default function AdresseInfo({ adresse }: AdresseInfoProps) {
             {renderDetailWhenExists(adresse?.adresselinje1)}
             {renderDetailWhenExists(adresse?.adresselinje2)}
             {renderDetailWhenExists(adresse?.adresselinje3)}
-            {renderDetailWhenExists(adresse?.postnummer, adresse?.poststed)}
+            {renderDetailWhenExists(adresse?.postnummer ?? adresse?.postnr, adresse?.poststed)}
             {renderDetailWhenExists(countryCodeToName(adresse?.landkode ?? adresse.land))}
         </>
     );

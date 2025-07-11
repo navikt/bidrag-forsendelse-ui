@@ -31,7 +31,7 @@ export class JournalpostForsendelseRelasjoner {
     getForsendelseStatus(dokumentDto: IDokumentJournalDto) {
         if (!this.journalpost.erForsendelse) {
             if (this.journalpost.journalpostId.startsWith("BID-")) {
-                return this.journalpost.status == "UNDER_PRODUKSJON"
+                return this.journalpost.status === "UNDER_PRODUKSJON"
                     ? DokumentStatus.UNDER_PRODUKSJON
                     : DokumentStatus.FERDIGSTILT;
             }
@@ -39,13 +39,13 @@ export class JournalpostForsendelseRelasjoner {
         }
 
         const kopiAvEksternDokument = this.erKopiAvEksternDokument(dokumentDto);
-        const erLenkeTilAnnenForsendelse = dokumentDto.arkivSystem == "FORSENDELSE";
-        if (dokumentDto.status == "FERDIGSTILT") {
+        const erLenkeTilAnnenForsendelse = dokumentDto.arkivSystem === "FORSENDELSE";
+        if (dokumentDto.status === "FERDIGSTILT") {
             return kopiAvEksternDokument && !erLenkeTilAnnenForsendelse
                 ? DokumentStatus.KONTROLLERT
                 : DokumentStatus.FERDIGSTILT;
         }
-        if (dokumentDto.status == "UNDER_PRODUKSJON") {
+        if (dokumentDto.status === "UNDER_PRODUKSJON") {
             return DokumentStatus.UNDER_PRODUKSJON;
         }
         return kopiAvEksternDokument && !erLenkeTilAnnenForsendelse
@@ -55,7 +55,7 @@ export class JournalpostForsendelseRelasjoner {
 
     isJournalpostSelected() {
         return this.selectedDocuments.some(
-            (d) => d.journalpostId == this.journalpost.journalpostId && d.dokumentreferanse == undefined
+            (d) => d.journalpostId === this.journalpost.journalpostId && d.dokumentreferanse === undefined
         );
     }
     isDocumentSelectedNotIncludingAdded(dokument: IDokumentJournalDto) {
@@ -74,8 +74,8 @@ export class JournalpostForsendelseRelasjoner {
     erJournalpostLagtTilIForsendelse() {
         return this.forsendelseDokumenter.some(
             (d) =>
-                d.originalJournalpostId?.replace(/\D/g, "") == this.journalpost.journalpostId?.replace(/\D/g, "") &&
-                d.originalDokumentreferanse == undefined
+                d.originalJournalpostId?.replace(/\D/g, "") === this.journalpost.journalpostId?.replace(/\D/g, "") &&
+                d.originalDokumentreferanse === undefined
         );
     }
 
@@ -112,12 +112,12 @@ export function erSammeDokument(
         isEqualIgnoreNull(forsendelseDokument.originalJournalpostId, dokumentJournal.originalJournalpostId);
 
     const erDokumentIJournalLenketTilDokument =
-        forsendelseDokument.dokumentreferanse == dokumentJournal.originalDokumentreferanse &&
-        forsendelseDokument.forsendelseId == dokumentJournal.originalJournalpostId?.replace(/\D/g, "");
+        forsendelseDokument.dokumentreferanse === dokumentJournal.originalDokumentreferanse &&
+        forsendelseDokument.forsendelseId === dokumentJournal.originalJournalpostId?.replace(/\D/g, "");
 
     const erForsendelseDokumentLenketTilDokumentIJournal =
-        forsendelseDokument.originalDokumentreferanse == dokumentJournal.dokumentreferanse &&
-        forsendelseDokument.originalJournalpostId?.replace(/\D/g, "") == journalpostId?.replace(/\D/g, "");
+        forsendelseDokument.originalDokumentreferanse === dokumentJournal.dokumentreferanse &&
+        forsendelseDokument.originalJournalpostId?.replace(/\D/g, "") === journalpostId?.replace(/\D/g, "");
 
     return (
         // harReferanseTilDokumentIJournal ||
@@ -151,7 +151,7 @@ export function isSameDocument(documentA: IDokument | IDokumentJournalDto, docum
         isEqualIgnoreNull(documentA.dokumentreferanse, documentB.originalDokumentreferanse) ||
         isEqualIgnoreNull(documentA.originalDokumentreferanse, documentB.originalDokumentreferanse) ||
         isEqualIgnoreNull(documentA.originalDokumentreferanse, documentB.dokumentreferanse);
-    const erSammeDokument = documentA.dokumentreferanse == documentB.dokumentreferanse;
+    const erSammeDokument = documentA.dokumentreferanse === documentB.dokumentreferanse;
 
     return erSammeDokument || erReferanseTilSammeHeleJournalpost || erReferanseTilSammeDokument;
 }
