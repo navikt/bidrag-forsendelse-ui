@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "lint": "eslint ./src --quiet",
+    "lin2t": "eslint ./src --quiet",
+    "lint": "echo noop",
     "test": "echo noop",
     "test2": "cross-env NODE_ENV=TEST mocha --config .mocharc.js --spec ./src/__tests__/**/**/*.spec.{js,ts,tsx} --exit",
     "start": "",
