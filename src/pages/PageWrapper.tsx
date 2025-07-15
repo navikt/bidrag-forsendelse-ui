@@ -2,6 +2,7 @@ import "../index.css";
 
 import { MDXProvider, useMDXComponents } from "@mdx-js/react";
 import { ArrowRightIcon } from "@navikt/aksel-icons";
+import { BidragCommonsProvider } from "@navikt/bidrag-ui-common";
 import { BodyLong, BodyShort, Heading, Label, Loader } from "@navikt/ds-react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { QueryClient } from "@tanstack/react-query";
@@ -17,7 +18,6 @@ import DokumentLinkedTag from "../components/dokument/DokumentLinkedTag";
 import DokumentStatusTag from "../components/dokument/DokumentStatusTag";
 import ErrorProvider from "../context/ErrorProvider";
 import environment from "../environment";
-import { BidragCommonsProvider } from "@navikt/bidrag-ui-common";
 const mdxComponents = { Heading, DokumentStatusTag, BodyShort, ArrowRightIcon, DokumentLinkedTag, BodyLong, Label };
 
 dayjs.extend(customParseFormat);

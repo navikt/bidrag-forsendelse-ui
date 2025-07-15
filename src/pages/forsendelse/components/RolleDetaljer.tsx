@@ -4,8 +4,6 @@ import { PersonNavnIdent, RolleType } from "@navikt/bidrag-ui-common";
 import { Heading } from "@navikt/ds-react";
 import React from "react";
 
-import PersonDetaljer from "../../../components/person/PersonDetaljer";
-
 interface IRolleDetaljerProps {
     rolle: RolleType;
     ident: string;
