@@ -1,6 +1,6 @@
 import "./Rolledetaljer.css";
 
-import { RolleType } from "@navikt/bidrag-ui-common";
+import { PersonNavnIdent, RolleType } from "@navikt/bidrag-ui-common";
 import { Heading } from "@navikt/ds-react";
 import React from "react";
 
@@ -19,7 +19,7 @@ export default function RolleDetaljer({ rolle, ident, navn, label }: IRolleDetal
                 {label}
             </Heading>
             <div className={"ml-2"}>
-                <PersonDetaljer rolle={rolle} navn={navn} ident={ident} />
+                <PersonNavnIdent rolle={rolle} navn={navn} ident={ident} />
             </div>
         </div>
     );

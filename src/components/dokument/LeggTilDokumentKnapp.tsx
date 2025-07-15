@@ -1,6 +1,6 @@
 import "./LeggTilDokumentButton.css";
 
-import { dateToDDMMYYYYString, RolleType, RolleTypeAbbreviation } from "@navikt/bidrag-ui-common";
+import { dateToDDMMYYYYString, PersonIdent, PersonNavnIdent, RolleType, RolleTypeAbbreviation } from "@navikt/bidrag-ui-common";
 import { Add } from "@navikt/ds-icons";
 import { Collapse } from "@navikt/ds-icons";
 import { Expand } from "@navikt/ds-icons";
@@ -545,7 +545,7 @@ function JournalpostDokumenterRowMultiDoc({
                 <Table.DataCell>{dateToDDMMYYYYString(new Date(journalpost.dokumentDato))}</Table.DataCell>
 
                 <Table.DataCell>{journalpost.dokumentType}</Table.DataCell>
-                <Table.DataCell>{journalpost.gjelderAktor?.ident}</Table.DataCell>
+                <Table.DataCell><PersonNavnIdent ident={journalpost.gjelderAktor?.ident} skjulNavn /></Table.DataCell>
                 <Table.DataCell>
                     <JournalpostStatusTag status={journalpost.journalstatus} />
                 </Table.DataCell>

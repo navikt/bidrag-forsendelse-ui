@@ -17,6 +17,7 @@ import DokumentLinkedTag from "../components/dokument/DokumentLinkedTag";
 import DokumentStatusTag from "../components/dokument/DokumentStatusTag";
 import ErrorProvider from "../context/ErrorProvider";
 import environment from "../environment";
+import { BidragCommonsProvider } from "@navikt/bidrag-ui-common";
 const mdxComponents = { Heading, DokumentStatusTag, BodyShort, ArrowRightIcon, DokumentLinkedTag, BodyLong, Label };
 
 dayjs.extend(customParseFormat);
@@ -98,12 +99,14 @@ export default function PageWrapper({ children, name }: PropsWithChildren<PageWr
             <MDXProvider components={{ ...mdxComponents, ...componentsWithStyles }}>
                 <ErrorProvider>
                     <QueryClientProvider client={queryClient}>
-                        <React.Suspense fallback={<Loader size={"3xlarge"} title={"Laster..."} />}>
-                            <div id={name} className={"w-full bidrag-forsendelse-ui"}>
-                                {children}
-                            </div>
-                        </React.Suspense>
-                        <ReactQueryDevtools />
+                        <BidragCommonsProvider client={queryClient}>
+                            <React.Suspense fallback={<Loader size={"3xlarge"} title={"Laster..."} />}>
+                                <div id={name} className={"w-full bidrag-forsendelse-ui"}>
+                                    {children}
+                                </div>
+                            </React.Suspense>
+                            <ReactQueryDevtools />
+                        </BidragCommonsProvider>
                     </QueryClientProvider>
                 </ErrorProvider>
             </MDXProvider>
