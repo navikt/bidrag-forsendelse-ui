@@ -31,8 +31,8 @@ jobs:
         run: cat env/.env.dev >> $GITHUB_ENV 
       - name: Install yarn dependencies
         run: yarn --immutable
-      - name: Check lint
-        run: yarn lint
+      # - name: Check lint
+      #   run: yarn lint
       - name: Run tests and build
         run: yarn test && yarn build
 

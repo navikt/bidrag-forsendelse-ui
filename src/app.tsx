@@ -65,7 +65,6 @@ export const faro = initializeFaro({
     ],
 });
 
-
 // This file is only used for development. The entrypoint is under pages folder
 initMock();
 export default function App() {
