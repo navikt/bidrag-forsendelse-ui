@@ -32,7 +32,7 @@ import ForsendelsePage from "./pages/forsendelse/ForsendelsePage";
 import Opprettforsendelse from "./pages/opprettforsendelse";
 import Opprettnotat from "./pages/opprettnotat";
 import PageWrapper from "./pages/PageWrapper";
-
+import useStartTracing from "@navikt/bidrag-ui-common/esm/react_components/hooks/useStartTracing";
 const config: IConfig = {
     url: process.env.UNLEASH_API_URL as string,
     clientKey: process.env.UNLEASH_FRONTEND_TOKEN,
@@ -53,7 +53,6 @@ export const faro = initializeFaro({
             captureConsole: true,
             captureConsoleDisabledLevels: [LogLevel.DEBUG, LogLevel.TRACE],
         }),
-
         new ReactIntegration({
             router: createReactRouterV6Options({
                 createRoutesFromChildren,
@@ -65,9 +64,12 @@ export const faro = initializeFaro({
         }),
     ],
 });
+
+
 // This file is only used for development. The entrypoint is under pages folder
 initMock();
 export default function App() {
+    useStartTracing()
     return (
         <React.StrictMode>
             <FlagProvider config={config}>
