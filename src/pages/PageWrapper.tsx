@@ -2,6 +2,7 @@ import "../index.css";
 
 import { MDXProvider, useMDXComponents } from "@mdx-js/react";
 import { ArrowRightIcon } from "@navikt/aksel-icons";
+import { BidragCommonsProvider } from "@navikt/bidrag-ui-common";
 import { BodyLong, BodyShort, Heading, Label, Loader } from "@navikt/ds-react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { QueryClient } from "@tanstack/react-query";
@@ -99,12 +100,14 @@ export default function PageWrapper({ children, name }: PropsWithChildren<PageWr
             <MDXProvider components={{ ...mdxComponents, ...componentsWithStyles }}>
                 <ErrorProvider>
                     <QueryClientProvider client={queryClient}>
-                        <React.Suspense fallback={<Loader size={"3xlarge"} title={"Laster..."} />}>
-                            <div id={name} className={"w-full bidrag-forsendelse-ui"}>
-                                {children}
-                            </div>
-                        </React.Suspense>
-                        <ReactQueryDevtools />
+                        <BidragCommonsProvider client={queryClient}>
+                            <React.Suspense fallback={<Loader size={"3xlarge"} title={"Laster..."} />}>
+                                <div id={name} className={"w-full bidrag-forsendelse-ui"}>
+                                    {children}
+                                </div>
+                            </React.Suspense>
+                            <ReactQueryDevtools />
+                        </BidragCommonsProvider>
                     </QueryClientProvider>
                 </ErrorProvider>
             </MDXProvider>
