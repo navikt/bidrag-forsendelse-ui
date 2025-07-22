@@ -28,6 +28,7 @@ import LanguageAndTemaSelect from "./LanguageAndTemaSelect";
 import MottakerSelect from "./MottakerSelect";
 import { useOpprettForsendelse } from "./OpprettForsendelseContext";
 import SlettForsendelseButton from "./SlettForsendelseButton";
+import { SecureLoggerService } from "@navikt/bidrag-ui-common";
 
 export type MottakerFormProps = {
     ident?: string;
@@ -71,10 +72,10 @@ function mapToOpprettEllerOppdaterForsendelseRequest<
             navn: data.mottaker.navn,
             adresse: hasAdresse
                 ? {
-                      ...data.mottaker?.adresse,
-                      landkode,
-                      landkode3: data.mottaker?.adresse?.landkode3 ?? countryCodeIso2ToIso3(landkode),
-                  }
+                    ...data.mottaker?.adresse,
+                    landkode,
+                    landkode3: data.mottaker?.adresse?.landkode3 ?? countryCodeIso2ToIso3(landkode),
+                }
                 : undefined,
         },
         tema: data.tema,
@@ -223,6 +224,7 @@ function OpprettForsendelsContainer({ onSubmit, tittel }: OpprettForsendelsConta
     const methods = useFormContext();
     const isLoading = useIsMutating({ mutationKey: [OPPRETT_FORSENDELSE_MUTATION_KEY] }) > 0;
     useEffect(() => {
+        SecureLoggerService.info("Dette er test av sikkerlogg")
         updateUrlSearchParam("page", `Opprett forsendelse`);
     }, []);
     return (
