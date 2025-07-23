@@ -9,6 +9,5 @@ export interface IMottakerAdresse {
     /** Lankode må være i ISO 3166-1 alpha-3 format */
     landkode3?: string;
     postnummer?: string;
-    postnr?: string;
     poststed?: string;
 }

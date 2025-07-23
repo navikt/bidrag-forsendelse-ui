@@ -18,7 +18,7 @@
     "types:forsendelse": "swagger-typescript-api -p http://localhost:8999/v3/api-docs --axios -n BidragForsendelseApi.ts -o src/api --extract-enums",
     "types:sak": "swagger-typescript-api -p https://bidrag-sak-feature.dev.intern.nav.no/v3/api-docs --axios -n BidragSakApi.ts -o src/api --extract-enums",
     "types:dokument": "swagger-typescript-api -p http://localhost:8099/bidrag-dokument/v3/api-docs --axios -n BidragDokumentApi.ts -o src/api --extract-enums",
-    "types:samhandler": "swagger-typescript-api -p https://bidrag-samhandler.intern.dev.nav.no/v3/api-docs --axios -n BidragSamhandlerApi.ts -o src/api --extract-enums",
+    "types:samhandler": "swagger-typescript-api -p https://bidrag-samhandler-q2.intern.dev.nav.no/v3/api-docs --extract-enums --enum-names-as-values --axios -n BidragSamhandlerApi.ts -o src/api",
     "types:tilgangskontroll": "swagger-typescript-api -p http://localhost:8991/v3/api-docs --axios -n BidragTilgangskontrollApi.ts -o src/api --extract-enums",
     "types:organisasjon": "swagger-typescript-api -p https://bidrag-organisasjon-feature.dev.intern.nav.no/bidrag-organisasjon/v3/api-docs --axios -n BidragOrganisasjontApi.ts -o src/api --extract-enums",
     "types:arkiv": "swagger-typescript-api -p https://bidrag-dokument-arkiv-feature.dev.intern.nav.no/bidrag-dokument-arkiv/v3/api-docs --axios -n BidragDokumentArkivApi.ts -o src/api --extract-enums",
