@@ -123,7 +123,7 @@ function DokumentValgVedlegg() {
         const tableData = vedleggListe.map((vedlegg) => ({
             malId: vedlegg.malId,
             beskrivelse: vedlegg.detaljer.beskrivelse,
-            tittel: vedlegg.detaljer.beskrivelse,
+            tittel: vedlegg.detaljer.tittel,
             innholdType: vedlegg.detaljer.innholdType,
             gruppeVisningsnavn: vedlegg.detaljer.gruppeVisningsnavn,
             språk: hentSpråk(vedlegg.detaljer),
@@ -147,7 +147,10 @@ function DokumentValgVedlegg() {
         if (dokument) {
             const beskrivelse = dokument.detaljer.beskrivelse;
             const erNorsk = dokument.detaljer.språk.length === 0 || dokument.detaljer.språk.includes("NB");
-            const tittel = erNorsk ? dokument.detaljer.tittel : `${dokument.detaljer.tittel} (${beskrivelse})`;
+            const tittel =
+                erNorsk || beskrivelse === dokument.detaljer.tittel
+                    ? dokument.detaljer.tittel
+                    : `${dokument.detaljer.tittel} (${beskrivelse})`;
             setValue("dokument", {
                 malId,
                 tittel,

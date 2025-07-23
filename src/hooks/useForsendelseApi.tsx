@@ -6,7 +6,7 @@ import {
     RolleTypeFullName,
 } from "@navikt/bidrag-ui-common";
 import IdentUtils from "@navikt/bidrag-ui-common/esm/utils/IdentUtils";
-import { useQueries, useSuspenseQueries, useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseQueries, useSuspenseQuery } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse, HttpStatusCode } from "axios";
 import React from "react";
 
@@ -137,7 +137,7 @@ export const useHentRoller = () => {
     const idents = sak.roller.map((rolle) => rolle.fodselsnummer ?? rolle.samhandlerIdent);
     const personApi = usePersonApi();
 
-    const personQueries = useQueries({
+    const personQueries = useSuspenseQueries({
         queries: idents.map((ident) => ({
             queryKey: ["person", ident],
             queryFn: async () => {
