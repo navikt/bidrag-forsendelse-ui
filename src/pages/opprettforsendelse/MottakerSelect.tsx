@@ -12,8 +12,8 @@ import { EditAddress, validerMaks128Tegn } from "../../components/EditAddress";
 import InfoKnapp from "../../components/InfoKnapp";
 import PersonDetaljer from "../../components/person/PersonDetaljer";
 import MottakerInfo from "../../docs/Mottaker.mdx";
-import { useForsendelseApi } from "../../hooks/useForsendelseApi";
-import useSamhandlerPersonApi from "../../hooks/usePersonApi";
+import { useHentRoller } from "../../hooks/useForsendelseApi";
+import { useHentSamhandlerEllerPersonForIdent } from "../../hooks/usePersonApi";
 import { hasOnlyNullValues } from "../../utils/ObjectUtils";
 import {
     MottakerFormProps,
@@ -24,7 +24,7 @@ import PersonSok from "./PersonSok";
 
 type RADIO_OPTIONS = "SAMME_SOM_GJELDER" | "ANNEN_MOTTAKER" | "FRITEKST";
 export default function MottakerSelect() {
-    const roller = useForsendelseApi().hentRoller();
+    const roller = useHentRoller();
     const {
         register,
         setValue,
@@ -33,7 +33,7 @@ export default function MottakerSelect() {
         formState: { errors },
     } = useOpprettForsendelseFormContext();
     const gjelderIdent: string = useWatch<OpprettForsendelseFormProps>({ name: "gjelderIdent" }) as string;
-    const gjelder = roller.find((rolle) => rolle.ident == gjelderIdent);
+    const gjelder = roller.find((rolle) => rolle.ident === gjelderIdent);
     const [selectedRadioOption, setSelectedRadioOption] = useState<RADIO_OPTIONS>("SAMME_SOM_GJELDER");
     const selectedTabOption = useRef<RADIO_OPTIONS>(selectedRadioOption);
 
@@ -41,16 +41,16 @@ export default function MottakerSelect() {
     useEffect(() => {
         register("mottaker", {
             validate: () => {
-                if (selectedTabOption.current == "FRITEKST") {
-                    return getValues("mottaker.navn") == undefined ? "Mottaker må settes" : true;
+                if (selectedTabOption.current === "FRITEKST") {
+                    return getValues("mottaker.navn") === undefined ? "Mottaker må settes" : true;
                 }
-                return getValues("mottaker.ident") == undefined ? "Mottaker må settes" : true;
+                return getValues("mottaker.ident") === undefined ? "Mottaker må settes" : true;
             },
         });
     }, []);
 
     useEffect(() => {
-        if (selectedTabOption.current == "SAMME_SOM_GJELDER") {
+        if (selectedTabOption.current === "SAMME_SOM_GJELDER") {
             setValue("mottaker.ident", gjelderIdent);
         }
     }, [gjelderIdent]);
@@ -60,11 +60,11 @@ export default function MottakerSelect() {
         mottakerCache.current.set(selectedTabOption.current, getValues("mottaker"));
         selectedTabOption.current = val;
         setValue("mottaker", null);
-        if (val == "SAMME_SOM_GJELDER") {
+        if (val === "SAMME_SOM_GJELDER") {
             setValue("mottaker.ident", gjelderIdent);
         } else {
             const mottakerCacheValue = mottakerCache.current.get(val) ?? null;
-            if (val == "FRITEKST" && !mottakerCacheValue) {
+            if (val === "FRITEKST" && !mottakerCacheValue) {
                 setValue("mottaker.adresse.land", "NO");
             } else {
                 setValue("mottaker", mottakerCacheValue);
@@ -153,16 +153,16 @@ function MottakerFritekst() {
 }
 
 function MottakerNavnOgAdresse() {
-    const { setValue, watch } = useOpprettForsendelseFormContext();
+    const { setValue } = useOpprettForsendelseFormContext();
     const mottakerIdent: string = useWatch<OpprettForsendelseFormProps>({ name: "mottaker.ident" }) as string;
-    const { data, isFetching, isError } = useSamhandlerPersonApi().hentSamhandlerEllerPersonForIdent(mottakerIdent);
-    const roller = useForsendelseApi().hentRoller();
+    const { data, isFetching, isError } = useHentSamhandlerEllerPersonForIdent(mottakerIdent);
+    const roller = useHentRoller();
     function hentRolle(ident: string) {
-        return roller.find((rolle) => rolle.ident == ident)?.rolleType;
+        return roller.find((rolle) => rolle.ident === ident)?.rolleType;
     }
 
     useEffect(() => {
-        if (mottakerIdent == null) {
+        if (mottakerIdent === null) {
             setValue("mottaker", null);
         }
     }, [mottakerIdent]);
@@ -175,7 +175,7 @@ function MottakerNavnOgAdresse() {
         if (data?.navn) {
             setValue("mottaker.navn", data.navn);
         }
-    }, [data?.adresse]);
+    }, [data?.adresse, data?.navn]);
 
     if (isFetching) {
         return <Loader size="xsmall" />;

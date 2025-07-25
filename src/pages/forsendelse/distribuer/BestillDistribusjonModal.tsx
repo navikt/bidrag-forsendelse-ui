@@ -7,14 +7,13 @@ import React from "react";
 import { useState } from "react";
 import { useEffect } from "react";
 
-import { BIDRAG_FORSENDELSE_API } from "../../../api/api";
-import { PERSON_API } from "../../../api/api";
+import { useBidragForsendelseApi, usePersonApi } from "../../../api/api";
 import { DistribuerTilAdresse } from "../../../api/BidragDokumentApi";
 import { BestemKanalResponseDistribusjonskanalEnum } from "../../../api/BidragDokumentArkivApi";
 import { DistribuerJournalpostRequest } from "../../../api/BidragForsendelseApi";
-import { hentPostnummere } from "../../../hooks/kodeverkQueries";
-import useDokumentApi from "../../../hooks/useDokumentApi";
-import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
+import { useHentPostnummere } from "../../../hooks/kodeverkQueries";
+import { useDistribusjonKanal } from "../../../hooks/useDokumentApi";
+import { useHentForsendelseQuery } from "../../../hooks/useForsendelseApi";
 import { hasOnlyNullValues } from "../../../utils/ObjectUtils";
 import { RedirectTo } from "../../../utils/RedirectUtils";
 import BestillDistribusjonInfo from "./BestillDistribusjonInfo";
@@ -22,6 +21,8 @@ interface BestillDistribusjonModalProps {
     onCancel: () => void;
 }
 export default function BestillDistribusjonModal({ onCancel }: BestillDistribusjonModalProps) {
+    const personApi = usePersonApi();
+    const bidragForsendelseApi = useBidragForsendelseApi();
     const [submitState, setSubmitState] = useState<
         "pending" | "idle" | "succesfull" | "succesfull_no_distribution" | "error"
     >("idle");
@@ -29,24 +30,24 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
     const [loadingData, setLoadingData] = useState<boolean>(true);
     const [error, setError] = useState<string>();
     const [adresse, setAdresse] = useState<DistribuerTilAdresse | undefined>();
-    const forsendelse = useForsendelseApi().hentForsendelse();
-    const postnummere = hentPostnummere();
+    const forsendelse = useHentForsendelseQuery();
+    const postnummere = useHentPostnummere();
     const ident = forsendelse.mottaker.ident;
     const mottaker = forsendelse.mottaker;
-    const harAdresse = adresse != undefined && adresse != null;
+    const harAdresse = adresse !== undefined && adresse !== null;
     const personAdresseQuery = useQuery({
         queryKey: [`person_adresse_${ident}`],
         queryFn: async () => {
             if (mottaker.adresse) {
                 const adresse = { ...mottaker.adresse, land: mottaker.adresse.landkode };
-                const manglerPoststed = adresse.landkode == "NO" && adresse.postnummer && !adresse.poststed;
+                const manglerPoststed = adresse.landkode === "NO" && adresse.postnummer && !adresse.poststed;
                 if (manglerPoststed) {
                     adresse.poststed = getPoststedByPostnummer(adresse.postnummer);
                 }
                 return adresse;
             } else {
-                const response = await PERSON_API.adresse.hentPersonPostadresse({ personident: "" }, { ident });
-                return response?.status == 204 ? null : response?.data;
+                const response = await personApi.adresse.hentPersonPostadresse({ personident: "" }, { ident });
+                return response?.status === 204 ? null : response?.data;
             }
         },
         select: (adresse) => {
@@ -56,13 +57,13 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
     });
 
     useEffect(() => {
-        if (personAdresseQuery.status == "success") {
+        if (personAdresseQuery.status === "success") {
             const adresseResponse = personAdresseQuery.data;
             setLoadingData(false);
             // @ts-ignore
             setAdresse(adresseResponse);
         }
-    }, [personAdresseQuery.status]);
+    }, [personAdresseQuery.data, personAdresseQuery.status]);
 
     const distribuerMutation = useMutation({
         mutationFn: async ({ ingenDistribusjon }: { ingenDistribusjon?: boolean }) => {
@@ -70,10 +71,10 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
                 lokalUtskrift: false,
                 adresse: adresse,
             };
-            await BIDRAG_FORSENDELSE_API.api.distribuerForsendelse(forsendelse.forsendelseId, request, {
+            await bidragForsendelseApi.api.distribuerForsendelse(forsendelse.forsendelseId, request, {
                 ingenDistribusjon,
             });
-            return ingenDistribusjon ? false : true;
+            return !ingenDistribusjon;
         },
         onSuccess: (distribuert: boolean) => {
             setSubmitState(distribuert ? "succesfull" : "succesfull_no_distribution");
@@ -116,7 +117,7 @@ export default function BestillDistribusjonModal({ onCancel }: BestillDistribusj
                 <React.Suspense fallback={<Loader variant="neutral" size="small" />}>
                     <BestillDistribusjonInfo
                         adresse={adresse}
-                        editable={submitState === "idle" || submitState == "error"}
+                        editable={submitState === "idle" || submitState === "error"}
                         onEditModeChanged={setOnEditMode}
                         onAdresseChanged={setAdresse}
                     />
@@ -188,9 +189,9 @@ function DistribusjonKnapper({
     submitButtonDisabled,
 }: DistribusjonKnapperProps) {
     const [ingenDistribusjon, setIngenDistribusjon] = useState(false);
-    const distribusjonKanal = useDokumentApi().distribusjonKanal();
+    const distribusjonKanal = useDistribusjonKanal();
     const trengerAdresseForDistribusjon =
-        distribusjonKanal.distribusjonskanal == BestemKanalResponseDistribusjonskanalEnum.PRINT;
+        distribusjonKanal.distribusjonskanal === BestemKanalResponseDistribusjonskanalEnum.PRINT;
     useEffect(() => {
         if (harAdresse) setIngenDistribusjon(false);
     }, [harAdresse]);

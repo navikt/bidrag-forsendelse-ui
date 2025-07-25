@@ -11,7 +11,7 @@ interface BekreftelseProps {
 function Bekreftelse(props: BekreftelseProps) {
     const { sendAvvikStatus } = useAvvikStateContext();
 
-    if (sendAvvikStatus == "loading") {
+    if (sendAvvikStatus === "loading") {
         return (
             <div className="AvvikshandteringModal__spinner-wrapper">
                 <Loader transparent={true} type="XL" aria-label="Utfører avvik" />

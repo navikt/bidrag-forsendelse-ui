@@ -2,7 +2,7 @@ import { faro } from "@grafana/faro-react";
 import { ExternalLinkIcon } from "@navikt/aksel-icons";
 import { Button } from "@navikt/ds-react";
 
-import { useForsendelseApi } from "../hooks/useForsendelseApi";
+import { useHentForsendelseQuery } from "../hooks/useForsendelseApi";
 
 export default function ForsendelseDocsButton() {
     return (
@@ -28,9 +28,9 @@ export default function ForsendelseDocsButton() {
 }
 
 function BrevmalerButtons() {
-    const forsendelse = useForsendelseApi().hentForsendelse();
+    const forsendelse = useHentForsendelseQuery();
 
-    if (forsendelse.tema == "FAR") {
+    if (forsendelse.tema === "FAR") {
         return (
             <Button
                 title={"Brevmaler foreldreskap"}

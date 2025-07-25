@@ -56,8 +56,8 @@ export default function TableDraggableBody<T>({ children, onChange, rowData, get
 
         setActiveId(active.id);
     }
-    const activeIndex = rowData.findIndex((data) => getRowKey(data) == activeId);
-    const activeData = rowData.find((data) => getRowKey(data) == activeId);
+    const activeIndex = rowData.findIndex((data) => getRowKey(data) === activeId);
+    const activeData = rowData.find((data) => getRowKey(data) === activeId);
     return (
         <DndContext
             sensors={sensors}

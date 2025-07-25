@@ -50,7 +50,7 @@ export default function OpprettEttersendelseOppgaveButton() {
     const forsendelse = useHentForsendelseQuery();
 
     if (!isEttersendingsoppgaveEnabled) return;
-    if (forsendelse.gjelderIdent != forsendelse.mottaker?.ident) return;
+    if (forsendelse.gjelderIdent !== forsendelse.mottaker?.ident) return;
     return (
         <>
             {forsendelse.ettersendingsoppgave ? (
@@ -92,11 +92,11 @@ function OpprettEttersendelseOppgaveModal({
 
     function opprett(data: FormProps) {
         const journalpost = inngåendeJournalposter.find((jp) => jp.journalpostId === data.journalpostId);
-        if (data.journalpostId == navAnnenSkjema && !data.tittel) {
+        if (data.journalpostId === navAnnenSkjema && !data.tittel) {
             form.setError("tittel", { message: "Tittel må settes når det ikke knyttes til skjema" });
             return;
         }
-        if (data.journalpostId == navAnnenSkjema && data.tittel && data.tittel.length > 250) {
+        if (data.journalpostId === navAnnenSkjema && data.tittel && data.tittel.length > 250) {
             form.setError("tittel", { message: "Tittel kan ikke være lengre enn 250 tegn" });
             return;
         }
@@ -104,14 +104,14 @@ function OpprettEttersendelseOppgaveModal({
         opprettVarselEttersendelseFn
             .mutateAsync({
                 forsendelseId: Number(forsendelseId.replace("BIF-", "")),
-                tittel: data.journalpostId == navAnnenSkjema ? data.tittel : journalpost?.innhold,
+                tittel: data.journalpostId === navAnnenSkjema ? data.tittel : journalpost?.innhold,
                 ettersendelseForJournalpostId: data.journalpostId,
                 skjemaId: journalpost?.brevkode?.kode ?? data.journalpostId,
             })
             .then(async (opprettetVarselEttersendelse) => {
                 setValue("ettersendingsoppgave", mapVarselEttersendelse(opprettetVarselEttersendelse.data));
                 qc.setQueryData(
-                    UseForsendelseApiKeys.hentForsendelse(),
+                    UseForsendelseApiKeys.hentForsendelse(forsendelseId),
                     varselForsendelseUpdater(opprettetVarselEttersendelse.data)
                 );
                 setIsOpen(false);
@@ -127,7 +127,7 @@ function OpprettEttersendelseOppgaveModal({
                     <FormProvider {...form}>
                         <EksisterendeOppgaveVarsel />
                         <VarselForJournalpostSelect />
-                        {journalpostId == navAnnenSkjema && (
+                        {journalpostId === navAnnenSkjema && (
                             <>
                                 <TextField
                                     className="w-[300px] pt-2"
@@ -181,7 +181,7 @@ function SlettOppgaveButton() {
                 forsendelseId: Number(forsendelse.forsendelseId.replace("BIF-", "")),
             })
             .then(() => {
-                qc.refetchQueries({ queryKey: UseForsendelseApiKeys.hentForsendelse() });
+                qc.refetchQueries({ queryKey: UseForsendelseApiKeys.hentForsendelse(forsendelse.forsendelseId) });
             });
     }
 
@@ -307,7 +307,7 @@ function EttersendingsoppgaveVedleggsliste() {
                         {vedleggsliste.fields.map((dokument, index) => (
                             <Table.Row shadeOnHover={false} key={dokument.id + "_" + index}>
                                 <Table.DataCell textSize="small">
-                                    {editableRow == index ? (
+                                    {editableRow === index ? (
                                         <Suspense fallback={<Loader size="xsmall" />}>
                                             <NavSkjemaSelect2 index={index} />
                                         </Suspense>
@@ -319,7 +319,7 @@ function EttersendingsoppgaveVedleggsliste() {
                                 <Table.DataCell textSize="small">
                                     <EditOrSaveButton
                                         index={index}
-                                        editableRow={editableRow == index}
+                                        editableRow={editableRow === index}
                                         onSaveRow={onSaveRow}
                                         onEditRow={() => {
                                             if (editableRow === undefined) {
@@ -387,7 +387,7 @@ function EksisterendeOppgaveVarsel() {
         return Object.values(eksisterendeOppgaverMap).flat();
     }, [eksisterendeOppgaverMap]);
 
-    if (eksisterendeOppgaver.length == 0) return null;
+    if (eksisterendeOppgaver.length === 0) return null;
 
     return (
         <ExpansionCard size="small" aria-label="" className="subtle-card w-[500px] mb-2">
@@ -413,7 +413,7 @@ function EksisterendeOppgaveVarsel() {
                 {eksisterendeOppgaver.map((oppgave, index) => {
                     return (
                         <div
-                            className={`${index != eksisterendeOppgaver.length - 1 ? "border-0 border-b border-solid border-border-subtle" : ""} pt-2`}
+                            className={`${index !== eksisterendeOppgaver.length - 1 ? "border-0 border-b border-solid border-border-subtle" : ""} pt-2`}
                         >
                             <Label as="p" size="small">
                                 Tittel

@@ -1,6 +1,6 @@
 import "./LeggTilDokumentButton.css";
 
-import { dateToDDMMYYYYString, RolleType, RolleTypeAbbreviation } from "@navikt/bidrag-ui-common";
+import { dateToDDMMYYYYString, PersonNavnIdent, RolleType, RolleTypeAbbreviation } from "@navikt/bidrag-ui-common";
 import { Add } from "@navikt/ds-icons";
 import { Collapse } from "@navikt/ds-icons";
 import { Expand } from "@navikt/ds-icons";
@@ -16,7 +16,12 @@ import { useEffect } from "react";
 
 import { DokumentStatus } from "../../constants/DokumentStatus";
 import useIsDebugMode from "../../hooks/useDebugMode";
-import { useForsendelseApi } from "../../hooks/useForsendelseApi";
+import {
+    useHentForsendelseQuery,
+    useHentJournalposterForPerson,
+    useHentJournalposterForSak,
+    useHentRoller,
+} from "../../hooks/useForsendelseApi";
 import { useDokumenterForm } from "../../pages/forsendelse/context/DokumenterFormContext";
 import { IDokument } from "../../types/Dokument";
 import { IDokumentJournalDto, IJournalpost, IJournalpostStatus } from "../../types/Journalpost";
@@ -27,7 +32,7 @@ import { isSameDocument, JournalpostForsendelseRelasjoner } from "./JournalpostS
 import OpenDokumentButton from "./OpenDokumentButton";
 
 export default function LeggTilDokumentKnapp() {
-    const { addDocuments, saveChanges } = useDokumenterForm();
+    const { addDocuments } = useDokumenterForm();
     const [modalOpen, setModalOpen] = useState(false);
 
     const closeModal = () => {
@@ -56,17 +61,17 @@ interface LeggTilDokumentFraSakModalProps {
 }
 function LeggTilDokumentFraSakModal({ onClose, open }: LeggTilDokumentFraSakModalProps) {
     const [selectedDocuments, setSelectedDocuments] = useState<IDokument[]>([]);
-    const { hentForsendelse } = useForsendelseApi();
+    const forsendelse = useHentForsendelseQuery();
     const [hasOpened, setHasOpened] = useState(false);
     const ref = useRef<HTMLDialogElement>(null);
 
-    const saksnummer = hentForsendelse().saksnummer;
+    const saksnummer = forsendelse.saksnummer;
     function selectDocument(document: IDokument, toggle = true) {
         const isSelected = (d: IDokument) => {
             if (document.dokumentreferanse) {
                 return isSameDocument(d, document);
             }
-            return d.journalpostId?.replace(/\D/g, "") == document.journalpostId?.replace(/\D/g, "");
+            return d.journalpostId?.replace(/\D/g, "") === document.journalpostId?.replace(/\D/g, "");
         };
 
         setSelectedDocuments((selectedDocuments) => {
@@ -76,7 +81,7 @@ function LeggTilDokumentFraSakModal({ onClose, open }: LeggTilDokumentFraSakModa
             }
             const rolle = document.fraRolle ? mapRolleToDisplayValue(document.fraRolle)?.toLowerCase() : "";
             const title =
-                saksnummer == document.fraSaksnummer
+                saksnummer === document.fraSaksnummer
                     ? document.tittel
                     : `${fjernRollereferanseFraTittel(document.tittel)} (fra ${rolle} sak ${document.fraSaksnummer})`;
             return [...selectedDocuments, { ...document, tittel: title }];
@@ -101,8 +106,8 @@ function LeggTilDokumentFraSakModal({ onClose, open }: LeggTilDokumentFraSakModa
     function unselectDocument(document: IDokument) {
         const isSelected = (d) =>
             document.dokumentreferanse
-                ? d.dokumentreferanse == document.dokumentreferanse
-                : d.journalpostId == document.journalpostId;
+                ? d.dokumentreferanse === document.dokumentreferanse
+                : d.journalpostId === document.journalpostId;
         setSelectedDocuments((selectedDocuments) => selectedDocuments.filter((d) => !isSelected(d)));
     }
 
@@ -151,13 +156,12 @@ interface VelgDokumentTabsProps {
     selectedDocuments: IDokument[];
 }
 function VelgDokumentTabs({ selectDocument, selectedDocuments, unselectDocument }: VelgDokumentTabsProps) {
-    const { hentForsendelse, hentRoller } = useForsendelseApi();
     const [tabState, setTabState] = useState("fra_samme_sak");
-    const forsendelse = hentForsendelse();
-    const roller = hentRoller();
+    const forsendelse = useHentForsendelseQuery();
+    const roller = useHentRoller();
     const renderLabel = (label: string, saksnummer?: string, rolle?: RolleType) => {
         const numberOfSelectedDocuments = selectedDocuments.filter(
-            (d) => (saksnummer && d.fraSaksnummer == saksnummer) || (rolle && d.fraRolle == rolle)
+            (d) => (saksnummer && d.fraSaksnummer === saksnummer) || (rolle && d.fraRolle === rolle)
         ).length;
         if (numberOfSelectedDocuments > 0) {
             return (
@@ -199,7 +203,7 @@ function VelgDokumentTabs({ selectDocument, selectedDocuments, unselectDocument 
                             selectDocument={(dokument, toogle) =>
                                 selectDocument({ ...dokument, fraRolle: RolleTypeAbbreviation.BM }, toogle)
                             }
-                            ident={roller.find((r) => r.rolleType == RolleTypeAbbreviation.BM)?.ident}
+                            ident={roller.find((r) => r.rolleType === RolleTypeAbbreviation.BM)?.ident}
                         />
                     </React.Suspense>
                 </Accordion>
@@ -214,7 +218,7 @@ function VelgDokumentTabs({ selectDocument, selectedDocuments, unselectDocument 
                             selectDocument={(dokument, toogle) =>
                                 selectDocument({ ...dokument, fraRolle: RolleTypeAbbreviation.BP }, toogle)
                             }
-                            ident={roller.find((r) => r.rolleType == RolleTypeAbbreviation.BP)?.ident}
+                            ident={roller.find((r) => r.rolleType === RolleTypeAbbreviation.BP)?.ident}
                         />
                     </React.Suspense>
                 </Accordion>
@@ -238,12 +242,11 @@ function DokumenterForPerson({
     selectedDocuments,
     rolle,
 }: DokumenterForPersonProps) {
-    const { hentJournalposterForPerson, hentForsendelse } = useForsendelseApi();
-    const forsendelseSaksnummer = hentForsendelse().saksnummer;
+    const forsendelseSaksnummer = useHentForsendelseQuery().saksnummer;
+    const journalposterForSak = useHentJournalposterForPerson(ident);
 
-    const journalposterForSak = hentJournalposterForPerson(ident);
     const renderAccordionHeader = (saksnummer: string) => {
-        const numberOfSelectedDocuments = selectedDocuments.filter((d) => d.fraSaksnummer == saksnummer).length;
+        const numberOfSelectedDocuments = selectedDocuments.filter((d) => d.fraSaksnummer === saksnummer).length;
         if (numberOfSelectedDocuments > 0) {
             return (
                 <div>
@@ -258,9 +261,9 @@ function DokumenterForPerson({
         return <div>Sak {saksnummer}</div>;
     };
     const rolleSaksnummere = Array.from(journalposterForSak.keys()).filter(
-        (saksnummer) => saksnummer != forsendelseSaksnummer
+        (saksnummer) => saksnummer !== forsendelseSaksnummer
     );
-    if (rolleSaksnummere.length == 0) {
+    if (rolleSaksnummere.length === 0) {
         return <div className={"p-2"}>Det finnes ikke flere saker for {rolle}</div>;
     }
     return (
@@ -298,17 +301,16 @@ function DokumenterForSakTabell({
     selectedDocuments,
     fraRolle,
 }: DokumenterForSakTabellProps) {
-    const { hentJournalposterForSak, hentForsendelse } = useForsendelseApi();
-    const journalposter = hentJournalposterForSak(saksnummer);
-    const forsendelse = hentForsendelse();
+    const journalposter = useHentJournalposterForSak(saksnummer);
+    const forsendelse = useHentForsendelseQuery();
     const visJournalposter = journalposter
-        .filter((jp) => jp.journalstatus != IJournalpostStatus.UNDER_OPPRETELSE)
-        .filter((jp) => jp.feilfort != true)
-        .filter((jp) => jp.journalpostId != `BIF-${forsendelse.forsendelseId?.replace("BIF-", "")}`)
+        .filter((jp) => jp.journalstatus !== IJournalpostStatus.UNDER_OPPRETELSE)
+        .filter((jp) => jp.feilfort !== true)
+        .filter((jp) => jp.journalpostId !== `BIF-${forsendelse.forsendelseId?.replace("BIF-", "")}`)
         .sort((a, b) => {
             return b.dokumentDato?.localeCompare(a.dokumentDato);
         });
-    if (visJournalposter.length == 0) {
+    if (visJournalposter.length === 0) {
         return <div className={"p-2"}>Det finnes ikke flere journalposter i samme sak</div>;
     }
     return (
@@ -374,8 +376,7 @@ function JournalpostDokumenterRowMultiDoc({
     selectedDocuments,
 }: JournalpostDokumenterRowProps) {
     const [showAllDocuments, setShowAllDocuments] = useState(false);
-    const { hentForsendelse } = useForsendelseApi();
-    const forsendelse = hentForsendelse();
+    const forsendelse = useHentForsendelseQuery();
     const forsendelseDokumenter = forsendelse.dokumenter;
     const isDebugMode = useIsDebugMode();
     const jpForsendelseRelasjoner = useMemo(
@@ -402,6 +403,7 @@ function JournalpostDokumenterRowMultiDoc({
                     lagret: false,
                     index: -1,
                     tittel: "",
+                    metadata: null,
                 })
             );
         }
@@ -416,6 +418,7 @@ function JournalpostDokumenterRowMultiDoc({
             dokumentDato: journalpost.dokumentDato,
             status: DokumentStatus.MÅ_KONTROLLERES,
             index: -1,
+            metadata: null,
         };
         selectDocument(leggTilDokument);
     }
@@ -427,6 +430,7 @@ function JournalpostDokumenterRowMultiDoc({
                 lagret: false,
                 index: -1,
                 tittel: "",
+                metadata: null,
             });
             journalpost.dokumenter.forEach((d) => onDocumentSelected(d, false, true));
         }
@@ -444,6 +448,7 @@ function JournalpostDokumenterRowMultiDoc({
             status: getForsendelseStatusEtterKnyttetTilForsendelse(dokumentDto),
             lagret: false,
             index: -1,
+            metadata: null,
         };
         selectDocument(leggTilDokument, toggle);
     }
@@ -462,7 +467,7 @@ function JournalpostDokumenterRowMultiDoc({
     function getForsendelseStatus(dokumentDto: IDokumentJournalDto) {
         if (!journalpost.erForsendelse) {
             if (journalpost.journalpostId.startsWith("BID-")) {
-                return journalpost.status == "UNDER_PRODUKSJON"
+                return journalpost.status === "UNDER_PRODUKSJON"
                     ? DokumentStatus.UNDER_PRODUKSJON
                     : DokumentStatus.FERDIGSTILT;
             }
@@ -470,13 +475,13 @@ function JournalpostDokumenterRowMultiDoc({
         }
 
         const kopiAvEksternDokument = erKopiAvEksternDokument(dokumentDto);
-        const erLenkeTilAnnenForsendelse = dokumentDto.arkivSystem == "FORSENDELSE";
-        if (dokumentDto.status == "FERDIGSTILT") {
+        const erLenkeTilAnnenForsendelse = dokumentDto.arkivSystem === "FORSENDELSE";
+        if (dokumentDto.status === "FERDIGSTILT") {
             return kopiAvEksternDokument && !erLenkeTilAnnenForsendelse
                 ? DokumentStatus.KONTROLLERT
                 : DokumentStatus.FERDIGSTILT;
         }
-        if (dokumentDto.status == "UNDER_PRODUKSJON") {
+        if (dokumentDto.status === "UNDER_PRODUKSJON") {
             return DokumentStatus.UNDER_PRODUKSJON;
         }
         return kopiAvEksternDokument && !erLenkeTilAnnenForsendelse
@@ -491,7 +496,7 @@ function JournalpostDokumenterRowMultiDoc({
     let tittel = journalpost.dokumenter.length > 0 ? journalpost.dokumenter[0].tittel : journalpost.innhold;
     tittel = tittel !== undefined || tittel?.trim()?.length === 0 ? journalpost.innhold : tittel;
     const tittelDebug = isDebugMode ? `${tittel}  -  ${journalpost.journalpostId}` : tittel;
-    const harBareEttDokument = journalpost.dokumenter.length == 1;
+    const harBareEttDokument = journalpost.dokumenter.length === 1;
     return (
         <>
             <Table.Row
@@ -540,7 +545,9 @@ function JournalpostDokumenterRowMultiDoc({
                 <Table.DataCell>{dateToDDMMYYYYString(new Date(journalpost.dokumentDato))}</Table.DataCell>
 
                 <Table.DataCell>{journalpost.dokumentType}</Table.DataCell>
-                <Table.DataCell>{journalpost.gjelderAktor?.ident}</Table.DataCell>
+                <Table.DataCell>
+                    <PersonNavnIdent ident={journalpost.gjelderAktor?.ident} skjulNavn />
+                </Table.DataCell>
                 <Table.DataCell>
                     <JournalpostStatusTag status={journalpost.journalstatus} />
                 </Table.DataCell>
@@ -572,7 +579,7 @@ type JournalpostDokumenterProps = {
     onDocumentSelected: (dokumentDto: IDokumentJournalDto, toggle?: boolean, skipJournalpostCheck?: boolean) => void;
 };
 function JournalpostDokumenter({ journalpost, onDocumentSelected, selectedDocuments }: JournalpostDokumenterProps) {
-    const forsendelse = useForsendelseApi().hentForsendelse();
+    const forsendelse = useHentForsendelseQuery();
     const forsendelseDokumenter = forsendelse.dokumenter;
     const isDebugMode = useIsDebugMode();
     const jpForsendelseRelasjoner = useMemo(
@@ -582,7 +589,7 @@ function JournalpostDokumenter({ journalpost, onDocumentSelected, selectedDocume
 
     return journalpost.dokumenter.map((dok, index) => (
         <Table.Row
-            className={`dokumentrad ${index == journalpost.dokumenter.length - 1 ? "last" : ""}`}
+            className={`dokumentrad ${index === journalpost.dokumenter.length - 1 ? "last" : ""}`}
             key={index + dok.dokumentreferanse}
             selected={jpForsendelseRelasjoner.erDokumentValgt(dok)}
         >

@@ -1,6 +1,6 @@
 import "./PersonSok.css";
 
-import { PersonSokButton } from "@navikt/bidrag-ui-common";
+import { PersonSokButton, SamhandlerSokButton } from "@navikt/bidrag-ui-common";
 import { Search } from "@navikt/ds-react";
 
 interface IPersonSokProps {
@@ -24,6 +24,11 @@ export default function PersonSok({ onChange, defaultValue }: IPersonSokProps) {
             <PersonSokButton
                 onResult={(data) => {
                     onChange(data.ident);
+                }}
+            />
+            <SamhandlerSokButton
+                onResult={(data) => {
+                    onChange(data.samhandlerId);
                 }}
             />
         </div>

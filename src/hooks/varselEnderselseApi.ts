@@ -1,6 +1,6 @@
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 
-import { BIDRAG_FORSENDELSE_API } from "../api/api";
+import { useBidragForsendelseApi } from "../api/api";
 import {
     OppdaterEttersendingsoppgaveRequest,
     OpprettEttersendingsoppgaveRequest,
@@ -11,11 +11,12 @@ import { useHentForsendelseQuery } from "./useForsendelseApi";
 
 export const useHentEksisterendeOppgaverForsendelse = () => {
     const forsendelse = useHentForsendelseQuery();
+    const bidragForsendelseApi = useBidragForsendelseApi();
     return useSuspenseQuery({
         queryKey: ["hentEksisterendeOppgaverForsendelse"],
         queryFn: async () => {
             return (
-                await BIDRAG_FORSENDELSE_API.api.hentEksisterendeEttersendingsoppgaverForsendelse(
+                await bidragForsendelseApi.api.hentEksisterendeEttersendingsoppgaverForsendelse(
                     forsendelse.forsendelseId
                 )
             ).data;
@@ -23,30 +24,34 @@ export const useHentEksisterendeOppgaverForsendelse = () => {
     }).data;
 };
 export const useOpprettVarselEttersendelse = () => {
+    const bidragForsendelseApi = useBidragForsendelseApi();
     return useMutation({
         mutationFn: async (data: OpprettEttersendingsoppgaveRequest) => {
-            return BIDRAG_FORSENDELSE_API.api.opprettEttersendingsoppgave(data);
+            return bidragForsendelseApi.api.opprettEttersendingsoppgave(data);
         },
     });
 };
 export const useOppdaterVarselEttersendelse = () => {
+    const bidragForsendelseApi = useBidragForsendelseApi();
     return useMutation({
         mutationFn: async (data: OppdaterEttersendingsoppgaveRequest) => {
-            return BIDRAG_FORSENDELSE_API.api.oppdaterEttesendingsoppgave(data);
+            return bidragForsendelseApi.api.oppdaterEttesendingsoppgave(data);
         },
     });
 };
 export const useSlettVarselEttersendelseDokument = () => {
+    const bidragForsendelseApi = useBidragForsendelseApi();
     return useMutation({
         mutationFn: async (data: SlettEttersendingsoppgaveVedleggRequest) => {
-            return BIDRAG_FORSENDELSE_API.api.slettEttersendingsoppgaveVedlegg(data);
+            return bidragForsendelseApi.api.slettEttersendingsoppgaveVedlegg(data);
         },
     });
 };
 export const useSlettVarselEttersendelse = () => {
+    const bidragForsendelseApi = useBidragForsendelseApi();
     return useMutation({
         mutationFn: async (data: SlettEttersendingsoppgave) => {
-            return BIDRAG_FORSENDELSE_API.api.slettEttersendingsoppgave(data);
+            return bidragForsendelseApi.api.slettEttersendingsoppgave(data);
         },
     });
 };

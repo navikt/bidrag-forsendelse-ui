@@ -5,12 +5,15 @@ import { AxiosError } from "axios";
 import { useEffect } from "react";
 import { FieldErrors, FormProvider, useForm, useFormContext } from "react-hook-form";
 
-import { BIDRAG_FORSENDELSE_API } from "../../api/api";
-import { JournalTema, OppdaterForsendelseForesporsel } from "../../api/BidragForsendelseApi";
+import { useBidragForsendelseApi } from "../../api/api";
+import {
+    OppdaterForsendelseForesporselTemaEnum,
+    OpprettForsendelseForesporselTemaEnum,
+} from "../../api/BidragForsendelseApi";
 import GjelderSelect from "../../components/detaljer/GjelderSelect";
 import BidragErrorPanel from "../../context/BidragErrorPanel";
 import { useErrorContext } from "../../context/ErrorProvider";
-import { useForsendelseApi, UseForsendelseApiKeys } from "../../hooks/useForsendelseApi";
+import { UseForsendelseApiKeys, useHentForsendelseQuery, useHentRoller } from "../../hooks/useForsendelseApi";
 import { ENHET_FARSKAP } from "../../types/EnhetTypes";
 import { mapToBehandlingInfoDto } from "../../types/Forsendelse";
 import { countryCodeIso2ToIso3 } from "../../utils/AdresseUtils";
@@ -25,6 +28,7 @@ import LanguageAndTemaSelect from "./LanguageAndTemaSelect";
 import MottakerSelect from "./MottakerSelect";
 import { useOpprettForsendelse } from "./OpprettForsendelseContext";
 import SlettForsendelseButton from "./SlettForsendelseButton";
+import { SecureLoggerService } from "@navikt/bidrag-ui-common";
 
 export type MottakerFormProps = {
     ident?: string;
@@ -52,13 +56,13 @@ export type OpprettForsendelseFormProps = {
         type: "UTGÅENDE" | "NOTAT";
     };
     språk: string;
-    tema: "BID" | "FAR";
+    tema: OpprettForsendelseForesporselTemaEnum | OppdaterForsendelseForesporselTemaEnum;
     enhet: string;
 };
 
-function mapToOpprettEllerOppdaterForsendelseRequest(
-    data: OpprettForsendelseFormProps
-): OppdaterForsendelseForesporsel {
+function mapToOpprettEllerOppdaterForsendelseRequest<
+    T extends OpprettForsendelseForesporselTemaEnum | OppdaterForsendelseForesporselTemaEnum,
+>(data: OpprettForsendelseFormProps & { tema: T }) {
     const landkode = data.mottaker?.adresse?.landkode ?? data.mottaker?.adresse?.land;
     const hasAdresse = !ObjectUtils.isEmpty(data.mottaker?.adresse) && !hasOnlyNullValues(data.mottaker?.adresse);
     return {
@@ -68,13 +72,13 @@ function mapToOpprettEllerOppdaterForsendelseRequest(
             navn: data.mottaker.navn,
             adresse: hasAdresse
                 ? {
-                      ...data.mottaker?.adresse,
-                      landkode,
-                      landkode3: data.mottaker?.adresse?.landkode3 ?? countryCodeIso2ToIso3(landkode),
-                  }
+                    ...data.mottaker?.adresse,
+                    landkode,
+                    landkode3: data.mottaker?.adresse?.landkode3 ?? countryCodeIso2ToIso3(landkode),
+                }
                 : undefined,
         },
-        tema: data.tema as JournalTema,
+        tema: data.tema,
         språk: data.språk,
         dokumenter: [
             {
@@ -90,7 +94,7 @@ const OPPRETT_FORSENDELSE_MUTATION_KEY = "opprettForsendelse";
 export const useOpprettForsendelseFormContext = () => useFormContext<OpprettForsendelseFormProps>();
 
 export default function OpprettForsendelsePage() {
-    const { forsendelseId, enhet } = useSession();
+    const { forsendelseId } = useSession();
     if (forsendelseId) {
         return <OpprettForsendelseUnderOpprettelse />;
     }
@@ -99,14 +103,18 @@ export default function OpprettForsendelsePage() {
 function OpprettForsendelseUnderOpprettelse() {
     const { addError } = useErrorContext();
     const { forsendelseId, navigateToForsendelse, enhet } = useSession();
+    const bidragForsendelseApi = useBidragForsendelseApi();
     const opprettForsendelseFn = useMutation({
         mutationKey: [OPPRETT_FORSENDELSE_MUTATION_KEY],
         mutationFn: (data: OpprettForsendelseFormProps) =>
-            BIDRAG_FORSENDELSE_API.api.oppdaterForsendelse(
+            bidragForsendelseApi.api.oppdaterForsendelse(
                 forsendelseId,
-                mapToOpprettEllerOppdaterForsendelseRequest(data)
+                mapToOpprettEllerOppdaterForsendelseRequest<OppdaterForsendelseForesporselTemaEnum>({
+                    ...data,
+                    tema: data.tema as OppdaterForsendelseForesporselTemaEnum,
+                })
             ),
-        onSuccess: (data) => {
+        onSuccess: () => {
             navigateToForsendelse(forsendelseId, "UTGÅENDE");
             queryClient.refetchQueries({ queryKey: UseForsendelseApiKeys.forsendelse });
         },
@@ -119,7 +127,7 @@ function OpprettForsendelseUnderOpprettelse() {
         },
     });
 
-    const forsendelse = useForsendelseApi().hentForsendelse();
+    const forsendelse = useHentForsendelseQuery();
     const defaultGjelder = forsendelse.gjelderIdent;
     const methods = useForm<OpprettForsendelseFormProps>({
         defaultValues: {
@@ -127,7 +135,10 @@ function OpprettForsendelseUnderOpprettelse() {
             mottaker: {
                 ident: defaultGjelder,
             },
-            tema: enhet == ENHET_FARSKAP ? "FAR" : "BID",
+            tema:
+                enhet === ENHET_FARSKAP
+                    ? OpprettForsendelseForesporselTemaEnum.FAR
+                    : OpprettForsendelseForesporselTemaEnum.BID,
             språk: "NB",
         },
     });
@@ -144,12 +155,16 @@ function OpprettForsendelseUnderOpprettelse() {
 function OpprettForsendelseNy() {
     const { saksnummer, enhet, navigateToForsendelse } = useSession();
     const { addError } = useErrorContext();
+    const bidragForsendelseApi = useBidragForsendelseApi();
     const options = useOpprettForsendelse();
     const opprettForsendelseFn = useMutation({
         mutationKey: [OPPRETT_FORSENDELSE_MUTATION_KEY],
         mutationFn: (data: OpprettForsendelseFormProps) => {
-            const request = mapToOpprettEllerOppdaterForsendelseRequest(data);
-            return BIDRAG_FORSENDELSE_API.api.opprettForsendelse({
+            const request = mapToOpprettEllerOppdaterForsendelseRequest<OpprettForsendelseForesporselTemaEnum>({
+                ...data,
+                tema: data.tema as OpprettForsendelseForesporselTemaEnum,
+            });
+            return bidragForsendelseApi.api.opprettForsendelse({
                 ...request,
                 gjelderIdent: data.gjelderIdent,
                 enhet: enhet,
@@ -181,7 +196,10 @@ function OpprettForsendelseNy() {
 
     const methods = useForm<OpprettForsendelseFormProps>({
         defaultValues: {
-            tema: enhet == ENHET_FARSKAP ? "FAR" : "BID",
+            tema:
+                enhet === ENHET_FARSKAP
+                    ? OpprettForsendelseForesporselTemaEnum.FAR
+                    : OpprettForsendelseForesporselTemaEnum.BID,
             språk: "NB",
         },
     });
@@ -201,11 +219,12 @@ interface OpprettForsendelsContainerProps {
 }
 function OpprettForsendelsContainer({ onSubmit, tittel }: OpprettForsendelsContainerProps) {
     const { forsendelseId } = useSession();
-    const forsendelseEksisterer = forsendelseId != null;
-    const roller = useForsendelseApi().hentRoller();
+    const forsendelseEksisterer = forsendelseId !== null;
+    const roller = useHentRoller();
     const methods = useFormContext();
     const isLoading = useIsMutating({ mutationKey: [OPPRETT_FORSENDELSE_MUTATION_KEY] }) > 0;
     useEffect(() => {
+        SecureLoggerService.info("Dette er test av sikkerlogg")
         updateUrlSearchParam("page", `Opprett forsendelse`);
     }, []);
     return (
@@ -265,7 +284,7 @@ function OpprettForsendelsValidationErrorSummary() {
         });
         return allErrors.filter((error) => error && error.trim().length > 0);
     }
-    if (getAllErrors(errors).length == 0) {
+    if (getAllErrors(errors).length === 0) {
         return null;
     }
 

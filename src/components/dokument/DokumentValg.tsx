@@ -17,7 +17,7 @@ interface TableRowData {
 }
 
 const harAlternativeTitler = (row: TableRowData) => row.alternativeTitler && row.alternativeTitler.length > 0;
-const erFritekstbrev = (row: TableRowData) => row.malId == "BI01S02";
+const erFritekstbrev = (row: TableRowData) => row.malId === "BI01S02";
 export interface DokumentFormProps {
     malId: string;
     tittel: string;
@@ -50,7 +50,7 @@ export default function DokumentValg({ malDetaljer, showLegend }: DokumentValgPr
     }));
 
     function updateValues(malId?: string) {
-        const dokument = alleBrev.find((d) => d.malId == malId);
+        const dokument = alleBrev.find((d) => d.malId === malId);
         if (dokument) {
             const defaultTittel = harAlternativeTitler(dokument) || erFritekstbrev(dokument) ? null : dokument.tittel;
             const tittel = editableTitles.get(malId) ?? defaultTittel;
@@ -65,14 +65,14 @@ export default function DokumentValg({ malDetaljer, showLegend }: DokumentValgPr
     function onTitleChange(malId: string, title: string) {
         const titleNoPrintable = removeNonPrintableCharachters(title);
         setEditableTitles((prevValue) => prevValue.set(malId, titleNoPrintable));
-        if (getValues("dokument.malId") == malId) {
+        if (getValues("dokument.malId") === malId) {
             setValue("dokument.tittel", titleNoPrintable);
         }
     }
     const methods = register("dokument", {
         validate: (dok) => {
             if (dok?.malId == null) return "Dokument må velges";
-            if (dok?.tittel == null || dok.tittel.trim().length == 0) return "Tittel på dokumentet kan ikke være tom";
+            if (dok?.tittel == null || dok.tittel.trim().length === 0) return "Tittel på dokumentet kan ikke være tom";
             return true;
         },
     });
@@ -161,14 +161,14 @@ interface EditableTitleProps {
 }
 function EditableTitle({ row, onTitleChange }: EditableTitleProps) {
     const { malId, tittel, beskrivelse } = row;
-    const harAnnenTittel = tittel != beskrivelse;
+    const harAnnenTittel = tittel !== beskrivelse;
     function shouldBeEditable() {
         const MALID_TITTLE_REDIGERBAR = ["BI01X02", "BI01X01", "BI01P11", "BI01S02"];
         return MALID_TITTLE_REDIGERBAR.includes(malId);
     }
 
     function erFritekstbrev() {
-        return row.malId == "BI01S02";
+        return row.malId === "BI01S02";
     }
 
     if (!shouldBeEditable()) {

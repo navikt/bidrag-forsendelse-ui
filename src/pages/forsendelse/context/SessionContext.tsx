@@ -1,9 +1,6 @@
 import { CustomError, RedirectTo } from "@navikt/bidrag-ui-common";
 import ObjectUtils from "@navikt/bidrag-ui-common/esm/utils/ObjectUtils";
-import { createContext, useEffect } from "react";
-import { PropsWithChildren } from "react";
-import { useState } from "react";
-import { useContext } from "react";
+import { createContext, PropsWithChildren, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import environment from "../../../environment";
@@ -30,9 +27,9 @@ export const SessionContext = createContext<ISessionContext>({} as ISessionConte
 function SessionProvider({ children, ...props }: PropsWithChildren<ISessionPropsContext>) {
     const navigate = useNavigate();
     const [forsendelseId, setForsendelseId] = useState(props.forsendelseId);
-    const [saksnummer, setSaksnummer] = useState(props.saksnummer);
-    const [sessionId, setSessionId] = useState(props.sessionId);
-    const [enhet, setEnhet] = useState(props.enhet);
+    const [saksnummer] = useState(props.saksnummer);
+    const [sessionId] = useState(props.sessionId);
+    const [enhet] = useState(props.enhet);
 
     useEffect(() => {
         if (ObjectUtils.isEmpty(enhet)) {
@@ -51,9 +48,10 @@ function SessionProvider({ children, ...props }: PropsWithChildren<ISessionProps
         const params = new URLSearchParams();
         params.append("enhet", enhet);
         params.append("sessionState", sessionId);
-        if (type == "NOTAT") {
+        if (type === "NOTAT") {
             RedirectTo.sakshistorikk(saksnummer, environment.url.bisys);
         } else {
+            setForsendelseId(forsendelseId);
             navigate(`/sak/${saksnummer}/forsendelse/${forsendelseId}?${params.toString()}`);
         }
     };
