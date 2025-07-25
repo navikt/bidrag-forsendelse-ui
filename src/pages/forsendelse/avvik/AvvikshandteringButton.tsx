@@ -1,8 +1,8 @@
 import { Button } from "@navikt/ds-react";
 import React, { useContext, useState } from "react";
 
-import useDokumentApi from "../../../hooks/useDokumentApi";
-import { useForsendelseApi } from "../../../hooks/useForsendelseApi";
+import { useHentAvvikListe } from "../../../hooks/useDokumentApi";
+import { useHentForsendelseQuery } from "../../../hooks/useForsendelseApi";
 import { AvvikType } from "../../../types/AvvikTypes";
 import { IForsendelse } from "../../../types/Forsendelse";
 import { useSession } from "../context/SessionContext";
@@ -21,8 +21,8 @@ const AvvikModalContext = React.createContext<AvvikProviderProps>({} as AvvikPro
 
 function AvvikshandteringButton() {
     const { forsendelseId, saksnummer, enhet } = useSession();
-    const { data: avvikListe } = useDokumentApi().hentAvvikListe(forsendelseId, saksnummer, enhet);
-    const forsendelse = useForsendelseApi().hentForsendelse();
+    const { data: avvikListe } = useHentAvvikListe(forsendelseId, saksnummer, enhet);
+    const forsendelse = useHentForsendelseQuery();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 

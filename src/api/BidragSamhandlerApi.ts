@@ -9,6 +9,21 @@
  * ---------------------------------------------------------------
  */
 
+/** Søkbare felter for opphenting av samhandlere. */
+export interface SamhandlerSok {
+    ident?: string;
+    offentligId?: string;
+    navn?: string;
+    postnummer?: string;
+    poststed?: string;
+    norskkontonr?: string;
+    iban?: string;
+    swift?: string;
+    banknavn?: string;
+    banklandkode?: string;
+    bankcode?: string;
+}
+
 /** Representerer navn og/eller adresse for en samhandler. */
 export interface AdresseDto {
     /** Første adresselinje inneholder normalt gatenavn, men kan også innehold f.eks c/o. */
@@ -17,12 +32,40 @@ export interface AdresseDto {
     adresselinje2?: string;
     /** Tredje adresselinje brukes i noen tilfeller til region. */
     adresselinje3?: string;
-    /** Postnr dersom dette er tilgjengelig som strukturerte data. */
+    /**
+     * Bruk postnnummer.
+     * @deprecated
+     */
     postnr?: string;
+    /** Postnummer dersom dette er tilgjengelig som strukturerte data. */
+    postnummer?: string;
     /** Poststed dersom dette er tilgjengelig som strukturerte data. */
     poststed?: string;
     /** Land. ISO 3166-1 alfa-3. */
     land?: string;
+}
+
+export interface AuditLogDto {
+    /** Navnet på tabellen som ble endret. */
+    tabellNavn: string;
+    /**
+     * Id til raden som ble endret.
+     * @format int32
+     */
+    tabellId: number;
+    /** Operasjonen som ble utført. */
+    operasjon: string;
+    /**
+     * Tidspunkt for endringen.
+     * @format date-time
+     */
+    endretTidspunkt: string;
+    /** Brukeren som endret raden. Kan være et system, database-bruker eller saksbehandler. */
+    endretAv: string;
+    /** Verdiene som raden hadde før endringen. */
+    gamleVerdier: string;
+    /** Verdiene som raden har etter endringen. */
+    nyeVerdier: string;
 }
 
 /** Representerer kontonummer for en samhandler. For norske kontonummer er det kun norskKontornr som er utfyllt, ellers benyttes de andre feltene for utlandske kontonummer. */
@@ -40,33 +83,47 @@ export interface KontonummerDto {
     /** BankCode. Format varierer. */
     bankCode?: string;
     /** Kontoens valuta. */
-    valutakode?: string;
+    valutakode?: Valutakode;
+}
+
+export enum OffentligIDType {
+    ORG = "ORG",
+    FNR = "FNR",
+    UTOR = "UTOR",
+    UTPE = "UTPE",
+    DNR = "DNR",
+    HPR = "HPR",
 }
 
 export interface SamhandlerDto {
-    tssId: string;
+    /** Identen til samhandler */
+    samhandlerId?: string;
     /** Navn på samhandler */
-    navn?: string;
-    /** Offentlig id for samhandlere. */
-    offentligId?: string;
-    /** Type offentlig id. F.eks ORG for norske organisasjonsnummere. */
-    offentligIdType?: string;
-    /** Representerer navn og/eller adresse for en samhandler. */
-    adresse?: AdresseDto;
-    /** Representerer kontonummer for en samhandler. For norske kontonummer er det kun norskKontornr som er utfyllt, ellers benyttes de andre feltene for utlandske kontonummer. */
-    kontonummer?: KontonummerDto;
-}
-
-/** Query-felter for søk etter samhandlere. */
-export interface SokSamhandlerQuery {
     navn: string;
-    postnummer?: string;
-    omrade?: string;
-    /**
-     * Sidenummer med resultater man ønsker, hvis det finnes og man ønsker påfølgende resultater.
-     * @format int32
-     */
-    side: number;
+    /** Offentlig id for samhandlere. */
+    offentligId: string;
+    /** Type offentlig id. F.eks ORG for norske organisasjonsnummere, UTOR for utenlandske organisasjonsnummere, FNR for norske personnummer. */
+    offentligIdType: OffentligIDType;
+    /** Definerer hvilket område samhandleren er knyttet til. */
+    områdekode?: SamhandlerDtoOmradekodeEnum;
+    /** Språk til samhandleren. */
+    språk?: Sprak;
+    /** Samhandlerens adresse. */
+    adresse?: AdresseDto;
+    /** Samhandlerens kontonummer. */
+    kontonummer?: KontonummerDto;
+    /** Kontaktperson for samhandler. Benyttes primært av utland. */
+    kontaktperson?: string;
+    /** Kontakt epost for samhandler. Benyttes primært av utland. */
+    kontaktEpost?: string;
+    /** Kontakt telefon for samhandler. Benyttes primært av utland. */
+    kontaktTelefon?: string;
+    /** Fritekstfelt for notater. */
+    notat?: string;
+    /** Er samhandleren opphørt? */
+    erOpphørt?: boolean;
+    /** Liste over endringer på samhandleren. */
+    auditLog?: AuditLogDto[];
 }
 
 /** Søkeresultat etter søk på samhandler. */
@@ -76,7 +133,112 @@ export interface SamhandlersokeresultatDto {
     flereForekomster: boolean;
 }
 
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType } from "axios";
+export enum Sprak {
+    NB = "NB",
+    NN = "NN",
+    AR = "AR",
+    DA = "DA",
+    DE = "DE",
+    EN = "EN",
+    EL = "EL",
+    ET = "ET",
+    ES = "ES",
+    FI = "FI",
+    FR = "FR",
+    IS = "IS",
+    IT = "IT",
+    JA = "JA",
+    HR = "HR",
+    LV = "LV",
+    LT = "LT",
+    NL = "NL",
+    PL = "PL",
+    PT = "PT",
+    RO = "RO",
+    RU = "RU",
+    SR = "SR",
+    SL = "SL",
+    SK = "SK",
+    SV = "SV",
+    TH = "TH",
+    TR = "TR",
+    UK = "UK",
+    HU = "HU",
+    VI = "VI",
+}
+
+export enum Valutakode {
+    ALL = "ALL",
+    ANG = "ANG",
+    AUD = "AUD",
+    BAM = "BAM",
+    BGN = "BGN",
+    BRL = "BRL",
+    CAD = "CAD",
+    CHF = "CHF",
+    CNY = "CNY",
+    CZK = "CZK",
+    DKK = "DKK",
+    EEK = "EEK",
+    EUR = "EUR",
+    GBP = "GBP",
+    HKD = "HKD",
+    HRK = "HRK",
+    HUF = "HUF",
+    INR = "INR",
+    ISK = "ISK",
+    JPY = "JPY",
+    LTL = "LTL",
+    LVL = "LVL",
+    MAD = "MAD",
+    NOK = "NOK",
+    NZD = "NZD",
+    PKR = "PKR",
+    PLN = "PLN",
+    RON = "RON",
+    RSD = "RSD",
+    SEK = "SEK",
+    THB = "THB",
+    TND = "TND",
+    TRY = "TRY",
+    UAH = "UAH",
+    USD = "USD",
+    VND = "VND",
+    ZAR = "ZAR",
+    PHP = "PHP",
+}
+
+export interface DuplikatSamhandler {
+    feilmelding: string;
+    eksisterendeSamhandlerId: string;
+    felter: string[];
+}
+
+export interface FeltValideringsfeil {
+    feltnavn: string;
+    feilmelding: string;
+}
+
+export interface SamhandlerValideringsfeil {
+    duplikatSamhandler?: DuplikatSamhandler[];
+    ugyldigInput?: FeltValideringsfeil[];
+}
+
+/** Definerer hvilket område samhandleren er knyttet til. */
+export enum SamhandlerDtoOmradekodeEnum {
+    UTENRIKSSTASJON = "UTENRIKSSTASJON",
+    ADVOKAT = "ADVOKAT",
+    ARBEIDSGIVER = "ARBEIDSGIVER",
+    REELL_MOTTAKER = "REELL_MOTTAKER",
+    UTENLANDSK_PERSON = "UTENLANDSK_PERSON",
+    UTENLANDSK_FOGD = "UTENLANDSK_FOGD",
+    SOSIALKONTO = "SOSIALKONTO",
+    BARNEVERNSINSTITUSJON = "BARNEVERNSINSTITUSJON",
+    VERGE = "VERGE",
+}
+
+import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType } from "axios";
+import axios from "axios";
 
 export type QueryParamsType = Record<string | number, any>;
 
@@ -122,7 +284,7 @@ export class HttpClient<SecurityDataType = unknown> {
     constructor({ securityWorker, secure, format, ...axiosConfig }: ApiConfig<SecurityDataType> = {}) {
         this.instance = axios.create({
             ...axiosConfig,
-            baseURL: axiosConfig.baseURL || "https://bidrag-samhandler.intern.dev.nav.no",
+            baseURL: axiosConfig.baseURL || "https://bidrag-samhandler-q2.intern.dev.nav.no",
         });
         this.secure = secure;
         this.format = format;
@@ -157,6 +319,9 @@ export class HttpClient<SecurityDataType = unknown> {
     }
 
     protected createFormData(input: Record<string, unknown>): FormData {
+        if (input instanceof FormData) {
+            return input;
+        }
         return Object.keys(input || {}).reduce((formData, key) => {
             const property = input[key];
             const propertyContent: any[] = property instanceof Array ? property : [property];
@@ -199,7 +364,7 @@ export class HttpClient<SecurityDataType = unknown> {
             ...requestParams,
             headers: {
                 ...(requestParams.headers || {}),
-                ...(type && type !== ContentType.FormData ? { "Content-Type": type } : {}),
+                ...(type ? { "Content-Type": type } : {}),
             },
             params: query,
             responseType: responseFormat,
@@ -212,48 +377,125 @@ export class HttpClient<SecurityDataType = unknown> {
 /**
  * @title bidrag-samhandler
  * @version v1
- * @baseUrl https://bidrag-samhandler.intern.dev.nav.no
+ * @baseUrl https://bidrag-samhandler-q2.intern.dev.nav.no
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
-    samhandler = {
+    samhandlersok = {
         /**
-         * @description Søker etter samhandlere basert på navn, område og postnummer
+         * @description Søker etter samhandlere.
          *
          * @tags samhandler-controller
-         * @name SokSamhandler
-         * @request GET:/samhandler
+         * @name SamhandlerSok
+         * @request POST:/samhandlersok
          * @secure
          */
-        sokSamhandler: (
-            query: {
-                /** Query-felter for søk etter samhandlere. */
-                søkSamhandlerQuery: SokSamhandlerQuery;
-            },
-            params: RequestParams = {}
-        ) =>
+        samhandlerSok: (data: SamhandlerSok, params: RequestParams = {}) =>
             this.request<SamhandlersokeresultatDto, any>({
-                path: `/samhandler`,
-                method: "GET",
-                query: query,
+                path: `/samhandlersok`,
+                method: "POST",
+                body: data,
                 secure: true,
+                type: ContentType.Json,
                 ...params,
             }),
-
+    };
+    samhandler = {
         /**
-         * @description Henter samhandler for ident
+         * @description Henter samhandler for ident.
          *
          * @tags samhandler-controller
          * @name HentSamhandler
          * @request POST:/samhandler
          * @secure
          */
-        hentSamhandler: (data: string, params: RequestParams = {}) =>
-            this.request<SamhandlerDto, any>({
+        hentSamhandler: (
+            data: string,
+            query?: {
+                inkluderAuditLog?: boolean;
+            },
+            params: RequestParams = {}
+        ) =>
+            this.request<SamhandlerDto, object>({
                 path: `/samhandler`,
+                method: "POST",
+                query: query,
+                body: data,
+                secure: true,
+                type: ContentType.Json,
+                ...params,
+            }),
+    };
+    opprettSamhandler = {
+        /**
+         * @description Oppretter samhandler.
+         *
+         * @tags samhandler-controller
+         * @name OpprettSamhandler
+         * @request POST:/opprettSamhandler
+         * @secure
+         */
+        opprettSamhandler: (data: SamhandlerDto, params: RequestParams = {}) =>
+            this.request<object, SamhandlerValideringsfeil>({
+                path: `/opprettSamhandler`,
                 method: "POST",
                 body: data,
                 secure: true,
                 type: ContentType.Json,
+                ...params,
+            }),
+    };
+    oppdaterSamhandler = {
+        /**
+         * @description Oppdaterer samhandler.
+         *
+         * @tags samhandler-controller
+         * @name OppdaterSamhandler
+         * @request POST:/oppdaterSamhandler
+         * @secure
+         */
+        oppdaterSamhandler: (data: SamhandlerDto, params: RequestParams = {}) =>
+            this.request<object, SamhandlerValideringsfeil>({
+                path: `/oppdaterSamhandler`,
+                method: "POST",
+                body: data,
+                secure: true,
+                type: ContentType.Json,
+                ...params,
+            }),
+    };
+    auditlog = {
+        /**
+         * @description Henter audit log for samhandler.
+         *
+         * @tags audit-log-controller
+         * @name HentAuditLog
+         * @request POST:/auditlog
+         * @secure
+         */
+        hentAuditLog: (data: number, params: RequestParams = {}) =>
+            this.request<AuditLogDto, any>({
+                path: `/auditlog`,
+                method: "POST",
+                body: data,
+                secure: true,
+                type: ContentType.Json,
+                ...params,
+            }),
+    };
+    visningsnavn = {
+        /**
+         * No description
+         *
+         * @tags visningsnavn-controller
+         * @name HentVisningsnavn
+         * @request GET:/visningsnavn
+         * @secure
+         */
+        hentVisningsnavn: (params: RequestParams = {}) =>
+            this.request<Record<string, string>, any>({
+                path: `/visningsnavn`,
+                method: "GET",
+                secure: true,
                 ...params,
             }),
     };

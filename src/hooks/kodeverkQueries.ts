@@ -2,7 +2,7 @@ import { StringUtils } from "@navikt/bidrag-ui-common";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 
-import { BIDRAG_KODEVERK_API } from "../api/api";
+import { useBidragKodeverkApi } from "../api/api";
 import { KodeverkHierarkiResponse, KodeverkKoderBetydningerResponse } from "../api/BidragKodeverkApi";
 import KodeverkService from "../api/KodeverkService";
 import { visAndreVedleggskoder, visVedleggskoder } from "../constants/ettersendingConstants";
@@ -19,7 +19,7 @@ const postnummereQuery = {
     queryFn: () => new KodeverkService().getPostnummere(),
 };
 
-export const hentLandkoder = (): LandkodeLand[] => {
+export const useHentLandkoder = (): LandkodeLand[] => {
     const { data: landkoder } = useSuspenseQuery({
         queryKey: KodeverkQueryKeys.landkoder,
         queryFn: () => new KodeverkService().getLandkoder(),
@@ -28,17 +28,18 @@ export const hentLandkoder = (): LandkodeLand[] => {
     return landkoder;
 };
 
-export const hentPostnummere = (): PostnummerPoststed[] => {
+export const useHentPostnummere = (): PostnummerPoststed[] => {
     const { data: postnummere } = useSuspenseQuery(postnummereQuery);
 
     return postnummere;
 };
 
 export const useHentNavSkjemaer = (): KodeBeskrivelse[] => {
+    const bidragKodeverkApi = useBidragKodeverkApi();
     const { data } = useSuspenseQuery({
         queryKey: KodeverkQueryKeys.navskjema,
         queryFn: async () => {
-            const response = await BIDRAG_KODEVERK_API.kodeverk.hentKodeverk("NAVSkjema");
+            const response = await bidragKodeverkApi.kodeverk.hentKodeverk("NAVSkjema");
             return mapKodeverkResponseToCodeAndName(response.data);
         },
     });
@@ -47,10 +48,11 @@ export const useHentNavSkjemaer = (): KodeBeskrivelse[] => {
 };
 
 export const useHentVedleggskoder = (): KodeBeskrivelse[] => {
+    const bidragKodeverkApi = useBidragKodeverkApi();
     const { data } = useSuspenseQuery({
         queryKey: KodeverkQueryKeys.navBidragSkjema,
         queryFn: async () => {
-            const response = await BIDRAG_KODEVERK_API.kodeverk.hentKodeverk("Vedleggskoder");
+            const response = await bidragKodeverkApi.kodeverk.hentKodeverk("Vedleggskoder");
             return [
                 ...visAndreVedleggskoder,
                 ...mapKodeverkResponseToCodeAndName(response.data).filter((kodeBeskrivelse) =>
@@ -77,8 +79,19 @@ export const mapHierarkiResponseToCodeAndName = (kodeverk: KodeverkHierarkiRespo
 
 export const mapKodeverkResponseToCodeAndName = (kodeverk: KodeverkKoderBetydningerResponse): KodeBeskrivelse[] =>
     Object.entries(kodeverk.betydninger)
-        .filter(([_, betydning]) => {
-            const gyldigTil = betydning[0].gyldigTil;
+        .map(([kode, betydninger]) => {
+            if (!betydninger || betydninger.length === 0) {
+                return null;
+            }
+            // Find the Betydning with the most recent gyldigFom date
+            const latestBetydning = betydninger.reduce((latest, current) =>
+                latest.gyldigFra > current.gyldigFra ? latest : current
+            );
+            return { kode, betydning: latestBetydning };
+        })
+        .filter(Boolean) // Remove any null entries from empty betydninger
+        .filter(({ betydning }) => {
+            const gyldigTil = betydning.gyldigTil;
             if (!gyldigTil) {
                 // ingen sluttdato = gyldig
                 return true;
@@ -92,17 +105,17 @@ export const mapKodeverkResponseToCodeAndName = (kodeverk: KodeverkKoderBetydnin
             // behold kun de som ikke er utløpt
             return gyldigTilDate >= today;
         })
-        .map(([kode, betydning]) => {
-            const tekst = StringUtils.isEmpty(betydning[0].beskrivelser["nb"].tekst)
-                ? betydning[0].beskrivelser["nb"].term
-                : betydning[0].beskrivelser["nb"].tekst;
+        .map(({ kode, betydning }) => {
+            const tekst = StringUtils.isEmpty(betydning.beskrivelser["nb"].tekst)
+                ? betydning.beskrivelser["nb"].term
+                : betydning.beskrivelser["nb"].tekst;
             return {
                 kode,
                 beskrivelse: tekst,
             };
         });
 
-export const prefetchPostnummere = (): void => {
+export const usePrefetchPostnummere = (): void => {
     const queryClient = useQueryClient();
     useEffect(() => {
         queryClient.prefetchQuery(postnummereQuery);
