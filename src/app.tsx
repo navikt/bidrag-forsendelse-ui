@@ -125,9 +125,9 @@ function OpprettNyNotatPageWrapper() {
                 barnObjNr={searchParams.getAll("barn_obj_nr") ?? []}
                 vedtakType={searchParams.get("vedtakType") as Vedtakstype}
                 erFattetBeregnet={
-                    searchParams.get("erFattetBeregnet") !== undefined
-                        ? searchParams.get("erFattetBeregnet") === "true"
-                        : null
+                    (searchParams.get("erFattetBeregnet") === undefined || searchParams.get("erFattetBeregnet") === null)
+                        ? null
+                        : searchParams.get("erFattetBeregnet") === "true"
                 }
                 erVedtakIkkeTilbakekreving={searchParams.get("erVedtakIkkeTilbakekreving") === "true"}
                 soknadId={searchParams.get("soknadId")}
@@ -156,9 +156,9 @@ function OpprettNyForsendelsePageWrapper() {
                 barnObjNr={searchParams.getAll("barn_obj_nr") ?? []}
                 vedtakType={searchParams.get("vedtakType") as Vedtakstype}
                 erFattetBeregnet={
-                    searchParams.get("erFattetBeregnet") !== undefined
-                        ? searchParams.get("erFattetBeregnet") === "true"
-                        : null
+                    (searchParams.get("erFattetBeregnet") === undefined || searchParams.get("erFattetBeregnet") === null)
+                        ? null
+                        : searchParams.get("erFattetBeregnet") === "true"
                 }
                 erVedtakIkkeTilbakekreving={searchParams.get("erVedtakIkkeTilbakekreving") === "true"}
                 soknadId={searchParams.get("soknadId")}
