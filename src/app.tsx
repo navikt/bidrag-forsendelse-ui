@@ -124,11 +124,10 @@ function OpprettNyNotatPageWrapper() {
             <Opprettnotat
                 barnObjNr={searchParams.getAll("barn_obj_nr") ?? []}
                 vedtakType={searchParams.get("vedtakType") as Vedtakstype}
-                erFattetBeregnet={
-                    (searchParams.get("erFattetBeregnet") === undefined || searchParams.get("erFattetBeregnet") === null)
-                        ? null
-                        : searchParams.get("erFattetBeregnet") === "true"
-                }
+                erFattetBeregnet={(() => {
+                    const param = searchParams.get("erFattetBeregnet");
+                    return param === null ? null : param === "true";
+                })()}
                 erVedtakIkkeTilbakekreving={searchParams.get("erVedtakIkkeTilbakekreving") === "true"}
                 soknadId={searchParams.get("soknadId")}
                 soknadType={searchParams.get("soknadType")}
@@ -155,11 +154,10 @@ function OpprettNyForsendelsePageWrapper() {
             <Opprettforsendelse
                 barnObjNr={searchParams.getAll("barn_obj_nr") ?? []}
                 vedtakType={searchParams.get("vedtakType") as Vedtakstype}
-                erFattetBeregnet={
-                    (searchParams.get("erFattetBeregnet") === undefined || searchParams.get("erFattetBeregnet") === null)
-                        ? null
-                        : searchParams.get("erFattetBeregnet") === "true"
-                }
+                erFattetBeregnet={(() => {
+                    const param = searchParams.get("erFattetBeregnet");
+                    return param === null ? null : param === "true";
+                })()}
                 erVedtakIkkeTilbakekreving={searchParams.get("erVedtakIkkeTilbakekreving") === "true"}
                 soknadId={searchParams.get("soknadId")}
                 soknadType={searchParams.get("soknadType")}
