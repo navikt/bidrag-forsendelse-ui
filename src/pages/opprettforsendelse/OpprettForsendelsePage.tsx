@@ -222,7 +222,6 @@ function OpprettForsendelseNy() {
         },
     });
     function onSubmit(data: OpprettForsendelseFormProps) {
-        console.log(data)
         opprettForsendelseFn.mutate(data);
     }
     return (

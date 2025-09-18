@@ -35,16 +35,6 @@ export const useDokumentMalDetaljerForsendelseV2 = () => {
     });
 };
 
-export const useDokumentMalDetaljerForsendelse = () => {
-    const { forsendelseId } = useSession();
-    const bidragForsendelseApi = useBidragForsendelseApi();
-    return useSuspenseQuery({
-        queryKey: ["dokumentMalDetaljer", forsendelseId],
-        queryFn: () => bidragForsendelseApi.api.hentDokumentValgForForsendelse(forsendelseId),
-        select: (data) => data.data,
-    });
-};
-
 export const useDokumentMalDetaljer2 = (request: HentDokumentValgRequest) => {
     const { enhet } = useSession();
     const bidragForsendelseApi = useBidragForsendelseApi();
@@ -58,27 +48,6 @@ export const useDokumentMalDetaljer2 = (request: HentDokumentValgRequest) => {
             enhet,
         ],
         queryFn: () => bidragForsendelseApi.api.hentDokumentValgV2({ ...request, enhet }),
-        select: (data) => data.data,
-        retry: (failureCount, error: AxiosError) => {
-            if (error.response.status === 400) return false;
-            return failureCount < 3;
-        },
-    });
-};
-
-export const useDokumentMalDetaljer = (request: HentDokumentValgRequest) => {
-    const { enhet } = useSession();
-    const bidragForsendelseApi = useBidragForsendelseApi();
-    return useSuspenseQuery({
-        queryKey: [
-            "dokumentMalDetaljer",
-            request.behandlingType,
-            request.vedtakType,
-            request.soknadFra,
-            request.erFattetBeregnet,
-            enhet,
-        ],
-        queryFn: () => bidragForsendelseApi.api.hentDokumentValg({ ...request, enhet }),
         select: (data) => data.data,
         retry: (failureCount, error: AxiosError) => {
             if (error.response.status === 400) return false;

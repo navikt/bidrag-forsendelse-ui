@@ -53,7 +53,7 @@ export default function DokumentValgMulti({ malDetaljer, automatiskOpprettDokume
         if (automatiskOpprettDokumenter.length > 0) {
             return <Alert size="small" variant="info">
                 <Heading size="xsmall">Automatisk dokumentvalg</Heading>
-                <BodyShort size="small">Valgte dokumenter vil bli opprettet automatisk. Du kan endre rekkefølge og legge til dokumenter senere i forsendelsebildet</BodyShort>
+                <BodyShort size="small">Valgte dokumenter vil bli opprettet automatisk. Du kan endre på rekkefølgen og legge til dokumenter senere i forsendelsebildet</BodyShort>
             </Alert>
         }
     }
