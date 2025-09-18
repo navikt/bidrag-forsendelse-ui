@@ -12,47 +12,56 @@ import { Api as SamhandlerApi } from "./BidragSamhandlerApi";
 import { Api as BidragTilgangskontrollApi } from "./BidragTilgangskontrollApi";
 
 export const useSamhandlerApi = () =>
-    useApi(new SamhandlerApi({ baseURL: environment.url.bidragSamhandler }), "bidrag-samhandler", "gcp");
+    useApi(new SamhandlerApi({ baseURL: environment.url.bidragSamhandler }), {
+        app: "bidrag-samhandler",
+        cluster: "gcp",
+    });
 export const usePersonApi = () =>
-    useApi(new PersonApi({ baseURL: environment.url.bidragPerson }), "bidrag-person", "fss");
-export const useSakApi = () => useApi(new SakApi({ baseURL: environment.url.bidragSak }), "bidrag-sak", "fss");
+    useApi(new PersonApi({ baseURL: environment.url.bidragPerson }), {
+        app: "bidrag-person",
+        cluster: "fss",
+    });
+export const useSakApi = () =>
+    useApi(new SakApi({ baseURL: environment.url.bidragSak }), {
+        app: "bidrag-sak",
+        cluster: "fss",
+    });
 export const useBidragDokumentApi = () =>
-    useApi(
-        new BidragDokumentApi({ baseURL: environment.url.bidragDokument }),
-        "bidrag-dokument",
-        "fss",
-        environment.system.legacyEnvironment
-    );
+    useApi(new BidragDokumentApi({ baseURL: environment.url.bidragDokument }), {
+        app: "bidrag-dokument",
+        cluster: "fss",
+        env: environment.system.legacyEnvironment,
+    });
 export const useBidragOrganisasjonApi = () =>
-    useApi(
-        new BidragOrganisasjontApi({ baseURL: environment.url.bidragOrganisasjon }),
-        "bidrag-organisasjon",
-        "fss",
-        environment.system.legacyEnvironment
-    );
+    useApi(new BidragOrganisasjontApi({ baseURL: environment.url.bidragOrganisasjon }), {
+        app: "bidrag-organisasjon",
+        cluster: "fss",
+        env: environment.system.legacyEnvironment,
+    });
 export const useBidragForsendelseApi = () =>
-    useApi(
-        new BidragForsendelseApi({ baseURL: environment.url.bidragDokumentForsendelse }),
-        "bidrag-dokument-forsendelse",
-        "gcp",
-        environment.system.legacyEnvironment
-    );
+    useApi(new BidragForsendelseApi({ baseURL: environment.url.bidragDokumentForsendelse }), {
+        app: "bidrag-dokument-forsendelse",
+        cluster: "gcp",
+        env: environment.system.legacyEnvironment,
+    });
 
 export const useBidragTilgangskontrollApi = () =>
-    useApi(
-        new BidragTilgangskontrollApi({ baseURL: environment.url.bidragTilgangskontroll }),
-        "bidrag-tilgangskontroll",
-        "gcp",
-        environment.system.legacyEnvironment
-    );
+    useApi(new BidragTilgangskontrollApi({ baseURL: environment.url.bidragTilgangskontroll }), {
+        app: "bidrag-tilgangskontroll",
+        cluster: "gcp",
+        env: environment.system.legacyEnvironment,
+    });
 
 export const useBidragDokumentArkivApi = () =>
-    useApi(
-        new BidragDokumentArkivApi({ baseURL: environment.url.bidragDokumentArkiv }),
-        "bidrag-dokument-arkiv",
-        "fss",
-        environment.system.legacyEnvironment
-    );
+    useApi(new BidragDokumentArkivApi({ baseURL: environment.url.bidragDokumentArkiv }), {
+        app: "bidrag-dokument-arkiv",
+        cluster: "fss",
+        env: environment.system.legacyEnvironment,
+    });
 
 export const useBidragKodeverkApi = () =>
-    useApi(new BidragKodeverkApi({ baseURL: environment.url.bidragKodeverk }), "bidrag-kodeverk", "gcp");
+    useApi(new BidragKodeverkApi({ baseURL: environment.url.bidragKodeverk }), {
+        app: "bidrag-kodeverk",
+        cluster: "gcp",
+        env: environment.system.legacyEnvironment,
+    });

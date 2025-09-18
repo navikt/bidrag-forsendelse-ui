@@ -25,6 +25,16 @@ const DokumentQueryKeys = {
     ],
 };
 
+export const useDokumentMalDetaljerForsendelseV2 = () => {
+    const { forsendelseId } = useSession();
+    const bidragForsendelseApi = useBidragForsendelseApi();
+    return useSuspenseQuery({
+        queryKey: ["dokumentMalDetaljerV2", forsendelseId],
+        queryFn: () => bidragForsendelseApi.api.hentDokumentValgForForsendelseV2(forsendelseId),
+        select: (data) => data.data,
+    });
+};
+
 export const useDokumentMalDetaljerForsendelse = () => {
     const { forsendelseId } = useSession();
     const bidragForsendelseApi = useBidragForsendelseApi();
@@ -32,6 +42,27 @@ export const useDokumentMalDetaljerForsendelse = () => {
         queryKey: ["dokumentMalDetaljer", forsendelseId],
         queryFn: () => bidragForsendelseApi.api.hentDokumentValgForForsendelse(forsendelseId),
         select: (data) => data.data,
+    });
+};
+
+export const useDokumentMalDetaljer2 = (request: HentDokumentValgRequest) => {
+    const { enhet } = useSession();
+    const bidragForsendelseApi = useBidragForsendelseApi();
+    return useSuspenseQuery({
+        queryKey: [
+            "dokumentMalDetaljerV2",
+            request.behandlingType,
+            request.vedtakType,
+            request.soknadFra,
+            request.erFattetBeregnet,
+            enhet,
+        ],
+        queryFn: () => bidragForsendelseApi.api.hentDokumentValgV2({ ...request, enhet }),
+        select: (data) => data.data,
+        retry: (failureCount, error: AxiosError) => {
+            if (error.response.status === 400) return false;
+            return failureCount < 3;
+        },
     });
 };
 
@@ -104,16 +135,22 @@ export const useHentAvvikListe = (
     const journalpostId = _journalpostId.startsWith("BIF") ? _journalpostId : `BIF-${_journalpostId}`;
     return useSuspenseQuery({
         queryKey: DokumentQueryKeys.hentAvvikListe(journalpostId),
-        queryFn: () =>
-            bidragDokumentApi.journal.hentAvvik(
-                journalpostId,
-                { saksnummer },
-                {
-                    headers: {
-                        "X-enhet": enhet,
-                    },
-                }
-            ),
+        queryFn: () => {
+            try {
+                return bidragDokumentApi.journal.hentAvvik(
+                    journalpostId,
+                    { saksnummer },
+                    {
+                        headers: {
+                            "X-enhet": enhet,
+                        },
+                    }
+                );
+            } catch (e) {
+                return { data: [] };
+            }
+        },
+
         select: (data) => {
             return data.data as AvvikType[];
         },

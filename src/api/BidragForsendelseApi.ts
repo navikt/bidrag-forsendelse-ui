@@ -123,6 +123,8 @@ export interface OpprettDokumentForesporsel {
     dokumentmalId?: string;
     /** Om dokumentet med dokumentmalId skal bestilles. Hvis dette er satt til false så antas det at kallende system bestiller dokumentet selv. */
     bestillDokument: boolean;
+    /** Om dokumentet skal automatisk ferdigstilles etter bestilling */
+    ferdigstill: boolean;
 }
 
 /** Metadata for opprettelse av forsendelse */
@@ -153,6 +155,9 @@ export interface OpprettForsendelseForesporsel {
     saksbehandlerIdent?: string;
     /** Opprett tittel på forsendelse automatisk basert på behandling detaljer. Skal bare settes til false hvis gamle brevmeny (Bisys) brukes */
     opprettTittel?: boolean;
+    unikReferanse?: string;
+    /** Distribuer forsendelse automatisk etter ferdigstilling. Dette kan brukes hvis det er opprettet av batch eller en vedtaksbrev som skal automatisk distribueres etter fattet vedtak (feks manuell aldersjustering) */
+    distribuerAutomatiskEtterFerdigstilling: boolean;
 }
 
 export enum Stonadstype {
@@ -192,6 +197,332 @@ export enum Vedtakstype {
     KLAGE = "KLAGE",
     ENDRING = "ENDRING",
     ENDRING_MOTTAKER = "ENDRING_MOTTAKER",
+}
+
+export interface ConflictException {
+    message?: string;
+    body?: any;
+    cause?: {
+        stackTrace?: {
+            classLoaderName?: string;
+            moduleName?: string;
+            moduleVersion?: string;
+            methodName?: string;
+            fileName?: string;
+            /** @format int32 */
+            lineNumber?: number;
+            className?: string;
+            nativeMethod?: boolean;
+        }[];
+        message?: string;
+        localizedMessage?: string;
+    };
+    stackTrace?: {
+        classLoaderName?: string;
+        moduleName?: string;
+        moduleVersion?: string;
+        methodName?: string;
+        fileName?: string;
+        /** @format int32 */
+        lineNumber?: number;
+        className?: string;
+        nativeMethod?: boolean;
+    }[];
+    statusCode?: DefaultHttpStatusCode | HttpStatus;
+    statusText?: string;
+    responseHeaders?: {
+        connection?: string[];
+        contentType?: MediaType;
+        origin?: string;
+        host?: {
+            hostString?: string;
+            address?: {
+                hostAddress?: string;
+                /** @format byte */
+                address?: string;
+                hostName?: string;
+                linkLocalAddress?: boolean;
+                anyLocalAddress?: boolean;
+                multicastAddress?: boolean;
+                loopbackAddress?: boolean;
+                siteLocalAddress?: boolean;
+                mcglobal?: boolean;
+                mcnodeLocal?: boolean;
+                mclinkLocal?: boolean;
+                mcsiteLocal?: boolean;
+                mcorgLocal?: boolean;
+                canonicalHostName?: string;
+            };
+            /** @format int32 */
+            port?: number;
+            unresolved?: boolean;
+            hostName?: string;
+        };
+        /** @format int64 */
+        ifModifiedSince?: number;
+        /** @format int64 */
+        contentLength?: number;
+        empty?: boolean;
+        /** @format uri */
+        location?: string;
+        all?: Record<string, string>;
+        /** @format int64 */
+        lastModified?: number;
+        /** @format int64 */
+        date?: number;
+        cacheControl?: string;
+        contentDisposition?: ContentDisposition;
+        acceptCharset?: string[];
+        /** @uniqueItems true */
+        allow?: HttpMethod[];
+        bearerAuth?: string;
+        basicAuth?: string;
+        accept?: MediaType[];
+        acceptPatch?: MediaType[];
+        etag?: string;
+        /** @format int64 */
+        expires?: number;
+        ifMatch?: string[];
+        ifNoneMatch?: string[];
+        pragma?: string;
+        upgrade?: string;
+        vary?: string[];
+        range?: HttpRange[];
+        /** @format int64 */
+        accessControlMaxAge?: number;
+        acceptLanguage?: {
+            range?: string;
+            /** @format double */
+            weight?: number;
+        }[];
+        contentLanguage?: string;
+        /** @format int64 */
+        ifUnmodifiedSince?: number;
+        accessControlAllowCredentials?: boolean;
+        acceptLanguageAsLocales?: string[];
+        accessControlAllowHeaders?: string[];
+        accessControlAllowMethods?: HttpMethod[];
+        accessControlAllowOrigin?: string;
+        accessControlExposeHeaders?: string[];
+        accessControlRequestHeaders?: string[];
+        accessControlRequestMethod?: HttpMethod;
+        [key: string]: any;
+    };
+    /**
+     * @deprecated
+     * @format int32
+     */
+    rawStatusCode?: number;
+    bodyConvertFunction?: any;
+    /** @format byte */
+    responseBodyAsByteArray?: string;
+    responseBodyAsString?: string;
+    rootCause?: {
+        cause?: {
+            stackTrace?: {
+                classLoaderName?: string;
+                moduleName?: string;
+                moduleVersion?: string;
+                methodName?: string;
+                fileName?: string;
+                /** @format int32 */
+                lineNumber?: number;
+                className?: string;
+                nativeMethod?: boolean;
+            }[];
+            message?: string;
+            localizedMessage?: string;
+        };
+        stackTrace?: {
+            classLoaderName?: string;
+            moduleName?: string;
+            moduleVersion?: string;
+            methodName?: string;
+            fileName?: string;
+            /** @format int32 */
+            lineNumber?: number;
+            className?: string;
+            nativeMethod?: boolean;
+        }[];
+        message?: string;
+        suppressed?: {
+            stackTrace?: {
+                classLoaderName?: string;
+                moduleName?: string;
+                moduleVersion?: string;
+                methodName?: string;
+                fileName?: string;
+                /** @format int32 */
+                lineNumber?: number;
+                className?: string;
+                nativeMethod?: boolean;
+            }[];
+            message?: string;
+            localizedMessage?: string;
+        }[];
+        localizedMessage?: string;
+    };
+    mostSpecificCause?: {
+        stackTrace?: {
+            classLoaderName?: string;
+            moduleName?: string;
+            moduleVersion?: string;
+            methodName?: string;
+            fileName?: string;
+            /** @format int32 */
+            lineNumber?: number;
+            className?: string;
+            nativeMethod?: boolean;
+        }[];
+        message?: string;
+        localizedMessage?: string;
+    };
+    suppressed?: {
+        stackTrace?: {
+            classLoaderName?: string;
+            moduleName?: string;
+            moduleVersion?: string;
+            methodName?: string;
+            fileName?: string;
+            /** @format int32 */
+            lineNumber?: number;
+            className?: string;
+            nativeMethod?: boolean;
+        }[];
+        message?: string;
+        localizedMessage?: string;
+    }[];
+    localizedMessage?: string;
+}
+
+export interface ContentDisposition {
+    type?: string;
+    name?: string;
+    filename?: string;
+    charset?: string;
+    /**
+     * @deprecated
+     * @format int64
+     */
+    size?: number;
+    /**
+     * @deprecated
+     * @format date-time
+     */
+    creationDate?: string;
+    /**
+     * @deprecated
+     * @format date-time
+     */
+    modificationDate?: string;
+    /**
+     * @deprecated
+     * @format date-time
+     */
+    readDate?: string;
+    inline?: boolean;
+    attachment?: boolean;
+    formData?: boolean;
+}
+
+export type DefaultHttpStatusCode = HttpStatusCode;
+
+export type HttpMethod = any;
+
+export type HttpRange = any;
+
+export enum HttpStatus {
+    Value100CONTINUE = "100 CONTINUE",
+    Value101SWITCHINGPROTOCOLS = "101 SWITCHING_PROTOCOLS",
+    Value102PROCESSING = "102 PROCESSING",
+    Value103EARLYHINTS = "103 EARLY_HINTS",
+    Value103CHECKPOINT = "103 CHECKPOINT",
+    Value200OK = "200 OK",
+    Value201CREATED = "201 CREATED",
+    Value202ACCEPTED = "202 ACCEPTED",
+    Value203NONAUTHORITATIVEINFORMATION = "203 NON_AUTHORITATIVE_INFORMATION",
+    Value204NOCONTENT = "204 NO_CONTENT",
+    Value205RESETCONTENT = "205 RESET_CONTENT",
+    Value206PARTIALCONTENT = "206 PARTIAL_CONTENT",
+    Value207MULTISTATUS = "207 MULTI_STATUS",
+    Value208ALREADYREPORTED = "208 ALREADY_REPORTED",
+    Value226IMUSED = "226 IM_USED",
+    Value300MULTIPLECHOICES = "300 MULTIPLE_CHOICES",
+    Value301MOVEDPERMANENTLY = "301 MOVED_PERMANENTLY",
+    Value302FOUND = "302 FOUND",
+    Value302MOVEDTEMPORARILY = "302 MOVED_TEMPORARILY",
+    Value303SEEOTHER = "303 SEE_OTHER",
+    Value304NOTMODIFIED = "304 NOT_MODIFIED",
+    Value305USEPROXY = "305 USE_PROXY",
+    Value307TEMPORARYREDIRECT = "307 TEMPORARY_REDIRECT",
+    Value308PERMANENTREDIRECT = "308 PERMANENT_REDIRECT",
+    Value400BADREQUEST = "400 BAD_REQUEST",
+    Value401UNAUTHORIZED = "401 UNAUTHORIZED",
+    Value402PAYMENTREQUIRED = "402 PAYMENT_REQUIRED",
+    Value403FORBIDDEN = "403 FORBIDDEN",
+    Value404NOTFOUND = "404 NOT_FOUND",
+    Value405METHODNOTALLOWED = "405 METHOD_NOT_ALLOWED",
+    Value406NOTACCEPTABLE = "406 NOT_ACCEPTABLE",
+    Value407PROXYAUTHENTICATIONREQUIRED = "407 PROXY_AUTHENTICATION_REQUIRED",
+    Value408REQUESTTIMEOUT = "408 REQUEST_TIMEOUT",
+    Value409CONFLICT = "409 CONFLICT",
+    Value410GONE = "410 GONE",
+    Value411LENGTHREQUIRED = "411 LENGTH_REQUIRED",
+    Value412PRECONDITIONFAILED = "412 PRECONDITION_FAILED",
+    Value413PAYLOADTOOLARGE = "413 PAYLOAD_TOO_LARGE",
+    Value413REQUESTENTITYTOOLARGE = "413 REQUEST_ENTITY_TOO_LARGE",
+    Value414URITOOLONG = "414 URI_TOO_LONG",
+    Value414REQUESTURITOOLONG = "414 REQUEST_URI_TOO_LONG",
+    Value415UNSUPPORTEDMEDIATYPE = "415 UNSUPPORTED_MEDIA_TYPE",
+    Value416REQUESTEDRANGENOTSATISFIABLE = "416 REQUESTED_RANGE_NOT_SATISFIABLE",
+    Value417EXPECTATIONFAILED = "417 EXPECTATION_FAILED",
+    Value418IAMATEAPOT = "418 I_AM_A_TEAPOT",
+    Value419INSUFFICIENTSPACEONRESOURCE = "419 INSUFFICIENT_SPACE_ON_RESOURCE",
+    Value420METHODFAILURE = "420 METHOD_FAILURE",
+    Value421DESTINATIONLOCKED = "421 DESTINATION_LOCKED",
+    Value422UNPROCESSABLEENTITY = "422 UNPROCESSABLE_ENTITY",
+    Value423LOCKED = "423 LOCKED",
+    Value424FAILEDDEPENDENCY = "424 FAILED_DEPENDENCY",
+    Value425TOOEARLY = "425 TOO_EARLY",
+    Value426UPGRADEREQUIRED = "426 UPGRADE_REQUIRED",
+    Value428PRECONDITIONREQUIRED = "428 PRECONDITION_REQUIRED",
+    Value429TOOMANYREQUESTS = "429 TOO_MANY_REQUESTS",
+    Value431REQUESTHEADERFIELDSTOOLARGE = "431 REQUEST_HEADER_FIELDS_TOO_LARGE",
+    Value451UNAVAILABLEFORLEGALREASONS = "451 UNAVAILABLE_FOR_LEGAL_REASONS",
+    Value500INTERNALSERVERERROR = "500 INTERNAL_SERVER_ERROR",
+    Value501NOTIMPLEMENTED = "501 NOT_IMPLEMENTED",
+    Value502BADGATEWAY = "502 BAD_GATEWAY",
+    Value503SERVICEUNAVAILABLE = "503 SERVICE_UNAVAILABLE",
+    Value504GATEWAYTIMEOUT = "504 GATEWAY_TIMEOUT",
+    Value505HTTPVERSIONNOTSUPPORTED = "505 HTTP_VERSION_NOT_SUPPORTED",
+    Value506VARIANTALSONEGOTIATES = "506 VARIANT_ALSO_NEGOTIATES",
+    Value507INSUFFICIENTSTORAGE = "507 INSUFFICIENT_STORAGE",
+    Value508LOOPDETECTED = "508 LOOP_DETECTED",
+    Value509BANDWIDTHLIMITEXCEEDED = "509 BANDWIDTH_LIMIT_EXCEEDED",
+    Value510NOTEXTENDED = "510 NOT_EXTENDED",
+    Value511NETWORKAUTHENTICATIONREQUIRED = "511 NETWORK_AUTHENTICATION_REQUIRED",
+}
+
+export interface HttpStatusCode {
+    error?: boolean;
+    is2xxSuccessful?: boolean;
+    is4xxClientError?: boolean;
+    is5xxServerError?: boolean;
+    is1xxInformational?: boolean;
+    is3xxRedirection?: boolean;
+}
+
+export interface MediaType {
+    type?: string;
+    subtype?: string;
+    parameters?: Record<string, string>;
+    /** @format double */
+    qualityValue?: number;
+    wildcardSubtype?: boolean;
+    subtypeSuffix?: string;
+    charset?: string;
+    wildcardType?: boolean;
+    concrete?: boolean;
 }
 
 /** Metadata til en respons etter dokumenter i forsendelse ble opprettet */
@@ -315,16 +646,51 @@ export interface DistribuerJournalpostRequest {
 
 export interface OpprettEttersendingsoppgaveVedleggDto {
     tittel?: string;
+    url?: string;
     vedleggsnr: string;
 }
 
 export interface OpprettEttersendingsppgaveDto {
     tittel: string;
     skjemaId: string;
-    språk: OpprettEttersendingsppgaveDtoSprakEnum;
+    språk: Sprak;
     /** @format int32 */
     innsendingsFristDager: number;
     vedleggsliste: OpprettEttersendingsoppgaveVedleggDto[];
+}
+
+export enum Sprak {
+    NB = "NB",
+    NN = "NN",
+    AR = "AR",
+    DA = "DA",
+    DE = "DE",
+    EN = "EN",
+    EL = "EL",
+    ET = "ET",
+    ES = "ES",
+    FI = "FI",
+    FR = "FR",
+    IS = "IS",
+    IT = "IT",
+    JA = "JA",
+    HR = "HR",
+    LV = "LV",
+    LT = "LT",
+    NL = "NL",
+    PL = "PL",
+    PT = "PT",
+    RO = "RO",
+    RU = "RU",
+    SR = "SR",
+    SL = "SL",
+    SK = "SK",
+    SV = "SV",
+    TH = "TH",
+    TR = "TR",
+    UK = "UK",
+    HU = "HU",
+    VI = "VI",
 }
 
 /** Respons etter bestilt distribusjon */
@@ -343,7 +709,7 @@ export interface OpprettEttersendingsoppgaveResponseDto {
 export interface OpprettEttersendingsoppgaveRequest {
     /** @format int64 */
     forsendelseId: number;
-    tittel: string;
+    tittel?: string;
     ettersendelseForJournalpostId: string;
     skjemaId: string;
 }
@@ -358,17 +724,21 @@ export interface HentDokumentValgRequest {
     vedtakId?: string;
     behandlingId?: string;
     enhet?: string;
+    inneholderAldersjustering?: boolean;
+    erOrkestrertVedtak?: boolean;
     stonadType?: Stonadstype;
     engangsBelopType?: Engangsbeloptype;
     behandlingtypeKonvertert?: string;
 }
 
 export interface DokumentMalDetaljer {
+    malId: string;
     tittel: string;
     type: DokumentMalDetaljerTypeEnum;
     kanBestilles: boolean;
     redigerbar: boolean;
     beskrivelse: string;
+    nyDokumentProduksjon: boolean;
     statiskInnhold: boolean;
     kreverVedtak: boolean;
     kreverBehandling: boolean;
@@ -377,6 +747,11 @@ export interface DokumentMalDetaljer {
     språk: string[];
     tilhorerEnheter: string[];
     alternativeTitler: string[];
+}
+
+export interface HentDokumentValgResponse {
+    dokumentMalDetaljer: Record<string, DokumentMalDetaljer>;
+    automatiskOpprettDokumenter: DokumentMalDetaljer[];
 }
 
 /** Metadata for dokument som skal knyttes til forsendelsen. Første dokument i listen blir automatisk satt som hoveddokument i forsendelsen */
@@ -425,7 +800,10 @@ export interface OppdaterForsendelseResponse {
 }
 
 export interface FerdigstillDokumentRequest {
-    /** @format binary */
+    /**
+     * @format binary
+     * @minLength 1
+     */
     fysiskDokument: File;
     redigeringMetadata?: string;
 }
@@ -575,6 +953,7 @@ export interface ForsendelseResponsTo {
      * @format date
      */
     distribuertDato?: string;
+    unikReferanse?: string;
 }
 
 /** Status på forsendelsen */
@@ -911,14 +1290,6 @@ export enum DokumentDtoArkivSystemEnum {
     UKJENT = "UKJENT",
     BIDRAG = "BIDRAG",
     FORSENDELSE = "FORSENDELSE",
-}
-
-export enum OpprettEttersendingsppgaveDtoSprakEnum {
-    NB = "NB",
-    NN = "NN",
-    DE = "DE",
-    FR = "FR",
-    EN = "EN",
 }
 
 export enum DokumentMalDetaljerTypeEnum {
@@ -1371,7 +1742,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @secure
          */
         opprettForsendelse: (data: OpprettForsendelseForesporsel, params: RequestParams = {}) =>
-            this.request<OpprettForsendelseRespons, OpprettForsendelseRespons>({
+            this.request<OpprettForsendelseRespons, OpprettForsendelseRespons | ConflictException>({
                 path: `/api/forsendelse`,
                 method: "POST",
                 body: data,
@@ -1706,6 +2077,24 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         hentDokumentValg: (data: HentDokumentValgRequest, params: RequestParams = {}) =>
             this.request<Record<string, DokumentMalDetaljer>, any>({
                 path: `/api/forsendelse/dokumentvalg`,
+                method: "POST",
+                body: data,
+                secure: true,
+                type: ContentType.Json,
+                ...params,
+            }),
+
+        /**
+         * @description Henter dokumentmaler som er støttet av applikasjonen
+         *
+         * @tags forsendelse-innsyn-kontroller
+         * @name HentDokumentValgV2
+         * @request POST:/api/forsendelse/dokumentvalgV2
+         * @secure
+         */
+        hentDokumentValgV2: (data: HentDokumentValgRequest, params: RequestParams = {}) =>
+            this.request<HentDokumentValgResponse, any>({
+                path: `/api/forsendelse/dokumentvalgV2`,
                 method: "POST",
                 body: data,
                 secure: true,
@@ -2167,6 +2556,23 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
             }),
 
         /**
+         * @description Hent forsendelser som har ettersending som ikke er oppretttet
+         *
+         * @tags admin-controller
+         * @name ForsendelserEttersendingIkkeOpprettet
+         * @summary Sjekk status på dokumentene i forsendelser og oppdater status hvis det er ute av synk
+         * @request GET:/api/forsendelse/internal/ettersendingIkkeOpprettet
+         * @secure
+         */
+        forsendelserEttersendingIkkeOpprettet: (params: RequestParams = {}) =>
+            this.request<Record<string, string>[], any>({
+                path: `/api/forsendelse/internal/ettersendingIkkeOpprettet`,
+                method: "GET",
+                secure: true,
+                ...params,
+            }),
+
+        /**
          * No description
          *
          * @tags ettersendingsoppgave-controller
@@ -2178,6 +2584,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         hentEksisterendeEttersendingsoppgaverForsendelse: (forsendelseId: string, params: RequestParams = {}) =>
             this.request<Record<string, DokumentSoknadDto[]>, any>({
                 path: `/api/forsendelse/ettersendingsoppgave/oppgaver/${forsendelseId}`,
+                method: "GET",
+                secure: true,
+                ...params,
+            }),
+
+        /**
+         * @description Henter dokumentmaler som er støttet av applikasjonen
+         *
+         * @tags forsendelse-innsyn-kontroller
+         * @name HentDokumentValgForForsendelseV2
+         * @request GET:/api/forsendelse/dokumentvalg/forsendelseV2/{forsendelseIdMedPrefix}
+         * @secure
+         */
+        hentDokumentValgForForsendelseV2: (forsendelseIdMedPrefix: string, params: RequestParams = {}) =>
+            this.request<HentDokumentValgResponse, any>({
+                path: `/api/forsendelse/dokumentvalg/forsendelseV2/${forsendelseIdMedPrefix}`,
                 method: "GET",
                 secure: true,
                 ...params,
