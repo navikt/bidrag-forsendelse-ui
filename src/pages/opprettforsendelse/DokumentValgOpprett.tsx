@@ -6,7 +6,7 @@ export default function DokumentValgOpprett() {
     const { forsendelseId } = useSession();
 
     if (forsendelseId) {
-        return <DokumentValgForsendelse />;
+        return <DokumentValgForsendelse  autoselect/>;
     }
     return <DokumentValgFromQuery />;
 }
