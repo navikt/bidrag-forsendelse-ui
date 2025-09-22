@@ -19,7 +19,7 @@ interface DokumentValgProps {
     automatiskOpprettDokumenter?: DokumentMalDetaljer[];
     showLegend?: boolean;
 }
-export default function DokumentValgMulti({ malDetaljer, automatiskOpprettDokumenter, showLegend }: DokumentValgProps) {
+export default function DokumentValgMulti({ malDetaljer, automatiskOpprettDokumenter = [], showLegend }: DokumentValgProps) {
     const {
         formState: { errors },
         register,
@@ -30,7 +30,7 @@ export default function DokumentValgMulti({ malDetaljer, automatiskOpprettDokume
 
     const alleBrev: TableRowData[] = Object.keys(malDetaljer).map((key) => ({
         malId: key,
-        autovalgt: automatiskOpprettDokumenter.some((a) => a.malId === key),
+        autovalgt: automatiskOpprettDokumenter?.some((a) => a.malId === key),
         tittel: malDetaljer[key].tittel,
         type: malDetaljer[key].type,
     }));
@@ -63,7 +63,7 @@ export default function DokumentValgMulti({ malDetaljer, automatiskOpprettDokume
         <div className="w-100">
             {renderVarselAutomatiskValgt()}
             <CheckboxGroup
-                disabled={!!automatiskOpprettDokumenter}
+                disabled={automatiskOpprettDokumenter?.length > 0}
                 legend={showLegend && <Heading size="small">Velg dokument</Heading>}
                 error={errors?.dokumenter?.message}
             >
