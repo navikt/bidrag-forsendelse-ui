@@ -50,6 +50,7 @@ export default function OpprettNotatPage() {
             tema: data.tema as OpprettForsendelseForesporselTemaEnum,
             språk: data.språk,
             behandlingInfo: mapToBehandlingInfoDto(options),
+            distribuerAutomatiskEtterFerdigstilling: false,
             dokumenter: [
                 {
                     dokumentmalId: dokument.malId,
@@ -57,6 +58,7 @@ export default function OpprettNotatPage() {
                     språk: data.språk,
                     bestillDokument: true,
                     dokumentDato: data.dokumentdato ? `${data.dokumentdato}-00-00-00` : null,
+                    ferdigstill: false
                 },
             ],
         });

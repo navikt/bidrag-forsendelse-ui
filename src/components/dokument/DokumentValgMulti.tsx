@@ -1,6 +1,6 @@
 import { removeNonPrintableCharachters } from "@navikt/bidrag-ui-common";
-import { Checkbox, CheckboxGroup, Heading, Table, Textarea } from "@navikt/ds-react";
-import { useState } from "react";
+import { Alert, BodyShort, Checkbox, CheckboxGroup, Heading, Table, Textarea } from "@navikt/ds-react";
+import { useEffect, useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
 import { DokumentMalDetaljer } from "../../api/BidragForsendelseApi";
@@ -10,23 +10,27 @@ import { DokumentFormProps, DokumentValgTableHeader } from "./DokumentValg";
 interface TableRowData {
     malId: string;
     tittel: string;
+    autovalgt: boolean;
     type: "UTGÅENDE" | "NOTAT";
 }
 
 interface DokumentValgProps {
     malDetaljer: Record<string, DokumentMalDetaljer>;
+    automatiskOpprettDokumenter?: DokumentMalDetaljer[];
     showLegend?: boolean;
 }
-export default function DokumentValgMulti({ malDetaljer, showLegend }: DokumentValgProps) {
+export default function DokumentValgMulti({ malDetaljer, automatiskOpprettDokumenter, showLegend }: DokumentValgProps) {
     const {
         formState: { errors },
         register,
+        setValue
     } = useFormContext<{
         dokumenter: DokumentFormProps[];
     }>();
 
     const alleBrev: TableRowData[] = Object.keys(malDetaljer).map((key) => ({
         malId: key,
+        autovalgt: automatiskOpprettDokumenter.some((a) => a.malId === key),
         tittel: malDetaljer[key].tittel,
         type: malDetaljer[key].type,
     }));
@@ -44,9 +48,22 @@ export default function DokumentValgMulti({ malDetaljer, showLegend }: DokumentV
         },
     });
 
+
+    function renderVarselAutomatiskValgt() {
+        if (automatiskOpprettDokumenter.length > 0) {
+            return <Alert size="small" variant="info">
+                <Heading size="xsmall">Automatisk dokumentvalg</Heading>
+                <BodyShort size="small">Vedtaket består av flere delvedtak. Forside med oppsummering av alle endringer og vedtaksbrev blir opprettet automatisk. Du kan endre på rekkefølgen og legge til dokumenter senere i forsendelsebildet</BodyShort>
+            </Alert>
+        }
+    }
+
+
     return (
         <div className="w-100">
+            {renderVarselAutomatiskValgt()}
             <CheckboxGroup
+                disabled={!!automatiskOpprettDokumenter}
                 legend={showLegend && <Heading size="small">Velg dokument</Heading>}
                 error={errors?.dokumenter?.message}
             >
@@ -91,7 +108,19 @@ function DokumentRow({ row, index }: DokumentRowProps) {
         dokumenter: DokumentFormProps[];
     }>();
     const methods = register(`dokumenter.${index}`);
+
+    useEffect(() => {
+        if (row.autovalgt) {
+            setValue(`dokumenter.${index}`, {
+                malId: row.malId,
+                tittel: title,
+                type: row.type,
+            })
+        }
+
+    }, [])
     function updateValues(malId: string, checked: boolean) {
+        if (row.autovalgt) return;
         if (checked) {
             setValue(`dokumenter.${index}`, {
                 malId,
@@ -113,6 +142,7 @@ function DokumentRow({ row, index }: DokumentRowProps) {
                 <Checkbox
                     size="small"
                     value={row.malId}
+                    defaultChecked={row.autovalgt}
                     onBlur={(e) => {
                         methods.onBlur(e);
                         // @ts-ignore

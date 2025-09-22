@@ -54,7 +54,12 @@ export type OpprettForsendelseFormProps = {
         malId: string;
         tittel: string;
         type: "UTGÅENDE" | "NOTAT";
-    };
+    },
+    dokumenter: {
+        malId: string;
+        tittel: string;
+        type: "UTGÅENDE" | "NOTAT";
+    }[]
     språk: string;
     tema: OpprettForsendelseForesporselTemaEnum | OppdaterForsendelseForesporselTemaEnum;
     enhet: string;
@@ -80,14 +85,18 @@ function mapToOpprettEllerOppdaterForsendelseRequest<
         },
         tema: data.tema,
         språk: data.språk,
-        dokumenter: [
+        dokumenter: data.dokument ? [
             {
                 dokumentmalId: data.dokument.malId,
                 tittel: data.dokument.tittel,
                 språk: data.språk,
             },
-        ],
-    };
+        ] : data.dokumenter.filter((d) => d !== undefined).map(d => ({
+            dokumentmalId: d.malId,
+            tittel: d.tittel,
+            språk: data.språk,
+        }))
+    }
 }
 
 const OPPRETT_FORSENDELSE_MUTATION_KEY = "opprettForsendelse";
@@ -164,6 +173,7 @@ function OpprettForsendelseNy() {
                 ...data,
                 tema: data.tema as OpprettForsendelseForesporselTemaEnum,
             });
+            console.log(data)
             return bidragForsendelseApi.api.opprettForsendelse({
                 ...request,
                 gjelderIdent: data.gjelderIdent,
@@ -171,14 +181,22 @@ function OpprettForsendelseNy() {
                 saksnummer,
                 opprettTittel: true,
                 behandlingInfo: mapToBehandlingInfoDto(options),
-                dokumenter: [
+                distribuerAutomatiskEtterFerdigstilling: false,
+                dokumenter: data.dokument ? [
                     {
                         dokumentmalId: data.dokument.malId,
                         tittel: data.dokument.tittel,
                         språk: data.språk,
                         bestillDokument: true,
+                        ferdigstill: false
                     },
-                ],
+                ] : data.dokumenter.filter((d) => d !== undefined).map(d => ({
+                    dokumentmalId: d.malId,
+                    tittel: d.tittel,
+                    språk: data.språk,
+                    bestillDokument: true,
+                    ferdigstill: false
+                })),
             });
         },
         onError: (error: AxiosError) => {
