@@ -6,6 +6,7 @@ import { useEffect } from "react";
 export default function useFeatureToogle() {
     const isMockEnabled = process.env.ENABLE_MOCK === "true";
     const enableEttersendingsoppgave = useFlag("forsendelse.ettersendingsoppgave");
+    const visDokumentmalKode = useFlag("forsendelse.vis_dokumentmalkode");
     const utvikler = useFlag("bidrag.utvikler");
     const client = useUnleashClient();
     const { data: userId } = useQuery({
@@ -26,6 +27,7 @@ export default function useFeatureToogle() {
     }, [enableEttersendingsoppgave, utvikler]);
     return {
         isEttersendingsoppgaveEnabled: enableEttersendingsoppgave,
+        visDokumentmalKode: visDokumentmalKode,
         isDeveloper: utvikler,
     };
 }

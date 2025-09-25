@@ -6,6 +6,7 @@ import { useFormContext, useWatch } from "react-hook-form";
 import { DokumentMalDetaljer } from "../../api/BidragForsendelseApi";
 import environment from "../../environment";
 import { DokumentFormProps, DokumentValgTableHeader } from "./DokumentValg";
+import useFeatureToogle from "../../hooks/useFeatureToggle";
 
 interface TableRowData {
     malId: string;
@@ -104,6 +105,7 @@ interface DokumentRowProps {
 }
 function DokumentRow({ row, index }: DokumentRowProps) {
     const [title, setTitle] = useState<string>(row.tittel);
+    const {visDokumentmalKode} = useFeatureToogle()
     const { register, setValue, resetField } = useFormContext<{
         dokumenter: DokumentFormProps[];
     }>();
@@ -157,7 +159,7 @@ function DokumentRow({ row, index }: DokumentRowProps) {
                     {""}
                 </Checkbox>
             </Table.DataCell>
-            {environment.feature.visDokumentmalKode && <Table.DataCell width="1%">{row.malId}</Table.DataCell>}
+            {visDokumentmalKode && <Table.DataCell width="1%">{row.malId}</Table.DataCell>}
             <Table.DataCell width="100%">
                 <EditableTitle index={index} malId={row.malId} tittel={row.tittel} onTitleChange={onTitleChange} />
             </Table.DataCell>

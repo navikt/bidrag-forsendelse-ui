@@ -7,6 +7,7 @@ import { DokumentMalDetaljer } from "../../api/BidragForsendelseApi";
 import DokumentvalgTittel from "../../docs/DokumentvalgTittel.mdx";
 import environment from "../../environment";
 import InfoKnapp from "../InfoKnapp";
+import useFeatureToogle from "../../hooks/useFeatureToggle";
 
 interface TableRowData {
     malId: string;
@@ -114,11 +115,12 @@ function DokumentValgTable({ rows, onTitleChange }: IDokumentValgTableProps) {
 }
 
 export function DokumentValgTableHeader() {
+    const { visDokumentmalKode } = useFeatureToogle()
     return (
         <Table.Header>
             <Table.Row>
                 <Table.HeaderCell></Table.HeaderCell>
-                {environment.feature.visDokumentmalKode && <Table.HeaderCell>Mal</Table.HeaderCell>}
+                {visDokumentmalKode && <Table.HeaderCell>Mal</Table.HeaderCell>}
                 <Table.HeaderCell>
                     <div className="flex flex-row gap-1 items-center">
                         <div>Tittel</div>
@@ -137,6 +139,7 @@ interface DokumentValgTableProps {
     onTitleChange: (malId: string, tittel: string) => void;
 }
 function DokumentValgTableRows({ rows, onTitleChange }: DokumentValgTableProps) {
+    const { visDokumentmalKode } = useFeatureToogle()
     return (
         <Table.Body>
             {rows.map((row) => (
@@ -146,7 +149,7 @@ function DokumentValgTableRows({ rows, onTitleChange }: DokumentValgTableProps) 
                             {""}
                         </Radio>
                     </Table.DataCell>
-                    {environment.feature.visDokumentmalKode && <Table.DataCell width="1%">{row.malId}</Table.DataCell>}
+                    {visDokumentmalKode && <Table.DataCell width="1%">{row.malId}</Table.DataCell>}
                     <Table.DataCell width="100%">
                         <EditableTitle row={row} onTitleChange={(value) => onTitleChange(row.malId, value)} />
                     </Table.DataCell>
