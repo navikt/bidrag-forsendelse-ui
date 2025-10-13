@@ -44,9 +44,17 @@ export const visAndreVedleggskoder: KodeBeskrivelse[] = [
         kode: "N6_FYLLUT_SÆRBIDRAG",
         beskrivelse: "Søknad om særbidrag",
     },
-      {
+    {
         kode: "N6_FYLLUT_SÆRBIDRAG_SVAR",
         beskrivelse: "Svar i sak om særbidrag",
+    },
+    {
+        kode: "N6_FYLLUT_UTTALELSE_BARNEBIDRAG",
+        beskrivelse: "Uttalelse i barnebidragssaken din",
+    },
+    {
+        kode: "N6_FYLLUT_MELDING_SKATT_INNKREVING_BARNEBIDRAG",
+        beskrivelse: "Melding om at Skatteetaten skal kreve inn barnebidraget",
     },
     {
         kode: "N6_FYLLUT_SØKNAD_18_SVAR",
