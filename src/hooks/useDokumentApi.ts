@@ -141,14 +141,23 @@ export const useDistribusjonKanal = (): BestemKanalResponse => {
             //         regelBegrunnelse: "Gjelder er ulik mottaker",
             //         regel: "",
             //     };
-            return (
-                await bidragDokumentArkivApi.journal.hentDistribusjonKanal({
-                    mottakerId,
-                    gjelderId,
-                    tema: forsendelse.tema,
-                    forsendelseStoerrelse: størrelseIMb,
-                })
-            )?.data;
+            try {
+                return (
+                    await bidragDokumentArkivApi.journal.hentDistribusjonKanal({
+                        mottakerId,
+                        gjelderId,
+                        tema: forsendelse.tema,
+                        forsendelseStoerrelse: størrelseIMb,
+                    })
+                )?.data;
+            } catch (error) {
+                return {
+                    distribusjonskanal: BestemKanalResponseDistribusjonskanalEnum.PRINT,
+                    regelBegrunnelse: "Gjelder er ulik mottaker",
+                    regel: "",
+                };
+            }
+
         },
     });
 
