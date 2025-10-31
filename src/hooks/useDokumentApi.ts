@@ -135,12 +135,12 @@ export const useDistribusjonKanal = (): BestemKanalResponse => {
     const result = useSuspenseQuery({
         queryKey: DokumentQueryKeys.hentDistribusjonKanal(mottakerId, mottakerId),
         queryFn: async () => {
-            // if (gjelderId !== mottakerId)
-            //     return {
-            //         distribusjonskanal: BestemKanalResponseDistribusjonskanalEnum.PRINT,
-            //         regelBegrunnelse: "Gjelder er ulik mottaker",
-            //         regel: "",
-            //     };
+            if (!mottakerId)
+                return {
+                    distribusjonskanal: BestemKanalResponseDistribusjonskanalEnum.PRINT,
+                    regelBegrunnelse: "Gjelder er ulik mottaker",
+                    regel: "",
+                };
             try {
                 return (
                     await bidragDokumentArkivApi.journal.hentDistribusjonKanal({
