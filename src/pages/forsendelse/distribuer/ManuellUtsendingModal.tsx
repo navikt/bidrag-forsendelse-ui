@@ -83,7 +83,7 @@ export default function ManuellUtsendingModal({ onCancel }: ManuellUtsendingModa
                 </div>
             </Modal.Body>
             <Modal.Footer className="flex items-center pt-2 space-x-2 ">
-                <Button size="small" variant={"primary"} onClick={onSubmit} loading={distribuerMutation.isPending}>
+                <Button size="small" variant={"primary"} onClick={onSubmit} loading={distribuerMutation.isPending || distribuerMutation.isSuccess}>
                     Bekreft og gå tilbake til sakshistorikk
                 </Button>
                 <Button size="small" variant={"tertiary"} disabled={distribuerMutation.isPending} onClick={onCancel}>
