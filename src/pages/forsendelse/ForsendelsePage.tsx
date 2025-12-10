@@ -134,7 +134,9 @@ function BottomButtons() {
     return (
         <div className={"mt-2 flex flex-row gap-[5px]"}>
             <SendButton />
-            <AvvikshandteringButton />
+            <React.Suspense fallback={<Loader size="xsmall" />}>
+                <AvvikshandteringButton />
+            </React.Suspense>
         </div>
     );
 }

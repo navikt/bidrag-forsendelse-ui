@@ -173,7 +173,6 @@ function OpprettForsendelseNy() {
                 ...data,
                 tema: data.tema as OpprettForsendelseForesporselTemaEnum,
             });
-            console.log(data)
             return bidragForsendelseApi.api.opprettForsendelse({
                 ...request,
                 gjelderIdent: data.gjelderIdent,

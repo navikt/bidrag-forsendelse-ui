@@ -19,7 +19,7 @@ import {
     VStack,
 } from "@navikt/ds-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Suspense, useMemo, useState } from "react";
+import React, { Suspense, useMemo, useState } from "react";
 import { FormProvider, useFieldArray, useForm, useFormContext, useWatch } from "react-hook-form";
 
 import {
@@ -52,7 +52,7 @@ export default function OpprettEttersendelseOppgaveButton() {
     if (!isEttersendingsoppgaveEnabled) return;
     if (forsendelse.gjelderIdent !== forsendelse.mottaker?.ident) return;
     return (
-        <>
+        <React.Suspense fallback={<Loader size="xsmall" />}>
             {forsendelse.ettersendingsoppgave ? (
                 <EttersendelseOppgavePanel />
             ) : (
@@ -63,7 +63,7 @@ export default function OpprettEttersendelseOppgaveButton() {
                     <OpprettEttersendelseOppgaveModal isOpen={isOpen} setIsOpen={setIsOpen} />
                 </>
             )}
-        </>
+        </React.Suspense>
     );
 }
 
@@ -125,19 +125,21 @@ function OpprettEttersendelseOppgaveModal({
                 </Modal.Header>
                 <Modal.Body>
                     <FormProvider {...form}>
-                        <EksisterendeOppgaveVarsel />
-                        <VarselForJournalpostSelect />
-                        {journalpostId === navAnnenSkjema && (
-                            <>
-                                <TextField
-                                    className="w-[300px] pt-2"
-                                    size="small"
-                                    label="Tittel"
-                                    {...form.register(`tittel`)}
-                                    error={form.formState?.errors?.tittel?.message}
-                                />
-                            </>
-                        )}
+                        <React.Suspense fallback={<Loader size="xsmall" />}>
+                            <EksisterendeOppgaveVarsel />
+                            <VarselForJournalpostSelect />
+                            {journalpostId === navAnnenSkjema && (
+                                <>
+                                    <TextField
+                                        className="w-[300px] pt-2"
+                                        size="small"
+                                        label="Tittel"
+                                        {...form.register(`tittel`)}
+                                        error={form.formState?.errors?.tittel?.message}
+                                    />
+                                </>
+                            )}
+                        </React.Suspense>
                     </FormProvider>
                 </Modal.Body>
                 <Modal.Footer>
