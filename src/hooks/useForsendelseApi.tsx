@@ -283,6 +283,7 @@ export function useHentForsendelseQuery(): IForsendelse {
             const forsendelse = data as IForsendelse;
             const hasDokumentsWithStatus = forsendelse.dokumenter.some((d) =>
                 [
+                    "IKKE_BESTILT",
                     "UNDER_PRODUKSJON",
                     "BESTILLING_FEILET",
                     "UNDER_PRODUKSJON",
