@@ -3,12 +3,10 @@ import "./ForsendelseDetaljer.css";
 import { dateToDDMMYYYYString } from "@navikt/bidrag-ui-common";
 import { BodyLong, Label } from "@navikt/ds-react";
 
-import { mapToDistribusjonKanalBeskrivelse } from "../../../helpers/forsendelseHelpers";
-import { useDistribusjonKanal } from "../../../hooks/useDokumentApi";
 import { useHentForsendelseQuery } from "../../../hooks/useForsendelseApi";
+import { Distribusjonskanal } from "./Distribusjonskanal";
 export default function ForsendelseDetaljer() {
     const forsendelse = useHentForsendelseQuery();
-    const distribusjonKanal = useDistribusjonKanal();
 
     return (
         <div>
@@ -31,7 +29,7 @@ export default function ForsendelseDetaljer() {
                         },
                         {
                             label: "Distribusjonskanal",
-                            value: mapToDistribusjonKanalBeskrivelse(distribusjonKanal.distribusjonskanal),
+                            value: <Distribusjonskanal/>,
                         },
                     ]}
                 />
@@ -43,7 +41,7 @@ export default function ForsendelseDetaljer() {
 interface DetailsColumnProps {
     rows: {
         label: string;
-        value: string;
+        value: string | JSX.Element;
     }[];
 }
 function DetailsGrid({ rows }: DetailsColumnProps) {
