@@ -1,8 +1,8 @@
 import ObjectUtils from "@navikt/bidrag-ui-common/esm/utils/ObjectUtils";
-import { Button, ErrorSummary, Heading, Page, VStack } from "@navikt/ds-react";
+import { Button, ErrorSummary, Heading, Loader, Page, VStack } from "@navikt/ds-react";
 import { useIsMutating, useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { FieldErrors, FormProvider, useForm, useFormContext } from "react-hook-form";
 
 import { useBidragForsendelseApi } from "../../api/api";
@@ -256,9 +256,11 @@ function OpprettForsendelsContainer({ onSubmit, tittel }: OpprettForsendelsConta
                                 <GjelderSelect roller={roller} />
                                 <MottakerSelect />
                                 <LanguageAndTemaSelect />
-                                <div className="w-2/3">
-                                    <DokumentValgOpprett />
-                                </div>
+                                <React.Suspense fallback={<Loader size="xsmall" />}>
+                                    <div className="w-2/3">
+                                        <DokumentValgOpprett />
+                                    </div>
+                                </React.Suspense>
                                 <BidragErrorPanel />
                                 <OpprettForsendelsValidationErrorSummary />
                                 <div className="flex flex-row gap-2 pt-4">
