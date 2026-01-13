@@ -7,29 +7,35 @@ import { DOKUMENT_KAN_IKKE_ÅPNES_STATUS, DokumentStatus } from "../../constants
 import { queryClient } from "../../pages/PageWrapper";
 import { IJournalpostStatus } from "../../types/Journalpost";
 import EditDocumentButton from "./EditDocumentButton";
+import useFeatureToogle from "../../hooks/useFeatureToggle";
+import { useFlag } from "@unleash/proxy-client-react";
 
 interface IOpenDokumentButtonProps {
     dokumentreferanse?: string;
     journalpostId?: string;
     status?: DokumentStatus | string | IJournalpostStatus;
     erSkjema?: boolean;
+    erRedigerbar?: boolean;
 }
 export default function OpenDokumentButton({
     dokumentreferanse,
     status,
     journalpostId,
     erSkjema,
+    erRedigerbar,
 }: IOpenDokumentButtonProps) {
     const [isOpeningIframe, setIsOpeningIframe] = useState(false);
     if (DOKUMENT_KAN_IKKE_ÅPNES_STATUS.includes(status as DokumentStatus | IJournalpostStatus)) {
         return null;
     }
-    if (status === "MÅ_KONTROLLERES" || status === "KONTROLLERT") {
+    const kanRedigeres = erRedigerbar && useFlag("forsendelse.redigering_av_dokumenter");
+    if (status === "MÅ_KONTROLLERES" || status === "KONTROLLERT" || kanRedigeres) {
         return (
             <EditDocumentButton
                 journalpostId={journalpostId}
                 dokumentreferanse={dokumentreferanse}
                 erSkjema={erSkjema}
+                erRedigerbar={erRedigerbar}
                 onEditFinished={() => queryClient.invalidateQueries({ queryKey: ["forsendelse"] })}
             />
         );

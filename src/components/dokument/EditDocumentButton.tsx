@@ -20,6 +20,7 @@ interface EditDocumentButtonProps {
     journalpostId: string;
     dokumentreferanse?: string;
     erSkjema?: boolean;
+    erRedigerbar?: boolean;
     editedDocument?: EditDocumentBroadcastMessage;
     onEditFinished: (document?: EditDocumentBroadcastMessage) => void;
     onEditStarted?: () => void;
@@ -38,10 +39,13 @@ async function editDocument(
     journalpostId: string,
     dokumentreferanse: string,
     erSkjema?: boolean,
+    erRedigerbar?: boolean,
     editedDocument?: EditDocumentBroadcastMessage
 ) {
     const windowId = uuidV4();
-    if (erSkjema) {
+    if (erRedigerbar) {
+        openDocumentEditor(journalpostId, dokumentreferanse, editedDocument, windowId);
+    } else if (erSkjema) {
         openDocumentSkjemaEditor(journalpostId, dokumentreferanse, editedDocument, windowId);
     } else {
         OpenDocumentUtils.openDocumentMaskingEditor(journalpostId, dokumentreferanse, editedDocument, windowId);
@@ -53,12 +57,19 @@ async function editDocument(
 function waitForDocumentEditFinished(id: string): Promise<BroadcastMessage<EditDocumentBroadcastMessage>> {
     return Broadcast.waitForBroadcast(BroadcastNames.EDIT_DOCUMENT_RESULT, id);
 }
-
+function openDocumentEditor(forsendelseId, dokumentreferanse, editedDocument, id) {
+    LoggerService.info(`Åpner redigering av forsendelse ${forsendelseId} og dokument ${dokumentreferanse} på nettleser`);
+    if (id && editedDocument) {
+        EditorConfigStorage.save(id, editedDocument?.config);
+    }
+    window.open(`/rediger/editor/${forsendelseId}/${dokumentreferanse}?id=${id}`);
+}
 export default function EditDocumentButton({
     journalpostId,
     dokumentreferanse,
     editedDocument,
     onEditFinished,
+    erRedigerbar,
     erSkjema,
     onEditStarted,
 }: PropsWithChildren<EditDocumentButtonProps>) {
@@ -66,7 +77,7 @@ export default function EditDocumentButton({
     function _editDocument() {
         onEditStarted?.();
         setIsWaiting(true);
-        editDocument(journalpostId, dokumentreferanse, erSkjema, editedDocument)
+        editDocument(journalpostId, dokumentreferanse, erSkjema, erRedigerbar, editedDocument)
             .then(onEditFinished)
             .finally(() => setIsWaiting(false));
     }
