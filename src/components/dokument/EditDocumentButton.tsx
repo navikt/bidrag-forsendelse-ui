@@ -9,12 +9,12 @@ import {
 } from "@navikt/bidrag-ui-common";
 import { Close } from "@navikt/ds-icons";
 import { ExternalLink } from "@navikt/ds-icons";
-import { Button } from "@navikt/ds-react";
+import { BodyShort, Button } from "@navikt/ds-react";
 import React, { PropsWithChildren, useState } from "react";
 import { v4 as uuidV4 } from "uuid";
 
 import { IDokument } from "../../types/Dokument";
-
+import { DocPencilIcon } from '@navikt/aksel-icons';
 interface EditDocumentButtonProps {
     dokumentList?: IDokument[];
     journalpostId: string;
@@ -88,7 +88,7 @@ export default function EditDocumentButton({
                 loading={isWaiting}
                 variant="tertiary"
                 onClick={_editDocument}
-                icon={<ExternalLink fr="true" />}
+                icon={erRedigerbar ? <div className="flex"><DocPencilIcon fr="true" /></div> : <ExternalLink />}
                 size={"small"}
                 type={"button"}
             />

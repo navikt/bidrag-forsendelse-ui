@@ -24,12 +24,11 @@ export default function OpenDokumentButton({
     erSkjema,
     erRedigerbar,
 }: IOpenDokumentButtonProps) {
-    const [isOpeningIframe, setIsOpeningIframe] = useState(false);
     if (DOKUMENT_KAN_IKKE_ÅPNES_STATUS.includes(status as DokumentStatus | IJournalpostStatus)) {
         return null;
     }
-    const kanRedigeres = erRedigerbar && useFlag("forsendelse.redigering_av_dokumenter");
-    if (status === "MÅ_KONTROLLERES" || status === "KONTROLLERT" || kanRedigeres) {
+    const kanRedigeres = erRedigerbar && useFlag("forsendelse.redigering_av_dokumenter") && status == DokumentStatus.UNDER_REDIGERING;
+    if (status === "MÅ_KONTROLLERES" || status === "KONTROLLERT") {
         return (
             <EditDocumentButton
                 journalpostId={journalpostId}
@@ -41,19 +40,43 @@ export default function OpenDokumentButton({
         );
     }
 
-    const id = `doklink_${journalpostId}_${dokumentreferanse}`;
-    function openDocumentIframe() {
+    if (kanRedigeres){
+        return <>
+            <ÅpneDokumentWord dokumentreferanse={dokumentreferanse} journalpostId={journalpostId} />
+             <EditDocumentButton
+                journalpostId={journalpostId}
+                dokumentreferanse={dokumentreferanse}
+                erSkjema={erSkjema}
+                erRedigerbar={erRedigerbar}
+                onEditFinished={() => queryClient.invalidateQueries({ queryKey: ["forsendelse"] })}
+            />
+
+        </>
+    }
+
+
+    // if (status == "UNDER_REDIGERING") {
+    //     return <MbdokUrl dokumentreferanse={dokumentreferanse} journalpostId={journalpostId} />;
+    // }
+    return <ÅpneDokumentWord dokumentreferanse={dokumentreferanse} journalpostId={journalpostId} />;
+}
+
+function ÅpneDokumentWord({
+    dokumentreferanse,
+    journalpostId,
+}: IOpenDokumentButtonProps){
+        const [isOpeningIframe, setIsOpeningIframe] = useState(false);
+
+      function openDocumentIframe() {
         setIsOpeningIframe(true);
         document.getElementById(id).click();
         setTimeout(() => {
             setIsOpeningIframe(false);
         }, 4000);
     }
-    // if (status == "UNDER_REDIGERING") {
-    //     return <MbdokUrl dokumentreferanse={dokumentreferanse} journalpostId={journalpostId} />;
-    // }
-    return (
-        <>
+        const id = `doklink_${journalpostId}_${dokumentreferanse}`;
+
+     return ( <>
             <Button
                 as="span"
                 size={"small"}
@@ -68,8 +91,7 @@ export default function OpenDokumentButton({
                 id={id}
                 path={OpenDocumentUtils.getÅpneDokumentLenke(journalpostId, dokumentreferanse, false, true)}
             />
-        </>
-    );
+        </>)
 }
 
 // function MbdokUrl({ dokumentreferanse, journalpostId }: IOpenDokumentButtonProps) {
