@@ -7,6 +7,7 @@ import { usePersonApi, useSamhandlerApi } from "../api/api";
 import { MottakerAdresseTo } from "../api/BidragForsendelseApi";
 import { PersonAdresseDto, PersonDto } from "../api/BidragPersonApi";
 import { countryCodeIso3ToIso2 } from "../utils/AdresseUtils";
+import { StringUtils } from "@navikt/bidrag-ui-common";
 
 type PersonInfo = { ident: string; navn?: string; valid?: boolean; adresse?: MottakerAdresseTo };
 
@@ -26,7 +27,7 @@ export const useHentPerson = (ident?: string): PersonDto => {
     const { data: personData } = useSuspenseQuery({
         queryKey: PersonApiQueryKeys.hentPerson(ident),
         queryFn: async () => {
-            if (!ident) return { ident, visningsnavn: "" };
+            if (!ident || StringUtils.isEmpty(ident)) return { ident, visningsnavn: "" };
             return (await personApi.informasjon.hentPersonPost({ ident }))?.data;
         },
     });
