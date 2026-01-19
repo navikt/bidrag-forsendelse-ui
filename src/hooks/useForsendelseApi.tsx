@@ -4,6 +4,7 @@ import {
     RolleType,
     RolleTypeAbbreviation,
     RolleTypeFullName,
+    StringUtils,
 } from "@navikt/bidrag-ui-common";
 import IdentUtils from "@navikt/bidrag-ui-common/esm/utils/IdentUtils";
 import { useSuspenseQueries, useSuspenseQuery } from "@tanstack/react-query";
@@ -141,7 +142,7 @@ export const useHentRoller = () => {
         queries: idents.map((ident) => ({
             queryKey: ["person", ident],
             queryFn: async () => {
-                if (!ident) return { ident: "", visningsnavn: "Ukjent" };
+                if (!ident || StringUtils.isEmpty(ident)) return { ident: "", visningsnavn: "Ukjent" };
                 const { data } = await personApi.informasjon.hentPersonPost({ ident });
                 return data;
             },
