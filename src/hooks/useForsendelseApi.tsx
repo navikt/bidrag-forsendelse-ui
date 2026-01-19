@@ -1,5 +1,6 @@
 import {
     IRolleDetaljer,
+    isStringEmpty,
     ObjectUtils,
     RolleType,
     RolleTypeAbbreviation,
@@ -142,7 +143,7 @@ export const useHentRoller = () => {
         queries: idents.map((ident) => ({
             queryKey: ["person", ident],
             queryFn: async () => {
-                if (!ident || StringUtils.isEmpty(ident)) return { ident: "", visningsnavn: "Ukjent" };
+                if (!ident || isStringEmpty(ident)) return { ident: "", visningsnavn: "Ukjent" };
                 const { data } = await personApi.informasjon.hentPersonPost({ ident });
                 return data;
             },

@@ -7,7 +7,7 @@ import { usePersonApi, useSamhandlerApi } from "../api/api";
 import { MottakerAdresseTo } from "../api/BidragForsendelseApi";
 import { PersonAdresseDto, PersonDto } from "../api/BidragPersonApi";
 import { countryCodeIso3ToIso2 } from "../utils/AdresseUtils";
-import { StringUtils } from "@navikt/bidrag-ui-common";
+import { isStringEmpty, StringUtils } from "@navikt/bidrag-ui-common";
 
 type PersonInfo = { ident: string; navn?: string; valid?: boolean; adresse?: MottakerAdresseTo };
 
@@ -27,7 +27,7 @@ export const useHentPerson = (ident?: string): PersonDto => {
     const { data: personData } = useSuspenseQuery({
         queryKey: PersonApiQueryKeys.hentPerson(ident),
         queryFn: async () => {
-            if (!ident || StringUtils.isEmpty(ident)) return { ident, visningsnavn: "" };
+            if (!ident || isStringEmpty(ident)) return { ident, visningsnavn: "" };
             return (await personApi.informasjon.hentPersonPost({ ident }))?.data;
         },
     });
@@ -41,7 +41,7 @@ export const useHentSamhandlerEllerPersonForIdent = (ident: string) => {
     return useQuery({
         queryKey: PersonApiQueryKeys.hentAktorForIdent(ident),
         queryFn: async (): Promise<PersonInfo> => {
-            if (ObjectUtils.isEmpty(ident)) return { ident, valid: false };
+            if (ObjectUtils.isEmpty(ident) || isStringEmpty(ident)) return { ident, valid: false };
             if (IdentUtils.isSamhandlerId(ident)) {
                 const result = await samhandlerApi.samhandler.hentSamhandler(JSON.stringify(ident));
                 if (result.status !== 200) throw Error(`Fant ikke samhandler med ident ${ident}`);
