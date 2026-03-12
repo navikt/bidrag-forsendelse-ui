@@ -1,4 +1,5 @@
 ## Bidrag-forsendelse-ui
+## Repoet er overført til [bidrag-ui](https://github.com/navikt/bidrag-ui)
 Bidrag UI app for opprettelse og behandling av forsendelse
 
 ## Kjøre lokalt
